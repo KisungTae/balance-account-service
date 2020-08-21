@@ -1,17 +1,30 @@
-jdbc:
-  driver:com.mysql.jdbc.Driver
+spring:
+  profiles:
+    include:
+      - credential
 
-connectionPool:
-  initialPoolSize:5
-  minPoolSize:5
-  maxPoolSize:20
-  maxIdleTime:3000
+jdbc:
+  driver: com.mysql.jdbc.Driver
 
 hibernate:
-  entityPackageToScan:com.kokotripadmin.entity
-  hibernateDialect:org.hibernate.dialect.MySQLDialect
-  showSql:true
+  hibernateDialect: org.hibernate.dialect.MySQLDialect
+  showSql: true
+#  useSecondLevelCache: true
+#  regionFactoryClass: org.hibernate.cache.ehcache.EhCacheRegionFactory
+#  useQueryCache: true
 
-webMvc:
-  messageSourcePath:classpath:messages
-  messageSourceDefaultEncoding:UTF-8
+connection-pool:
+  initialPoolSize: 5
+  minPoolSize: 5
+  maxPoolSize: 20
+  maxIdleTime: 3000
+
+web-mvc:
+  messageSourcePath: classpath:messages
+#  resourcePathPattern: /resources/**
+#  resourceLocation: /resources/
+#  cachedPeriod: 31556926
+#  localeParamName: lang
+
+jpa:
+  entityPackageToScan: com.beeswork.balanceaccountservice.entity

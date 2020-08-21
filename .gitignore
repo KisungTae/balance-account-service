@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### Credential ###
-src/main/resources/credential.yaml
+src/main/resources/application-credential.yaml
