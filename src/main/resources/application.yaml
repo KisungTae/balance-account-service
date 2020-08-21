@@ -1,0 +1,17 @@
+jdbc:
+  driver:com.mysql.jdbc.Driver
+
+connectionPool:
+  initialPoolSize:5
+  minPoolSize:5
+  maxPoolSize:20
+  maxIdleTime:3000
+
+hibernate:
+  entityPackageToScan:com.kokotripadmin.entity
+  hibernateDialect:org.hibernate.dialect.MySQLDialect
+  showSql:true
+
+webMvc:
+  messageSourcePath:classpath:messages
+  messageSourceDefaultEncoding:UTF-8
