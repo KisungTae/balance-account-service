@@ -123,12 +123,16 @@
 -- normal like does not cost, heart like costs, watch ad every 15 user cards, change question costs, add question does not costs
 
 
+
 -- facebook, kakao, naver, google
 create table account_type
 (
     id          serial primary key,
     description varchar(20)
 );
+
+select *
+from account_type;
 
 -- enabled for unregister account
 create table account
