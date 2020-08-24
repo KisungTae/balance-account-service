@@ -123,7 +123,6 @@
 -- normal like does not cost, heart like costs, watch ad every 15 user cards, change question costs, add question does not costs
 
 
-
 -- facebook, kakao, naver, google
 create table account_type
 (
@@ -134,24 +133,26 @@ create table account_type
 select *
 from account_type;
 
--- enabled for unregister account
+-- unregister deletes account
+-- favor count will be reset on every night
 create table account
 (
-    id              serial primary key,
-    enabled         bit(1)                 not null,
-    blocked         bit(1)                 not null,
-    name            varchar(50)            not null,
-    email           varchar(256) unique    not null,
-    birth           int                    not null,
-    gender          bit(1)                 not null,
-    about           varchar(500)           not null,
-    score           int                    not null,
-    index           int                    not null,
-    point           int                    not null,
-    location        geography(point, 4326) not null,
-    account_type_id int                    not null,
-    created_at      timestamp              not null,
-    updated_at      timestamp              not null,
+    id                     serial primary key,
+    blocked                bit(1)                 not null,
+    name                   varchar(50)            not null,
+    email                  varchar(256) unique    not null,
+    birth                  int                    not null,
+    gender                 bit(1)                 not null,
+    about                  varchar(500)           not null,
+    score                  int                    not null,
+    index                  int                    not null,
+    point                  int                    not null,
+    favor_count            int                    not null,
+    favor_count_updated_at timestamp              not null,
+    location               geography(point, 4326) not null,
+    account_type_id        int                    not null,
+    created_at             timestamp              not null,
+    updated_at             timestamp              not null,
 
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
@@ -166,9 +167,12 @@ create table photo
     url        varchar(1000) not null,
     account_id int           not null,
     created_at timestamp     not null,
+    updated_at timestamp     not null,
 
     constraint photo_account_id_fk foreign key (account_id) references account (id)
 );
+
+
 
 create table question
 (
@@ -308,6 +312,18 @@ create table report_resolution
 
     constraint report_resolution_report_id_fk foreign key (report_id) references report (id),
     constraint report_resolution_report_resolution_type_id_fk foreign key (report_resolution_type_id) references report_resolution_type (id)
+);
+
+-- download deleted photo with email + sequence + date
+create table deleted_photo
+(
+    id         serial primary key,
+    url        varchar(256) not null,
+    report_id  int          not null,
+    admin_id   int          not null,
+    created_at timestamp    not null,
+
+    constraint deleted_photo_report_id_fk foreign key (report_id) references report (id)
 );
 
 create table unblock

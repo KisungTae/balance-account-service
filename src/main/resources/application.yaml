@@ -37,6 +37,13 @@ logging:
 #    org.springframework.web: ERROR
     org.hibernate: TRACE
 
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: beans
+
 #spring:
 #  jpa:
 #    hibernate:

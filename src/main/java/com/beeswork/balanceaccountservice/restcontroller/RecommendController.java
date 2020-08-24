@@ -42,12 +42,14 @@ public class RecommendController {
 
         AccountType accountType = new AccountType();
         accountType.setDescription("페이스북 로그인");
-        accountTypeRepository.save(accountType);
 
+
+        accountTypeRepository.test();
 
         List<AccountType> accountTypes = new JPAQueryFactory(entityManager).selectFrom(QAccountType.accountType)
                                                                            .where(QAccountType.accountType.description.like("%페이스%"))
                                                                            .fetch();
+
 
 
 
