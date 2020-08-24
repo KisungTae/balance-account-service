@@ -159,7 +159,6 @@ create table account
 
 CREATE INDEX account_location_idx ON account USING GIST (location);
 
--- photo url is constant, you can just overwrite the pic in S3 so that you don't have to change url every time users change their pics
 create table photo
 (
     id         serial primary key,
@@ -314,11 +313,13 @@ create table report_resolution
     constraint report_resolution_report_resolution_type_id_fk foreign key (report_resolution_type_id) references report_resolution_type (id)
 );
 
--- download deleted photo with email + sequence + date
+
+
 create table deleted_photo
 (
     id         serial primary key,
     url        varchar(256) not null,
+    stored_at  varchar(256) not null,
     report_id  int          not null,
     admin_id   int          not null,
     created_at timestamp    not null,
