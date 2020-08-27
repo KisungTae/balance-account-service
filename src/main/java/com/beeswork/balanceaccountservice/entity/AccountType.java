@@ -3,6 +3,8 @@ package com.beeswork.balanceaccountservice.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
+import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
 
@@ -22,5 +24,5 @@ public class AccountType {
     @Column(name = "description")
     private String description;
 
-
 }
+

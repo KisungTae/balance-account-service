@@ -12,24 +12,17 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "photo")
-public class Photo {
+@Table(name = "account_question_rel")
+public class AccountQuestionRel {
 
+    @EmbeddedId
+    private AccountQuestionRelId accountQuestionRelId;
 
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "enabled")
+    private boolean enabled;
 
-    @Column(name = "sequence")
-    private int sequence;
-
-    @Column(name = "url")
-    private String url;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
-    private Account account;
+    @Column(name = "selected")
+    private boolean selected;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -38,4 +31,5 @@ public class Photo {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated_at;
+
 }

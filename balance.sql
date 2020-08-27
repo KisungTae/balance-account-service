@@ -123,6 +123,27 @@
 -- normal like does not cost, heart like costs, watch ad every 15 user cards, change question costs, add question does not costs
 
 
+
+drop table unmatch;
+drop table unblock;
+drop table reward;
+drop table reward_type;
+drop table report_resolution;
+drop table deleted_photo;
+drop table report;
+drop table report_reason;
+drop table report_resolution_type;
+drop table account_question_rel;
+drop table question;
+drop table photo;
+drop table match;
+drop table favor_spent_history;
+drop table favor;
+drop table admin;
+drop table account;
+drop table account_type;
+
+
 -- facebook, kakao, naver, google
 create table account_type
 (
@@ -130,19 +151,17 @@ create table account_type
     description varchar(20)
 );
 
-select *
-from account_type;
 
 -- unregister deletes account
 -- favor count will be reset on every night
 create table account
 (
     id                     serial primary key,
-    blocked                bit(1)                 not null,
+    blocked                boolean                 not null,
     name                   varchar(50)            not null,
     email                  varchar(256) unique    not null,
     birth                  int                    not null,
-    gender                 bit(1)                 not null,
+    gender                 boolean                 not null,
     about                  varchar(500)           not null,
     score                  int                    not null,
     index                  int                    not null,
@@ -187,8 +206,8 @@ create table account_question_rel
 (
     account_id  int       not null,
     question_id int       not null,
-    enabled     bit(1)    not null,
-    selected    bit(1)    not null,
+    enabled     boolean    not null,
+    selected    boolean    not null,
     created_at  timestamp not null,
     updated_at  timestamp not null,
 
@@ -224,7 +243,7 @@ create table favor
     id         serial primary key,
     liker_id   int       not null,
     liked_id   int       not null,
-    balanced   bit(1)    not null,
+    balanced   boolean    not null,
     created_at timestamp not null,
 
     constraint favor_liker_id_fk foreign key (liker_id) references account (id),
@@ -240,7 +259,7 @@ create table match
 (
     matcher_id int       not null,
     matched_id int       not null,
-    unmatched  bit(1)    not null,
+    unmatched  boolean    not null,
     created_at timestamp not null,
 
     primary key (matcher_id, matched_id),
@@ -351,6 +370,11 @@ create table favor_spent_history
     constraint favor_spent_history_account_id_fk foreign key (account_id) references account (id)
 );
 
+select *
+from account;
 
+select *
+from question;
 
-
+select *
+from account_question_rel;

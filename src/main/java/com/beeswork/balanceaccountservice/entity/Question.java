@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.entity;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,25 +12,24 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "photo")
-public class Photo {
-
+@Table(name = "question")
+public class Question {
 
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "sequence")
-    private int sequence;
+    @Column(name = "description")
+    private String description;
 
-    @Column(name = "url")
-    private String url;
+    @Column(name = "top_option")
+    private String topOption;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
-    private Account account;
+    @Column(name = "bottom_option")
+    private String bottomOption;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
