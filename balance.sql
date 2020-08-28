@@ -374,7 +374,14 @@ select *
 from account;
 
 select *
+from question q
+inner join account_question_rel aqr on q.id = aqr.question_id
+where aqr.account_id = 3;
+
+
+select *
 from question;
 
 select *
 from account_question_rel;
+

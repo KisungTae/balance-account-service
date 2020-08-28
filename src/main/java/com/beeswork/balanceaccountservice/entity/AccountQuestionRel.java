@@ -18,6 +18,14 @@ public class AccountQuestionRel {
     @EmbeddedId
     private AccountQuestionRelId accountQuestionRelId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("accountId")
+    private Account account;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("questionId")
+    private Question question;
+
     @Column(name = "enabled")
     private boolean enabled;
 

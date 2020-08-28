@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,6 +32,11 @@ public class Question {
 
     @Column(name = "bottom_option")
     private String bottomOption;
+
+    @OneToMany(mappedBy = "question",
+               cascade = CascadeType.ALL,
+               orphanRemoval = true)
+    private List<AccountQuestionRel> accountQuestionRels = new ArrayList<>();
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

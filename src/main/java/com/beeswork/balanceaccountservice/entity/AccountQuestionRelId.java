@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class AccountQuestionRelId implements Serializable {
 
     @Column(name = "account_id")
-    private Long account;
+    private Long accountId;
 
     @Column(name = "question_id")
     private Long questionId;

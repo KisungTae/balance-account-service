@@ -43,58 +43,65 @@ public class RecommendController {
     @GetMapping("/test")
     @Transactional
     public String test() {
-        System.out.println("한국");
-        System.out.println(awsProperties.toString());
+//        System.out.println("한국");
+//        System.out.println(awsProperties.toString());
 
 
-        AccountType accountType = new AccountType();
-        accountType.setDescription("페이스북 로그인");
-        GeometryFactory gf = new GeometryFactory();
-        Point point = gf.createPoint(new Coordinate(126.807883, 37.463557));
+//        AccountType accountType = new AccountType();
+//        accountType.setDescription("페이스북 로그인");
+//        GeometryFactory gf = new GeometryFactory();
+//        Point point = gf.createPoint(new Coordinate(126.807883, 37.463557));
+//
+//        entityManager.persist(accountType);
+//        entityManager.flush();
+//
+//        Account account = new Account(null,
+//                                      false,
+//                                      "test2",
+//                                      "test2@gmail.com",
+//                                      1987,
+//                                      false,
+//                                      "this is about",
+//                                      19,
+//                                      10,
+//                                      10,
+//                                      10,
+//                                      new Date(),
+//                                      point,
+//                                      accountType,
+//                                      new Date(),
+//                                      new Date());
+//
+//        Question question = new Question(null, "this is question222", "top option", "bottom option",new Date() ,new Date());
+//
+//
+//        entityManager.persist(account);
+//        entityManager.persist(question);
+//        entityManager.flush();
+//
+//        AccountQuestionRel accountQuestionRel = new AccountQuestionRel();
+//
+//
+//        accountQuestionRel.setAccountQuestionRelId(new AccountQuestionRelId(account.getId(), question.getId()));
+//        accountQuestionRel.setEnabled(true);
+//        accountQuestionRel.setSelected(true);
+//        accountQuestionRel.setCreated_at(new Date());
+//        accountQuestionRel.setUpdated_at(new Date());
+//
+//        entityManager.persist(accountQuestionRel);
+//
+//
+//
+//        List<AccountType> accountTypes = new JPAQueryFactory(entityManager).selectFrom(QAccountType.accountType)
+//                .where(QAccountType.accountType.description.like("%페이스%"))
+//                .fetch();
 
-        entityManager.persist(accountType);
-        entityManager.flush();
 
-        Account account = new Account(null,
-                                      false,
-                                      "test1",
-                                      "test@gmail.com",
-                                      1987,
-                                      false,
-                                      "this is about",
-                                      19,
-                                      10,
-                                      10,
-                                      10,
-                                      new Date(),
-                                      point,
-                                      accountType,
-                                      new Date(),
-                                      new Date());
-
-        Question question = new Question(null, "this is question", "top option", "bottom option",new Date() ,new Date());
+        QQuestion qQuestion = QQuestion.question;
+        QAccountQuestionRel qAccountQuestionRel = QAccountQuestionRel.accountQuestionRel;
 
 
-        entityManager.persist(account);
-        entityManager.persist(question);
-        entityManager.flush();
 
-        AccountQuestionRel accountQuestionRel = new AccountQuestionRel();
-
-
-        accountQuestionRel.setAccountQuestionRelId(new AccountQuestionRelId(account.getId(), question.getId()));
-        accountQuestionRel.setEnabled(true);
-        accountQuestionRel.setSelected(true);
-        accountQuestionRel.setCreated_at(new Date());
-        accountQuestionRel.setUpdated_at(new Date());
-
-        entityManager.persist(accountQuestionRel);
-
-        
-
-        List<AccountType> accountTypes = new JPAQueryFactory(entityManager).selectFrom(QAccountType.accountType)
-                .where(QAccountType.accountType.description.like("%페이스%"))
-                .fetch();
 
 
         return messageSource.getMessage("test.notfound", null, Locale.getDefault());
