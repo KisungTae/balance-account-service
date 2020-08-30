@@ -123,7 +123,6 @@
 -- normal like does not cost, heart like costs, watch ad every 15 user cards, change question costs, add question does not costs
 
 
-
 drop table unmatch;
 drop table unblock;
 drop table reward;
@@ -133,7 +132,7 @@ drop table deleted_photo;
 drop table report;
 drop table report_reason;
 drop table report_resolution_type;
-drop table account_question_rel;
+drop table account_question;
 drop table question;
 drop table photo;
 drop table match;
@@ -143,6 +142,13 @@ drop table admin;
 drop table account;
 drop table account_type;
 
+ALTER SEQUENCE question_id_seq RESTART WITH 1;
+ALTER SEQUENCE account_id_seq RESTART WITH 1;
+ALTER SEQUENCE account_type_id_seq RESTART WITH 1;
+
+
+
+
 
 -- facebook, kakao, naver, google
 create table account_type
@@ -151,18 +157,17 @@ create table account_type
     description varchar(20)
 );
 
-
 -- unregister deletes account
 -- favor count will be reset on every night
 create table account
 (
     id                     serial primary key,
-    blocked                boolean                 not null,
+    blocked                boolean                not null,
     name                   varchar(50)            not null,
     email                  varchar(256) unique    not null,
     birth                  int                    not null,
-    gender                 boolean                 not null,
     about                  varchar(500)           not null,
+    gender                 boolean                not null,
     score                  int                    not null,
     index                  int                    not null,
     point                  int                    not null,
@@ -202,18 +207,19 @@ create table question
     updated_at    timestamp    not null
 );
 
-create table account_question_rel
+create table account_question
 (
     account_id  int       not null,
     question_id int       not null,
-    enabled     boolean    not null,
-    selected    boolean    not null,
+    sequence    int       not null,
+    enabled     boolean   not null,
+    selected    boolean   not null,
     created_at  timestamp not null,
     updated_at  timestamp not null,
 
     primary key (account_id, question_id),
-    constraint account_question_rel_account_id_fk foreign key (account_id) references account (id),
-    constraint account_question_rel_question_id_fk foreign key (question_id) references question (id)
+    constraint account_question_account_id_fk foreign key (account_id) references account (id),
+    constraint account_question_question_id_fk foreign key (question_id) references question (id)
 );
 
 
@@ -243,7 +249,7 @@ create table favor
     id         serial primary key,
     liker_id   int       not null,
     liked_id   int       not null,
-    balanced   boolean    not null,
+    balanced   boolean   not null,
     created_at timestamp not null,
 
     constraint favor_liker_id_fk foreign key (liker_id) references account (id),
@@ -259,7 +265,7 @@ create table match
 (
     matcher_id int       not null,
     matched_id int       not null,
-    unmatched  boolean    not null,
+    unmatched  boolean   not null,
     created_at timestamp not null,
 
     primary key (matcher_id, matched_id),
@@ -374,14 +380,19 @@ select *
 from account;
 
 select *
-from question q
-inner join account_question_rel aqr on q.id = aqr.question_id
-where aqr.account_id = 3;
-
-
-select *
 from question;
 
 select *
-from account_question_rel;
+from account_question;
 
+select *
+from account_question;
+
+insert into account_question
+values (1, 2, true, true, current_timestamp, current_timestamp);
+insert into account_question
+values (1, 3, true, true, current_timestamp, current_timestamp);
+
+delete
+from account_question
+where account_id = 1;

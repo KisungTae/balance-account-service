@@ -1,22 +1,24 @@
 package com.beeswork.balanceaccountservice.entity;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "account_question_rel")
-public class AccountQuestionRel {
+@Table(name = "account_question")
+public class AccountQuestion {
 
     @EmbeddedId
-    private AccountQuestionRelId accountQuestionRelId;
+    private AccountQuestionId accountQuestionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("accountId")
@@ -32,12 +34,14 @@ public class AccountQuestionRel {
     @Column(name = "selected")
     private boolean selected;
 
+    @Column(name = "sequence")
+    private int sequence;
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date created_at;
+    private Date createdAt;
 
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updated_at;
-
+    private Date updatedAt;
 }

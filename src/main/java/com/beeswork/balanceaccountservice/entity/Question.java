@@ -1,7 +1,6 @@
 package com.beeswork.balanceaccountservice.entity;
 
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +13,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "question")
 public class Question {
@@ -36,13 +34,13 @@ public class Question {
     @OneToMany(mappedBy = "question",
                cascade = CascadeType.ALL,
                orphanRemoval = true)
-    private List<AccountQuestionRel> accountQuestionRels = new ArrayList<>();
+    private List<AccountQuestion> accountQuestions = new ArrayList<>();
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date created_at;
+    private Date createdAt;
 
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updated_at;
+    private Date updatedAt;
 }

@@ -7,17 +7,17 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountQuestionRelId implements Serializable {
+@Getter
+@Setter
+public class AccountQuestionId implements Serializable {
 
-    @Column(name = "account_id")
     private Long accountId;
-
-    @Column(name = "question_id")
     private Long questionId;
 
 }

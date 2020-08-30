@@ -7,13 +7,15 @@ import lombok.Setter;
 import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "account")
 public class Account {
@@ -51,11 +53,11 @@ public class Account {
     private int point;
 
     @Column(name = "favor_count")
-    private int favor_count;
+    private int favorCount;
 
     @Column(name = "favor_count_updated_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date favor_count_updated_at;
+    private Date favorCountUpdatedAt;
 
     @Column(name = "location", columnDefinition = "GEOGRAPHY(POINT)")
     private Point location;
@@ -66,9 +68,9 @@ public class Account {
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date created_at;
+    private Date createdAt;
 
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updated_at;
+    private Date updatedAt;
 }

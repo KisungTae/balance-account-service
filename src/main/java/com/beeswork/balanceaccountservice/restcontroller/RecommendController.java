@@ -3,25 +3,21 @@ package com.beeswork.balanceaccountservice.restcontroller;
 import com.beeswork.balanceaccountservice.config.properties.AWSProperties;
 import com.beeswork.balanceaccountservice.entity.*;
 import com.beeswork.balanceaccountservice.repository.AccountTypeRepository;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.apache.tomcat.jni.Local;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Transient;
 import javax.transaction.Transactional;
-import java.sql.Struct;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @RestController
 @RequestMapping("/recommend")
@@ -43,67 +39,142 @@ public class RecommendController {
     @GetMapping("/test")
     @Transactional
     public String test() {
-//        System.out.println("한국");
-//        System.out.println(awsProperties.toString());
 
 
-//        AccountType accountType = new AccountType();
-//        accountType.setDescription("페이스북 로그인");
-//        GeometryFactory gf = new GeometryFactory();
-//        Point point = gf.createPoint(new Coordinate(126.807883, 37.463557));
-//
-//        entityManager.persist(accountType);
-//        entityManager.flush();
-//
-//        Account account = new Account(null,
-//                                      false,
-//                                      "test2",
-//                                      "test2@gmail.com",
-//                                      1987,
-//                                      false,
-//                                      "this is about",
-//                                      19,
-//                                      10,
-//                                      10,
-//                                      10,
-//                                      new Date(),
-//                                      point,
-//                                      accountType,
-//                                      new Date(),
-//                                      new Date());
-//
-//        Question question = new Question(null, "this is question222", "top option", "bottom option",new Date() ,new Date());
-//
-//
-//        entityManager.persist(account);
-//        entityManager.persist(question);
-//        entityManager.flush();
-//
 //        AccountQuestionRel accountQuestionRel = new AccountQuestionRel();
-//
-//
 //        accountQuestionRel.setAccountQuestionRelId(new AccountQuestionRelId(account.getId(), question.getId()));
 //        accountQuestionRel.setEnabled(true);
 //        accountQuestionRel.setSelected(true);
 //        accountQuestionRel.setCreated_at(new Date());
 //        accountQuestionRel.setUpdated_at(new Date());
-//
+
 //        entityManager.persist(accountQuestionRel);
-//
-//
-//
-//        List<AccountType> accountTypes = new JPAQueryFactory(entityManager).selectFrom(QAccountType.accountType)
-//                .where(QAccountType.accountType.description.like("%페이스%"))
-//                .fetch();
 
 
-        QQuestion qQuestion = QQuestion.question;
-        QAccountQuestionRel qAccountQuestionRel = QAccountQuestionRel.accountQuestionRel;
-
-
-
-
-
+//        createDummyAccountTypes(5);
+//        createDummyAccounts(50);
+//        createDummyQuestions(50);
+//        createDummyAccountQuestionRel(151, 151, false, 3);
+        getQuestionsByAccountId(5);
         return messageSource.getMessage("test.notfound", null, Locale.getDefault());
+    }
+
+
+
+    @Transactional
+    @GetMapping("question-by-account-id")
+    public List<Tuple> getQuestionsByAccountId(@RequestParam long accountId) {
+        QAccountQuestion qAccountQuestion = QAccountQuestion.accountQuestion;
+        QAccount qAccount = QAccount.account;
+        QQuestion qQuestion = QQuestion.question;
+
+        List<Tuple> tuples = new JPAQueryFactory(entityManager).select(qAccountQuestion.account.id,
+                                                                       qAccountQuestion.question.id,
+                                                                       qQuestion.description,
+                                                                       qQuestion.topOption,
+                                                                       qQuestion.bottomOption,
+                                                                       qAccountQuestion.enabled,
+                                                                       qAccountQuestion.selected)
+                                                               .from(qAccountQuestion)
+                                                               .innerJoin(qAccountQuestion.question, qQuestion)
+                                                               .where(qAccountQuestion.account.id.eq(accountId))
+                                                               .fetch();
+
+        return tuples;
+    }
+
+    @Transactional
+    @PostMapping("/create/dummy-account-question")
+    public void createDummyAccountQuestionRel(@RequestParam long accountId,
+                                              @RequestParam long questionId,
+                                              @RequestParam boolean selected,
+                                              @RequestParam int sequence) {
+
+        Account account = new JPAQueryFactory(entityManager).selectFrom(QAccount.account)
+                                                            .where(QAccount.account.id.eq(accountId))
+                                                            .fetchOne();
+
+        Question question = new JPAQueryFactory(entityManager).selectFrom(QQuestion.question)
+                                                              .where(QQuestion.question.id.eq(questionId))
+                                                              .fetchOne();
+
+        AccountQuestion accountQuestion = new AccountQuestion();
+        accountQuestion.setAccountQuestionId(new AccountQuestionId(account.getId(), question.getId()));
+        accountQuestion.setAccount(account);
+        accountQuestion.setQuestion(question);
+        accountQuestion.setSequence(sequence);
+        accountQuestion.setEnabled(true);
+        accountQuestion.setSelected(selected);
+        accountQuestion.setCreatedAt(new Date());
+        accountQuestion.setUpdatedAt(new Date());
+
+        entityManager.persist(accountQuestion);
+    }
+
+    @Transactional
+    @PostMapping("/create/dummy-account-types")
+    public void createDummyAccountTypes(@RequestParam int size) {
+        for (int i = 0; i < size; i++) {
+            AccountType accountType = new AccountType();
+            accountType.setDescription("login type - " + i);
+            entityManager.persist(accountType);
+        }
+        entityManager.flush();
+    }
+
+    @Transactional
+    @PostMapping("/create/dummy-questions")
+    public void createDummyQuestions(@RequestParam int size) {
+        for (int i = 0; i < size; i++) {
+            Question question = new Question();
+            question.setDescription("question-" + i);
+            question.setTopOption("question-" + i + " top option");
+            question.setBottomOption("question-" + i + " bottom option");
+            question.setCreatedAt(new Date());
+            question.setUpdatedAt(new Date());
+            entityManager.persist(question);
+        }
+        entityManager.flush();
+    }
+
+    @Transactional
+    @PostMapping("/create/dummy-accounts")
+    public void createDummyAccounts(@RequestParam int size) {
+
+        Random random = new Random();
+
+        GeometryFactory gf = new GeometryFactory();
+        Point location = gf.createPoint(new Coordinate(126.807883, 37.463557));
+
+        AccountType accountType = new JPAQueryFactory(entityManager).selectFrom(QAccountType.accountType).fetchFirst();
+
+        for (int i = 0; i < size; i++) {
+
+            int birth = random.nextInt(50) + 1950;
+            boolean gender = random.nextInt(2) == 0;
+            int score = random.nextInt(1000);
+            int index = random.nextInt(1000);
+            int point = random.nextInt(1000);
+
+            Account account = new Account();
+            account.setBlocked(false);
+            account.setName("account-" + i);
+            account.setEmail("account-" + i + "@gmail.com");
+            account.setBirth(birth);
+            account.setGender(gender);
+            account.setAbout("account-" + i + " about");
+            account.setScore(score);
+            account.setIndex(index);
+            account.setPoint(point);
+            account.setFavorCount(0);
+            account.setFavorCountUpdatedAt(new Date());
+            account.setLocation(location);
+            account.setAccountType(accountType);
+            account.setCreatedAt(new Date());
+            account.setUpdatedAt(new Date());
+            entityManager.persist(account);
+        }
+        entityManager.flush();
+
     }
 }
