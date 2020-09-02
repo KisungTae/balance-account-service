@@ -59,12 +59,19 @@ public class Account {
     @Temporal(TemporalType.TIMESTAMP)
     private Date favorCountUpdatedAt;
 
-    @Column(name = "location", columnDefinition = "GEOGRAPHY(POINT)")
+    @Column(name = "location",
+            columnDefinition = "GEOGRAPHY(POINT)")
     private Point location;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_type_id")
     private AccountType accountType;
+
+    @OneToMany(mappedBy = "account",
+               fetch = FetchType.LAZY,
+               cascade = CascadeType.ALL,
+               orphanRemoval = true)
+    private List<AccountQuestion> accountQuestions = new ArrayList<>();
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

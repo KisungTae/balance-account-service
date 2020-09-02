@@ -1,15 +1,13 @@
-package com.beeswork.balanceaccountservice.repository.base;
+package com.beeswork.balanceaccountservice.dao.base;
 
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import javax.persistence.EntityManager;
 
 @AllArgsConstructor
-public abstract class BaseRepositoryImpl<E> implements BaseRepository<E> {
+public abstract class BaseDAOImpl<E> implements BaseDAO<E> {
 
     protected EntityManager entityManager;
     protected JPAQueryFactory jpaQueryFactory;

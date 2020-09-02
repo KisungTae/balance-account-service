@@ -2,7 +2,9 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.config.properties.AWSProperties;
 import com.beeswork.balanceaccountservice.entity.*;
-import com.beeswork.balanceaccountservice.repository.AccountTypeRepository;
+import com.beeswork.balanceaccountservice.dao.accounttype.AccountTypeDAO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.locationtech.jts.geom.Coordinate;
@@ -31,7 +33,10 @@ public class RecommendController {
     private MessageSource messageSource;
 
     @Autowired
-    private AccountTypeRepository accountTypeRepository;
+    private AccountTypeDAO accountTypeRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -55,15 +60,13 @@ public class RecommendController {
 //        createDummyAccounts(50);
 //        createDummyQuestions(50);
 //        createDummyAccountQuestionRel(151, 151, false, 3);
-        getQuestionsByAccountId(5);
         return messageSource.getMessage("test.notfound", null, Locale.getDefault());
     }
 
 
-
     @Transactional
     @GetMapping("question-by-account-id")
-    public List<Tuple> getQuestionsByAccountId(@RequestParam long accountId) {
+    public ResponseEntity<String> getQuestionsByAccountId(@RequestParam long accountId) throws JsonProcessingException {
         QAccountQuestion qAccountQuestion = QAccountQuestion.accountQuestion;
         QAccount qAccount = QAccount.account;
         QQuestion qQuestion = QQuestion.question;
@@ -80,15 +83,16 @@ public class RecommendController {
                                                                .where(qAccountQuestion.account.id.eq(accountId))
                                                                .fetch();
 
-        return tuples;
+
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(tuples));
     }
 
     @Transactional
     @PostMapping("/create/dummy-account-question")
-    public void createDummyAccountQuestionRel(@RequestParam long accountId,
-                                              @RequestParam long questionId,
-                                              @RequestParam boolean selected,
-                                              @RequestParam int sequence) {
+    public void createDummyAccountQuestion(@RequestParam long accountId,
+                                           @RequestParam long questionId,
+                                           @RequestParam boolean selected,
+                                           @RequestParam int sequence) {
 
         Account account = new JPAQueryFactory(entityManager).selectFrom(QAccount.account)
                                                             .where(QAccount.account.id.eq(accountId))
@@ -108,7 +112,9 @@ public class RecommendController {
         accountQuestion.setCreatedAt(new Date());
         accountQuestion.setUpdatedAt(new Date());
 
-        entityManager.persist(accountQuestion);
+        account.getAccountQuestions().add(accountQuestion);
+        entityManager.persist(account);
+//        entityManager.persist(accountQuestion);
     }
 
     @Transactional
