@@ -163,10 +163,10 @@ create table account
 (
     id                     serial primary key,
     blocked                boolean                not null,
-    name                   varchar(50)            not null,
+    name                   varchar(50)            not null default '',
     email                  varchar(256) unique    not null,
     birth                  int                    not null,
-    about                  varchar(500)           not null,
+    about                  varchar(500)           not null default '',
     gender                 boolean                not null,
     score                  int                    not null,
     index                  int                    not null,
@@ -180,6 +180,8 @@ create table account
 
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
+
+
 
 CREATE INDEX account_location_idx ON account USING GIST (location);
 
