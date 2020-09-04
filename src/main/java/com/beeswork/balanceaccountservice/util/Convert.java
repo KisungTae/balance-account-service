@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-
 public final class Convert {
 
     private final ObjectMapper objectMapper;
