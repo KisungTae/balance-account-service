@@ -1,20 +1,30 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.util.Convert;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class BaseController {
 
-    protected final Convert convert;
+    protected final ObjectMapper objectMapper;
+    protected final ModelMapper modelMapper;
 
-    public BaseController(Convert convert) {
-        this.convert = convert;
+    public BaseController(ObjectMapper objectMapper, ModelMapper modelMapper) {
+        this.objectMapper = objectMapper;
+        this.modelMapper = modelMapper;
     }
 
     public ResponseEntity<String> fieldErrorsResponse(BindingResult bindingResult) throws JsonProcessingException {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(convert.fieldErrorsToJson(bindingResult));
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError fieldError : bindingResult.getFieldErrors())
+            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(errors));
     }
 }

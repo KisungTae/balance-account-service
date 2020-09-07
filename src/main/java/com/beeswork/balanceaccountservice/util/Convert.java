@@ -13,17 +13,6 @@ import java.util.Map;
 @Component
 public final class Convert {
 
-    private final ObjectMapper objectMapper;
 
-    @Autowired
-    public Convert(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
 
-    public String fieldErrorsToJson(BindingResult bindingResult) throws JsonProcessingException {
-        Map<String, String> errors = new HashMap<>();
-        for (FieldError fieldError : bindingResult.getFieldErrors())
-            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
-        return objectMapper.writeValueAsString(errors);
-    }
 }

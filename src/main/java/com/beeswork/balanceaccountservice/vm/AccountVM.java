@@ -14,6 +14,9 @@ import java.util.List;
 @Setter
 public class AccountVM {
 
+//  for indentity checks
+    private int id;
+
     @NotEmpty(message = "이름을 입력해주세요")
     @Length(min = 1, max = 50, message = "이름은 최소 {min} 글자 그리고 최대 {max} 글자로 작성해주세요")
     private String name;
