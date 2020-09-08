@@ -19,6 +19,7 @@ public class BalanceAccountServiceApplication {
 // TODO ************************************************************************************
 
 // TODO: GLOBAL - 1. change the exception message in controlleradvice to messagesource from exception.getmessage()
+//				  2. remove createat and updateat in some entities like question, account we dont need them
 
 
 // TODO: 04/09/2020	- 1. can't remove tailing spaces in @RequestBody
@@ -27,3 +28,4 @@ public class BalanceAccountServiceApplication {
 //					  4. messageSource or ValidationMessage for field @Valid
 //					  5. type.mismatch does not occur why? even if you map wrong type through JSON
 //					  6. if objectmapper has custom mapping and it is singleton, then object lock occurs?
+//

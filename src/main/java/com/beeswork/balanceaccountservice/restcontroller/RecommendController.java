@@ -67,24 +67,24 @@ public class RecommendController {
     @Transactional
     @GetMapping("question-by-account-id")
     public ResponseEntity<String> getQuestionsByAccountId(@RequestParam long accountId) throws JsonProcessingException {
-        QAccountQuestion qAccountQuestion = QAccountQuestion.accountQuestion;
-        QAccount qAccount = QAccount.account;
-        QQuestion qQuestion = QQuestion.question;
+//        QAccountQuestion qAccountQuestion = QAccountQuestion.accountQuestion;
+//        QAccount qAccount = QAccount.account;
+//        QQuestion qQuestion = QQuestion.question;
+//
+//        List<Tuple> tuples = new JPAQueryFactory(entityManager).select(qAccountQuestion.account.id,
+//                                                                       qAccountQuestion.question.id,
+//                                                                       qQuestion.description,
+//                                                                       qQuestion.topOption,
+//                                                                       qQuestion.bottomOption,
+//                                                                       qAccountQuestion.enabled,
+//                                                                       qAccountQuestion.selected)
+//                                                               .from(qAccountQuestion)
+//                                                               .innerJoin(qAccountQuestion.question, qQuestion)
+//                                                               .where(qAccountQuestion.account.id.eq(accountId))
+//                                                               .fetch();
 
-        List<Tuple> tuples = new JPAQueryFactory(entityManager).select(qAccountQuestion.account.id,
-                                                                       qAccountQuestion.question.id,
-                                                                       qQuestion.description,
-                                                                       qQuestion.topOption,
-                                                                       qQuestion.bottomOption,
-                                                                       qAccountQuestion.enabled,
-                                                                       qAccountQuestion.selected)
-                                                               .from(qAccountQuestion)
-                                                               .innerJoin(qAccountQuestion.question, qQuestion)
-                                                               .where(qAccountQuestion.account.id.eq(accountId))
-                                                               .fetch();
 
-
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(tuples));
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString("tuples"));
     }
 
     @Transactional
@@ -94,26 +94,26 @@ public class RecommendController {
                                            @RequestParam boolean selected,
                                            @RequestParam int sequence) {
 
-        Account account = new JPAQueryFactory(entityManager).selectFrom(QAccount.account)
-                                                            .where(QAccount.account.id.eq(accountId))
-                                                            .fetchOne();
-
-        Question question = new JPAQueryFactory(entityManager).selectFrom(QQuestion.question)
-                                                              .where(QQuestion.question.id.eq(questionId))
-                                                              .fetchOne();
-
-        AccountQuestion accountQuestion = new AccountQuestion();
-        accountQuestion.setAccountQuestionId(new AccountQuestionId(account.getId(), question.getId()));
-        accountQuestion.setAccount(account);
-        accountQuestion.setQuestion(question);
-        accountQuestion.setSequence(sequence);
-        accountQuestion.setEnabled(true);
-        accountQuestion.setSelected(selected);
-        accountQuestion.setCreatedAt(new Date());
-        accountQuestion.setUpdatedAt(new Date());
-
-        account.getAccountQuestions().add(accountQuestion);
-        entityManager.persist(account);
+//        Account account = new JPAQueryFactory(entityManager).selectFrom(QAccount.account)
+//                                                            .where(QAccount.account.id.eq(accountId))
+//                                                            .fetchOne();
+//
+//        Question question = new JPAQueryFactory(entityManager).selectFrom(QQuestion.question)
+//                                                              .where(QQuestion.question.id.eq(questionId))
+//                                                              .fetchOne();
+//
+//        AccountQuestion accountQuestion = new AccountQuestion();
+//        accountQuestion.setAccountQuestionId(new AccountQuestionId(account.getId(), question.getId()));
+//        accountQuestion.setAccount(account);
+//        accountQuestion.setQuestion(question);
+//        accountQuestion.setSequence(sequence);
+//        accountQuestion.setEnabled(true);
+//        accountQuestion.setSelected(selected);
+//        accountQuestion.setCreatedAt(new Date());
+//        accountQuestion.setUpdatedAt(new Date());
+//
+//        account.getAccountQuestions().add(accountQuestion);
+//        entityManager.persist(account);
 //        entityManager.persist(accountQuestion);
     }
 

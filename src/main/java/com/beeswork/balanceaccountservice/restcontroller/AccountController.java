@@ -1,8 +1,9 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 
-import com.beeswork.balanceaccountservice.dto.AccountDTO;
+import com.beeswork.balanceaccountservice.dto.account.AccountDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
+import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
 import com.beeswork.balanceaccountservice.vm.AccountVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,7 +32,7 @@ public class AccountController extends BaseController {
     @PostMapping("/save")
     public ResponseEntity<String> saveAccount(@Valid @RequestBody AccountVM accountVM,
                                               BindingResult bindingResult)
-    throws JsonProcessingException, AccountNotFoundException {
+    throws JsonProcessingException, AccountNotFoundException, QuestionNotFoundException {
 
         if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
         accountService.save(modelMapper.map(accountVM, AccountDTO.class));

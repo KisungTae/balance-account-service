@@ -147,7 +147,7 @@ ALTER SEQUENCE account_id_seq RESTART WITH 1;
 ALTER SEQUENCE account_type_id_seq RESTART WITH 1;
 
 
-
+create extension if not exists "uuid-ossp";
 
 
 -- facebook, kakao, naver, google
@@ -161,7 +161,7 @@ create table account_type
 -- favor count will be reset on every night
 create table account
 (
-    id                     serial primary key,
+    id                     uuid primary key default uuid_generate_v4(),
     blocked                boolean                not null,
     name                   varchar(50)            not null default '',
     email                  varchar(256) unique    not null,
@@ -181,16 +181,18 @@ create table account
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
 
-
-
 CREATE INDEX account_location_idx ON account USING GIST (location);
+
+
+select *
+from account;
 
 create table photo
 (
     id         serial primary key,
     sequence   int           not null,
     url        varchar(1000) not null,
-    account_id int           not null,
+    account_id uuid           not null,
     created_at timestamp     not null,
     updated_at timestamp     not null,
 
@@ -211,7 +213,7 @@ create table question
 
 create table account_question
 (
-    account_id  int       not null,
+    account_id  uuid       not null,
     question_id int       not null,
     sequence    int       not null,
     enabled     boolean   not null,
@@ -238,7 +240,7 @@ create table reward
 (
     id             serial primary key,
     rewarded_point int       not null,
-    account_id     int       not null,
+    account_id     uuid       not null,
     reward_type_id int       not null,
     created_at     timestamp not null,
 
@@ -249,8 +251,8 @@ create table reward
 create table favor
 (
     id         serial primary key,
-    liker_id   int       not null,
-    liked_id   int       not null,
+    liker_id   uuid       not null,
+    liked_id   uuid       not null,
     balanced   boolean   not null,
     created_at timestamp not null,
 
@@ -265,8 +267,8 @@ create table favor
 -- application can also have match table in its light database to store messages in the chat
 create table match
 (
-    matcher_id int       not null,
-    matched_id int       not null,
+    matcher_id uuid       not null,
+    matched_id uuid       not null,
     unmatched  boolean   not null,
     created_at timestamp not null,
 
@@ -277,8 +279,8 @@ create table match
 
 create table unmatch
 (
-    unmatcher_id int       not null,
-    unmatched_id int       not null,
+    unmatcher_id uuid       not null,
+    unmatched_id uuid       not null,
     created_at   timestamp not null,
 
     primary key (unmatcher_id, unmatched_id),
@@ -293,7 +295,7 @@ create table admin
     name       varchar(20)  not null,
     email      varchar(100) not null,
     password   varchar(100) not null,
-    account_id int          not null,
+    account_id uuid          not null,
     created_at timestamp    not null,
     updated_at timestamp    not null,
 
@@ -317,8 +319,8 @@ create table report_reason
 create table report
 (
     id               serial primary key,
-    reporter_id      int          not null,
-    reported_id      int          not null,
+    reporter_id      uuid          not null,
+    reported_id      uuid          not null,
     description      varchar(200) not null,
     report_reason_id int          not null,
     created_at       timestamp    not null,
@@ -358,7 +360,7 @@ create table unblock
 (
     id                   serial primary key,
     description          varchar(200) not null,
-    unblocked_account_id int          not null,
+    unblocked_account_id uuid          not null,
     admin_id             int          not null,
     created_at           timestamp    not null,
 
@@ -370,7 +372,7 @@ create table favor_spent_history
 (
     id          serial primary key,
     point_spent int       not null,
-    account_id  int       not null,
+    account_id  uuid       not null,
     favor_id    int       not null,
     created_at  timestamp not null,
 

@@ -4,6 +4,7 @@ package com.beeswork.balanceaccountservice.controlleradvice;
 import com.beeswork.balanceaccountservice.constant.ExceptionCode;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
+import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.querydsl.core.QueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -26,7 +27,7 @@ public class ExceptionControllerAdvice {
         this.messageSource = messageSource;
     }
 
-    @ExceptionHandler({AccountNotFoundException.class})
+    @ExceptionHandler({AccountNotFoundException.class, QuestionNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .contentType(MediaType.APPLICATION_JSON)

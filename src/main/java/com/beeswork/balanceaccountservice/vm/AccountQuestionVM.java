@@ -10,5 +10,6 @@ import lombok.Setter;
 public class AccountQuestionVM {
     private long accountId;
     private long questionId;
+    private int sequence;
     private boolean selected;
 }

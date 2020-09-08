@@ -9,5 +9,6 @@ import lombok.Setter;
 public class AccountQuestionDTO {
     private long accountId;
     private long questionId;
+    private int sequence;
     private boolean selected;
 }

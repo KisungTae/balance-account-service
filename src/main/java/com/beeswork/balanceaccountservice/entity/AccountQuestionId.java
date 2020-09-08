@@ -8,16 +8,17 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 
+@Getter
+@Setter
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 public class AccountQuestionId implements Serializable {
 
-    private Long accountId;
+    private UUID accountId;
     private Long questionId;
 
 }
