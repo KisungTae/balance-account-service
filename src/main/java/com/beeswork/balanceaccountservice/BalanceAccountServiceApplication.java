@@ -20,6 +20,7 @@ public class BalanceAccountServiceApplication {
 
 // TODO: GLOBAL - 1. change the exception message in controlleradvice to messagesource from exception.getmessage()
 //				  2. remove createat and updateat in some entities like question, account we dont need them
+//				  3. consider validtors or remove duplicates in accountquestionDTO when saveQuestions() in account.save();
 
 
 // TODO: 04/09/2020	- 1. can't remove tailing spaces in @RequestBody

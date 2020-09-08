@@ -76,7 +76,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
                                                     .collect(Collectors.toList());
 
         List<Question> questions = questionEntityService.findAllByIds(questionIds);
-        
+
         for (int i = accountQuestionDTOs.size() - 1; i >= 0; i--) {
             AccountQuestionDTO accountQuestionDTO = accountQuestionDTOs.get(i);
             Question question = questions.stream()
