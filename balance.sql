@@ -225,6 +225,7 @@ create table account_question
     constraint account_question_question_id_fk foreign key (question_id) references question (id)
 );
 
+alter table account_question drop column enabled;
 
 -- watch ad, liked, etc...
 create table reward_type
