@@ -9,6 +9,5 @@ import java.util.UUID;
 public interface AccountDAO extends BaseDAO<Account> {
 
     Account findById(UUID id) throws AccountNotFoundException;
-    void save(Account account);
 //    Account findByIdAndName(long id, String email);
 }

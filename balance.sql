@@ -216,7 +216,6 @@ create table account_question
     account_id  uuid       not null,
     question_id int       not null,
     sequence    int       not null,
-    enabled     boolean   not null,
     selected    boolean   not null,
     created_at  timestamp not null,
     updated_at  timestamp not null,
@@ -393,9 +392,9 @@ select *
 from account_question;
 
 insert into account_question
-values (1, 2, true, true, current_timestamp, current_timestamp);
+values ('10144511-b780-49e3-805a-51ca29d1240a', 2, 1, true, true, current_timestamp, current_timestamp);
 insert into account_question
-values (1, 3, true, true, current_timestamp, current_timestamp);
+values ('10144511-b780-49e3-805a-51ca29d1240a', 3, 2, true, true, current_timestamp, current_timestamp);
 
 delete
 from account_question

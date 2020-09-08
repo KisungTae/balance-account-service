@@ -20,10 +20,11 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
         this.questionDAO = questionDAO;
     }
 
-
     @Override
     @Transactional
     public List<Question> findAllByIds(List<Long> ids) {
         return questionDAO.findAllByIds(ids);
     }
+
+
 }

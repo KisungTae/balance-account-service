@@ -9,28 +9,17 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "account_question")
 public class AccountQuestion {
 
     @EmbeddedId
     private AccountQuestionId accountQuestionId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("accountId")
-    private Account account;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("questionId")
-    private Question question;
-
-    @Column(name = "enabled")
-    private boolean enabled;
 
     @Column(name = "selected")
     private boolean selected;
@@ -45,4 +34,20 @@ public class AccountQuestion {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("accountId")
+    private Account account;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("questionId")
+    private Question question;
+
+    public UUID getAccountId() {
+        return accountQuestionId.getAccountId();
+    }
+
+    public Long getQuestionId() {
+        return accountQuestionId.getQuestionId();
+    }
 }

@@ -28,10 +28,5 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
         return account;
     }
 
-    @Override
-    public void save(Account account) {
-        entityManager.persist(account);
-    }
-
 
 }

@@ -2,7 +2,6 @@ package com.beeswork.balanceaccountservice.service.account;
 
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
-import com.beeswork.balanceaccountservice.dao.accountquestion.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
 import com.beeswork.balanceaccountservice.dto.AccountQuestionDTO;
 import com.beeswork.balanceaccountservice.dto.account.AccountDTO;
@@ -19,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,8 +26,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     private final QuestionEntityService questionEntityService;
 
-
     private final AccountDAO accountDAO;
+
 
     @Autowired
     public AccountServiceImpl(AccountDAO accountDAO,
@@ -43,18 +39,37 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     }
 
 
-
-
     @Override
     @Transactional
     public void save(AccountDTO accountDTO) throws AccountNotFoundException, QuestionNotFoundException {
 
         Account account = accountDAO.findById(accountDTO.getId());
-
         modelMapper.map(accountDTO, account);
+        saveQuestions(accountDTO.getAccountQuestionDTOs(), account);
+        accountDAO.persist(account);
+
+    }
+
+    public void saveQuestions(List<AccountQuestionDTO> accountQuestionDTOs, Account account)
+    throws QuestionNotFoundException {
 
         List<AccountQuestion> accountQuestions = account.getAccountQuestions();
-        List<AccountQuestionDTO> accountQuestionDTOs = accountDTO.getAccountQuestionDTOs();
+
+        for (int i = accountQuestions.size() - 1; i >= 0; i--) {
+            AccountQuestion accountQuestion = accountQuestions.get(i);
+            AccountQuestionDTO accountQuestionDTO = accountQuestionDTOs.stream()
+                                                                       .filter(a -> a.getQuestionId() ==
+                                                                                    accountQuestion.getQuestionId())
+                                                                       .findFirst()
+                                                                       .orElse(null);
+
+            if (accountQuestionDTO == null) accountQuestions.remove(accountQuestion);
+            else {
+                modelMapper.map(accountQuestionDTO, accountQuestion);
+                accountQuestion.setUpdatedAt(new Date());
+                accountQuestionDTOs.remove(accountQuestionDTO);
+            }
+        }
 
         List<Long> questionIds = accountQuestionDTOs.stream()
                                                     .map(AccountQuestionDTO::getQuestionId)
@@ -62,39 +77,20 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
         List<Question> questions = questionEntityService.findAllByIds(questionIds);
 
-        if (questions.size() != questionIds.size()) throw new QuestionNotFoundException();
+        for (AccountQuestionDTO accountQuestionDTO : accountQuestionDTOs) {
+            Question question = questions.stream()
+                                         .filter(q -> q.getId() == accountQuestionDTO.getQuestionId())
+                                         .findFirst()
+                                         .orElseThrow(QuestionNotFoundException::new);
 
-        for (AccountQuestion accountQuestion : account.getAccountQuestions()) {
-            System.out.println(accountQuestion.toString());
+            AccountQuestion accountQuestion = modelMapper.map(accountQuestionDTO, AccountQuestion.class);
+            accountQuestion.setAccountQuestionId(new AccountQuestionId(account.getId(), question.getId()));
+            accountQuestion.setAccount(account);
+            accountQuestion.setQuestion(question);
+            accountQuestion.setCreatedAt(new Date());
+            accountQuestion.setUpdatedAt(new Date());
+            accountQuestions.add(accountQuestion);
         }
-
-//        for (Question question : questions) {
-//            AccountQuestionDTO accountQuestionDTO = accountQuestionDTOs.stream()
-//                                                                       .filter(a -> a.getQuestionId() == question.getId())
-//                                                                       .findFirst()
-//                                                                       .orElseThrow(QuestionNotFoundException::new);
-//
-//            accountQuestions.add(new AccountQuestion(new AccountQuestionId(account.getId(), question.getId()),
-//                                                     account,
-//                                                     question,
-//                                                     true,
-//                                                     accountQuestionDTO.isSelected(),
-//                                                     accountQuestionDTO.getSequence(),
-//                                                     new Date(),
-//                                                     new Date()));
-//        }
-
-        accountDAO.save(account);
     }
-
-    public void saveQuestions(List<AccountQuestionDTO> accountQuestionDTOs, UUID accountId) {
-
-    }
-
-    @Transactional
-    public void saveQuestions(List<AccountQuestionDTO> accountQuestionDTOs, Account account) {
-
-    }
-
 
 }
