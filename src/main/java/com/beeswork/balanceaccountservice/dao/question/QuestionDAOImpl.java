@@ -2,10 +2,9 @@ package com.beeswork.balanceaccountservice.dao.question;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.entity.QQuestion;
-import com.beeswork.balanceaccountservice.entity.Question;
+import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;

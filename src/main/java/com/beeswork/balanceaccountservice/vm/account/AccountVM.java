@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.vm;
+package com.beeswork.balanceaccountservice.vm.account;
 
 import com.beeswork.balanceaccountservice.constant.RegexPattern;
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
@@ -11,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +28,9 @@ public class AccountVM {
     @Length(min = 1, max = 50, message = "이름은 최소 {min} 글자 그리고 최대 {max} 글자로 작성해주세요")
     private String name;
 
-    private int birth;
+    private Date birth;
+
+    private String email;
 
     @NotEmpty(message = "자기소개를 입력해주세요")
     @Length(min = 1, max = 500, message = "자기소개는 최소 {min} 글자 그리고 최대 {max} 글자로 작성해주세요")
@@ -38,6 +41,4 @@ public class AccountVM {
     private double latitude;
 
     private double longitude;
-
-    private List<AccountQuestionVM> accountQuestionVMs = new ArrayList<>();
 }

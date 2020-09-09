@@ -1,14 +1,13 @@
-package com.beeswork.balanceaccountservice.entity;
+package com.beeswork.balanceaccountservice.entity.account;
 
 
-import lombok.AllArgsConstructor;
+import com.beeswork.balanceaccountservice.entity.question.Question;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Objects;
 import java.util.UUID;
 
 @Getter

@@ -27,4 +27,6 @@ public class BaseController {
             errors.put(fieldError.getField(), fieldError.getDefaultMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(errors));
     }
+
+
 }

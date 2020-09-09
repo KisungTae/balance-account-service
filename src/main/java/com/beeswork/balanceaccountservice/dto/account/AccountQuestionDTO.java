@@ -1,7 +1,6 @@
-package com.beeswork.balanceaccountservice.dto;
+package com.beeswork.balanceaccountservice.dto.account;
 
 
-import com.beeswork.balanceaccountservice.entity.AccountQuestion;
 import lombok.Getter;
 import lombok.Setter;
 

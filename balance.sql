@@ -161,11 +161,11 @@ create table account_type
 -- favor count will be reset on every night
 create table account
 (
-    id                     uuid primary key default uuid_generate_v4(),
+    id                     uuid primary key                default uuid_generate_v4(),
     blocked                boolean                not null,
     name                   varchar(50)            not null default '',
     email                  varchar(256) unique    not null,
-    birth                  int                    not null,
+    birth                  Date                   not null,
     about                  varchar(500)           not null default '',
     gender                 boolean                not null,
     score                  int                    not null,
@@ -181,18 +181,20 @@ create table account
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
 
+
+alter table account drop column birth;
+alter table account add column birth date not null default '1987-02-07';
+alter table account add column enabled boolean not null default true;
+
 CREATE INDEX account_location_idx ON account USING GIST (location);
 
-
-select *
-from account;
 
 create table photo
 (
     id         serial primary key,
     sequence   int           not null,
     url        varchar(1000) not null,
-    account_id uuid           not null,
+    account_id uuid          not null,
     created_at timestamp     not null,
     updated_at timestamp     not null,
 
@@ -213,7 +215,7 @@ create table question
 
 create table account_question
 (
-    account_id  uuid       not null,
+    account_id  uuid      not null,
     question_id int       not null,
     sequence    int       not null,
     selected    boolean   not null,
@@ -225,7 +227,6 @@ create table account_question
     constraint account_question_question_id_fk foreign key (question_id) references question (id)
 );
 
-alter table account_question drop column enabled;
 
 -- watch ad, liked, etc...
 create table reward_type
@@ -240,7 +241,7 @@ create table reward
 (
     id             serial primary key,
     rewarded_point int       not null,
-    account_id     uuid       not null,
+    account_id     uuid      not null,
     reward_type_id int       not null,
     created_at     timestamp not null,
 
@@ -248,16 +249,16 @@ create table reward
     constraint reward_reward_type_id_fk foreign key (reward_type_id) references reward_type (id)
 );
 
-create table favor
+create table liked
 (
     id         serial primary key,
-    liker_id   uuid       not null,
-    liked_id   uuid       not null,
+    liker_id   uuid      not null,
+    liked_id   uuid      not null,
     balanced   boolean   not null,
     created_at timestamp not null,
 
-    constraint favor_liker_id_fk foreign key (liker_id) references account (id),
-    constraint favor_liked_id_fk foreign key (liked_id) references account (id)
+    constraint liked_liker_id_fk foreign key (liker_id) references account (id),
+    constraint liked_liked_id_fk foreign key (liked_id) references account (id)
 );
 
 
@@ -267,8 +268,8 @@ create table favor
 -- application can also have match table in its light database to store messages in the chat
 create table match
 (
-    matcher_id uuid       not null,
-    matched_id uuid       not null,
+    matcher_id uuid      not null,
+    matched_id uuid      not null,
     unmatched  boolean   not null,
     created_at timestamp not null,
 
@@ -279,8 +280,8 @@ create table match
 
 create table unmatch
 (
-    unmatcher_id uuid       not null,
-    unmatched_id uuid       not null,
+    unmatcher_id uuid      not null,
+    unmatched_id uuid      not null,
     created_at   timestamp not null,
 
     primary key (unmatcher_id, unmatched_id),
@@ -295,7 +296,7 @@ create table admin
     name       varchar(20)  not null,
     email      varchar(100) not null,
     password   varchar(100) not null,
-    account_id uuid          not null,
+    account_id uuid         not null,
     created_at timestamp    not null,
     updated_at timestamp    not null,
 
@@ -319,8 +320,8 @@ create table report_reason
 create table report
 (
     id               serial primary key,
-    reporter_id      uuid          not null,
-    reported_id      uuid          not null,
+    reporter_id      uuid         not null,
+    reported_id      uuid         not null,
     description      varchar(200) not null,
     report_reason_id int          not null,
     created_at       timestamp    not null,
@@ -360,7 +361,7 @@ create table unblock
 (
     id                   serial primary key,
     description          varchar(200) not null,
-    unblocked_account_id uuid          not null,
+    unblocked_account_id uuid         not null,
     admin_id             int          not null,
     created_at           timestamp    not null,
 
@@ -368,20 +369,33 @@ create table unblock
     constraint unblock_admin_id_fk foreign key (admin_id) references admin (id)
 );
 
-create table favor_spent_history
+create table liked_spent_history
 (
     id          serial primary key,
     point_spent int       not null,
-    account_id  uuid       not null,
-    favor_id    int       not null,
+    account_id  uuid      not null,
+    liked_id    int       not null,
     created_at  timestamp not null,
 
-    constraint favor_spent_history_favor_id foreign key (favor_id) references favor (id),
-    constraint favor_spent_history_account_id_fk foreign key (account_id) references account (id)
+    constraint liked_spent_history_liked_id foreign key (liked_id) references liked (id),
+    constraint liked_spent_history_account_id_fk foreign key (account_id) references account (id)
 );
 
 select *
 from account;
+
+select *
+from account
+where id = '9280fca6-0c69-4c5a-a890-bd9d0b4079f6';
+
+
+
+insert into match values ('3cadd50a-2574-4625-811b-6e0c1e3cb38d', 'b94aef4f-3d7e-424c-8945-e57bad465212', false, current_timestamp);
+
+
+select *
+from match;
+
 
 select *
 from question;
@@ -396,6 +410,10 @@ insert into account_question
 values ('10144511-b780-49e3-805a-51ca29d1240a', 2, 1, true, true, current_timestamp, current_timestamp);
 insert into account_question
 values ('10144511-b780-49e3-805a-51ca29d1240a', 3, 2, true, true, current_timestamp, current_timestamp);
+
+
+
+
 
 delete
 from account_question

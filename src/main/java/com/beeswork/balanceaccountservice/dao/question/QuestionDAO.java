@@ -1,7 +1,7 @@
 package com.beeswork.balanceaccountservice.dao.question;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAO;
-import com.beeswork.balanceaccountservice.entity.Question;
+import com.beeswork.balanceaccountservice.entity.question.Question;
 
 import java.util.List;
 

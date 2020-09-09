@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.entity;
 
 
+import com.beeswork.balanceaccountservice.entity.account.Account;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

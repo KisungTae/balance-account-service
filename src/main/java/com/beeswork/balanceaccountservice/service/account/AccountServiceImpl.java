@@ -3,16 +3,20 @@ package com.beeswork.balanceaccountservice.service.account;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
-import com.beeswork.balanceaccountservice.dto.AccountQuestionDTO;
+import com.beeswork.balanceaccountservice.dto.account.AccountQuestionDTO;
 import com.beeswork.balanceaccountservice.dto.account.AccountDTO;
-import com.beeswork.balanceaccountservice.entity.Account;
-import com.beeswork.balanceaccountservice.entity.AccountQuestion;
-import com.beeswork.balanceaccountservice.entity.AccountQuestionId;
-import com.beeswork.balanceaccountservice.entity.Question;
+import com.beeswork.balanceaccountservice.dto.account.AccountQuestionSaveDTO;
+import com.beeswork.balanceaccountservice.dto.account.LocationDTO;
+import com.beeswork.balanceaccountservice.entity.account.Account;
+import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
+import com.beeswork.balanceaccountservice.entity.account.AccountQuestionId;
+import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
-import com.beeswork.balanceaccountservice.service.question.QuestionEntityService;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,18 +28,31 @@ import java.util.stream.Collectors;
 @Service
 public class AccountServiceImpl extends BaseServiceImpl implements AccountService {
 
-    private final QuestionEntityService questionEntityService;
 
     private final AccountDAO accountDAO;
+    private final QuestionDAO questionDAO;
 
+    private final GeometryFactory geometryFactory;
 
     @Autowired
     public AccountServiceImpl(AccountDAO accountDAO,
                               ModelMapper modelMapper,
-                              QuestionEntityService questionEntityService) {
+                              QuestionDAO questionDAO,
+                              GeometryFactory geometryFactory) {
         super(modelMapper);
         this.accountDAO = accountDAO;
-        this.questionEntityService = questionEntityService;
+        this.questionDAO = questionDAO;
+        this.geometryFactory = geometryFactory;
+    }
+
+
+    @Override
+    @Transactional
+    public void saveLocation(LocationDTO locationDTO) throws AccountNotFoundException {
+        Account account = accountDAO.findById(locationDTO.getAccountId());
+        Point location = geometryFactory.createPoint(new Coordinate(locationDTO.getLongitude(), locationDTO.getLatitude()));
+        account.setLocation(location);
+        accountDAO.persist(account);
     }
 
 
@@ -44,22 +61,53 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     public void save(AccountDTO accountDTO) throws AccountNotFoundException, QuestionNotFoundException {
 
         Account account = accountDAO.findById(accountDTO.getId());
-        modelMapper.map(accountDTO, account);
-        saveQuestions(accountDTO.getAccountQuestionDTOs(), account);
+
+        account.setName(accountDTO.getName());
+        account.setAbout(accountDTO.getAbout());
+
+//        modelMapper.map(accountDTO, account);
+
+
+//        saveQuestions(accountDTO.getAccountQuestionDTOs(), account);
         accountDAO.persist(account);
 
     }
 
-    public void saveQuestions(List<AccountQuestionDTO> accountQuestionDTOs, Account account)
-    throws QuestionNotFoundException {
+    //  DESC 1. when registering, an account will be created with enabled = false, then when finish profiles,
+    //          it will update enabled = true because users might get cards for which profile has not been updated
+    //  TEST 2. save account without any changes but changes in accountQuestions --> Hibernate does not publish update DML for unchanged account even if you change accountQuestions
+    //  TEST 3. save account without accountQuestions with modemapper --> modelmapper call setAccountQuestions and Hibernate recognizes this call and
+    //          update persistence context which will delete all accountQuestions. Without modelmapper and update account fields only
+    //          then Hibernate won't delete accountQuestions even if their size = 0
+    @Override
+    @Transactional
+    public void saveProfile(AccountDTO accountDTO) throws AccountNotFoundException {
+        Account account = accountDAO.findById(accountDTO.getId());
+        modelMapper.map(accountDTO, account);
+        account.setUpdatedAt(new Date());
+        account.setEnabled(true);
+        accountDAO.persist(account);
+    }
 
+    //  TEST 1. save accountQuestionDTOs without setAccount() and setQuestion() --> Hibernate does not insert those objects, no exception thrown
+    //  TEST 2. create new accountQuestionDTO with the same AccountQuestionId --> Hibernate throws exception of creating two object with the same Id
+    //  DESC 3. I don't need to put accountQuestionDTO or accountQuestion because Hibernate anyway need a whole list of
+    //          accountQuestions to check if it needs to remove or insert or update entities
+    @Override
+    @Transactional
+    public void saveQuestions(AccountQuestionSaveDTO accountQuestionSaveDTO)
+    throws QuestionNotFoundException, AccountNotFoundException {
+
+        List<AccountQuestionDTO> accountQuestionDTOs = accountQuestionSaveDTO.getAccountQuestionDTOs();
+
+        Account account = accountDAO.findById(accountQuestionSaveDTO.getAccountId());
         List<AccountQuestion> accountQuestions = account.getAccountQuestions();
 
         for (int i = accountQuestions.size() - 1; i >= 0; i--) {
             AccountQuestion accountQuestion = accountQuestions.get(i);
             AccountQuestionDTO accountQuestionDTO = accountQuestionDTOs.stream()
                                                                        .filter(a -> a.getQuestionId() ==
-                                                                                    accountQuestion.getQuestionId())
+                                                                               accountQuestion.getQuestionId())
                                                                        .findFirst()
                                                                        .orElse(null);
 
@@ -71,11 +119,12 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
             }
         }
 
+
         List<Long> questionIds = accountQuestionDTOs.stream()
                                                     .map(AccountQuestionDTO::getQuestionId)
                                                     .collect(Collectors.toList());
 
-        List<Question> questions = questionEntityService.findAllByIds(questionIds);
+        List<Question> questions = questionDAO.findAllByIds(questionIds);
 
         for (int i = accountQuestionDTOs.size() - 1; i >= 0; i--) {
             AccountQuestionDTO accountQuestionDTO = accountQuestionDTOs.get(i);

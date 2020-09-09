@@ -1,11 +1,10 @@
-package com.beeswork.balanceaccountservice.entity;
+package com.beeswork.balanceaccountservice.entity.account;
 
-import lombok.AllArgsConstructor;
+import com.beeswork.balanceaccountservice.entity.match.Match;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
@@ -22,8 +21,12 @@ public class Account {
     @Id
     @Column(name = "id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(name = "UUID",
+                      strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
+
+    @Column(name = "enabled")
+    private boolean enabled;
 
     @Column(name = "blocked")
     private boolean blocked;
@@ -35,7 +38,7 @@ public class Account {
     private String email;
 
     @Column(name = "birth")
-    private int birth;
+    private Date birth;
 
     @Column(name = "gender")
     private boolean gender;
@@ -72,6 +75,12 @@ public class Account {
                cascade = CascadeType.ALL,
                orphanRemoval = true)
     private List<AccountQuestion> accountQuestions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "matcher",
+               fetch = FetchType.LAZY,
+               cascade = CascadeType.ALL,
+               orphanRemoval = true)
+    private List<Match> matches = new ArrayList<>();
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

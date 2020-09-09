@@ -1,7 +1,7 @@
 package com.beeswork.balanceaccountservice.config;
 
-import com.beeswork.balanceaccountservice.dto.account.AccountDTO;
-import com.beeswork.balanceaccountservice.vm.AccountVM;
+import com.beeswork.balanceaccountservice.dto.account.AccountQuestionSaveDTO;
+import com.beeswork.balanceaccountservice.vm.account.AccountQuestionSaveVM;
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -23,19 +23,20 @@ public class ModelMapperConfig {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         modelMapper.getConfiguration().setSkipNullEnabled(true);
+
         setCustomMapping(modelMapper);
         return modelMapper;
     }
 
     private void setCustomMapping(ModelMapper modelMapper) {
         modelMapper.addConverter(stringToUUIDConverter());
-        accountVMToAccountDTO(modelMapper);
+        setAccountQuestionSaveVMToDTO(modelMapper);
     }
 
-    private void accountVMToAccountDTO(ModelMapper modelMapper) {
-        TypeMap<AccountVM, AccountDTO> typeMap = modelMapper.createTypeMap(AccountVM.class, AccountDTO.class);
-        typeMap.addMapping(AccountVM::getAccountQuestionVMs, AccountDTO::setAccountQuestionDTOs);
-        typeMap.addMapping(AccountVM::getId, AccountDTO::setId);
+
+    private void setAccountQuestionSaveVMToDTO(ModelMapper modelMapper) {
+        TypeMap<AccountQuestionSaveVM, AccountQuestionSaveDTO> typeMap = modelMapper.createTypeMap(AccountQuestionSaveVM.class, AccountQuestionSaveDTO.class);
+        typeMap.addMapping(AccountQuestionSaveVM::getAccountQuestionVMs, AccountQuestionSaveDTO::setAccountQuestionDTOs);
     }
 
     private Converter<String, UUID> stringToUUIDConverter() {
