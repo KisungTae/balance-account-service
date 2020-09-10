@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -28,5 +30,17 @@ public class Match {
 
     @Column(name = "unmatched")
     private boolean unmatched;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    public UUID getMatcherId() {
+        return matchId.getMatcherId();
+    }
+
+    public UUID getMatchedId() {
+        return matchId.getMatchedId();
+    }
 
 }

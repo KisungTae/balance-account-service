@@ -55,12 +55,12 @@ public class Account {
     @Column(name = "point")
     private int point;
 
-    @Column(name = "favor_count")
-    private int favorCount;
+    @Column(name = "liked_count")
+    private int likedCount;
 
-    @Column(name = "favor_count_updated_at")
+    @Column(name = "liked_count_updated_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date favorCountUpdatedAt;
+    private Date likedCountUpdatedAt;
 
     @Column(name = "location",
             columnDefinition = "GEOGRAPHY(POINT)")
@@ -81,6 +81,12 @@ public class Account {
                cascade = CascadeType.ALL,
                orphanRemoval = true)
     private List<Match> matches = new ArrayList<>();
+
+    @OneToMany(mappedBy = "account",
+               fetch = FetchType.LAZY,
+               cascade = CascadeType.ALL,
+               orphanRemoval = true)
+    private List<Photo> photos = new ArrayList<>();
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

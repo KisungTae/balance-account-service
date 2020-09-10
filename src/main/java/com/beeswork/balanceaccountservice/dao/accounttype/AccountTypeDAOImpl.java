@@ -1,8 +1,8 @@
 package com.beeswork.balanceaccountservice.dao.accounttype;
 
 import com.beeswork.balanceaccountservice.entity.account.AccountType;
-import com.beeswork.balanceaccountservice.entity.QAccountType;
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
+import com.beeswork.balanceaccountservice.entity.account.QAccountType;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

@@ -35,10 +35,12 @@ public class RecommendController extends BaseController {
                                                     @RequestParam("distance") @Min(1) @Max(10) int distance,
                                                     @RequestParam("min_age") int minAge,
                                                     @RequestParam("max_age") int maxAge,
-                                                    @RequestParam("show_me") boolean showMe)
+                                                    @RequestParam("show_me") boolean showMe,
+                                                    @RequestParam double latitude,
+                                                    @RequestParam double longitude)
     throws AccountNotFoundException {
 
-        recommendService.accountsByLocation(UUID.fromString(accountId), distance, minAge, maxAge, showMe);
+        recommendService.accountsByLocation(UUID.fromString(accountId), distance, minAge, maxAge, showMe, latitude, longitude);
 
         return ResponseEntity.status(HttpStatus.OK).body("");
     }

@@ -23,6 +23,8 @@ public class BalanceAccountServiceApplication {
 //				  3. consider validtors or remove duplicates in accountquestionDTO when saveQuestions() in account.save();
 //				  4. should I check the size of accountQuestionVMs and throw exception?
 //				  5. consider remove email in AccountVM and DTO
+//				  6. @requestParam with @validated throws error
+//				  7. @ModelAttribute is not mapped with query string in url
 
 
 

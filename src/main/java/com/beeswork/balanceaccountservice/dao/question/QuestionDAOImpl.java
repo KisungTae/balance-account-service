@@ -1,7 +1,8 @@
 package com.beeswork.balanceaccountservice.dao.question;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
-import com.beeswork.balanceaccountservice.entity.QQuestion;
+
+import com.beeswork.balanceaccountservice.entity.question.QQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;

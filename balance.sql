@@ -50,56 +50,66 @@
 --
 --
 --
--- create or replace procedure populate_user()
---     language plpgsql as
--- $$
--- declare
---     start_lat     numeric(8, 6) := 37.463557;
---     end_lat       numeric(8, 6) := 37.650017;
---     start_lon     numeric(9, 6) := 126.807883;
---     end_lon       numeric(9, 6) := 127.176639;
---     lat_count     numeric(8, 6) := start_lat;
---     max_duplicate int           := 0;
---     inner_count   int           := 0;
---     total_count   int           := 0;
---     year          int;
---     varchar_date  varchar(50);
--- begin
---
---     while start_lon < end_lon
---         loop
---             start_lon := start_lon + 0.000300;
---             while lat_count < end_lat
---                 loop
---                     max_duplicate := round((random() * (7 - 1)) + 1);
---                     while inner_count <= max_duplicate
---                         loop
---
---                             year := round((random() * (2003 - 1970)) + 1970);
---                             varchar_date := concat(year::varchar, '12', '20');
---
---                             insert into users
+create or replace procedure populate_user()
+    language plpgsql as
+$$
+declare
+    start_lat     numeric(8, 6) := 37.463557;
+    end_lat       numeric(8, 6) := 37.650017;
+    start_lon     numeric(9, 6) := 126.807883;
+    end_lon       numeric(9, 6) := 127.176639;
+    lat_count     numeric(8, 6) := start_lat;
+    max_duplicate int           := 0;
+    inner_count   int           := 0;
+    total_count   int           := 0;
+    random_gender          int;
+    varchar_date  varchar(50);
+    v_gender boolean;
+begin
+
+    while start_lon < end_lon
+        loop
+            start_lon := start_lon + 0.000300;
+            while lat_count < end_lat
+                loop
+                    max_duplicate := round((random() * (7 - 1)) + 1);
+                    while inner_count <= max_duplicate
+                        loop
+
+                            varchar_date := concat(round((random() * (2003 - 1970)) + 1970)::varchar, '/', round((random() * (12 - 1)) + 1)::varchar, '/', round((random() * (27 - 1)) + 1)::varchar);
+
+                            random_gender := round((random() * (1 - 0)) + 0);
+
+                            if random_gender = 1 then v_gender = false;
+                            else v_gender = true;
+                            end if;
+
+                            insert into account
+                            values (uuid_generate_v4(), false, 'account', 'account', to_date(varchar_date, 'YYYY/MM/DD'), 'this is about', v_gender,
+                                    round((random() * (100000 - 0)) + 0), round((random() * (100 - 0)) + 0), 10, 10, current_timestamp, ST_MakePoint(start_lon, lat_count),
+                                    1, current_timestamp, current_timestamp);
+
 --                             values (default,
 --                                     ST_MakePoint(start_lon, lat_count),
 --                                     year,
 --                                     to_date(varchar_date, 'YYYYMMDD'),
 --                                     round((random() * (1 - 0)) + 0),
 --                                     round((random() * (100000 - 0)) + 0));
---                             total_count := total_count + 1;
---                             lat_count := lat_count + 0.000010;
---                             inner_count := inner_count + 1;
---                         end loop;
---                     inner_count := 0;
---                     lat_count := lat_count + 0.000300;
---                 end loop;
---             lat_count := start_lat;
---         end loop;
+                            total_count := total_count + 1;
+                            lat_count := lat_count + 0.000010;
+                            inner_count := inner_count + 1;
+                        end loop;
+                    inner_count := 0;
+                    lat_count := lat_count + 0.000300;
+                end loop;
+            lat_count := start_lat;
+        end loop;
+
+    RAISE NOTICE 'total count: %', total_count;
+end
+$$;
 --
---     RAISE NOTICE 'total count: %', total_count;
--- end;
--- $$;
---
--- call populate_user();
+call populate_user();
 --
 -- select count(*)
 -- from users;
@@ -121,6 +131,11 @@
 
 -- setting: distance, age, gender will be included in query from front end, dont have to create a table for settings
 -- normal like does not cost, heart like costs, watch ad every 15 user cards, change question costs, add question does not costs
+
+
+
+select concat(round((random() * (2003 - 1970)) + 1970)::varchar, '/', round((random() * (12 - 1)) + 1)::varchar, '/', round((random() * (27 - 1)) + 1)::varchar);
+
 
 
 drop table unmatch;
@@ -171,8 +186,8 @@ create table account
     score                  int                    not null,
     index                  int                    not null,
     point                  int                    not null,
-    favor_count            int                    not null,
-    favor_count_updated_at timestamp              not null,
+    liked_count            int                    not null,
+    liked_count_updated_at timestamp              not null,
     location               geography(point, 4326) not null,
     account_type_id        int                    not null,
     created_at             timestamp              not null,
@@ -185,6 +200,10 @@ create table account
 alter table account drop column birth;
 alter table account add column birth date not null default '1987-02-07';
 alter table account add column enabled boolean not null default true;
+
+alter table account rename favor_count to liked_count;
+alter table account rename favor_count_updated_at to liked_count_updated_at;
+
 
 CREATE INDEX account_location_idx ON account USING GIST (location);
 
@@ -200,7 +219,6 @@ create table photo
 
     constraint photo_account_id_fk foreign key (account_id) references account (id)
 );
-
 
 
 create table question
@@ -391,6 +409,8 @@ where id = '9280fca6-0c69-4c5a-a890-bd9d0b4079f6';
 
 
 insert into match values ('3cadd50a-2574-4625-811b-6e0c1e3cb38d', 'b94aef4f-3d7e-424c-8945-e57bad465212', false, current_timestamp);
+insert into match values ('3cadd50a-2574-4625-811b-6e0c1e3cb38d', 'c2d34ab2-9b19-4502-b3d8-45d3eba15d14', false, current_timestamp);
+insert into match values ('3cadd50a-2574-4625-811b-6e0c1e3cb38d', 'e66e0b09-eee4-4700-b9d1-d6515d7852c5', false, current_timestamp);
 
 
 select *
@@ -413,8 +433,40 @@ values ('10144511-b780-49e3-805a-51ca29d1240a', 3, 2, true, true, current_timest
 
 
 
+select *
+from account a
+where a.id not in (select m.matched_id from match m where matcher_id = '3cadd50a-2574-4625-811b-6e0c1e3cb38d')
+and st_dwithin(location, st_setsrid(st_point(126.807883, 32.463557), 4326), 5000);
 
 
-delete
-from account_question
-where account_id = 1;
+select *
+from photo;
+
+select name, index, point, birth
+from account
+order by point;
+
+
+select *
+from account_question;
+
+delete from match where matched_id is not null;
+
+select *
+from match where matcher_id = 'c7a30bae-795f-47a0-88ad-69416f5b323e';
+
+
+delete from photo where id is not null;
+delete from match where matched_id is not null;
+delete from account_question where account_id is not null;
+delete from account where id is not null;
+
+
+
+-- select *
+-- from account
+-- where st_dwithin(location, st_setsrid(st_point(126.907883, 37.463557), 4326), 5000)
+--   and gender = 1
+--   and (birth_year >= 1987 and birth_year <= 1990)
+-- order by liked
+-- limit 30 offset 3000;
