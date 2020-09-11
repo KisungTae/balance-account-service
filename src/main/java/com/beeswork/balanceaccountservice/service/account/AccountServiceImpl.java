@@ -82,8 +82,12 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void saveProfile(AccountDTO accountDTO) throws AccountNotFoundException {
+
         Account account = accountDAO.findById(accountDTO.getId());
         modelMapper.map(accountDTO, account);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(account.getBirth());
+        account.setBirthYear(calendar.get(Calendar.YEAR));
         account.setUpdatedAt(new Date());
         account.setEnabled(true);
         accountDAO.persist(account);

@@ -24,10 +24,7 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 
 @RestController
 @RequestMapping("/dummy")
@@ -203,6 +200,8 @@ public class DummyController {
         int lonCount = 0;
         int latCount = 0;
 
+        Calendar calendar = Calendar.getInstance();
+
         for (double lon = startLon; lon <= endLon; lon+= 0.000300) {
 
             for (double lat = startLat; lat <= endLat; lat += 0.000300) {
@@ -215,19 +214,21 @@ public class DummyController {
                 String birthString = String.valueOf(year) + (month < 10 ? "0" + month : month) + (day < 10 ? "0" + day : day);
                 Date birth = originalFormat.parse(birthString);
                 Point location = gf.createPoint(new Coordinate(lon, lat));
-
                 String name = "account | " + lat + " | " + lon;
+                calendar.setTime(birth);
 
                 Account account = new Account();
                 account.setBlocked(false);
+                account.setEnabled(true);
                 account.setName(name);
                 account.setEmail("email | " + lat + " | " + lon);
                 account.setAbout("this is about");
+                account.setBirthYear(calendar.get(Calendar.YEAR));
                 account.setBirth(birth);
                 account.setGender(gender);
                 account.setLocation(location);
                 account.setAccountType(accountType);
-                account.setIndex(latCount);
+                account.setScore(latCount);
                 account.setPoint(lonCount);
                 account.setLikedCountUpdatedAt(new Date());
                 account.setCreatedAt(new Date());

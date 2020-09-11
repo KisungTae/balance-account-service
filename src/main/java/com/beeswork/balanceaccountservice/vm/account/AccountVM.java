@@ -10,10 +10,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 
 @Getter
@@ -41,4 +38,5 @@ public class AccountVM {
     private double latitude;
 
     private double longitude;
+
 }

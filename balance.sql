@@ -62,9 +62,9 @@ declare
     max_duplicate int           := 0;
     inner_count   int           := 0;
     total_count   int           := 0;
-    random_gender          int;
+    random_gender int;
     varchar_date  varchar(50);
-    v_gender boolean;
+    v_gender      boolean;
 begin
 
     while start_lon < end_lon
@@ -76,20 +76,26 @@ begin
                     while inner_count <= max_duplicate
                         loop
 
-                            varchar_date := concat(round((random() * (2003 - 1970)) + 1970)::varchar, '/', round((random() * (12 - 1)) + 1)::varchar, '/', round((random() * (27 - 1)) + 1)::varchar);
+                            varchar_date := concat(round((random() * (2003 - 1970)) + 1970)::varchar, '/',
+                                                   round((random() * (12 - 1)) + 1)::varchar, '/',
+                                                   round((random() * (27 - 1)) + 1)::varchar);
 
                             random_gender := round((random() * (1 - 0)) + 0);
 
-                            if random_gender = 1 then v_gender = false;
-                            else v_gender = true;
+                            if random_gender = 1 then
+                                v_gender = false;
+                            else
+                                v_gender = true;
                             end if;
 
                             insert into account
-                            values (uuid_generate_v4(), false, 'account', 'account', to_date(varchar_date, 'YYYY/MM/DD'), 'this is about', v_gender,
-                                    round((random() * (100000 - 0)) + 0), round((random() * (100 - 0)) + 0), 10, 10, current_timestamp, ST_MakePoint(start_lon, lat_count),
+                            values (uuid_generate_v4(), false, 'account', 'account',
+                                    to_date(varchar_date, 'YYYY/MM/DD'), 'this is about', v_gender,
+                                    round((random() * (100000 - 0)) + 0), round((random() * (100 - 0)) + 0), 10, 10,
+                                    current_timestamp, ST_MakePoint(start_lon, lat_count),
                                     1, current_timestamp, current_timestamp);
 
---                             values (default,
+                            --                             values (default,
 --                                     ST_MakePoint(start_lon, lat_count),
 --                                     year,
 --                                     to_date(varchar_date, 'YYYYMMDD'),
@@ -133,11 +139,6 @@ call populate_user();
 -- normal like does not cost, heart like costs, watch ad every 15 user cards, change question costs, add question does not costs
 
 
-
-select concat(round((random() * (2003 - 1970)) + 1970)::varchar, '/', round((random() * (12 - 1)) + 1)::varchar, '/', round((random() * (27 - 1)) + 1)::varchar);
-
-
-
 drop table unmatch;
 drop table unblock;
 drop table reward;
@@ -151,19 +152,15 @@ drop table account_question;
 drop table question;
 drop table photo;
 drop table match;
-drop table favor_spent_history;
-drop table favor;
+drop table liked_spent_history;
+drop table liked;
 drop table admin;
 drop table account;
 drop table account_type;
 
-ALTER SEQUENCE question_id_seq RESTART WITH 1;
-ALTER SEQUENCE account_id_seq RESTART WITH 1;
-ALTER SEQUENCE account_type_id_seq RESTART WITH 1;
 
-
+-- create UUID extension
 create extension if not exists "uuid-ossp";
-
 
 -- facebook, kakao, naver, google
 create table account_type
@@ -173,13 +170,15 @@ create table account_type
 );
 
 -- unregister deletes account
--- favor count will be reset on every night
+-- liked count will be reset on every night
 create table account
 (
     id                     uuid primary key                default uuid_generate_v4(),
+    enabled                boolean                not null,
     blocked                boolean                not null,
     name                   varchar(50)            not null default '',
     email                  varchar(256) unique    not null,
+    birth_year             int                    not null,
     birth                  Date                   not null,
     about                  varchar(500)           not null default '',
     gender                 boolean                not null,
@@ -195,14 +194,6 @@ create table account
 
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
-
-
-alter table account drop column birth;
-alter table account add column birth date not null default '1987-02-07';
-alter table account add column enabled boolean not null default true;
-
-alter table account rename favor_count to liked_count;
-alter table account rename favor_count_updated_at to liked_count_updated_at;
 
 
 CREATE INDEX account_location_idx ON account USING GIST (location);
@@ -399,74 +390,30 @@ create table liked_spent_history
     constraint liked_spent_history_account_id_fk foreign key (account_id) references account (id)
 );
 
-select *
+-- 194
+
+select id::varchar
 from account;
 
-select *
-from account
-where id = '9280fca6-0c69-4c5a-a890-bd9d0b4079f6';
-
-
-
-insert into match values ('3cadd50a-2574-4625-811b-6e0c1e3cb38d', 'b94aef4f-3d7e-424c-8945-e57bad465212', false, current_timestamp);
-insert into match values ('3cadd50a-2574-4625-811b-6e0c1e3cb38d', 'c2d34ab2-9b19-4502-b3d8-45d3eba15d14', false, current_timestamp);
-insert into match values ('3cadd50a-2574-4625-811b-6e0c1e3cb38d', 'e66e0b09-eee4-4700-b9d1-d6515d7852c5', false, current_timestamp);
-
-
-select *
-from match;
-
-
-select *
-from question;
-
-select *
-from account_question;
-
-select *
-from account_question;
-
-insert into account_question
-values ('10144511-b780-49e3-805a-51ca29d1240a', 2, 1, true, true, current_timestamp, current_timestamp);
-insert into account_question
-values ('10144511-b780-49e3-805a-51ca29d1240a', 3, 2, true, true, current_timestamp, current_timestamp);
-
-
-
-select *
-from account a
-where a.id not in (select m.matched_id from match m where matcher_id = '3cadd50a-2574-4625-811b-6e0c1e3cb38d')
-and st_dwithin(location, st_setsrid(st_point(126.807883, 32.463557), 4326), 5000);
-
-
-select *
+select count(*)
 from photo;
 
-select name, index, point, birth
-from account
-order by point;
-
-
-select *
-from account_question;
-
-delete from match where matched_id is not null;
-
-select *
-from match where matcher_id = 'c7a30bae-795f-47a0-88ad-69416f5b323e';
-
-
-delete from photo where id is not null;
-delete from match where matched_id is not null;
-delete from account_question where account_id is not null;
+delete from photo where id is  not null;
 delete from account where id is not null;
 
 
+select cast(b.id as varchar)
+from (select *
+      from account a
+      where st_dwithin(location, st_setsrid(st_point(126.807883, 37.521757), 4326), 5000)
+        and gender = true
+        and birth_year >= 1970
+        and birth_year <= 2003
+        and enabled = true
+      limit 30 offset 0) as b
+inner join photo as p
+on p.account_id = b.id
 
--- select *
--- from account
--- where st_dwithin(location, st_setsrid(st_point(126.907883, 37.463557), 4326), 5000)
---   and gender = 1
---   and (birth_year >= 1987 and birth_year <= 1990)
--- order by liked
--- limit 30 offset 3000;
+
+
+

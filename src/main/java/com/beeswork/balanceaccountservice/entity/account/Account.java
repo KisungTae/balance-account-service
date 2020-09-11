@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
@@ -16,6 +17,10 @@ import java.util.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "account")
+@SqlResultSetMapping(name = "AccountsWithinMapping",
+                     entities = {
+
+                     })
 public class Account {
 
     @Id
@@ -23,6 +28,7 @@ public class Account {
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID",
                       strategy = "org.hibernate.id.UUIDGenerator")
+    @Type(type="pg-uuid")
     private UUID id;
 
     @Column(name = "enabled")
@@ -36,6 +42,9 @@ public class Account {
 
     @Column(name = "email")
     private String email;
+
+    @Column(name = "birth_year")
+    private int birthYear;
 
     @Column(name = "birth")
     private Date birth;
@@ -53,6 +62,7 @@ public class Account {
     private int index;
 
     @Column(name = "point")
+
     private int point;
 
     @Column(name = "liked_count")

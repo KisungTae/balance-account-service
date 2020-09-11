@@ -8,5 +8,5 @@ import java.util.UUID;
 
 public interface RecommendService {
 
-    List<Account> accountsByLocation(UUID accountId, int distance, int minAge, int maxAge, boolean showMe, double latitude, double longitude) throws AccountNotFoundException;
+    List<Account> accountsWithin(UUID accountId, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude) throws AccountNotFoundException;
 }
