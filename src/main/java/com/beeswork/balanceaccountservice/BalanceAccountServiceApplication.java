@@ -25,6 +25,7 @@ public class BalanceAccountServiceApplication {
 //				  5. consider remove email in AccountVM and DTO
 //				  6. @requestParam with @validated throws error
 //				  7. @ModelAttribute is not mapped with query string in url
+//				  8. when use nativequery, type cast warning List<Object> lists = createNativeQuery().getresultlist, what is suppressWarning("unchecked")
 
 
 

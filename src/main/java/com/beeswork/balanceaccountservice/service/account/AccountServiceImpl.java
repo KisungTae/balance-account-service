@@ -60,7 +60,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Transactional
     public void save(AccountDTO accountDTO) throws AccountNotFoundException, QuestionNotFoundException {
 
-        Account account = accountDAO.findById(accountDTO.getId());
+        Account account = accountDAO.findById(UUID.fromString(accountDTO.getId()));
 
         account.setName(accountDTO.getName());
         account.setAbout(accountDTO.getAbout());
@@ -83,7 +83,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Transactional
     public void saveProfile(AccountDTO accountDTO) throws AccountNotFoundException {
 
-        Account account = accountDAO.findById(accountDTO.getId());
+        Account account = accountDAO.findById(UUID.fromString(accountDTO.getId()));
         modelMapper.map(accountDTO, account);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(account.getBirth());

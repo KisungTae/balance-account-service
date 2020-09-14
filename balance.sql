@@ -152,12 +152,21 @@ drop table account_question;
 drop table question;
 drop table photo;
 drop table match;
-drop table liked_spent_history;
-drop table liked;
+drop table swipe_spent_history;
+drop table swipe;
 drop table admin;
 drop table account;
 drop table account_type;
 
+
+-- TODO: 2020-09-14 execute these
+drop table liked_spent_history;
+drop table liked;
+
+alter table account
+    rename liked_count to swiped_count;
+alter table account
+    rename liked_count_updated_at to swiped_count_updated_at;
 
 -- create UUID extension
 create extension if not exists "uuid-ossp";
@@ -173,24 +182,24 @@ create table account_type
 -- liked count will be reset on every night
 create table account
 (
-    id                     uuid primary key                default uuid_generate_v4(),
-    enabled                boolean                not null,
-    blocked                boolean                not null,
-    name                   varchar(50)            not null default '',
-    email                  varchar(256) unique    not null,
-    birth_year             int                    not null,
-    birth                  Date                   not null,
-    about                  varchar(500)           not null default '',
-    gender                 boolean                not null,
-    score                  int                    not null,
-    index                  int                    not null,
-    point                  int                    not null,
-    liked_count            int                    not null,
-    liked_count_updated_at timestamp              not null,
-    location               geography(point, 4326) not null,
-    account_type_id        int                    not null,
-    created_at             timestamp              not null,
-    updated_at             timestamp              not null,
+    id                      uuid primary key                default uuid_generate_v4(),
+    enabled                 boolean                not null,
+    blocked                 boolean                not null,
+    name                    varchar(50)            not null default '',
+    email                   varchar(256) unique    not null,
+    birth_year              int                    not null,
+    birth                   Date                   not null,
+    about                   varchar(500)           not null default '',
+    gender                  boolean                not null,
+    score                   int                    not null,
+    index                   int                    not null,
+    point                   int                    not null,
+    swiped_count            int                    not null,
+    swiped_count_updated_at timestamp              not null,
+    location                geography(point, 4326) not null,
+    account_type_id         int                    not null,
+    created_at              timestamp              not null,
+    updated_at              timestamp              not null,
 
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
@@ -258,17 +267,20 @@ create table reward
     constraint reward_reward_type_id_fk foreign key (reward_type_id) references reward_type (id)
 );
 
-create table liked
-(
-    id         serial primary key,
-    liker_id   uuid      not null,
-    liked_id   uuid      not null,
-    balanced   boolean   not null,
-    created_at timestamp not null,
 
-    constraint liked_liker_id_fk foreign key (liker_id) references account (id),
-    constraint liked_liked_id_fk foreign key (liked_id) references account (id)
+create table swipe
+(
+    id          serial primary key,
+    swiper_id   uuid      not null,
+    swiped_id   uuid      not null,
+    balanced    boolean   not null,
+    created_at  timestamp not null,
+    updated_at  timestamp not null,
+
+    constraint swipe_swiper_id_fk foreign key (swiper_id) references account (id),
+    constraint swipe_swiped_id_fk foreign key (swiped_id) references account (id)
 );
+
 
 
 -- if match between 1 and 2 then
@@ -378,31 +390,35 @@ create table unblock
     constraint unblock_admin_id_fk foreign key (admin_id) references admin (id)
 );
 
-create table liked_spent_history
-(
-    id          serial primary key,
-    point_spent int       not null,
-    account_id  uuid      not null,
-    liked_id    int       not null,
-    created_at  timestamp not null,
-
-    constraint liked_spent_history_liked_id foreign key (liked_id) references liked (id),
-    constraint liked_spent_history_account_id_fk foreign key (account_id) references account (id)
-);
+-- create table swipe_spent_history
+-- (
+--     id          serial primary key,
+--     point_spent int       not null,
+--     account_id  uuid      not null,
+--     swipe_id    int       not null,
+--     created_at  timestamp not null,
+--
+--     constraint swipe_spent_history_swipe_id_fk foreign key (swipe_id) references swipe (id),
+--     constraint swipe_spent_history_account_id_fk foreign key (account_id) references account (id)
+-- );
 
 -- 194
 
 select id::varchar
 from account;
 
-select count(*)
+select *
 from photo;
 
-delete from photo where id is  not null;
-delete from account where id is not null;
+delete
+from photo
+where id is not null;
+delete
+from account
+where id is not null;
 
 
-select cast(b.id as varchar)
+select cast(b.id as varchar) as id, b.name
 from (select *
       from account a
       where st_dwithin(location, st_setsrid(st_point(126.807883, 37.521757), 4326), 5000)
@@ -411,8 +427,13 @@ from (select *
         and birth_year <= 2003
         and enabled = true
       limit 30 offset 0) as b
-inner join photo as p
-on p.account_id = b.id
+         inner join photo as p
+                    on p.account_id = b.id
+
+
+
+
+
 
 
 

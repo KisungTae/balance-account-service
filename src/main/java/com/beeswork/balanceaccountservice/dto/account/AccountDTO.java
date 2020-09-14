@@ -10,9 +10,9 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class AccountDTO {
+public class AccountDTO extends AccountProfileDTO {
 
-    private UUID id;
+    private String id;
     private String email;
     private String name;
     private Date birth;

@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.entity.account;
 
+import com.beeswork.balanceaccountservice.entity.match.Swipe;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,10 +18,6 @@ import java.util.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "account")
-@SqlResultSetMapping(name = "AccountsWithinMapping",
-                     entities = {
-
-                     })
 public class Account {
 
     @Id
@@ -62,15 +59,14 @@ public class Account {
     private int index;
 
     @Column(name = "point")
-
     private int point;
 
-    @Column(name = "liked_count")
-    private int likedCount;
+    @Column(name = "swiped_count")
+    private int swipedCount;
 
-    @Column(name = "liked_count_updated_at")
+    @Column(name = "swiped_count_updated_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date likedCountUpdatedAt;
+    private Date swipedCountUpdatedAt;
 
     @Column(name = "location",
             columnDefinition = "GEOGRAPHY(POINT)")
@@ -97,6 +93,12 @@ public class Account {
                cascade = CascadeType.ALL,
                orphanRemoval = true)
     private List<Photo> photos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "swiper",
+               fetch = FetchType.LAZY,
+               cascade = CascadeType.ALL,
+               orphanRemoval = true)
+    private List<Swipe> swipes = new ArrayList<>();
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

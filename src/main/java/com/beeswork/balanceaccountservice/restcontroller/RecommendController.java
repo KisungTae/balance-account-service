@@ -1,8 +1,10 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.dto.account.AccountProfileDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.service.recommend.RecommendService;
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.util.List;
 import java.util.UUID;
 
 @Validated
@@ -37,11 +40,20 @@ public class RecommendController extends BaseController {
                                                     @RequestParam("gender") boolean gender,
                                                     @RequestParam double latitude,
                                                     @RequestParam double longitude)
+    throws AccountNotFoundException, JsonProcessingException {
+
+        List<AccountProfileDTO> accountProfileDTOs = recommendService.accountsWithin(accountId, distance, minAge, maxAge, gender, latitude, longitude);
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(accountProfileDTOs));
+    }
+
+    @PostMapping("/swipe")
+    public ResponseEntity<String> swipeAccount(@RequestParam("swiper_id") @ValidUUID String swiperId,
+                                               @RequestParam("swiper_email") String swiperEmail,
+                                               @RequestParam("swiped_id") @ValidUUID String swipedId)
     throws AccountNotFoundException {
 
-        recommendService.accountsWithin(UUID.fromString(accountId), distance, minAge, maxAge, gender, latitude, longitude);
-
-        return ResponseEntity.status(HttpStatus.OK).body("");
+        long swipeId = recommendService.swipe(swiperId, swiperEmail, swipedId);
+        return ResponseEntity.status(HttpStatus.OK).body(String.valueOf(swipeId));
     }
 
 
