@@ -1,6 +1,6 @@
 package com.beeswork.balanceaccountservice.entity.account;
 
-import com.beeswork.balanceaccountservice.entity.match.Swipe;
+import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -404,7 +404,11 @@ create table unblock
 
 -- 194
 
-select id::varchar
+
+select *
+from account_question;
+
+select count(*)
 from account;
 
 select *

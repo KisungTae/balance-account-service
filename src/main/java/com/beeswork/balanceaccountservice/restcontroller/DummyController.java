@@ -230,7 +230,7 @@ public class DummyController {
                 account.setAccountType(accountType);
                 account.setScore(latCount);
                 account.setPoint(lonCount);
-                account.setLikedCountUpdatedAt(new Date());
+                account.setSwipedCountUpdatedAt(new Date());
                 account.setCreatedAt(new Date());
                 account.setUpdatedAt(new Date());
 

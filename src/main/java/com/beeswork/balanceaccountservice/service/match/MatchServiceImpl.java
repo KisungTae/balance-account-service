@@ -1,13 +1,19 @@
-package com.beeswork.balanceaccountservice.service.recommend;
+package com.beeswork.balanceaccountservice.service.match;
 
 import com.beeswork.balanceaccountservice.constant.ColumnIndex;
-import com.beeswork.balanceaccountservice.constant.QueryParameter;
+import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
+import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.account.AccountProfileDTO;
 import com.beeswork.balanceaccountservice.dto.account.PhotoDTO;
+import com.beeswork.balanceaccountservice.dto.match.SwipeAddedDTO;
+import com.beeswork.balanceaccountservice.dto.match.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
-import com.beeswork.balanceaccountservice.entity.match.Swipe;
+import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
+import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
+import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipeBalancedExistsException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -26,32 +32,34 @@ import java.util.UUID;
 
 
 @Service
-public class RecommendServiceImpl extends BaseServiceImpl implements RecommendService {
+public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     private final AccountDAO accountDAO;
+    private final SwipeDAO swipeDAO;
 
     private final GeometryFactory geometryFactory;
 
     @Autowired
-    public RecommendServiceImpl(ModelMapper modelMapper, AccountDAO accountDAO, GeometryFactory geometryFactory) {
+    public MatchServiceImpl(ModelMapper modelMapper, AccountDAO accountDAO, SwipeDAO swipeDAO, GeometryFactory geometryFactory) {
         super(modelMapper);
         this.accountDAO = accountDAO;
+        this.swipeDAO = swipeDAO;
         this.geometryFactory = geometryFactory;
     }
 
     // TEST 1. matches are mapped by matcher_id not matched_id
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<AccountProfileDTO> accountsWithin(String accountId, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude)
+    public List<AccountProfileDTO> recommend(String accountId, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude)
     throws AccountNotFoundException {
 
         UUID accountUUID = UUID.fromString(accountId);
 
         Account account = accountDAO.findById(accountUUID);
         Point location = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-        location.setSRID(QueryParameter.SRID);
+        location.setSRID(AppConstant.SRID);
 
-        List<Object[]> accounts = accountDAO.findAllWithin(accountUUID, distance, minAge, maxAge, gender, QueryParameter.LIMIT,
-                                                           QueryParameter.LIMIT * account.getIndex(), location);
+        List<Object[]> accounts = accountDAO.findAllWithin(accountUUID, distance, minAge, maxAge, gender, AppConstant.LIMIT,
+                                                           AppConstant.LIMIT * account.getIndex(), location);
 
         String previousId = "";
         List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>();
@@ -82,21 +90,41 @@ public class RecommendServiceImpl extends BaseServiceImpl implements RecommendSe
         return accountProfileDTOs;
     }
 
-    public long swipe(String swiperId, String swiperEmail, String swipedId) throws AccountNotFoundException {
-        Account swiper = accountDAO.findById(UUID.fromString(swiperId));
-        Account swiped = accountDAO.findById(UUID.fromString(swipedId));
+    @Transactional
+    public SwipeAddedDTO swipe(SwipeDTO swipeDTO)
+    throws AccountNotFoundException, AccountInvalidException, SwipeBalancedExistsException,
+           AccountShortOfPointException {
 
-        Swipe swipe = new Swipe(swiper, swiped, false, new Date());
+        UUID swiperUUId = UUID.fromString(swipeDTO.getSwiperId());
+        UUID swipedUUId = UUID.fromString(swipeDTO.getSwipedId());
+
+        Account swiper = accountDAO.findById(swiperUUId);
+
+        if (!swiper.getEmail().equals(swipeDTO.getSwiperEmail()))
+            throw new AccountInvalidException();
+
+        if (swipeDAO.balancedExists(swiperUUId, swipedUUId))
+            throw new SwipeBalancedExistsException();
+
+        int currentPoint = swiper.getPoint();
+
+        if (currentPoint < AppConstant.SWIPE_POINT)
+            throw new AccountShortOfPointException();
+
+        Account swiped = accountDAO.findById(swipedUUId);
+
+        Swipe swipe = new Swipe(swiper, swiped, false, new Date(), new Date());
         swiper.getSwipes().add(swipe);
+
+        currentPoint -= AppConstant.SWIPE_POINT;
+        swiper.setPoint(currentPoint);
+
+
         accountDAO.persist(swiper);
 
-        // subtract point
-
-        // check balanced swipe exists
 
 
-
-        return swipe.getId();
+        return new SwipeAddedDTO(swipe.getId());
     }
 
 

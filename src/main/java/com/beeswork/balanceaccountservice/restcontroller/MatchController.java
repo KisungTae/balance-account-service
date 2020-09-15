@@ -1,35 +1,43 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.account.AccountProfileDTO;
+import com.beeswork.balanceaccountservice.dto.match.SwipeAddedDTO;
+import com.beeswork.balanceaccountservice.dto.match.SwipeDTO;
+import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
-import com.beeswork.balanceaccountservice.service.recommend.RecommendService;
+import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipeBalancedExistsException;
+import com.beeswork.balanceaccountservice.service.match.MatchService;
+import com.beeswork.balanceaccountservice.util.Convert;
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
+import com.beeswork.balanceaccountservice.vm.match.SwipeVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.List;
-import java.util.UUID;
 
 @Validated
 @RestController
-@RequestMapping("/recommend")
-public class RecommendController extends BaseController {
+@RequestMapping("/match")
+public class MatchController extends BaseController {
 
 
-    private final RecommendService recommendService;
+    private final MatchService matchService;
 
     @Autowired
-    public RecommendController(ObjectMapper objectMapper, ModelMapper modelMapper, RecommendService recommendService) {
+    public MatchController(ObjectMapper objectMapper, ModelMapper modelMapper, MatchService matchService) {
         super(objectMapper, modelMapper);
-        this.recommendService = recommendService;
+        this.matchService = matchService;
     }
 
     @GetMapping("/accounts")
@@ -42,18 +50,18 @@ public class RecommendController extends BaseController {
                                                     @RequestParam double longitude)
     throws AccountNotFoundException, JsonProcessingException {
 
-        List<AccountProfileDTO> accountProfileDTOs = recommendService.accountsWithin(accountId, distance, minAge, maxAge, gender, latitude, longitude);
+        List<AccountProfileDTO> accountProfileDTOs = matchService.recommend(accountId, distance, minAge, maxAge, gender, latitude, longitude);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(accountProfileDTOs));
     }
 
     @PostMapping("/swipe")
-    public ResponseEntity<String> swipeAccount(@RequestParam("swiper_id") @ValidUUID String swiperId,
-                                               @RequestParam("swiper_email") String swiperEmail,
-                                               @RequestParam("swiped_id") @ValidUUID String swipedId)
-    throws AccountNotFoundException {
+    public ResponseEntity<String> swipeAccount(@Valid @RequestBody SwipeVM swipeVM,
+                                               BindingResult bindingResult)
+    throws AccountNotFoundException, AccountInvalidException, SwipeBalancedExistsException, JsonProcessingException,
+           AccountShortOfPointException {
 
-        long swipeId = recommendService.swipe(swiperId, swiperEmail, swipedId);
-        return ResponseEntity.status(HttpStatus.OK).body(String.valueOf(swipeId));
+        SwipeAddedDTO swipeAddedDTO = matchService.swipe(modelMapper.map(swipeVM, SwipeDTO.class));
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(swipeAddedDTO));
     }
 
 

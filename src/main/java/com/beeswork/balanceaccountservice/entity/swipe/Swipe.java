@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.entity.match;
+package com.beeswork.balanceaccountservice.entity.swipe;
 
 
 import com.beeswork.balanceaccountservice.entity.account.Account;
@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -22,12 +23,18 @@ public class Swipe {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "swiper_id", updatable = false, insertable = false)
+    private UUID swiperId;
+
+    @Column(name = "swiped_id", updatable = false, insertable = false)
+    private UUID swipedId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "swiper_id")
+    @JoinColumn(name = "swiper_id")
     private Account swiper;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "swiped_id")
+    @JoinColumn(name = "swiped_id")
     private Account swiped;
 
     @Column(name = "balanced")
@@ -39,12 +46,13 @@ public class Swipe {
 
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updated;
+    private Date updatedAt;
 
-    public Swipe(Account swiper, Account swiped, boolean balanced, Date createdAt) {
+    public Swipe(Account swiper, Account swiped, boolean balanced, Date createdAt, Date updatedAt) {
         this.swiper = swiper;
         this.swiped = swiped;
         this.balanced = balanced;
         this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 }

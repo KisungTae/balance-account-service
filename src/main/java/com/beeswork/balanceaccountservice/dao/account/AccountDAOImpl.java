@@ -1,24 +1,18 @@
 package com.beeswork.balanceaccountservice.dao.account;
 
-import com.beeswork.balanceaccountservice.constant.QueryParameter;
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
-import com.beeswork.balanceaccountservice.dto.account.AccountDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
-import com.beeswork.balanceaccountservice.entity.account.AccountType;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
 import com.beeswork.balanceaccountservice.entity.account.QPhoto;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,6 +62,8 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
                             .setParameter("offset", offset)
                             .getResultList();
     }
+
+    public Account findByIdWith
 
 
 }
