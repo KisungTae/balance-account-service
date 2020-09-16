@@ -6,6 +6,7 @@ import com.beeswork.balanceaccountservice.exception.BaseException;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
+import com.beeswork.balanceaccountservice.exception.match.MatchExistsException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeBalancedExistsException;
 import com.beeswork.balanceaccountservice.util.Convert;
@@ -40,7 +41,8 @@ public class ExceptionControllerAdvice {
                              .body(convert.exceptionMessageToJSON(exception, locale));
     }
 
-    @ExceptionHandler({AccountInvalidException.class, SwipeBalancedExistsException.class, AccountShortOfPointException.class})
+    @ExceptionHandler({AccountInvalidException.class, SwipeBalancedExistsException.class, AccountShortOfPointException.class,
+                       MatchExistsException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

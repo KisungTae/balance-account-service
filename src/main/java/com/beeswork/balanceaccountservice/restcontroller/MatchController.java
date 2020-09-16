@@ -1,14 +1,16 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.account.AccountProfileDTO;
-import com.beeswork.balanceaccountservice.dto.match.SwipeAddedDTO;
+import com.beeswork.balanceaccountservice.dto.match.BalanceDTO;
+import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.dto.match.SwipeDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
+import com.beeswork.balanceaccountservice.exception.match.MatchExistsException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeBalancedExistsException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
 import com.beeswork.balanceaccountservice.service.match.MatchService;
-import com.beeswork.balanceaccountservice.util.Convert;
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
 import com.beeswork.balanceaccountservice.vm.match.SwipeVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -50,7 +52,13 @@ public class MatchController extends BaseController {
                                                     @RequestParam double longitude)
     throws AccountNotFoundException, JsonProcessingException {
 
-        List<AccountProfileDTO> accountProfileDTOs = matchService.recommend(accountId, distance, minAge, maxAge, gender, latitude, longitude);
+        List<AccountProfileDTO> accountProfileDTOs = matchService.recommend(accountId,
+                                                                            distance,
+                                                                            minAge,
+                                                                            maxAge,
+                                                                            gender,
+                                                                            latitude,
+                                                                            longitude);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(accountProfileDTOs));
     }
 
@@ -60,8 +68,17 @@ public class MatchController extends BaseController {
     throws AccountNotFoundException, AccountInvalidException, SwipeBalancedExistsException, JsonProcessingException,
            AccountShortOfPointException {
 
-        SwipeAddedDTO swipeAddedDTO = matchService.swipe(modelMapper.map(swipeVM, SwipeDTO.class));
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(swipeAddedDTO));
+        if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
+        BalanceDTO balanceDTO = matchService.swipe(modelMapper.map(swipeVM, SwipeDTO.class));
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(balanceDTO));
+    }
+
+    @PostMapping("/balance")
+    public ResponseEntity<String> balanceAccount(@Valid @RequestBody SwipeVM swipeVM)
+    throws JsonProcessingException, SwipeNotFoundException, AccountInvalidException, MatchExistsException {
+
+        MatchDTO matchDTO = matchService.balance(modelMapper.map(swipeVM, SwipeDTO.class));
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(matchDTO));
     }
 
 

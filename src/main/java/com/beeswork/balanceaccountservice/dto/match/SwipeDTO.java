@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 public class SwipeDTO {
 
+    private Long swipeId;
     private String swiperId;
     private String swipedId;
     private String swiperEmail;

@@ -11,4 +11,7 @@ public class ExceptionCode {
     public static final String QUESTION_NOT_FOUND_EXCEPTION = "question.not.found.exception";
 
     public static final String SWIPE_BALANCED_EXISTS_EXCEPTION = "swipe.balanced.exists.exception";
+    public static final String SWIPE_NOT_FOUND_EXCEPTION = "swipe.not.found.exception";
+
+    public static final String MATCH_EXISTS_EXCEPTION = "match.exists.exception";
 }

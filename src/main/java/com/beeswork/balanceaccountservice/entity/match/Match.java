@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.entity.match;
 
 
 import com.beeswork.balanceaccountservice.entity.account.Account;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,6 +35,14 @@ public class Match {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
+    public Match(Account matcher, Account matched, boolean unmatched, Date createdAt) {
+        this.matchId = new MatchId(matcher.getId(), matched.getId());
+        this.matcher = matcher;
+        this.matched = matched;
+        this.unmatched = unmatched;
+        this.createdAt = createdAt;
+    }
 
     public UUID getMatcherId() {
         return matchId.getMatcherId();

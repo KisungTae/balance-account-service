@@ -163,10 +163,8 @@ drop table account_type;
 drop table liked_spent_history;
 drop table liked;
 
-alter table account
-    rename liked_count to swiped_count;
-alter table account
-    rename liked_count_updated_at to swiped_count_updated_at;
+alter table account rename liked_count to swiped_count;
+alter table account rename liked_count_updated_at to swiped_count_updated_at;
 
 -- create UUID extension
 create extension if not exists "uuid-ossp";
@@ -406,21 +404,15 @@ create table unblock
 
 
 select *
-from account_question;
-
-select count(*)
 from account;
 
+
 select *
-from photo;
+from swipe;
 
-delete
-from photo
-where id is not null;
-delete
-from account
-where id is not null;
 
+select *
+from match;
 
 select cast(b.id as varchar) as id, b.name
 from (select *

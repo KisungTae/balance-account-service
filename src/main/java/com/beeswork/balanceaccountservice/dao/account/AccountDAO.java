@@ -13,5 +13,6 @@ public interface AccountDAO extends BaseDAO<Account> {
     Account findById(UUID id) throws AccountNotFoundException;
     List<Object[]> findAllWithin(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point point)
     throws AccountNotFoundException;
-//    Account findByIdAndName(long id, String email);
+    Account findByIdWithQuestions(UUID accountId) throws AccountNotFoundException;
+    Account findByIdWithAccountQuestions(UUID accountId) throws AccountNotFoundException;
 }

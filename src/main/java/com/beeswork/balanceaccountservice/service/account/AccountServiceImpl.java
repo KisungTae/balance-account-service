@@ -104,7 +104,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
         List<AccountQuestionDTO> accountQuestionDTOs = accountQuestionSaveDTO.getAccountQuestionDTOs();
 
-        Account account = accountDAO.findById(accountQuestionSaveDTO.getAccountId());
+        Account account = accountDAO.findByIdWithAccountQuestions(accountQuestionSaveDTO.getAccountId());
         List<AccountQuestion> accountQuestions = account.getAccountQuestions();
 
         for (int i = accountQuestions.size() - 1; i >= 0; i--) {
