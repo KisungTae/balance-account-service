@@ -163,6 +163,7 @@ drop table account_type;
 drop table liked_spent_history;
 drop table liked;
 
+alter table photo drop column url;
 alter table account rename liked_count to swiped_count;
 alter table account rename liked_count_updated_at to swiped_count_updated_at;
 
@@ -210,7 +211,7 @@ create table photo
 (
     id         serial primary key,
     sequence   int           not null,
-    url        varchar(1000) not null,
+--     url        varchar(1000) not null,
     account_id uuid          not null,
     created_at timestamp     not null,
     updated_at timestamp     not null,
@@ -407,8 +408,36 @@ select *
 from account;
 
 
+update swipe set balanced = true where id = 7;
+
+
 select *
-from swipe;
+from swipe
+where swiped_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762';
+
+select *
+from match
+where matcher_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762';
+
+
+select *
+from swipe s
+left join match m on s.swiper_id = m.matched_id
+where s.swiped_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762'
+and s.balanced = true
+and m.matcher_id is null;
+
+
+select *
+from swipe
+where swiper_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762';
+
+
+insert into swipe values (default, 'e4d3d624-a9f1-4efc-9789-c4e951655762'::uuid, 'b68569a3-977e-45d1-b3b7-68fb38ec6948'::uuid, false, current_timestamp, current_timestamp);
+
+
+
+
 
 
 select *

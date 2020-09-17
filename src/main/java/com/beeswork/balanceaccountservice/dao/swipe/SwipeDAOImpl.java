@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.dao.swipe;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
+import com.beeswork.balanceaccountservice.entity.match.QMatch;
 import com.beeswork.balanceaccountservice.entity.swipe.QSwipe;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Tuple;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -17,6 +20,7 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
 
     private final QAccount qAccount = QAccount.account;
     private final QSwipe qSwipe = QSwipe.swipe;
+    private final QMatch qMatch = QMatch.match;
 
     @Autowired
     public SwipeDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
@@ -52,6 +56,22 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
                                                     .and(qSwipe.swipedId.eq(swipedId))
                                                     .and(qSwipe.balanced.eq(balanced)))
                               .fetchCount() > 0;
+    }
+
+    @Override
+    public List<Swipe> findAllBySwiperId(UUID swiperId) {
+        return jpaQueryFactory.selectFrom(qSwipe)
+                              .leftJoin(qMatch).on(qSwipe.swiperId.eq(qMatch.matchedId))
+                              .where(qSwipe.swipedId.eq(swiperId)
+                                                    .and(qSwipe.balanced.eq(true))
+                                                    .and(qMatch.matchedId.isNull()))
+                              .fetch();
+    }
+
+    public List<Swipe> findAllBySwipedId(UUID swipedId) {
+
+
+        return null;
     }
 
 

@@ -241,7 +241,7 @@ public class DummyController {
                     photo.setCreatedAt(new Date());
                     photo.setUpdatedAt(new Date());
                     photo.setSequence(p);
-                    photo.setUrl("https://aws." + name);
+//                    photo.setUrl("https://aws." + name);
                     account.getPhotos().add(photo);
                 }
 

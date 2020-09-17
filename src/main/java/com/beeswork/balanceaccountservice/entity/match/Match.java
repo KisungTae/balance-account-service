@@ -29,6 +29,12 @@ public class Match {
     @MapsId("matchedId")
     private Account matched;
 
+    @Column(name = "matcher_id", insertable = false, updatable = false)
+    private UUID matcherId;
+
+    @Column(name = "matched_id", insertable = false, updatable = false)
+    private UUID matchedId;
+
     @Column(name = "unmatched")
     private boolean unmatched;
 

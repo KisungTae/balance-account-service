@@ -25,8 +25,8 @@ public class Photo {
     @Column(name = "sequence")
     private int sequence;
 
-    @Column(name = "url")
-    private String url;
+//    @Column(name = "url")
+//    private String url;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
