@@ -69,8 +69,6 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
     public List<Swipe> findAllBySwipedId(UUID swipedId) {
-
-
         return null;
     }
 

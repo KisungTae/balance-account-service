@@ -219,6 +219,8 @@ create table photo
     constraint photo_account_id_fk foreign key (account_id) references account (id)
 );
 
+create index photo_account_id_idx on photo (account_id);
+
 
 create table question
 (
@@ -280,6 +282,9 @@ create table swipe
     constraint swipe_swiped_id_fk foreign key (swiped_id) references account (id)
 );
 
+create index swipe_swiper_id_idx on swipe (swiper_id);
+create index swipe_swiped_id_idx on swipe (swiped_id);
+
 
 
 -- if match between 1 and 2 then
@@ -298,6 +303,11 @@ create table match
     constraint match_matched_id_fk foreign key (matched_id) references account (id)
 );
 
+create index match_matcher_id_idx on match (matcher_id);
+create index match_matched_id_idx on match (matched_id);
+
+
+
 create table unmatch
 (
     unmatcher_id uuid      not null,
@@ -308,6 +318,10 @@ create table unmatch
     constraint unmatch_unmatcher_id_fk foreign key (unmatcher_id) references account (id),
     constraint unmatch_unmatched_id_fk foreign key (unmatched_id) references account (id)
 );
+
+
+create index unmatch_unmatcher_id_idx on unmatch (unmatcher_id);
+create index unmatch_unmatched_id_idx on unmatch (unmatched_id);
 
 
 create table admin
@@ -404,62 +418,58 @@ create table unblock
 -- 194
 
 
-select *
-from account;
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'swipe';
 
 
-update swipe set balanced = true where id = 7;
 
-
-select *
-from swipe
-where swiped_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762';
-
-select *
-from match
-where matcher_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762';
-
-
-select *
+explain select *
 from swipe s
-left join match m on s.swiper_id = m.matched_id
-where s.swiped_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762'
-and s.balanced = true
-and m.matcher_id is null;
+where swiper_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762'
+and s.swiped_id not in (select swiped_id from swipe where swiper_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762' and balanced = true);
 
 
+explain analyse select *
+from swipe s
+left join (select swiped_id from swipe where swiper_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762' and balanced = true) lj on s.swiped_id = lj.swiped_id
+where s.swiper_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762'
+and lj.swiped_id is null;
+
+
+select *
+from swipe;
+
+explain analyse
 select *
 from swipe
-where swiper_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762';
-
-
-insert into swipe values (default, 'e4d3d624-a9f1-4efc-9789-c4e951655762'::uuid, 'b68569a3-977e-45d1-b3b7-68fb38ec6948'::uuid, false, current_timestamp, current_timestamp);
+where swiper_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762'::uuid;
 
 
 
+explain analyse
+select *
+from swipe
+where id = 1;
 
+explain analyse
+select *
+from account
+where id = 'e4d3d624-a9f1-4efc-9789-c4e951655762'::uuid;
+
+explain analyse
+select *
+from account_question
+where account_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762'::uuid;
 
 
 select *
-from match;
+from swipe;
 
-select cast(b.id as varchar) as id, b.name
-from (select *
-      from account a
-      where st_dwithin(location, st_setsrid(st_point(126.807883, 37.521757), 4326), 5000)
-        and gender = true
-        and birth_year >= 1970
-        and birth_year <= 2003
-        and enabled = true
-      limit 30 offset 0) as b
-         inner join photo as p
-                    on p.account_id = b.id
-
-
-
-
-
-
-
-
+select *
+from swipe s1
+inner join swipe s2 on s1.swiped_id = s2.swiper_id
+where s1.balanced = true and s2.balanced = true
+and s1.swiper_id = s2.swiped_id
+and s1.id != s2.id;
 

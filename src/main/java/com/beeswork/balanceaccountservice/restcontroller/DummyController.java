@@ -7,9 +7,12 @@ import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
 import com.beeswork.balanceaccountservice.entity.question.QQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
+import com.beeswork.balanceaccountservice.entity.swipe.QSwipe;
+import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.hibernate.Session;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -92,41 +95,65 @@ public class DummyController {
     }
 
     @Transactional
-    @PostMapping("/create/match")
-    public void createDummyMatch(@RequestParam int size) {
+    @PostMapping("/create/swipe")
+    public void createDummySwipe() {
         List<Account> accounts = new JPAQueryFactory(entityManager).selectFrom(QAccount.account).fetch();
 
-        int count = 0;
-
         Random random = new Random();
-        for (Account account : accounts) {
 
-            count++;
+        for (int i = 0; i < accounts.size(); i++) {
+            Account swiper = accounts.get(i);
 
-            int index =  random.nextInt((accounts.size() - 10));
+            int index1 = random.nextInt(accounts.size() - 1);
+            int index2 = random.nextInt(accounts.size() - 1);
 
-            for (int i = 0;  i < 3; i++) {
-                Account matched = accounts.get(index);
+            int startIndex = Math.min(index1, index2);
+            int endIndex = Math.max(index1, index2);
 
-                Match match = account.getMatches().stream().filter(d -> d.getMatchedId() == matched.getId()).findFirst().orElse(null);
-                if (match == null) {
-                    Match newMatcher = new Match();
-                    newMatcher.setMatcher(account);
-                    newMatcher.setMatched(matched);
-                    newMatcher.setCreatedAt(new Date());
-                    newMatcher.setMatchId(new MatchId(account.getId(), matched.getId()));
-                    account.getMatches().add(newMatcher);
+            for (int j = startIndex; j < endIndex; j++) {
+                if (i != j) {
+                    int count = random.nextInt(4);
 
-                    Match newMatched = new Match();
-                    newMatched.setMatcher(matched);
-                    newMatched.setMatched(account);
-                    newMatched.setCreatedAt(new Date());
-                    newMatched.setMatchId(new MatchId(matched.getId(), account.getId()));
-                    matched.getMatches().add(newMatched);
+                    for (int k = 0; k < count; k++) {
+                        Swipe swipe = new Swipe(swiper, accounts.get(j), false, new Date(), new Date());
+                        swiper.getSwipes().add(swipe);
+                    }
+
+                    Swipe swipe = new Swipe(swiper, accounts.get(j), random.nextBoolean(), new Date(), new Date());
+                    swiper.getSwipes().add(swipe);
                 }
             }
+            entityManager.persist(swiper);
+        }
+    }
 
-//            if (count > size) break;
+    @Transactional
+    @PostMapping("/create/match")
+    public void createDummyMatch() {
+
+
+        List<Swipe> swipes = entityManager.unwrap(Session.class).createQuery("from swipe s1 " +
+                                                                             "inner join swipe s2 on s1.swiped_id = s2.swiper_id " +
+                                                                             "where s1.balanced = true and s2.balanced = true " +
+                                                                             "and s1.swiper_id = s2.swiped_id ", Swipe.class).getResultList();
+
+//        List<Swipe> swipes = new JPAQueryFactory(entityManager).select(QSwipe.swipe)
+//                                                               .from(s1)
+//                                                               .innerJoin(s2)
+//                                                               .on(s1.swipedId.eq(s2.swiperId))
+//                                                               .where(s1.swiperId.eq(s2.swipedId)
+//                                                                                 .and(s1.balanced.eq(true))
+//                                                                                 .and(s2.balanced.eq(true)))
+//                                                               .fetch();
+
+        for (Swipe swipe : swipes) {
+            Match newMatcher = new Match();
+            newMatcher.setMatcher(swipe.getSwiper());
+            newMatcher.setMatched(swipe.getSwiped());
+            newMatcher.setCreatedAt(new Date());
+            newMatcher.setMatchId(new MatchId(swipe.getSwiperId(), swipe.getSwipedId()));
+            swipe.getSwiper().getMatches().add(newMatcher);
+            entityManager.persist(swipe.getSwiper());
         }
     }
 
@@ -186,9 +213,9 @@ public class DummyController {
     public void createDummyAccounts(@RequestParam int size) throws ParseException {
 
         double startLat = 37.463557;
-        double endLat   = 37.650017;
+        double endLat = 37.650017;
         double startLon = 126.807883;
-        double endLon   = 127.176639;
+        double endLon = 127.176639;
 
         Random random = new Random();
         SimpleDateFormat originalFormat = new SimpleDateFormat("yyyyMMdd");
@@ -202,7 +229,7 @@ public class DummyController {
 
         Calendar calendar = Calendar.getInstance();
 
-        for (double lon = startLon; lon <= endLon; lon+= 0.000300) {
+        for (double lon = startLon; lon <= endLon; lon += 0.000300) {
 
             for (double lat = startLat; lat <= endLat; lat += 0.000300) {
 
@@ -211,7 +238,9 @@ public class DummyController {
                 int year = random.nextInt((2003 - 1970)) + 1970;
                 int month = random.nextInt((12 - 1)) + 1;
                 int day = random.nextInt((25 - 1)) + 1;
-                String birthString = String.valueOf(year) + (month < 10 ? "0" + month : month) + (day < 10 ? "0" + day : day);
+                String birthString = String.valueOf(year) +
+                                     (month < 10 ? "0" + month : month) +
+                                     (day < 10 ? "0" + day : day);
                 Date birth = originalFormat.parse(birthString);
                 Point location = gf.createPoint(new Coordinate(lon, lat));
                 String name = "account | " + lat + " | " + lon;
