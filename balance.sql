@@ -170,6 +170,9 @@ alter table account
 alter table account
     rename liked_count_updated_at to swiped_count_updated_at;
 
+alter table photo drop column updated_at;
+alter table photo drop column sequence;
+
 -- create UUID extension
 create extension if not exists "uuid-ossp";
 
@@ -422,3 +425,4 @@ create table unblock
 
 select *
 from photo;
+

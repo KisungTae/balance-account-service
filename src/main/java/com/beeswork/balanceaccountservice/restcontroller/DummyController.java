@@ -225,8 +225,8 @@ public class DummyController {
                     Photo photo = new Photo();
                     photo.setAccount(account);
                     photo.setCreatedAt(new Date());
-                    photo.setUpdatedAt(new Date());
-                    photo.setSequence(p);
+//                    photo.setUpdatedAt(new Date());
+//                    photo.setSequence(p);
 //                    photo.setUrl("https://aws." + name);
                     account.getPhotos().add(photo);
                 }
