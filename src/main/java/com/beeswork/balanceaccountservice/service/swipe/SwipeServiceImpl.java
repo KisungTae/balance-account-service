@@ -3,10 +3,10 @@ package com.beeswork.balanceaccountservice.service.swipe;
 import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
-import com.beeswork.balanceaccountservice.dto.account.AccountSimpleProfileDTO;
 import com.beeswork.balanceaccountservice.dto.match.BalanceDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.SwipeListDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
@@ -38,15 +38,15 @@ public class SwipeServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public List<AccountSimpleProfileDTO> listSwipes(String accountId) {
+    public SwipeListDTO listSwipes(String accountId) {
 
-        List<AccountSimpleProfileDTO> accountSimpleProfileDTOs = new ArrayList<>();
+        SwipeListDTO swipeListDTO = new SwipeListDTO();
 
-        for (Swipe swipe : swipeDAO.findAllBySwiperId(UUID.fromString(accountId))) {
-            accountSimpleProfileDTOs.add(new AccountSimpleProfileDTO(swipe.getSwiperId().toString(), AppConstant.AWS_S3_URL));
+        for (Swipe swipe : swipeDAO.findAllSwiped(UUID.fromString(accountId))) {
+            swipeListDTO.getSwiperIds().add(swipe.getSwiperId().toString());
         }
 
-        return  accountSimpleProfileDTOs;
+        return swipeListDTO;
     }
 
     @Override

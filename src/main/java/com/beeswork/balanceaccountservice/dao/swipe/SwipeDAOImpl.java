@@ -58,18 +58,23 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
                               .fetchCount() > 0;
     }
 
-    @Override
-    public List<Swipe> findAllBySwiperId(UUID swiperId) {
-        return jpaQueryFactory.selectFrom(qSwipe)
-                              .leftJoin(qMatch).on(qSwipe.swiperId.eq(qMatch.matchedId))
-                              .where(qSwipe.swipedId.eq(swiperId)
-                                                    .and(qSwipe.balanced.eq(true))
-                                                    .and(qMatch.matchedId.isNull()))
-                              .fetch();
-    }
+//    @Override
+//    public List<Swipe> findAll(UUID swiperId) {
+//        return jpaQueryFactory.selectFrom(qSwipe)
+//                              .leftJoin(qMatch).on(qSwipe.swiperId.eq(qMatch.matchedId))
+//                              .where(qSwipe.swipedId.eq(swiperId)
+//                                                    .and(qSwipe.balanced.eq(true))
+//                                                    .and(qMatch.matchedId.isNull()))
+//                              .fetch();
+//    }
 
-    public List<Swipe> findAllBySwipedId(UUID swipedId) {
-        return null;
+    public List<Swipe> findAllSwiped(UUID swipedId) {
+        return jpaQueryFactory.selectFrom(qSwipe)
+                              .leftJoin(qMatch)
+                              .on(qSwipe.swiperId.eq(qMatch.matcherId).and(qSwipe.swipedId.eq(qMatch.matchedId)))
+                              .where(qSwipe.swipedId.eq(swipedId)
+                                                    .and(qSwipe.balanced.eq(true))
+                                                    .and(qMatch.matchedId.isNull())).fetch();
     }
 
 

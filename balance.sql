@@ -163,9 +163,12 @@ drop table account_type;
 drop table liked_spent_history;
 drop table liked;
 
-alter table photo drop column url;
-alter table account rename liked_count to swiped_count;
-alter table account rename liked_count_updated_at to swiped_count_updated_at;
+alter table photo
+    drop column url;
+alter table account
+    rename liked_count to swiped_count;
+alter table account
+    rename liked_count_updated_at to swiped_count_updated_at;
 
 -- create UUID extension
 create extension if not exists "uuid-ossp";
@@ -210,11 +213,11 @@ CREATE INDEX account_location_idx ON account USING GIST (location);
 create table photo
 (
     id         serial primary key,
-    sequence   int           not null,
+    sequence   int       not null,
 --     url        varchar(1000) not null,
-    account_id uuid          not null,
-    created_at timestamp     not null,
-    updated_at timestamp     not null,
+    account_id uuid      not null,
+    created_at timestamp not null,
+    updated_at timestamp not null,
 
     constraint photo_account_id_fk foreign key (account_id) references account (id)
 );
@@ -271,12 +274,12 @@ create table reward
 
 create table swipe
 (
-    id          serial primary key,
-    swiper_id   uuid      not null,
-    swiped_id   uuid      not null,
-    balanced    boolean   not null,
-    created_at  timestamp not null,
-    updated_at  timestamp not null,
+    id         serial primary key,
+    swiper_id  uuid      not null,
+    swiped_id  uuid      not null,
+    balanced   boolean   not null,
+    created_at timestamp not null,
+    updated_at timestamp not null,
 
     constraint swipe_swiper_id_fk foreign key (swiper_id) references account (id),
     constraint swipe_swiped_id_fk foreign key (swiped_id) references account (id)
@@ -417,59 +420,5 @@ create table unblock
 
 -- 194
 
-
-SELECT indexname, indexdef
-FROM pg_indexes
-WHERE tablename = 'swipe';
-
-
-
-explain select *
-from swipe s
-where swiper_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762'
-and s.swiped_id not in (select swiped_id from swipe where swiper_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762' and balanced = true);
-
-
-explain analyse select *
-from swipe s
-left join (select swiped_id from swipe where swiper_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762' and balanced = true) lj on s.swiped_id = lj.swiped_id
-where s.swiper_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762'
-and lj.swiped_id is null;
-
-
 select *
-from swipe;
-
-explain analyse
-select *
-from swipe
-where swiper_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762'::uuid;
-
-
-
-explain analyse
-select *
-from swipe
-where id = 1;
-
-explain analyse
-select *
-from account
-where id = 'e4d3d624-a9f1-4efc-9789-c4e951655762'::uuid;
-
-explain analyse
-select *
-from account_question
-where account_id = 'e4d3d624-a9f1-4efc-9789-c4e951655762'::uuid;
-
-
-select *
-from swipe;
-
-select *
-from swipe s1
-inner join swipe s2 on s1.swiped_id = s2.swiper_id
-where s1.balanced = true and s2.balanced = true
-and s1.swiper_id = s2.swiped_id
-and s1.id != s2.id;
-
+from photo;

@@ -1,8 +1,8 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.dto.account.AccountSimpleProfileDTO;
 import com.beeswork.balanceaccountservice.dto.match.BalanceDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.SwipeListDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
@@ -50,7 +50,7 @@ public class SwipeController extends BaseController {
     @GetMapping("/list")
     public ResponseEntity<String> listSwipes(@RequestParam("account_id") @ValidUUID String accountId) throws JsonProcessingException {
 
-        List<AccountSimpleProfileDTO> accountSimpleProfileDTOs = swipeService.listSwipes(accountId);
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(accountSimpleProfileDTOs));
+        SwipeListDTO swipeListDTO = swipeService.listSwipes(accountId);
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(swipeListDTO));
     }
 }

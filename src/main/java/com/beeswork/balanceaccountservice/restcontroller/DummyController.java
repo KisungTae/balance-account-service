@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.config.properties.AWSProperties;
 import com.beeswork.balanceaccountservice.dao.accounttype.AccountTypeDAO;
+import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
@@ -43,54 +44,18 @@ public class DummyController {
     private AccountTypeDAO accountTypeRepository;
 
     @Autowired
+    private MatchDAO matchDAO;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    @GetMapping("/test")
-    @Transactional
-    public String test() {
-
-
-//        AccountQuestionRel accountQuestionRel = new AccountQuestionRel();
-//        accountQuestionRel.setAccountQuestionRelId(new AccountQuestionRelId(account.getId(), question.getId()));
-//        accountQuestionRel.setEnabled(true);
-//        accountQuestionRel.setSelected(true);
-//        accountQuestionRel.setCreated_at(new Date());
-//        accountQuestionRel.setUpdated_at(new Date());
-
-//        entityManager.persist(accountQuestionRel);
-
-
-//        createDummyAccountTypes(5);
-//        createDummyAccounts(50);
-//        createDummyQuestions(50);
-//        createDummyAccountQuestionRel(151, 151, false, 3);
-        return messageSource.getMessage("test.notfound", null, Locale.getDefault());
-    }
-
 
     @Transactional
     @GetMapping("question-by-account-id")
     public ResponseEntity<String> getQuestionsByAccountId(@RequestParam long accountId) throws JsonProcessingException {
-//        QAccountQuestion qAccountQuestion = QAccountQuestion.accountQuestion;
-//        QAccount qAccount = QAccount.account;
-//        QQuestion qQuestion = QQuestion.question;
-//
-//        List<Tuple> tuples = new JPAQueryFactory(entityManager).select(qAccountQuestion.account.id,
-//                                                                       qAccountQuestion.question.id,
-//                                                                       qQuestion.description,
-//                                                                       qQuestion.topOption,
-//                                                                       qQuestion.bottomOption,
-//                                                                       qAccountQuestion.enabled,
-//                                                                       qAccountQuestion.selected)
-//                                                               .from(qAccountQuestion)
-//                                                               .innerJoin(qAccountQuestion.question, qQuestion)
-//                                                               .where(qAccountQuestion.account.id.eq(accountId))
-//                                                               .fetch();
-
-
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString("tuples"));
     }
 
@@ -132,28 +97,20 @@ public class DummyController {
     public void createDummyMatch() {
 
 
-        List<Swipe> swipes = entityManager.unwrap(Session.class).createQuery("from swipe s1 " +
-                                                                             "inner join swipe s2 on s1.swiped_id = s2.swiper_id " +
+        List<Swipe> swipes = entityManager.unwrap(Session.class).createQuery("select s1 from Swipe s1 " +
+                                                                             "inner join Swipe s2 on s1.swipedId = s2.swiperId " +
                                                                              "where s1.balanced = true and s2.balanced = true " +
-                                                                             "and s1.swiper_id = s2.swiped_id ", Swipe.class).getResultList();
-
-//        List<Swipe> swipes = new JPAQueryFactory(entityManager).select(QSwipe.swipe)
-//                                                               .from(s1)
-//                                                               .innerJoin(s2)
-//                                                               .on(s1.swipedId.eq(s2.swiperId))
-//                                                               .where(s1.swiperId.eq(s2.swipedId)
-//                                                                                 .and(s1.balanced.eq(true))
-//                                                                                 .and(s2.balanced.eq(true)))
-//                                                               .fetch();
+                                                                             "and s1.swiperId = s2.swipedId order by s1.swiperId", Swipe.class).getResultList();
 
         for (Swipe swipe : swipes) {
-            Match newMatcher = new Match();
-            newMatcher.setMatcher(swipe.getSwiper());
-            newMatcher.setMatched(swipe.getSwiped());
-            newMatcher.setCreatedAt(new Date());
-            newMatcher.setMatchId(new MatchId(swipe.getSwiperId(), swipe.getSwipedId()));
-            swipe.getSwiper().getMatches().add(newMatcher);
-            entityManager.persist(swipe.getSwiper());
+
+
+            Match newMatch = new Match();
+            newMatch.setMatcher(swipe.getSwiper());
+            newMatch.setMatched(swipe.getSwiped());
+            newMatch.setCreatedAt(new Date());
+            newMatch.setMatchId(new MatchId(swipe.getSwiperId(), swipe.getSwipedId()));
+            matchDAO.persist(newMatch);
         }
     }
 
