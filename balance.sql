@@ -152,26 +152,16 @@ drop table account_question;
 drop table question;
 drop table photo;
 drop table match;
-drop table swipe_spent_history;
 drop table swipe;
 drop table admin;
 drop table account;
 drop table account_type;
 
 
+
+
 -- TODO: 2020-09-14 execute these
-drop table liked_spent_history;
-drop table liked;
 
-alter table photo
-    drop column url;
-alter table account
-    rename liked_count to swiped_count;
-alter table account
-    rename liked_count_updated_at to swiped_count_updated_at;
-
-alter table photo drop column updated_at;
-alter table photo drop column sequence;
 
 -- create UUID extension
 create extension if not exists "uuid-ossp";
@@ -216,14 +206,13 @@ CREATE INDEX account_location_idx ON account USING GIST (location);
 create table photo
 (
     id         serial primary key,
-    sequence   int       not null,
 --     url        varchar(1000) not null,
     account_id uuid      not null,
     created_at timestamp not null,
-    updated_at timestamp not null,
 
     constraint photo_account_id_fk foreign key (account_id) references account (id)
 );
+
 
 create index photo_account_id_idx on photo (account_id);
 
@@ -423,6 +412,6 @@ create table unblock
 
 -- 194
 
-select *
-from photo;
 
+select count(*)
+from account;
