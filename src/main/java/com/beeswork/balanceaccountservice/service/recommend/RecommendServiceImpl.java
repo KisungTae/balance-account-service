@@ -66,7 +66,9 @@ public class RecommendServiceImpl implements RecommendService {
                 accountProfileDTO = new AccountProfileDTO(id, name, about, birthYear, distanceBetween);
             }
 
-            accountProfileDTO.getPhotoIds().add(Integer.valueOf(cAccount[ColumnIndex.ACCOUNT_PROFILE_PHOTO_ID].toString()));
+            PhotoDTO photoDTO = new PhotoDTO(Integer.parseInt(cAccount[ColumnIndex.ACCOUNT_PROFILE_PHOTO_ID].toString()),
+                                             cAccount[ColumnIndex.ACCOUNT_PROFILE_PHOTO_KEY].toString());
+            accountProfileDTO.getPhotoDTOs().add(photoDTO);
 //
 //            int sequence = (int) cAccount[ColumnIndex.ACCOUNT_PROFILE_PHOTO_ID];
 //            PhotoDTO photoDTO = new PhotoDTO(AppConstant.AWS_S3_URL, sequence);

@@ -159,7 +159,6 @@ drop table account_type;
 
 
 
-
 -- TODO: 2020-09-14 execute these
 
 
@@ -206,7 +205,7 @@ CREATE INDEX account_location_idx ON account USING GIST (location);
 create table photo
 (
     id         serial primary key,
---     url        varchar(1000) not null,
+    key        uuid      not null,
     account_id uuid      not null,
     created_at timestamp not null,
 
@@ -240,6 +239,7 @@ create table account_question
     constraint account_question_account_id_fk foreign key (account_id) references account (id),
     constraint account_question_question_id_fk foreign key (question_id) references question (id)
 );
+
 
 
 -- watch ad, liked, etc...
@@ -279,7 +279,6 @@ create table swipe
 
 create index swipe_swiper_id_idx on swipe (swiper_id);
 create index swipe_swiped_id_idx on swipe (swiped_id);
-
 
 
 -- if match between 1 and 2 then
@@ -398,20 +397,5 @@ create table unblock
     constraint unblock_admin_id_fk foreign key (admin_id) references admin (id)
 );
 
--- create table swipe_spent_history
--- (
---     id          serial primary key,
---     point_spent int       not null,
---     account_id  uuid      not null,
---     swipe_id    int       not null,
---     created_at  timestamp not null,
---
---     constraint swipe_spent_history_swipe_id_fk foreign key (swipe_id) references swipe (id),
---     constraint swipe_spent_history_account_id_fk foreign key (account_id) references account (id)
--- );
-
--- 194
-
-
-select count(*)
-from account;
+delete from photo where id is not null;
+delete from account where id is not null;

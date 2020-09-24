@@ -224,10 +224,8 @@ public class DummyController {
                 for (int p = 0; p < 5; p++) {
                     Photo photo = new Photo();
                     photo.setAccount(account);
+                    photo.setKey(UUID.randomUUID());
                     photo.setCreatedAt(new Date());
-//                    photo.setUpdatedAt(new Date());
-//                    photo.setSequence(p);
-//                    photo.setUrl("https://aws." + name);
                     account.getPhotos().add(photo);
                 }
 
@@ -236,6 +234,7 @@ public class DummyController {
 
                 count++;
                 latCount++;
+                if (count > size) break;
             }
 
             if (count > size) break;

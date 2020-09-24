@@ -12,6 +12,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PhotoDTO {
 
-    private String url;
-    private int sequence;
+    private int id;
+    private String key;
 }

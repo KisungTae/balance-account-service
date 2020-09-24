@@ -19,7 +19,7 @@ public class AccountProfileDTO {
     private String about;
     private int birthYear;
     private int distance;
-    private List<Integer> photoIds = new ArrayList<>();
+    private List<PhotoDTO> photoDTOs = new ArrayList<>();
 
     public AccountProfileDTO(String id, String name, String about, int birthYear, int distance) {
         this.id = id;
