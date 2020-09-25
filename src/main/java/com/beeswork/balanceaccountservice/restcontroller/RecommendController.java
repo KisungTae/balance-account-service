@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.account.AccountProfileDTO;
+import com.beeswork.balanceaccountservice.dto.account.CardDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.service.recommend.RecommendService;
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
@@ -41,13 +42,13 @@ public class RecommendController extends BaseController {
                                                     @RequestParam double longitude)
     throws AccountNotFoundException, JsonProcessingException {
 
-        List<AccountProfileDTO> accountProfileDTOs = recommendService.recommend(accountId,
-                                                                                distance,
-                                                                                minAge,
-                                                                                maxAge,
-                                                                                gender,
-                                                                                latitude,
-                                                                                longitude);
+        List<CardDTO> accountProfileDTOs = recommendService.recommend(accountId,
+                                                                      distance,
+                                                                      minAge,
+                                                                      maxAge,
+                                                                      gender,
+                                                                      latitude,
+                                                                      longitude);
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(accountProfileDTOs));
     }

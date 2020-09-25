@@ -399,3 +399,7 @@ create table unblock
 
 delete from photo where id is not null;
 delete from account where id is not null;
+
+
+select *
+from account;

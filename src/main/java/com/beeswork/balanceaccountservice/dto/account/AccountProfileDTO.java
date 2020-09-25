@@ -14,18 +14,20 @@ import java.util.List;
 @NoArgsConstructor
 public class AccountProfileDTO {
 
-    private String id;
+    private String accountId;
     private String name;
     private String about;
     private int birthYear;
     private int distance;
     private List<PhotoDTO> photoDTOs = new ArrayList<>();
 
-    public AccountProfileDTO(String id, String name, String about, int birthYear, int distance) {
-        this.id = id;
+    public AccountProfileDTO(String accountId, String name, String about, int birthYear, int distance) {
+        this.accountId = accountId;
         this.name = name;
         this.about = about;
         this.birthYear = birthYear;
         this.distance = distance;
+
+
     }
 }

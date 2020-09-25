@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.constant.ColumnIndex;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dto.account.AccountProfileDTO;
+import com.beeswork.balanceaccountservice.dto.account.CardDTO;
 import com.beeswork.balanceaccountservice.dto.account.PhotoDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
@@ -35,7 +36,7 @@ public class RecommendServiceImpl implements RecommendService {
     // TEST 1. matches are mapped by matcher_id not matched_id
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<AccountProfileDTO> recommend(String accountId, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude)
+    public List<CardDTO> recommend(String accountId, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude)
     throws AccountNotFoundException {
 
         UUID accountUUID = UUID.fromString(accountId);
@@ -47,15 +48,23 @@ public class RecommendServiceImpl implements RecommendService {
         List<Object[]> accounts = accountDAO.findAllWithin(accountUUID, distance, minAge, maxAge, gender, AppConstant.LIMIT,
                                                            AppConstant.LIMIT * account.getIndex(), location);
 
+
+        List<CardDTO> cardDTOs = new ArrayList<>();
+
         String previousId = "";
         List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>();
+
+
+        CardDTO cardDTO = new CardDTO();
+
         AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
 
         for (Object[] cAccount : accounts) {
             String id = cAccount[ColumnIndex.ACCOUNT_PROFILE_ID].toString();
             if (!previousId.equals(id)) {
 
-                accountProfileDTOs.add(accountProfileDTO);
+                cardDTOs.add(cardDTO);
+//                accountProfileDTOs.add(accountProfileDTO);
                 previousId = id;
 
                 String name = cAccount[ColumnIndex.ACCOUNT_PROFILE_NAME].toString();
@@ -63,20 +72,17 @@ public class RecommendServiceImpl implements RecommendService {
                 int birthYear = Integer.parseInt(cAccount[ColumnIndex.ACCOUNT_PROFILE_BIRTH_YEAR].toString());
                 int distanceBetween = (int) ((double) cAccount[ColumnIndex.ACCOUNT_PROFILE_DISTANCE]);
 
-                accountProfileDTO = new AccountProfileDTO(id, name, about, birthYear, distanceBetween);
+                cardDTO = new CardDTO();
+                cardDTO.setCard(new AccountProfileDTO(id, name, about, birthYear, distanceBetween));
             }
 
             PhotoDTO photoDTO = new PhotoDTO(Integer.parseInt(cAccount[ColumnIndex.ACCOUNT_PROFILE_PHOTO_ID].toString()),
                                              cAccount[ColumnIndex.ACCOUNT_PROFILE_PHOTO_KEY].toString());
-            accountProfileDTO.getPhotoDTOs().add(photoDTO);
-//
-//            int sequence = (int) cAccount[ColumnIndex.ACCOUNT_PROFILE_PHOTO_ID];
-//            PhotoDTO photoDTO = new PhotoDTO(AppConstant.AWS_S3_URL, sequence);
-//            accountProfileDTO.getPhotoDTOs().add(photoDTO);
+            cardDTO.getPhotos().add(photoDTO);
         }
 
-        accountProfileDTOs.add(accountProfileDTO);
-        accountProfileDTOs.remove(0);
-        return accountProfileDTOs;
+        cardDTOs.add(cardDTO);
+        cardDTOs.remove(0);
+        return cardDTOs;
     }
 }

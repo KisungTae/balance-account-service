@@ -62,8 +62,8 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
                         "      from account a  " +
                         "      where st_dwithin(location, :pivot, :distance) " +
                         "        and gender = :gender " +
-                        "        and birth_year >= :minAge " +
-                        "        and birth_year <= :maxAge " +
+                        "        and birth_year <= :minAge " +
+                        "        and birth_year >= :maxAge " +
                         "        and enabled = true" +
                         "        and blocked = false " +
                         "       limit :limit " +
