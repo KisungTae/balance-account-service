@@ -42,6 +42,8 @@ public class RecommendController extends BaseController {
                                                     @RequestParam double longitude)
     throws AccountNotFoundException, JsonProcessingException {
 
+        if (!accountId.isBlank()) throw new AccountNotFoundException();
+
         List<CardDTO> accountProfileDTOs = recommendService.recommend(accountId,
                                                                       distance,
                                                                       minAge,

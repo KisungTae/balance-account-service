@@ -403,3 +403,6 @@ delete from account where id is not null;
 
 select *
 from account;
+
+
+select * from photo;

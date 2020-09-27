@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.util;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.scheduling.support.SimpleTriggerContext;
@@ -24,22 +25,13 @@ public class Convert {
         this.messageSource = messageSource;
     }
 
-    public String keyValueToJSON(String key, String value) throws JsonProcessingException {
+    public String exceptionToJSON(String exceptionCode, Locale locale) throws JsonProcessingException {
 
+        String exceptionMessage = messageSource.getMessage(exceptionCode, null, locale);
         Map<String, String> map = new HashMap<>();
-        map.put(key, value);
+        map.put("exceptionCode", exceptionCode);
+        map.put("exceptionMessage", exceptionMessage);
         return objectMapper.writeValueAsString(map);
     }
 
-    public String exceptionMessageToJSON(BaseException exception, Locale locale) throws JsonProcessingException {
-
-        String exceptionMessage = messageSource.getMessage(exception.getExceptionCode(), null, locale);
-        return keyValueToJSON(exception.getExceptionCode(), exceptionMessage);
-    }
-
-    public String exceptionMessageToJSON(String exceptionCode, Locale locale) throws JsonProcessingException {
-
-        String exceptionMessage = messageSource.getMessage(exceptionCode, null, locale);
-        return keyValueToJSON(exceptionCode, exceptionMessage);
-    }
 }

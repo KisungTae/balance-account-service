@@ -1,7 +1,6 @@
 package com.beeswork.balanceaccountservice.controlleradvice;
 
 
-import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
@@ -38,7 +37,7 @@ public class ExceptionControllerAdvice {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(convert.exceptionMessageToJSON(exception, locale));
+                             .body(convert.exceptionToJSON(exception.getExceptionCode(), locale));
     }
 
     @ExceptionHandler({AccountInvalidException.class, SwipeBalancedExistsException.class, AccountShortOfPointException.class,
@@ -47,7 +46,7 @@ public class ExceptionControllerAdvice {
     throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(convert.exceptionMessageToJSON(exception, locale));
+                             .body(convert.exceptionToJSON(exception.getExceptionCode(), locale));
     }
 
 //    @ExceptionHandler({QueryException.class})
