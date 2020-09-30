@@ -167,7 +167,7 @@ public class DummyController {
 
     @Transactional
     @PostMapping("/create/accounts")
-    public void createDummyAccounts(@RequestParam int size) throws ParseException {
+    public void createDummyAccounts(@RequestParam int size) throws ParseException, InterruptedException {
 
         double startLat = 37.463557;
         double endLat = 37.650017;
@@ -223,9 +223,9 @@ public class DummyController {
 
                 for (int p = 0; p < 5; p++) {
                     Photo photo = new Photo();
+                    Thread.sleep(2);
+                    photo.setKey(new Date().toInstant().toString());
                     photo.setAccount(account);
-                    photo.setKey(UUID.randomUUID());
-                    photo.setCreatedAt(new Date());
                     account.getPhotos().add(photo);
                 }
 

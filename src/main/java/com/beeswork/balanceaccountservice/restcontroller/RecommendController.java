@@ -1,6 +1,5 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.dto.account.AccountProfileDTO;
 import com.beeswork.balanceaccountservice.dto.account.CardDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.service.recommend.RecommendService;
@@ -42,7 +41,7 @@ public class RecommendController extends BaseController {
                                                     @RequestParam double longitude)
     throws AccountNotFoundException, JsonProcessingException {
 
-        if (!accountId.isBlank()) throw new AccountNotFoundException();
+//        if (!accountId.isBlank()) throw new AccountNotFoundException();
 
         List<CardDTO> accountProfileDTOs = recommendService.recommend(accountId,
                                                                       distance,

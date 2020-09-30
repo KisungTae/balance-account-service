@@ -1,6 +1,5 @@
 package com.beeswork.balanceaccountservice.service.recommend;
 
-import com.beeswork.balanceaccountservice.dto.account.AccountProfileDTO;
 import com.beeswork.balanceaccountservice.dto.account.CardDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 

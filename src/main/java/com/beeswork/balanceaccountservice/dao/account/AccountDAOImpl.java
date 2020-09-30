@@ -57,7 +57,7 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
 
         
         return entityManager.createNativeQuery(
-                "select cast(b.id as varchar), b.name, b.about, b.birth_year, st_distance(b.location, :pivot), p.id as photo_id, cast(p.key as varchar) " +
+                "select cast(b.id as varchar), b.name, b.about, b.birth_year, st_distance(b.location, :pivot), p.key " +
                         "from (select * " +
                         "      from account a  " +
                         "      where st_dwithin(location, :pivot, :distance) " +

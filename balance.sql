@@ -82,11 +82,7 @@ begin
 
                             random_gender := round((random() * (1 - 0)) + 0);
 
-                            if random_gender = 1 then
-                                v_gender = false;
-                            else
-                                v_gender = true;
-                            end if;
+                            if random_gender = 1 then v_gender = false; else v_gender = true; end if;
 
                             insert into account
                             values (uuid_generate_v4(), false, 'account', 'account',
@@ -204,13 +200,12 @@ CREATE INDEX account_location_idx ON account USING GIST (location);
 
 create table photo
 (
-    id         serial primary key,
-    key        uuid      not null,
-    account_id uuid      not null,
-    created_at timestamp not null,
+    key        varchar(30) primary key not null,
+    account_id uuid                    not null,
 
     constraint photo_account_id_fk foreign key (account_id) references account (id)
 );
+
 
 
 create index photo_account_id_idx on photo (account_id);
@@ -239,7 +234,6 @@ create table account_question
     constraint account_question_account_id_fk foreign key (account_id) references account (id),
     constraint account_question_question_id_fk foreign key (question_id) references question (id)
 );
-
 
 
 -- watch ad, liked, etc...
@@ -397,12 +391,6 @@ create table unblock
     constraint unblock_admin_id_fk foreign key (admin_id) references admin (id)
 );
 
-delete from photo where id is not null;
-delete from account where id is not null;
-
 
 select *
 from account;
-
-
-select * from photo;

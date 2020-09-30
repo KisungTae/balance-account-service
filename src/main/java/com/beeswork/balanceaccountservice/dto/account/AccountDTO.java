@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class AccountDTO extends AccountProfileDTO {
+public class AccountDTO {
 
     private String id;
     private String email;
@@ -20,5 +20,6 @@ public class AccountDTO extends AccountProfileDTO {
     private boolean gender;
     private double latitude;
     private double longitude;
+
     private List<AccountQuestionDTO> accountQuestionDTOs = new ArrayList<>();
 }

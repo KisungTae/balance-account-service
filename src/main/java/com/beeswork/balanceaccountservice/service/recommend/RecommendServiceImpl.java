@@ -3,9 +3,7 @@ package com.beeswork.balanceaccountservice.service.recommend;
 import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.constant.ColumnIndex;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
-import com.beeswork.balanceaccountservice.dto.account.AccountProfileDTO;
 import com.beeswork.balanceaccountservice.dto.account.CardDTO;
-import com.beeswork.balanceaccountservice.dto.account.PhotoDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import org.locationtech.jts.geom.Coordinate;
@@ -48,23 +46,15 @@ public class RecommendServiceImpl implements RecommendService {
         List<Object[]> accounts = accountDAO.findAllWithin(accountUUID, distance, minAge, maxAge, gender, AppConstant.LIMIT,
                                                            AppConstant.LIMIT * account.getIndex(), location);
 
-
-        List<CardDTO> cardDTOs = new ArrayList<>();
-
         String previousId = "";
-        List<AccountProfileDTO> accountProfileDTOs = new ArrayList<>();
-
-
+        List<CardDTO> cardDTOs = new ArrayList<>();
         CardDTO cardDTO = new CardDTO();
-
-        AccountProfileDTO accountProfileDTO = new AccountProfileDTO();
 
         for (Object[] cAccount : accounts) {
             String id = cAccount[ColumnIndex.ACCOUNT_PROFILE_ID].toString();
             if (!previousId.equals(id)) {
 
                 cardDTOs.add(cardDTO);
-//                accountProfileDTOs.add(accountProfileDTO);
                 previousId = id;
 
                 String name = cAccount[ColumnIndex.ACCOUNT_PROFILE_NAME].toString();
@@ -72,13 +62,9 @@ public class RecommendServiceImpl implements RecommendService {
                 int birthYear = Integer.parseInt(cAccount[ColumnIndex.ACCOUNT_PROFILE_BIRTH_YEAR].toString());
                 int distanceBetween = (int) ((double) cAccount[ColumnIndex.ACCOUNT_PROFILE_DISTANCE]);
 
-                cardDTO = new CardDTO();
-                cardDTO.setCard(new AccountProfileDTO(id, name, about, birthYear, distanceBetween));
+                cardDTO = new CardDTO(id, name, about, birthYear, distanceBetween);
             }
-
-            PhotoDTO photoDTO = new PhotoDTO(Integer.parseInt(cAccount[ColumnIndex.ACCOUNT_PROFILE_PHOTO_ID].toString()),
-                                             cAccount[ColumnIndex.ACCOUNT_PROFILE_PHOTO_KEY].toString());
-            cardDTO.getPhotos().add(photoDTO);
+            cardDTO.getPhotos().add(cAccount[ColumnIndex.ACCOUNT_PROFILE_PHOTO_KEY].toString());
         }
 
         cardDTOs.add(cardDTO);
