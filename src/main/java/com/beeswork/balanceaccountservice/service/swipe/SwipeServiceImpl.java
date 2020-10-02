@@ -51,7 +51,7 @@ public class SwipeServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public BalanceDTO swipe(SwipeDTO swipeDTO)
+    public List<QuestionDTO> swipe(SwipeDTO swipeDTO)
     throws AccountNotFoundException, AccountInvalidException, SwipeBalancedExistsException,
            AccountShortOfPointException {
 
@@ -81,9 +81,7 @@ public class SwipeServiceImpl implements SwipeService {
 
         accountDAO.persist(swiper);
 
-        BalanceDTO balanceDTO = new BalanceDTO();
-        balanceDTO.setSwipeId(swipe.getId());
-        balanceDTO.setSwipedId(swiped.getId().toString());
+        List<QuestionDTO> questionDTOs = new ArrayList<>();
 
         for (AccountQuestion accountQuestion : swiped.getAccountQuestions()) {
             Question question = accountQuestion.getQuestion();
@@ -91,9 +89,9 @@ public class SwipeServiceImpl implements SwipeService {
                                                       question.getTopOption(),
                                                       question.getBottomOption(),
                                                       accountQuestion.isSelected());
-            balanceDTO.getQuestionDTOs().add(questionDTO);
+            questionDTOs.add(questionDTO);
         }
 
-        return balanceDTO;
+        return questionDTOs;
     }
 }

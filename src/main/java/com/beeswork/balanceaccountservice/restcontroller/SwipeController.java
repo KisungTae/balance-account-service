@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.match.BalanceDTO;
+import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeListDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
@@ -43,8 +44,8 @@ public class SwipeController extends BaseController {
            AccountShortOfPointException {
 
         if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
-        BalanceDTO balanceDTO = swipeService.swipe(modelMapper.map(swipeVM, SwipeDTO.class));
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(balanceDTO));
+        List<QuestionDTO> questionDTOs = swipeService.swipe(modelMapper.map(swipeVM, SwipeDTO.class));
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
     }
 
     @GetMapping("/list")
