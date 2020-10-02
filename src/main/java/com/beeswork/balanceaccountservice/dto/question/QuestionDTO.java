@@ -20,5 +20,4 @@ public class QuestionDTO {
     private String topOption;
     private String bottomOption;
     private boolean selected;
-    private int sequence;
 }

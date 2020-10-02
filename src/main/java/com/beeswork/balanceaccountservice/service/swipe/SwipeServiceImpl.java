@@ -90,8 +90,7 @@ public class SwipeServiceImpl implements SwipeService {
             QuestionDTO questionDTO = new QuestionDTO(question.getDescription(),
                                                       question.getTopOption(),
                                                       question.getBottomOption(),
-                                                      accountQuestion.isSelected(),
-                                                      accountQuestion.getSequence());
+                                                      accountQuestion.isSelected());
             balanceDTO.getQuestionDTOs().add(questionDTO);
         }
 
