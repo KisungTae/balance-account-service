@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface SwipeDAO extends BaseDAO<Swipe> {
 
-    boolean balancedExists(UUID swiperId, UUID swipedId);
+    boolean clickedExists(UUID swiperId, UUID swipedId);
 
     Swipe findByIdWithAccounts(Long swipeId, UUID swiperId, UUID swipedId) throws SwipeNotFoundException;
 

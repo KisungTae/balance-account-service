@@ -31,11 +31,11 @@ public class MatchController extends BaseController {
         this.matchService = matchService;
     }
 
-    @PostMapping("/balance")
-    public ResponseEntity<String> balanceAccount(@Valid @RequestBody SwipeVM swipeVM)
+    @PostMapping("/click")
+    public ResponseEntity<String> balance(@Valid @RequestBody SwipeVM swipeVM)
     throws JsonProcessingException, SwipeNotFoundException, AccountInvalidException, MatchExistsException {
 
-        MatchDTO matchDTO = matchService.balance(modelMapper.map(swipeVM, SwipeDTO.class));
+        MatchDTO matchDTO = matchService.click(modelMapper.map(swipeVM, SwipeDTO.class));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(matchDTO));
     }
 

@@ -40,7 +40,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Override
     @Transactional
-    public MatchDTO balance(SwipeDTO swipeDTO)
+    public MatchDTO click(SwipeDTO swipeDTO)
     throws SwipeNotFoundException, AccountInvalidException, MatchExistsException {
 
         UUID swiperUUId = UUID.fromString(swipeDTO.getSwiperId());

@@ -9,5 +9,5 @@ import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException
 public interface MatchService {
 
 
-    MatchDTO balance(SwipeDTO swipeDTO) throws SwipeNotFoundException, AccountInvalidException, MatchExistsException;
+    MatchDTO click(SwipeDTO swipeDTO) throws SwipeNotFoundException, AccountInvalidException, MatchExistsException;
 }

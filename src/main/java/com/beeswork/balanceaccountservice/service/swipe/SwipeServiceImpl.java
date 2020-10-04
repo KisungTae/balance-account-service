@@ -3,7 +3,7 @@ package com.beeswork.balanceaccountservice.service.swipe;
 import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
-import com.beeswork.balanceaccountservice.dto.match.BalanceDTO;
+import com.beeswork.balanceaccountservice.dto.match.BalanceGameDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeListDTO;
@@ -19,9 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -51,7 +49,7 @@ public class SwipeServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public List<QuestionDTO> swipe(SwipeDTO swipeDTO)
+    public BalanceGameDTO swipe(SwipeDTO swipeDTO)
     throws AccountNotFoundException, AccountInvalidException, SwipeBalancedExistsException,
            AccountShortOfPointException {
 
@@ -63,7 +61,7 @@ public class SwipeServiceImpl implements SwipeService {
 //        if (!swiper.getEmail().equals(swipeDTO.getSwiperEmail()))
 //            throw new AccountInvalidException();
 
-        if (swipeDAO.balancedExists(swiperUUId, swipedUUId))
+        if (swipeDAO.clickedExists(swiperUUId, swipedUUId))
             throw new SwipeBalancedExistsException();
 
         int currentPoint = swiper.getPoint();
@@ -81,7 +79,10 @@ public class SwipeServiceImpl implements SwipeService {
 
         accountDAO.persist(swiper);
 
-        List<QuestionDTO> questionDTOs = new ArrayList<>();
+
+        BalanceGameDTO balanceGameDTO = new BalanceGameDTO();
+        balanceGameDTO.setSwipeId(swipe.getId());
+//        List<QuestionDTO> questionDTOs = new ArrayList<>();
 
         for (AccountQuestion accountQuestion : swiped.getAccountQuestions()) {
             Question question = accountQuestion.getQuestion();
@@ -89,9 +90,9 @@ public class SwipeServiceImpl implements SwipeService {
                                                       question.getTopOption(),
                                                       question.getBottomOption(),
                                                       accountQuestion.isSelected());
-            questionDTOs.add(questionDTO);
+            balanceGameDTO.getQuestions().add(questionDTO);
         }
 
-        return questionDTOs;
+        return balanceGameDTO;
     }
 }

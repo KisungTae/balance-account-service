@@ -1,7 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.dto.match.BalanceDTO;
-import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
+import com.beeswork.balanceaccountservice.dto.match.BalanceGameDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeListDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
@@ -22,7 +21,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Validated
 @RestController
@@ -37,15 +35,14 @@ public class SwipeController extends BaseController {
         this.swipeService = swipeService;
     }
 
-    @PostMapping("/account")
-    public ResponseEntity<String> swipeAccount(@Valid @RequestBody SwipeVM swipeVM,
-                                               BindingResult bindingResult)
+    @PostMapping
+    public ResponseEntity<String> swipe(@Valid @RequestBody SwipeVM swipeVM, BindingResult bindingResult)
     throws AccountNotFoundException, AccountInvalidException, SwipeBalancedExistsException, JsonProcessingException,
            AccountShortOfPointException {
 
         if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
-        List<QuestionDTO> questionDTOs = swipeService.swipe(modelMapper.map(swipeVM, SwipeDTO.class));
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
+        BalanceGameDTO balanceGameDTO = swipeService.swipe(modelMapper.map(swipeVM, SwipeDTO.class));
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(balanceGameDTO));
     }
 
     @GetMapping("/list")

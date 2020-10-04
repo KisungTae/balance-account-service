@@ -32,13 +32,13 @@ public class RecommendController extends BaseController {
     }
 
     @GetMapping("/recommend")
-    public ResponseEntity<String> recommendAccounts(@RequestParam("account_id") @ValidUUID String accountId,
-                                                    @RequestParam("distance") @Min(1000) @Max(10000) int distance,
-                                                    @RequestParam("min_age") int minAge,
-                                                    @RequestParam("max_age") int maxAge,
-                                                    @RequestParam("gender") boolean gender,
-                                                    @RequestParam double latitude,
-                                                    @RequestParam double longitude)
+    public ResponseEntity<String> recommend(@RequestParam("account_id") @ValidUUID String accountId,
+                                            @RequestParam("distance") @Min(1000) @Max(10000) int distance,
+                                            @RequestParam("min_age") int minAge,
+                                            @RequestParam("max_age") int maxAge,
+                                            @RequestParam("gender") boolean gender,
+                                            @RequestParam double latitude,
+                                            @RequestParam double longitude)
     throws AccountNotFoundException, JsonProcessingException {
 
 //        if (!accountId.isBlank()) throw new AccountNotFoundException();

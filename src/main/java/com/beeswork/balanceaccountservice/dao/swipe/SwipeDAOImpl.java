@@ -28,7 +28,7 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
     @Override
-    public boolean balancedExists(UUID swiperId, UUID swipedId) {
+    public boolean clickedExists(UUID swiperId, UUID swipedId) {
         return jpaQueryFactory.selectFrom(qSwipe)
                               .where(qSwipe.swiperId.eq(swiperId)
                                                     .and(qSwipe.swipedId.eq(swipedId))

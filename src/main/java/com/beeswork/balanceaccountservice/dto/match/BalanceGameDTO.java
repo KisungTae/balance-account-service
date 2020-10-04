@@ -14,9 +14,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BalanceDTO {
+public class BalanceGameDTO {
 
-    private Long swipeId;
-    private String swipedId;
-    private List<QuestionDTO> questionDTOs = new ArrayList<>();
+    private Long              swipeId;
+    private List<QuestionDTO> questions = new ArrayList<>();
 }
