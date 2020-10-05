@@ -391,6 +391,7 @@ create table unblock
     constraint unblock_admin_id_fk foreign key (admin_id) references admin (id)
 );
 
+alter table swipe rename balanced to clicked;
 
 select *
 from account;

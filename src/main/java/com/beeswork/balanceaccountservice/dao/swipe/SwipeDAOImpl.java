@@ -32,7 +32,7 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
         return jpaQueryFactory.selectFrom(qSwipe)
                               .where(qSwipe.swiperId.eq(swiperId)
                                                     .and(qSwipe.swipedId.eq(swipedId))
-                                                    .and(qSwipe.balanced.eq(true)))
+                                                    .and(qSwipe.clicked.eq(true)))
                               .fetchCount() > 0;
     }
 
@@ -50,11 +50,11 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
     @Override
-    public boolean existsByAccountIdsAndBalanced(UUID swiperId, UUID swipedId, boolean balanced) {
+    public boolean existsByAccountIdsAndClicked(UUID swiperId, UUID swipedId, boolean clicked) {
         return jpaQueryFactory.selectFrom(qSwipe)
                               .where(qSwipe.swiperId.eq(swiperId)
                                                     .and(qSwipe.swipedId.eq(swipedId))
-                                                    .and(qSwipe.balanced.eq(balanced)))
+                                                    .and(qSwipe.clicked.eq(clicked)))
                               .fetchCount() > 0;
     }
 
@@ -73,7 +73,7 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
                               .leftJoin(qMatch)
                               .on(qSwipe.swiperId.eq(qMatch.matcherId).and(qSwipe.swipedId.eq(qMatch.matchedId)))
                               .where(qSwipe.swipedId.eq(swipedId)
-                                                    .and(qSwipe.balanced.eq(true))
+                                                    .and(qSwipe.clicked.eq(true))
                                                     .and(qMatch.matchedId.isNull())).fetch();
     }
 

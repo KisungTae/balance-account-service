@@ -7,7 +7,7 @@ import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundExcep
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
 import com.beeswork.balanceaccountservice.exception.match.MatchExistsException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipeBalancedExistsException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
 import com.beeswork.balanceaccountservice.util.Convert;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class ExceptionControllerAdvice {
                              .body(convert.exceptionToJSON(exception.getExceptionCode(), locale));
     }
 
-    @ExceptionHandler({AccountInvalidException.class, SwipeBalancedExistsException.class, AccountShortOfPointException.class,
+    @ExceptionHandler({AccountInvalidException.class, SwipeClickedExistsException.class, AccountShortOfPointException.class,
                        MatchExistsException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {

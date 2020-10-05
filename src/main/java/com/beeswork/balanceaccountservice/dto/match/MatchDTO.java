@@ -9,6 +9,4 @@ public class MatchDTO {
 
     private String matchedId;
     private boolean isMatched;
-    private String matchedImageUrl;
-
 }

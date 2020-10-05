@@ -6,12 +6,12 @@ import com.beeswork.balanceaccountservice.dto.swipe.SwipeListDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipeBalancedExistsException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
 
 public interface SwipeService {
 
     BalanceGameDTO swipe(SwipeDTO swipeDTO)
-    throws AccountNotFoundException, AccountInvalidException, SwipeBalancedExistsException,
+    throws AccountNotFoundException, AccountInvalidException, SwipeClickedExistsException,
            AccountShortOfPointException;
 
     SwipeListDTO listSwipes(String accountId);

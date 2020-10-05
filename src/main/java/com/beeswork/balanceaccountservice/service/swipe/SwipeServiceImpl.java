@@ -14,7 +14,7 @@ import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipeBalancedExistsException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +50,7 @@ public class SwipeServiceImpl implements SwipeService {
     @Override
     @Transactional
     public BalanceGameDTO swipe(SwipeDTO swipeDTO)
-    throws AccountNotFoundException, AccountInvalidException, SwipeBalancedExistsException,
+    throws AccountNotFoundException, AccountInvalidException, SwipeClickedExistsException,
            AccountShortOfPointException {
 
         UUID swiperUUId = UUID.fromString(swipeDTO.getSwiperId());
@@ -62,7 +62,7 @@ public class SwipeServiceImpl implements SwipeService {
 //            throw new AccountInvalidException();
 
         if (swipeDAO.clickedExists(swiperUUId, swipedUUId))
-            throw new SwipeBalancedExistsException();
+            throw new SwipeClickedExistsException();
 
         int currentPoint = swiper.getPoint();
 

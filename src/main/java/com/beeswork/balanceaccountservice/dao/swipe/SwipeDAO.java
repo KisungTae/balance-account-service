@@ -13,7 +13,7 @@ public interface SwipeDAO extends BaseDAO<Swipe> {
 
     Swipe findByIdWithAccounts(Long swipeId, UUID swiperId, UUID swipedId) throws SwipeNotFoundException;
 
-    boolean existsByAccountIdsAndBalanced(UUID swiperId, UUID swipedId, boolean balanced);
+    boolean existsByAccountIdsAndClicked(UUID swiperId, UUID swipedId, boolean clicked);
 
     List<Swipe> findAllSwiped(UUID swipedId);
 }

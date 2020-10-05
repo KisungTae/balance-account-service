@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
+import com.beeswork.balanceaccountservice.dto.match.ClickDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
@@ -40,7 +41,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Override
     @Transactional
-    public MatchDTO click(SwipeDTO swipeDTO)
+    public ClickDTO click(SwipeDTO swipeDTO)
     throws SwipeNotFoundException, AccountInvalidException, MatchExistsException {
 
         UUID swiperUUId = UUID.fromString(swipeDTO.getSwiperId());
@@ -54,14 +55,11 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 //        if (!swiper.getEmail().equals(swipeDTO.getSwiperEmail()))
 //            throw new AccountInvalidException();
 
-        swipe.setBalanced(true);
+        swipe.setClicked(true);
         swipeDAO.persist(swipe);
 
-        MatchDTO matchDTO = new MatchDTO();
-        matchDTO.setMatched(false);
-
         // match
-        if (swipeDAO.existsByAccountIdsAndBalanced(swipedUUId, swiperUUId, true)) {
+        if (swipeDAO.existsByAccountIdsAndClicked(swipedUUId, swiperUUId, true)) {
 
             if (matchDAO.existsById(new MatchId(swiperUUId, swipedUUId)))
                 throw new MatchExistsException();
@@ -72,12 +70,9 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
             accountDAO.persist(swiper);
             accountDAO.persist(swiped);
-
-            matchDTO.setMatchedId(swipedUUId.toString());
-            matchDTO.setMatchedImageUrl(AppConstant.AWS_S3_URL);
         }
 
-        return matchDTO;
+        return new ClickDTO(swipeDTO.getSwipeId());
     }
 
 

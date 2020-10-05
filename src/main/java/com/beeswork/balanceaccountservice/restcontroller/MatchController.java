@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.dto.match.ClickDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
@@ -32,11 +33,11 @@ public class MatchController extends BaseController {
     }
 
     @PostMapping("/click")
-    public ResponseEntity<String> balance(@Valid @RequestBody SwipeVM swipeVM)
-    throws JsonProcessingException, SwipeNotFoundException, AccountInvalidException, MatchExistsException {
+    public ResponseEntity<String> click(@Valid @RequestBody SwipeVM swipeVM)
+    throws SwipeNotFoundException, AccountInvalidException, MatchExistsException, JsonProcessingException {
 
-        MatchDTO matchDTO = matchService.click(modelMapper.map(swipeVM, SwipeDTO.class));
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(matchDTO));
+        ClickDTO clickDTO = matchService.click(modelMapper.map(swipeVM, SwipeDTO.class));
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO));
     }
 
 

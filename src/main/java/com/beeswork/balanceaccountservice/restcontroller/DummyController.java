@@ -99,7 +99,7 @@ public class DummyController {
 
         List<Swipe> swipes = entityManager.unwrap(Session.class).createQuery("select s1 from Swipe s1 " +
                                                                              "inner join Swipe s2 on s1.swipedId = s2.swiperId " +
-                                                                             "where s1.balanced = true and s2.balanced = true " +
+                                                                             "where s1.clicked = true and s2.clicked = true " +
                                                                              "and s1.swiperId = s2.swipedId order by s1.swiperId", Swipe.class).getResultList();
 
         for (Swipe swipe : swipes) {

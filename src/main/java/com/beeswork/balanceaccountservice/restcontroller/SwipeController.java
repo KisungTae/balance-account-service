@@ -6,7 +6,7 @@ import com.beeswork.balanceaccountservice.dto.swipe.SwipeListDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipeBalancedExistsException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
 import com.beeswork.balanceaccountservice.service.swipe.SwipeService;
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
 import com.beeswork.balanceaccountservice.vm.match.SwipeVM;
@@ -37,7 +37,7 @@ public class SwipeController extends BaseController {
 
     @PostMapping
     public ResponseEntity<String> swipe(@Valid @RequestBody SwipeVM swipeVM, BindingResult bindingResult)
-    throws AccountNotFoundException, AccountInvalidException, SwipeBalancedExistsException, JsonProcessingException,
+    throws AccountNotFoundException, AccountInvalidException, SwipeClickedExistsException, JsonProcessingException,
            AccountShortOfPointException {
 
         if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
