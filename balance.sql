@@ -187,6 +187,7 @@ create table account
     swiped_count            int                    not null,
     swiped_count_updated_at timestamp              not null,
     location                geography(point, 4326) not null,
+    firebase_messaging_token varchar(200) not null default '',
     account_type_id         int                    not null,
     created_at              timestamp              not null,
     updated_at              timestamp              not null,
@@ -194,7 +195,7 @@ create table account
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
 
-
+alter table account add column firebase_messaging_token varchar(200) not null default '';
 CREATE INDEX account_location_idx ON account USING GIST (location);
 
 

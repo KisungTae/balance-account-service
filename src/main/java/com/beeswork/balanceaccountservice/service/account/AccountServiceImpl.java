@@ -3,10 +3,7 @@ package com.beeswork.balanceaccountservice.service.account;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
-import com.beeswork.balanceaccountservice.dto.account.AccountQuestionDTO;
-import com.beeswork.balanceaccountservice.dto.account.AccountDTO;
-import com.beeswork.balanceaccountservice.dto.account.AccountQuestionSaveDTO;
-import com.beeswork.balanceaccountservice.dto.account.LocationDTO;
+import com.beeswork.balanceaccountservice.dto.account.*;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestionId;
@@ -49,9 +46,18 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void saveLocation(LocationDTO locationDTO) throws AccountNotFoundException {
-        Account account = accountDAO.findById(locationDTO.getAccountId());
+        Account account = accountDAO.findById(UUID.fromString(locationDTO.getAccountId()));
         Point location = geometryFactory.createPoint(new Coordinate(locationDTO.getLongitude(), locationDTO.getLatitude()));
         account.setLocation(location);
+        accountDAO.persist(account);
+    }
+
+    @Override
+    @Transactional
+    public void saveFirebaseMessagingToken(FirebaseMessagingTokenDTO firebaseMessagingTokenDTO)
+    throws AccountNotFoundException {
+        Account account = accountDAO.findById(UUID.fromString(firebaseMessagingTokenDTO.getAccountId()));
+        account.setFirebaseMessagingToken(firebaseMessagingTokenDTO.getToken());
         accountDAO.persist(account);
     }
 

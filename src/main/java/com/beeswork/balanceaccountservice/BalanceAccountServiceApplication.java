@@ -27,13 +27,15 @@ public class BalanceAccountServiceApplication {
 //				  7. @ModelAttribute is not mapped with query string in url
 //				  8. when use nativequery, type cast warning List<Object> lists = createNativeQuery().getresultlist, what is suppressWarning("unchecked")
 //				  9. email request param needs validation
+//				 10. can't remove tailing spaces in @RequestBody
+//				 11. ObjectMapper Singleton make it final, final ObjectMapper objectMapper does it make objectmapper final?
+//				 12. Convert.fieldErrorsToJson need Map?
+//				 13. messageSource or ValidationMessage for field @Valid, because messagesource dose not seem to map with the validation messages
+//				 14. type.mismatch does not occur why? even if you map wrong type through JSON
+//				 15. if objectmapper has custom mapping and it is singleton, then object lock occurs?
+//				 16. check if account is blocked or not before proceeding to methods in services
 
 
 
-// TODO: 04/09/2020	- 1. can't remove tailing spaces in @RequestBody
-//					  2. ObjectMapper Singleton make it final, final ObjectMapper objectMapper does it make objectmapper final?
-//					  3. Convert.fieldErrorsToJson need Map?
-//					  4. messageSource or ValidationMessage for field @Valid, because messagesource dose not seem to map with the validation messages
-//					  5. type.mismatch does not occur why? even if you map wrong type through JSON
-//					  6. if objectmapper has custom mapping and it is singleton, then object lock occurs?
+// TODO: 04/09/2020	-
 //
