@@ -198,6 +198,10 @@ create table account
 alter table account add column firebase_messaging_token varchar(200) not null default '';
 CREATE INDEX account_location_idx ON account USING GIST (location);
 
+select *
+from account;
+
+
 
 create table photo
 (

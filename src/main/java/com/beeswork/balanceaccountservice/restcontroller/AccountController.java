@@ -9,6 +9,7 @@ import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundExcep
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
+import com.beeswork.balanceaccountservice.service.firebase.FirebaseMessagingService;
 import com.beeswork.balanceaccountservice.vm.account.AccountQuestionSaveVM;
 import com.beeswork.balanceaccountservice.vm.account.AccountVM;
 import com.beeswork.balanceaccountservice.vm.account.FirebaseMessageTokenVM;
@@ -39,6 +40,10 @@ import java.util.Random;
 public class AccountController extends BaseController {
 
     private final AccountService accountService;
+
+    //    TODO: remove me
+    @Autowired
+    private FirebaseMessagingService firebaseMessagingService;
 
     @Autowired
     public AccountController(ObjectMapper objectMapper, ModelMapper modelMapper, AccountService accountService) {
@@ -99,27 +104,11 @@ public class AccountController extends BaseController {
     }
 
     //  TODO: remove me
-    @PostMapping("send-message/{token}")
-    public void firebaseMessaging(@PathVariable("token") String token) throws IOException, FirebaseMessagingException {
-        FileInputStream serviceAccount = new FileInputStream(
-                "/Users/kisungtae/Documents/intellijSpringProjects/balance-896d6-firebase-adminsdk-sppjt-13d87a9365.json");
-
-        FirebaseOptions options = new FirebaseOptions.Builder()
-                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://balance-896d6.firebaseio.com")
-                .build();
-
-        FirebaseApp.initializeApp(options);
-
-        Random random = new Random();
-        Message message = Message.builder()
-                                 .putData("message", "this is test message from server " + random.nextInt())
-                                 .setToken(token)
-                                 .build();
-
-        String response = FirebaseMessaging.getInstance().send(message);
-
-        System.out.println("response: " + response);
+    @PostMapping("/send-message")
+    public void firebaseMessaging(@RequestParam("token") String token,
+                                  @RequestParam("message") String message)
+    throws IOException, FirebaseMessagingException {
+        firebaseMessagingService.sendNotification(token, message);
     }
 
 }
