@@ -67,10 +67,6 @@ public class Account {
     @Column(name = "swiped_count")
     private int swipedCount;
 
-    @Column(name = "swiped_count_updated_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date swipedCountUpdatedAt;
-
     @Column(name = "location",
             columnDefinition = "GEOGRAPHY(POINT)")
     private Point location;

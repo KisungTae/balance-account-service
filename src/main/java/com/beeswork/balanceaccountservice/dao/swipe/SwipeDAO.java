@@ -15,5 +15,5 @@ public interface SwipeDAO extends BaseDAO<Swipe> {
 
     boolean existsByAccountIdsAndClicked(UUID swiperId, UUID swipedId, boolean clicked);
 
-    List<Swipe> findAllSwiped(UUID swipedId);
+    List<Swipe> findAllClicked(UUID swipedId);
 }

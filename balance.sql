@@ -172,46 +172,39 @@ create table account_type
 -- liked count will be reset on every night
 create table account
 (
-    id                      uuid primary key                default uuid_generate_v4(),
-    enabled                 boolean                not null,
-    blocked                 boolean                not null,
-    name                    varchar(50)            not null default '',
-    email                   varchar(256) unique    not null,
-    birth_year              int                    not null,
-    birth                   Date                   not null,
-    about                   varchar(500)           not null default '',
-    gender                  boolean                not null,
-    score                   int                    not null,
-    index                   int                    not null,
-    point                   int                    not null,
-    swiped_count            int                    not null,
-    swiped_count_updated_at timestamp              not null,
-    location                geography(point, 4326) not null,
-    firebase_messaging_token varchar(200) not null default '',
-    account_type_id         int                    not null,
-    created_at              timestamp              not null,
-    updated_at              timestamp              not null,
+    id                       uuid primary key                default uuid_generate_v4(),
+    enabled                  boolean                not null,
+    blocked                  boolean                not null,
+    name                     varchar(50)            not null default '',
+    email                    varchar(256) unique    not null,
+    birth_year               int                    not null,
+    birth                    Date                   not null,
+    about                    varchar(500)           not null default '',
+    gender                   boolean                not null,
+    score                    int                    not null,
+    index                    int                    not null,
+    point                    int                    not null,
+    swiped_count             int                    not null,
+    location                 geography(point, 4326) not null,
+    firebase_messaging_token varchar(200)           not null default '',
+    account_type_id          int                    not null,
+    created_at               timestamp              not null,
+    updated_at               timestamp              not null,
 
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
 
-alter table account add column firebase_messaging_token varchar(200) not null default '';
 CREATE INDEX account_location_idx ON account USING GIST (location);
-
-select *
-from account;
-
 
 
 create table photo
 (
     key        varchar(30) primary key not null,
+    sequence   int                     not null,
     account_id uuid                    not null,
 
     constraint photo_account_id_fk foreign key (account_id) references account (id)
 );
-
-
 
 create index photo_account_id_idx on photo (account_id);
 
@@ -268,7 +261,7 @@ create table swipe
     id         serial primary key,
     swiper_id  uuid      not null,
     swiped_id  uuid      not null,
-    balanced   boolean   not null,
+    clicked    boolean   not null,
     created_at timestamp not null,
     updated_at timestamp not null,
 
@@ -396,7 +389,27 @@ create table unblock
     constraint unblock_admin_id_fk foreign key (admin_id) references admin (id)
 );
 
-alter table swipe rename balanced to clicked;
+
 
 select *
 from account;
+
+select *
+from swipe s
+left join match m
+on s.swiper_id = m.matcher_id and s.swiped_id = m.matched_id
+left join photo p on s.swiper_id = p.account_id
+where s.swiped_id = 'fa8a6bbd-09f5-4ef1-8b60-37dcb0bfb44f'::uuid
+and s.clicked = true
+and m.matched_id is null
+and p.sequence = 1;
+
+
+
+-- 2,b0bc55d7-d1c2-4b7c-832f-179cb88b09c4
+-- 110,afdff432-27e4-4bc3-b1b5-dda260d728d1
+-- 254,374c8d9d-f125-4db4-8244-78897ceeeb65
+-- 424,f5c548c1-7b16-4eb3-9f2a-0eb81cda7892
+-- 875,f67128ef-8e0b-4c1b-aed1-bc722c271aa3
+-- 1437,b9e6ea26-5de6-4eca-ba68-a67e813be6ed
+-- 1652,421323d0-a257-4199-80cc-a275bd5a4844

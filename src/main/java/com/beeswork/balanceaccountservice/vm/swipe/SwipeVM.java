@@ -1,14 +1,23 @@
-package com.beeswork.balanceaccountservice.dto.swipe;
+package com.beeswork.balanceaccountservice.vm.swipe;
+
 
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Locale;
+
 @Getter
 @Setter
-public class SwipeDTO {
+public class SwipeVM {
 
+    private Long swipeId;
+
+    @ValidUUID
     private String swiperId;
+
+    @ValidUUID
     private String swipedId;
+
     private String swiperEmail;
 }

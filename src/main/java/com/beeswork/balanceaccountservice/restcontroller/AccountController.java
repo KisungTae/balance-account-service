@@ -9,31 +9,20 @@ import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundExcep
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
-import com.beeswork.balanceaccountservice.service.firebase.FirebaseMessagingService;
 import com.beeswork.balanceaccountservice.vm.account.AccountQuestionSaveVM;
 import com.beeswork.balanceaccountservice.vm.account.AccountVM;
 import com.beeswork.balanceaccountservice.vm.account.FirebaseMessageTokenVM;
 import com.beeswork.balanceaccountservice.vm.account.LocationVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Random;
 
 @RestController
 @RequestMapping("/account")
@@ -42,8 +31,8 @@ public class AccountController extends BaseController {
     private final AccountService accountService;
 
     //    TODO: remove me
-    @Autowired
-    private FirebaseMessagingService firebaseMessagingService;
+//    @Autowired
+//    private FirebaseMessagingService firebaseMessagingService;
 
     @Autowired
     public AccountController(ObjectMapper objectMapper, ModelMapper modelMapper, AccountService accountService) {
@@ -107,8 +96,8 @@ public class AccountController extends BaseController {
     @PostMapping("/send-message")
     public void firebaseMessaging(@RequestParam("token") String token,
                                   @RequestParam("message") String message)
-    throws IOException, FirebaseMessagingException {
-        firebaseMessagingService.sendNotification(token, message);
+    throws IOException {
+//        firebaseMessagingService.sendNotification(token, message);
     }
 
 }

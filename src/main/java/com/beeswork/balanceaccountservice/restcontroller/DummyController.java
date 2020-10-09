@@ -216,7 +216,7 @@ public class DummyController {
                 account.setAccountType(accountType);
                 account.setScore(latCount);
                 account.setPoint(lonCount);
-                account.setSwipedCountUpdatedAt(new Date());
+                account.setFirebaseMessagingToken("");
                 account.setCreatedAt(new Date());
                 account.setUpdatedAt(new Date());
 
@@ -225,6 +225,7 @@ public class DummyController {
                     Photo photo = new Photo();
                     Thread.sleep(2);
                     photo.setKey(new Date().toInstant().toString());
+                    photo.setSequence(p);
                     photo.setAccount(account);
                     account.getPhotos().add(photo);
                 }

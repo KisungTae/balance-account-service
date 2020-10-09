@@ -22,6 +22,12 @@ public class Photo {
     @Column(name = "key")
     private String key;
 
+    @Column(name = "sequence")
+    private Integer sequence;
+
+    @Column(name = "account_id", insertable = false, updatable = false)
+    private UUID accountId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;

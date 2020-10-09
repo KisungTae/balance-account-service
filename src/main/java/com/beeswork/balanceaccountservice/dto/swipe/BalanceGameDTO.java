@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.dto.match;
+package com.beeswork.balanceaccountservice.dto.swipe;
 
 
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;

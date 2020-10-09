@@ -1,15 +1,13 @@
-package com.beeswork.balanceaccountservice.vm.match;
-
+package com.beeswork.balanceaccountservice.vm.click;
 
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Locale;
+import org.springframework.stereotype.Service;
 
 @Getter
 @Setter
-public class SwipeVM {
+public class ClickVM {
 
     private Long swipeId;
 

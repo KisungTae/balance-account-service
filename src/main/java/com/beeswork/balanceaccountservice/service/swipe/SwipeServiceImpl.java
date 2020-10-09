@@ -3,10 +3,9 @@ package com.beeswork.balanceaccountservice.service.swipe;
 import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
-import com.beeswork.balanceaccountservice.dto.match.BalanceGameDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.BalanceGameDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.SwipeListDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
@@ -19,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -32,19 +33,6 @@ public class SwipeServiceImpl implements SwipeService {
     public SwipeServiceImpl(AccountDAO accountDAO, SwipeDAO swipeDAO) {
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
-    }
-
-    @Override
-    @Transactional
-    public SwipeListDTO listSwipes(String accountId) {
-
-        SwipeListDTO swipeListDTO = new SwipeListDTO();
-
-        for (Swipe swipe : swipeDAO.findAllSwiped(UUID.fromString(accountId))) {
-            swipeListDTO.getSwiperIds().add(swipe.getSwiperId().toString());
-        }
-
-        return swipeListDTO;
     }
 
     @Override
@@ -70,6 +58,9 @@ public class SwipeServiceImpl implements SwipeService {
 //            throw new AccountShortOfPointException();
 
         Account swiped = accountDAO.findByIdWithQuestions(swipedUUId);
+        int swipedCount = swiped.getSwipedCount();
+        swipedCount++;
+        swiped.setSwipedCount(swipedCount);
 
         Swipe swipe = new Swipe(swiper, swiped, false, new Date(), new Date());
         swiper.getSwipes().add(swipe);
@@ -78,6 +69,7 @@ public class SwipeServiceImpl implements SwipeService {
         swiper.setPoint(currentPoint);
 
         accountDAO.persist(swiper);
+        accountDAO.persist(swiped);
 
 
         BalanceGameDTO balanceGameDTO = new BalanceGameDTO();
