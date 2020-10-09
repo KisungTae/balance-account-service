@@ -15,4 +15,5 @@ public interface AccountDAO extends BaseDAO<Account> {
     throws AccountNotFoundException;
     Account findByIdWithQuestions(UUID accountId) throws AccountNotFoundException;
     Account findByIdWithAccountQuestions(UUID accountId) throws AccountNotFoundException;
+    boolean existsByIdAndEmail(UUID id, String email);
 }

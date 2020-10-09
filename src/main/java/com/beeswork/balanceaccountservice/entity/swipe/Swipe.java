@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.entity.swipe;
 
 
 import com.beeswork.balanceaccountservice.entity.account.Account;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -21,15 +21,22 @@ import java.util.UUID;
 @Repository
 public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
 
-    private final QAccount qAccount = QAccount.account;
+    private final QAccount         qAccount         = QAccount.account;
     private final QAccountQuestion qAccountQuestion = QAccountQuestion.accountQuestion;
-    private final QQuestion qQuestion = QQuestion.question;
-    private final QPhoto qPhoto = QPhoto.photo;
-    private final QMatch qMatch = QMatch.match;
+    private final QQuestion        qQuestion        = QQuestion.question;
+    private final QPhoto           qPhoto           = QPhoto.photo;
+    private final QMatch           qMatch           = QMatch.match;
 
     @Autowired
     public AccountDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
         super(entityManager, jpaQueryFactory);
+    }
+
+    @Override
+    public boolean existsByIdAndEmail(UUID id, String email) {
+        return jpaQueryFactory.selectFrom(qAccount)
+                              .where(qAccount.id.eq(id).and(qAccount.email.eq(email)))
+                              .fetchCount() > 0;
     }
 
     @Override
@@ -52,24 +59,24 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Object[]> findAllWithin(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point point) {
+    public List<Object[]> findAllWithin(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int limit,
+                                        int offset, Point point) {
 
 
-        
         return entityManager.createNativeQuery(
                 "select cast(b.id as varchar), b.name, b.about, b.birth_year, st_distance(b.location, :pivot), p.key " +
-                        "from (select * " +
-                        "      from account a  " +
-                        "      where st_dwithin(location, :pivot, :distance) " +
-                        "        and gender = :gender " +
-                        "        and birth_year <= :minAge " +
-                        "        and birth_year >= :maxAge " +
-                        "        and enabled = true" +
-                        "        and blocked = false " +
-                        "       limit :limit " +
-                        "       offset :offset) as b " +
-                        "inner join photo as p " +
-                        "on p.account_id = b.id")
+                "from (select * " +
+                "      from account a  " +
+                "      where st_dwithin(location, :pivot, :distance) " +
+                "        and gender = :gender " +
+                "        and birth_year <= :minAge " +
+                "        and birth_year >= :maxAge " +
+                "        and enabled = true" +
+                "        and blocked = false " +
+                "       limit :limit " +
+                "       offset :offset) as b " +
+                "inner join photo as p " +
+                "on p.account_id = b.id")
                             .setParameter("pivot", point)
                             .setParameter("distance", distance)
                             .setParameter("gender", gender)

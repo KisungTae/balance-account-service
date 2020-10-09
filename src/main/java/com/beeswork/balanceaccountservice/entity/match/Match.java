@@ -38,9 +38,16 @@ public class Match {
     @Column(name = "unmatched")
     private boolean unmatched;
 
+    @Column(name = "unmatcher")
+    private boolean unmatcher;
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updateAt;
 
     public Match(Account matcher, Account matched, boolean unmatched, Date createdAt) {
         this.matchId = new MatchId(matcher.getId(), matched.getId());

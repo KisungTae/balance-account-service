@@ -282,32 +282,35 @@ create table match
     matcher_id uuid      not null,
     matched_id uuid      not null,
     unmatched  boolean   not null,
+    unmatcher  boolean   not null,
     created_at timestamp not null,
+    updated_at timestamp not null,
 
     primary key (matcher_id, matched_id),
     constraint match_matcher_id_fk foreign key (matcher_id) references account (id),
     constraint match_matched_id_fk foreign key (matched_id) references account (id)
 );
 
+
 create index match_matcher_id_idx on match (matcher_id);
 create index match_matched_id_idx on match (matched_id);
 
 
 
-create table unmatch
-(
-    unmatcher_id uuid      not null,
-    unmatched_id uuid      not null,
-    created_at   timestamp not null,
-
-    primary key (unmatcher_id, unmatched_id),
-    constraint unmatch_unmatcher_id_fk foreign key (unmatcher_id) references account (id),
-    constraint unmatch_unmatched_id_fk foreign key (unmatched_id) references account (id)
-);
-
-
-create index unmatch_unmatcher_id_idx on unmatch (unmatcher_id);
-create index unmatch_unmatched_id_idx on unmatch (unmatched_id);
+-- create table unmatch
+-- (
+--     unmatcher_id uuid      not null,
+--     unmatched_id uuid      not null,
+--     created_at   timestamp not null,
+--
+--     primary key (unmatcher_id, unmatched_id),
+--     constraint unmatch_unmatcher_id_fk foreign key (unmatcher_id) references account (id),
+--     constraint unmatch_unmatched_id_fk foreign key (unmatched_id) references account (id)
+-- );
+--
+--
+-- create index unmatch_unmatcher_id_idx on unmatch (unmatcher_id);
+-- create index unmatch_unmatched_id_idx on unmatch (unmatched_id);
 
 
 create table admin
@@ -390,26 +393,10 @@ create table unblock
 );
 
 
+select *
+from account
+where id = '1e86a5eb-2717-429c-8a05-fd30c2da4515';
 
 select *
-from account;
-
-select *
-from swipe s
-left join match m
-on s.swiper_id = m.matcher_id and s.swiped_id = m.matched_id
-left join photo p on s.swiper_id = p.account_id
-where s.swiped_id = 'fa8a6bbd-09f5-4ef1-8b60-37dcb0bfb44f'::uuid
-and s.clicked = true
-and m.matched_id is null
-and p.sequence = 1;
-
-
-
--- 2,b0bc55d7-d1c2-4b7c-832f-179cb88b09c4
--- 110,afdff432-27e4-4bc3-b1b5-dda260d728d1
--- 254,374c8d9d-f125-4db4-8244-78897ceeeb65
--- 424,f5c548c1-7b16-4eb3-9f2a-0eb81cda7892
--- 875,f67128ef-8e0b-4c1b-aed1-bc722c271aa3
--- 1437,b9e6ea26-5de6-4eca-ba68-a67e813be6ed
--- 1652,421323d0-a257-4199-80cc-a275bd5a4844
+from match
+where unmatched = true

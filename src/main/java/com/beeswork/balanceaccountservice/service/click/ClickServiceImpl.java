@@ -8,15 +8,17 @@ import com.beeswork.balanceaccountservice.dto.click.ClickDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
+import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.match.MatchExistsException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -36,16 +38,10 @@ public class ClickServiceImpl implements ClickService {
     }
 
     @Override
-    @Transactional
-    public List<String> listClick(String accountId) {
-
-        List<String> swipeIds = new ArrayList<>();
-        for (Swipe swipe : swipeDAO.findAllClicked(UUID.fromString(accountId))) {
-            swipeIds.add(swipe.getSwiperId().toString());
-        }
-        return swipeIds;
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public List<ClickedProjection> listClicked(String swiperId) {
+        return swipeDAO.findAllClicked(UUID.fromString(swiperId));
     }
-
 
     @Override
     @Transactional

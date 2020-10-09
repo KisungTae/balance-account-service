@@ -15,11 +15,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
+@Validated
 @RestController
 public class ClickController extends BaseController {
 
@@ -39,25 +40,12 @@ public class ClickController extends BaseController {
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
-
-    @GetMapping("/click/list")
-    public ResponseEntity<String> listClicks(@RequestParam("accountId") @ValidUUID String accountId) throws JsonProcessingException {
-//
-//        SwipeListDTO swipeListDTO = click.listSwipes(accountId);
-//        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(swipeListDTO));
-        return null;
-    }
-
-
     @GetMapping("/clicked/list")
-    public ResponseEntity<String> listClicked(@RequestParam("accountId") @ValidUUID String accountId) throws JsonProcessingException {
+    public ResponseEntity<String> listClicked(@RequestParam("swiperId") @ValidUUID String swiperId)
+    throws JsonProcessingException {
 
-        clickService.listClick(accountId);
-        //
-//        SwipeListDTO swipeListDTO = click.listSwipes(accountId);
-//        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(swipeListDTO));
-
-        return null;
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(objectMapper.writeValueAsString(clickService.listClicked(swiperId)));
     }
 
 

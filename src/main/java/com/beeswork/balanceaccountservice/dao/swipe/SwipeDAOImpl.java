@@ -5,10 +5,11 @@ import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
 import com.beeswork.balanceaccountservice.entity.account.QPhoto;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
+import com.beeswork.balanceaccountservice.projection.ClickedProjection;
+import com.beeswork.balanceaccountservice.entity.swipe.QClickedProjection;
 import com.beeswork.balanceaccountservice.entity.swipe.QSwipe;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,9 +22,9 @@ import java.util.UUID;
 public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
 
     private final QAccount qAccount = QAccount.account;
-    private final QSwipe qSwipe = QSwipe.swipe;
-    private final QMatch qMatch = QMatch.match;
-    private final QPhoto qPhoto = QPhoto.photo;
+    private final QSwipe   qSwipe   = QSwipe.swipe;
+    private final QMatch   qMatch   = QMatch.match;
+    private final QPhoto   qPhoto   = QPhoto.photo;
 
     @Autowired
     public SwipeDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
@@ -62,31 +63,29 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
 //    @Override
-//    public List<Swipe> findAll(UUID swiperId) {
-//        return jpaQueryFactory.selectFrom(qSwipe)
+//    public List<UUID> findAllClick(UUID swiperId) {
+//        return jpaQueryFactory.select(qSwipe.swipedId)
+//                              .from(qSwipe)
 //                              .leftJoin(qMatch).on(qSwipe.swiperId.eq(qMatch.matchedId))
 //                              .where(qSwipe.swipedId.eq(swiperId)
-//                                                    .and(qSwipe.balanced.eq(true))
+//                                                    .and(qSwipe.clicked.eq(true))
 //                                                    .and(qMatch.matchedId.isNull()))
 //                              .fetch();
 //    }
 
-    public List<Swipe> findAllClicked(UUID swipedId) {
-        List<Tuple> swipes = jpaQueryFactory.select(qSwipe.swiperId, qPhoto.key)
-                                            .from(qSwipe)
-                                            .leftJoin(qMatch)
-                                            .on(qSwipe.swiperId.eq(qMatch.matcherId)
-                                                               .and(qSwipe.swipedId.eq(qMatch.matchedId)))
-                                            .leftJoin(qPhoto)
-                                            .on(qSwipe.swiperId.eq(qPhoto.accountId))
-                                            .where(qSwipe.swipedId.eq(swipedId)
-                                                                  .and(qSwipe.clicked.eq(true))
-                                                                  .and(qMatch.matchedId.isNull())
-                                                                  .and(qPhoto.sequence.eq(AppConstant.REP_IMAGE_SEQUENCE)))
-                                            .fetch();
-
-
-        return null;
+    public List<ClickedProjection> findAllClicked(UUID swipedId) {
+        return jpaQueryFactory.select(new QClickedProjection(qSwipe.swiperId, qPhoto.key))
+                              .from(qSwipe)
+                              .leftJoin(qMatch)
+                              .on(qSwipe.swiperId.eq(qMatch.matcherId)
+                                                 .and(qSwipe.swipedId.eq(qMatch.matchedId)))
+                              .leftJoin(qPhoto)
+                              .on(qSwipe.swiperId.eq(qPhoto.accountId))
+                              .where(qSwipe.swipedId.eq(swipedId)
+                                                    .and(qSwipe.clicked.eq(true))
+                                                    .and(qMatch.matchedId.isNull())
+                                                    .and(qPhoto.sequence.eq(AppConstant.REP_PHOTO_SEQUENCE)))
+                              .fetch();
     }
 
 

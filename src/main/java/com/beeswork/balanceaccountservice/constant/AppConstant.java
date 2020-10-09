@@ -9,5 +9,5 @@ public class AppConstant {
 
     public static final String AWS_S3_URL = "";
 
-    public static final int REP_IMAGE_SEQUENCE = 1;
+    public static final int REP_PHOTO_SEQUENCE = 1;
 }
