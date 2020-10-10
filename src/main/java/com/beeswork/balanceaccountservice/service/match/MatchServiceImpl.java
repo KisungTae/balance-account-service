@@ -24,14 +24,12 @@ import java.util.UUID;
 public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     private final AccountDAO accountDAO;
-    private final SwipeDAO   swipeDAO;
     private final MatchDAO   matchDAO;
 
     @Autowired
-    public MatchServiceImpl(ModelMapper modelMapper, AccountDAO accountDAO, SwipeDAO swipeDAO, MatchDAO matchDAO) {
+    public MatchServiceImpl(ModelMapper modelMapper, AccountDAO accountDAO, MatchDAO matchDAO) {
         super(modelMapper);
         this.accountDAO = accountDAO;
-        this.swipeDAO = swipeDAO;
         this.matchDAO = matchDAO;
     }
 

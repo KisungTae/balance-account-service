@@ -61,8 +61,8 @@ public class Account {
     @Column(name = "point")
     private int point;
 
-    @Column(name = "firebase_messaging_token")
-    private String firebaseMessagingToken;
+    @Column(name = "fcm_token")
+    private String FCMToken;
 
     @Column(name = "swiped_count")
     private int swipedCount;

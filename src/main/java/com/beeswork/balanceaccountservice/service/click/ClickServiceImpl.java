@@ -1,10 +1,12 @@
 package com.beeswork.balanceaccountservice.service.click;
 
 
+import com.beeswork.balanceaccountservice.constant.FirebaseConstant;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.click.ClickDTO;
+import com.beeswork.balanceaccountservice.dto.firebase.FirebaseNotificationDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
@@ -45,7 +47,7 @@ public class ClickServiceImpl implements ClickService {
 
     @Override
     @Transactional
-    public void click(ClickDTO clickDTO)
+    public FirebaseNotificationDTO click(ClickDTO clickDTO)
     throws SwipeNotFoundException, AccountInvalidException, MatchExistsException {
 
         UUID swiperUUId = UUID.fromString(clickDTO.getSwiperId());
@@ -62,6 +64,10 @@ public class ClickServiceImpl implements ClickService {
         swipe.setClicked(true);
         swipeDAO.persist(swipe);
 
+        FirebaseNotificationDTO firebaseNotificationDTO = new FirebaseNotificationDTO();
+        firebaseNotificationDTO.setMessage("");
+        firebaseNotificationDTO.getTokens().add(swiped.getFCMToken());
+
         // match
         if (swipeDAO.existsByAccountIdsAndClicked(swipedUUId, swiperUUId, true)) {
 
@@ -74,6 +80,14 @@ public class ClickServiceImpl implements ClickService {
 
             accountDAO.persist(swiper);
             accountDAO.persist(swiped);
+
+            firebaseNotificationDTO.setNotificationType(FirebaseConstant.NotificationType.MATCH);
+            firebaseNotificationDTO.getTokens().add(swiper.getFCMToken());
+
+        } else {
+            firebaseNotificationDTO.setNotificationType(FirebaseConstant.NotificationType.CLICKED);
         }
+
+        return firebaseNotificationDTO;
     }
 }

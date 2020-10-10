@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.dto.account;
+package com.beeswork.balanceaccountservice.dto.firebase;
 
 
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class FirebaseMessagingTokenDTO {
+public class FirebaseTokenDTO {
 
     private String accountId;
     private String email;

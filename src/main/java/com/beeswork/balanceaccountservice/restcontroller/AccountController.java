@@ -3,7 +3,7 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.account.AccountDTO;
 import com.beeswork.balanceaccountservice.dto.account.AccountQuestionSaveDTO;
-import com.beeswork.balanceaccountservice.dto.account.FirebaseMessagingTokenDTO;
+import com.beeswork.balanceaccountservice.dto.firebase.FirebaseTokenDTO;
 import com.beeswork.balanceaccountservice.dto.account.LocationDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
@@ -11,7 +11,7 @@ import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
 import com.beeswork.balanceaccountservice.vm.account.AccountQuestionSaveVM;
 import com.beeswork.balanceaccountservice.vm.account.AccountVM;
-import com.beeswork.balanceaccountservice.vm.account.FirebaseMessageTokenVM;
+import com.beeswork.balanceaccountservice.vm.firebase.FirebaseTokenVM;
 import com.beeswork.balanceaccountservice.vm.account.LocationVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.io.IOException;
 
@@ -80,15 +81,14 @@ public class AccountController extends BaseController {
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
-    @PostMapping("/message-token/save")
-    public ResponseEntity<String> saveFirebaseMessagingToken(
-            @Valid @RequestBody FirebaseMessageTokenVM firebaseMessageTokenVM,
+    @PostMapping("/firebase/token/save")
+    public ResponseEntity<String> saveFirebaseToken(
+            @Valid @RequestBody FirebaseTokenVM firebaseTokenVM,
             BindingResult bindingResult)
     throws JsonProcessingException, AccountNotFoundException {
 
         if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
-        accountService.saveFirebaseMessagingToken(
-                modelMapper.map(firebaseMessageTokenVM, FirebaseMessagingTokenDTO.class));
+        accountService.saveFirebaseToken(modelMapper.map(firebaseTokenVM, FirebaseTokenDTO.class));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 

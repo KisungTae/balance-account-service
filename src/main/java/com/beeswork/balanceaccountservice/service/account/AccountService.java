@@ -1,10 +1,9 @@
 package com.beeswork.balanceaccountservice.service.account;
 
 import com.beeswork.balanceaccountservice.dto.account.*;
+import com.beeswork.balanceaccountservice.dto.firebase.FirebaseTokenDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
-
-import java.util.List;
 
 public interface AccountService {
 
@@ -15,6 +14,6 @@ public interface AccountService {
     throws AccountNotFoundException, QuestionNotFoundException;
     void saveLocation(LocationDTO locationDTO) throws AccountNotFoundException;
 
-    void saveFirebaseMessagingToken(FirebaseMessagingTokenDTO firebaseMessagingTokenDTO)
+    void saveFirebaseToken(FirebaseTokenDTO firebaseTokenDTO)
     throws AccountNotFoundException;
 }

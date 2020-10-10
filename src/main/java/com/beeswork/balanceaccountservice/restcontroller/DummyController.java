@@ -218,7 +218,7 @@ public class DummyController {
                 account.setAccountType(accountType);
                 account.setScore(latCount);
                 account.setPoint(lonCount);
-                account.setFirebaseMessagingToken("");
+                account.setFCMToken("");
                 account.setCreatedAt(new Date());
                 account.setUpdatedAt(new Date());
 

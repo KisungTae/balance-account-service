@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.vm.account;
+package com.beeswork.balanceaccountservice.vm.firebase;
 
 
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class FirebaseMessageTokenVM {
+public class FirebaseTokenVM {
 
     @ValidUUID
     private String accountId;
