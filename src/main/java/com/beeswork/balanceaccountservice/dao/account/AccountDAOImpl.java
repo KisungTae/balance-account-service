@@ -4,8 +4,8 @@ import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
 import com.beeswork.balanceaccountservice.entity.account.QAccountQuestion;
-import com.beeswork.balanceaccountservice.entity.account.QPhoto;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
+import com.beeswork.balanceaccountservice.entity.photo.QPhoto;
 import com.beeswork.balanceaccountservice.entity.question.QQuestion;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -23,9 +23,9 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
 
     private final QAccount         qAccount         = QAccount.account;
     private final QAccountQuestion qAccountQuestion = QAccountQuestion.accountQuestion;
-    private final QQuestion        qQuestion        = QQuestion.question;
-    private final QPhoto           qPhoto           = QPhoto.photo;
-    private final QMatch           qMatch           = QMatch.match;
+    private final QQuestion qQuestion = QQuestion.question;
+    private final QPhoto    qPhoto    = QPhoto.photo;
+    private final QMatch    qMatch    = QMatch.match;
 
     @Autowired
     public AccountDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {

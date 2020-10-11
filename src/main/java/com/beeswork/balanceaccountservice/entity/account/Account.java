@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.entity.account;
 
+import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import lombok.Getter;
@@ -62,10 +63,13 @@ public class Account {
     private int point;
 
     @Column(name = "fcm_token")
-    private String FCMToken;
+    private String fcmToken;
 
     @Column(name = "swiped_count")
     private int swipedCount;
+
+    @Column(name = "rep_photo_key")
+    private String repPhotoKey;
 
     @Column(name = "location",
             columnDefinition = "GEOGRAPHY(POINT)")

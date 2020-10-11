@@ -2,10 +2,10 @@ package com.beeswork.balanceaccountservice.dao.match;
 
 import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
-import com.beeswork.balanceaccountservice.entity.account.QPhoto;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
+import com.beeswork.balanceaccountservice.entity.photo.QPhoto;
 import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import com.beeswork.balanceaccountservice.projection.QMatchProjection;
 import com.querydsl.jpa.impl.JPAQueryFactory;

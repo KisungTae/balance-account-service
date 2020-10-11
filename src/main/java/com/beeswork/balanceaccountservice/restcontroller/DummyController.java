@@ -1,17 +1,23 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.config.properties.AWSProperties;
+import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.accounttype.AccountTypeDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
+import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
 import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
+import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.question.QQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
-import com.beeswork.balanceaccountservice.entity.swipe.QSwipe;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
+import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
+import com.beeswork.balanceaccountservice.service.account.AccountService;
+import com.beeswork.balanceaccountservice.service.firebase.FCMService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.hibernate.Session;
 import org.locationtech.jts.geom.Coordinate;
@@ -51,6 +57,16 @@ public class DummyController {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    private FCMService fcmService;
+
+    @Autowired
+    private AccountService accountService;
+
+    @Autowired
+    private AccountDAO accountDAO;
+
 
 
     @Transactional
@@ -100,7 +116,8 @@ public class DummyController {
         List<Swipe> swipes = entityManager.unwrap(Session.class).createQuery("select s1 from Swipe s1 " +
                                                                              "inner join Swipe s2 on s1.swipedId = s2.swiperId " +
                                                                              "where s1.clicked = true and s2.clicked = true " +
-                                                                             "and s1.swiperId = s2.swipedId order by s1.swiperId", Swipe.class).getResultList();
+                                                                             "and s1.swiperId = s2.swipedId order by s1.swiperId",
+                                                                             Swipe.class).getResultList();
 
         for (Swipe swipe : swipes) {
 
@@ -209,7 +226,8 @@ public class DummyController {
                 account.setBlocked(false);
                 account.setEnabled(true);
                 account.setName(name);
-                account.setEmail("email | " + lat + " | " + lon);
+
+                account.setEmail(count + "@gmail.com");
                 account.setAbout("this is about");
                 account.setBirthYear(calendar.get(Calendar.YEAR));
                 account.setBirth(birth);
@@ -218,7 +236,7 @@ public class DummyController {
                 account.setAccountType(accountType);
                 account.setScore(latCount);
                 account.setPoint(lonCount);
-                account.setFCMToken("");
+                account.setFcmToken("");
                 account.setCreatedAt(new Date());
                 account.setUpdatedAt(new Date());
 
@@ -226,7 +244,11 @@ public class DummyController {
                 for (int p = 0; p < 5; p++) {
                     Photo photo = new Photo();
                     Thread.sleep(2);
-                    photo.setKey(new Date().toInstant().toString());
+                    String photoKey = new Date().toInstant().toString();
+                    photo.setKey(photoKey);
+                    if (p == 0) {
+                        account.setRepPhotoKey(photoKey);
+                    }
                     photo.setSequence(p);
                     photo.setAccount(account);
                     account.getPhotos().add(photo);
@@ -246,4 +268,56 @@ public class DummyController {
 
         entityManager.flush();
     }
+
+    @GetMapping("/send/notification/clicked")
+    public void sendDummyClickedNotification(@RequestParam("token") String token,
+                                             @RequestParam("clickedId") String clickedId)
+    throws AccountNotFoundException, FirebaseMessagingException {
+
+        Account clicked = accountDAO.findById(UUID.fromString(clickedId));
+        FCMNotificationDTO notificationDTO = FCMNotificationDTO.clickedNotification(token, clicked.getRepPhotoKey());
+        List<FCMNotificationDTO> notificationDTOs = new ArrayList<>();
+        notificationDTOs.add(notificationDTO);
+        fcmService.sendNotifications(notificationDTOs);
+    }
+
+    @GetMapping("/send/notification/match")
+    public void sendDummyMatchNotification() {
+
+    }
+
+    @GetMapping("/send/notification")
+    public void sendDummyNotification(@RequestParam("token") String token,
+                                      @RequestParam("message") String message,
+                                      @RequestParam("notificationType") String notificationType)
+    throws FirebaseMessagingException {
+
+        Map<String, String> map = new HashMap<>();
+        map.put("dd", "dd");
+        map.put("ff", "ff");
+        System.out.println(map.toString());
+
+        FCMNotificationDTO fcmNotificationDTO = new FCMNotificationDTO();
+//        fcmNotificationDTO.getTokens().add(token);
+//        fcmNotificationDTO.setMessage(message);
+//        fcmNotificationDTO.setNotificationType(notificationType);
+//        fcmService.sendNotification(fcmNotificationDTO);
+    }
+
+    @PostMapping("/change/swipe-count")
+    public void changeSwipeCount(@RequestParam("count") int count,
+                                 @RequestParam("accountId") String accountId)
+    throws AccountNotFoundException, InterruptedException {
+
+        accountService.changeSwipeCount(accountId, count);
+    }
+
+    @PostMapping("/change/about")
+    public void changeAbout(@RequestParam("about") String about,
+                            @RequestParam("accountId") String accountId) throws AccountNotFoundException {
+
+        accountService.changeAbout(accountId, about);
+
+    }
+
 }

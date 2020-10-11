@@ -4,11 +4,13 @@ package com.beeswork.balanceaccountservice.service.account;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
 import com.beeswork.balanceaccountservice.dto.account.*;
-import com.beeswork.balanceaccountservice.dto.firebase.FirebaseTokenDTO;
+import com.beeswork.balanceaccountservice.dto.firebase.FCMTokenDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestionId;
 import com.beeswork.balanceaccountservice.entity.question.Question;
+import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
+import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
@@ -55,12 +57,18 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
-    public void saveFirebaseToken(FirebaseTokenDTO firebaseTokenDTO)
-    throws AccountNotFoundException {
-        Account account = accountDAO.findById(UUID.fromString(firebaseTokenDTO.getAccountId()));
-        account.setFCMToken(firebaseTokenDTO.getToken());
+    public void saveFCMToken(FCMTokenDTO fcmTokenDTO)
+    throws AccountNotFoundException, AccountInvalidException {
+
+        Account account = accountDAO.findById(UUID.fromString(fcmTokenDTO.getAccountId()));
+        if (!account.getEmail().equals(fcmTokenDTO.getEmail()))
+            throw new AccountInvalidException();
+
+        account.setFcmToken(fcmTokenDTO.getToken());
         accountDAO.persist(account);
     }
+
+
 
 
     @Override
@@ -153,6 +161,33 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
             accountQuestions.add(accountQuestion);
             accountQuestionDTOs.remove(accountQuestionDTO);
         }
+    }
+
+
+    @Override
+    @Transactional
+    public void changeSwipeCount(String accountId, int count) throws AccountNotFoundException, InterruptedException {
+        Account account = accountDAO.findById(UUID.fromString(accountId));
+//        account.setSwipedCount(count);
+
+        Account account1 = accountDAO.findById(UUID.fromString("619419af-e0d7-49e8-b8bf-f5b1fd6c60fe"));
+
+
+        account.getSwipes().add(new Swipe(account, account1, false, new Date(), new Date()));
+
+        System.out.println("thread sleep start");
+        Thread.sleep(10000);
+        System.out.println("thread sleep end");
+
+        accountDAO.persist(account);
+    }
+
+    @Override
+    @Transactional
+    public void changeAbout(String accountId, String about) throws AccountNotFoundException {
+        Account account = accountDAO.findById(UUID.fromString(accountId));
+        account.setAbout(about);
+        accountDAO.persist(account);
     }
 
 }

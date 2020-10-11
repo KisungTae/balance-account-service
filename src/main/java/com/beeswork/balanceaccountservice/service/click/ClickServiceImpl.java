@@ -1,12 +1,12 @@
 package com.beeswork.balanceaccountservice.service.click;
 
 
-import com.beeswork.balanceaccountservice.constant.FirebaseConstant;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
+import com.beeswork.balanceaccountservice.dao.photo.PhotoDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.click.ClickDTO;
-import com.beeswork.balanceaccountservice.dto.firebase.FirebaseNotificationDTO;
+import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -29,14 +30,17 @@ import java.util.UUID;
 public class ClickServiceImpl implements ClickService {
 
     private final AccountDAO accountDAO;
-    private final SwipeDAO swipeDAO;
-    private final MatchDAO matchDAO;
+    private final SwipeDAO   swipeDAO;
+    private final MatchDAO   matchDAO;
+    private final PhotoDAO   photoDAO;
 
     @Autowired
-    public ClickServiceImpl(AccountDAO accountDAO, SwipeDAO swipeDAO, MatchDAO matchDAO) {
+    public ClickServiceImpl(AccountDAO accountDAO, SwipeDAO swipeDAO, MatchDAO matchDAO,
+                            PhotoDAO photoDAO) {
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
         this.matchDAO = matchDAO;
+        this.photoDAO = photoDAO;
     }
 
     @Override
@@ -47,7 +51,7 @@ public class ClickServiceImpl implements ClickService {
 
     @Override
     @Transactional
-    public FirebaseNotificationDTO click(ClickDTO clickDTO)
+    public List<FCMNotificationDTO> click(ClickDTO clickDTO)
     throws SwipeNotFoundException, AccountInvalidException, MatchExistsException {
 
         UUID swiperUUId = UUID.fromString(clickDTO.getSwiperId());
@@ -64,9 +68,7 @@ public class ClickServiceImpl implements ClickService {
         swipe.setClicked(true);
         swipeDAO.persist(swipe);
 
-        FirebaseNotificationDTO firebaseNotificationDTO = new FirebaseNotificationDTO();
-        firebaseNotificationDTO.setMessage("");
-        firebaseNotificationDTO.getTokens().add(swiped.getFCMToken());
+        List<FCMNotificationDTO> fcmNotificationDTOs = new ArrayList<>();
 
         // match
         if (swipeDAO.existsByAccountIdsAndClicked(swipedUUId, swiperUUId, true)) {
@@ -81,13 +83,14 @@ public class ClickServiceImpl implements ClickService {
             accountDAO.persist(swiper);
             accountDAO.persist(swiped);
 
-            firebaseNotificationDTO.setNotificationType(FirebaseConstant.NotificationType.MATCH);
-            firebaseNotificationDTO.getTokens().add(swiper.getFCMToken());
+            fcmNotificationDTOs.add(FCMNotificationDTO.matchNotification(swiper.getFcmToken(), swiped.getRepPhotoKey()));
+            fcmNotificationDTOs.add(FCMNotificationDTO.matchNotification(swiped.getFcmToken(), swiper.getRepPhotoKey()));
 
         } else {
-            firebaseNotificationDTO.setNotificationType(FirebaseConstant.NotificationType.CLICKED);
+            fcmNotificationDTOs.add(FCMNotificationDTO.clickedNotification(swiped.getFcmToken(), swiper.getRepPhotoKey()));
         }
 
-        return firebaseNotificationDTO;
+        return fcmNotificationDTOs;
     }
+
 }

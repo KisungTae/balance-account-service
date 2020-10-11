@@ -135,7 +135,6 @@ call populate_user();
 -- normal like does not cost, heart like costs, watch ad every 15 user cards, change question costs, add question does not costs
 
 
-drop table unmatch;
 drop table unblock;
 drop table reward;
 drop table reward_type;
@@ -172,21 +171,22 @@ create table account_type
 -- liked count will be reset on every night
 create table account
 (
-    id              uuid primary key                default uuid_generate_v4(),
+    id              uuid primary key default uuid_generate_v4(),
     enabled         boolean                not null,
     blocked         boolean                not null,
-    name            varchar(50)            not null default '',
+    name            varchar(50)            not null,
     email           varchar(256) unique    not null,
     birth_year      int                    not null,
     birth           Date                   not null,
-    about           varchar(500)           not null default '',
+    about           varchar(500)           not null,
     gender          boolean                not null,
     score           int                    not null,
     index           int                    not null,
     point           int                    not null,
     swiped_count    int                    not null,
+    rep_photo_key   varchar(30)            not null,
     location        geography(point, 4326) not null,
-    firebase_token  varchar(200)           not null default '',
+    fcm_token       varchar(200)           not null,
     account_type_id int                    not null,
     created_at      timestamp              not null,
     updated_at      timestamp              not null,
@@ -393,10 +393,10 @@ create table unblock
 );
 
 
-select *
-from account
-where id = '1e86a5eb-2717-429c-8a05-fd30c2da4515';
 
 select *
-from match
-where unmatched = true
+from account;
+
+
+update account set fcm_token = 'ceb88CXjTVCb5h-yjlxDrZ:APA91bEehgan19DLiHoyQsy3-5Q2F_eG1W0VQ3GE6inXjU1CaL_fNPdzmtcySsl2urwjw3b67jy49u8pJe-ho4SKbvtkegsLJ9I1RPb3fZLz7bsjWlf82doKAvizCveA2YEaVHAU3_oS'
+where id = '578ba923-f047-4354-92bd-7e8a9112aac8';

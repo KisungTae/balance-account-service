@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class FirebaseTokenVM {
+public class FCMTokenVM {
 
     @ValidUUID
     private String accountId;

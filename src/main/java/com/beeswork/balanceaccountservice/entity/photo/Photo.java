@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.entity.account;
+package com.beeswork.balanceaccountservice.entity.photo;
 
 
 import com.beeswork.balanceaccountservice.entity.account.Account;

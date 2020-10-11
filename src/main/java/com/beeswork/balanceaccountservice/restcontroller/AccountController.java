@@ -3,15 +3,16 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.account.AccountDTO;
 import com.beeswork.balanceaccountservice.dto.account.AccountQuestionSaveDTO;
-import com.beeswork.balanceaccountservice.dto.firebase.FirebaseTokenDTO;
+import com.beeswork.balanceaccountservice.dto.firebase.FCMTokenDTO;
 import com.beeswork.balanceaccountservice.dto.account.LocationDTO;
+import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
 import com.beeswork.balanceaccountservice.vm.account.AccountQuestionSaveVM;
 import com.beeswork.balanceaccountservice.vm.account.AccountVM;
-import com.beeswork.balanceaccountservice.vm.firebase.FirebaseTokenVM;
+import com.beeswork.balanceaccountservice.vm.firebase.FCMTokenVM;
 import com.beeswork.balanceaccountservice.vm.account.LocationVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,23 +82,13 @@ public class AccountController extends BaseController {
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
-    @PostMapping("/firebase/token/save")
-    public ResponseEntity<String> saveFirebaseToken(
-            @Valid @RequestBody FirebaseTokenVM firebaseTokenVM,
-            BindingResult bindingResult)
-    throws JsonProcessingException, AccountNotFoundException {
+    @PostMapping("/fcm/token/save")
+    public ResponseEntity<String> saveFCMToken(@Valid @RequestBody FCMTokenVM fcmTokenVM,
+                                               BindingResult bindingResult)
+    throws JsonProcessingException, AccountNotFoundException, AccountInvalidException {
 
         if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
-        accountService.saveFirebaseToken(modelMapper.map(firebaseTokenVM, FirebaseTokenDTO.class));
+        accountService.saveFCMToken(modelMapper.map(fcmTokenVM, FCMTokenDTO.class));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
-
-    //  TODO: remove me
-    @PostMapping("/send-message")
-    public void firebaseMessaging(@RequestParam("token") String token,
-                                  @RequestParam("message") String message)
-    throws IOException {
-//        firebaseMessagingService.sendNotification(token, message);
-    }
-
 }

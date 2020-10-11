@@ -3,13 +3,13 @@ package com.beeswork.balanceaccountservice.dao.swipe;
 import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
-import com.beeswork.balanceaccountservice.entity.account.QPhoto;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
+import com.beeswork.balanceaccountservice.entity.photo.QPhoto;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
-import com.beeswork.balanceaccountservice.entity.swipe.QClickedProjection;
 import com.beeswork.balanceaccountservice.entity.swipe.QSwipe;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
+import com.beeswork.balanceaccountservice.projection.QClickedProjection;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -23,8 +23,8 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
 
     private final QAccount qAccount = QAccount.account;
     private final QSwipe   qSwipe   = QSwipe.swipe;
-    private final QMatch   qMatch   = QMatch.match;
-    private final QPhoto   qPhoto   = QPhoto.photo;
+    private final QMatch qMatch = QMatch.match;
+    private final QPhoto qPhoto = QPhoto.photo;
 
     @Autowired
     public SwipeDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {

@@ -1,7 +1,8 @@
 package com.beeswork.balanceaccountservice.service.account;
 
 import com.beeswork.balanceaccountservice.dto.account.*;
-import com.beeswork.balanceaccountservice.dto.firebase.FirebaseTokenDTO;
+import com.beeswork.balanceaccountservice.dto.firebase.FCMTokenDTO;
+import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 
@@ -14,6 +15,11 @@ public interface AccountService {
     throws AccountNotFoundException, QuestionNotFoundException;
     void saveLocation(LocationDTO locationDTO) throws AccountNotFoundException;
 
-    void saveFirebaseToken(FirebaseTokenDTO firebaseTokenDTO)
-    throws AccountNotFoundException;
+    void saveFCMToken(FCMTokenDTO FCMTokenDTO)
+    throws AccountNotFoundException, AccountInvalidException;
+
+
+//    TODO: remove me
+    void changeSwipeCount(String accountId, int count) throws AccountNotFoundException, InterruptedException;
+    void changeAbout(String accountId, String about) throws AccountNotFoundException;
 }

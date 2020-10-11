@@ -2,13 +2,13 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 
 import com.beeswork.balanceaccountservice.dto.click.ClickDTO;
-import com.beeswork.balanceaccountservice.dto.firebase.FirebaseNotificationDTO;
+import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.match.MatchExistsException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.click.ClickService;
-import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
+import com.beeswork.balanceaccountservice.service.firebase.FCMService;
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
 import com.beeswork.balanceaccountservice.vm.click.ClickVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,20 +22,21 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Validated
 @RestController
 public class ClickController extends BaseController {
 
     private final ClickService clickService;
-    private final FirebaseService firebaseService;
+    private final FCMService   FCMService;
 
     @Autowired
     public ClickController(ObjectMapper objectMapper, ModelMapper modelMapper, ClickService clickService,
-                           FirebaseService firebaseService) {
+                           FCMService FCMService) {
         super(objectMapper, modelMapper);
         this.clickService = clickService;
-        this.firebaseService = firebaseService;
+        this.FCMService = FCMService;
     }
 
     @PostMapping("/click")
@@ -43,8 +44,8 @@ public class ClickController extends BaseController {
     throws SwipeNotFoundException, AccountInvalidException, MatchExistsException, JsonProcessingException,
            FirebaseMessagingException {
 
-        FirebaseNotificationDTO firebaseNotificationDTO = clickService.click(modelMapper.map(clickVM, ClickDTO.class));
-        firebaseService.sendNotification(firebaseNotificationDTO);
+        List<FCMNotificationDTO> FCMNotificationDTOs = clickService.click(modelMapper.map(clickVM, ClickDTO.class));
+        FCMService.sendNotifications(FCMNotificationDTOs);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
