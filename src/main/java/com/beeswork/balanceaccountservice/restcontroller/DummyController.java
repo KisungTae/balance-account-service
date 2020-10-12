@@ -72,7 +72,6 @@ public class DummyController {
     private AccountDAO accountDAO;
 
 
-
     @Transactional
     @GetMapping("question-by-account-id")
     public ResponseEntity<String> getQuestionsByAccountId(@RequestParam long accountId) throws JsonProcessingException {
@@ -274,39 +273,40 @@ public class DummyController {
     }
 
     @GetMapping("/send/notification/clicked")
-    public void sendDummyClickedNotification(@RequestParam("token") String token,
-                                             @RequestParam("clickedId") String clickedId)
+    public void sendDummyClickedNotification(@RequestParam("clickedId") String clickedId)
     throws AccountNotFoundException, FirebaseMessagingException {
 
         Account clicked = accountDAO.findById(UUID.fromString(clickedId));
-        FCMNotificationDTO notificationDTO = FCMNotificationDTO.clickedNotification(token, clicked.getRepPhotoKey());
+
+        FCMNotificationDTO notificationDTO = FCMNotificationDTO.clickedNotification(clicked.getFcmToken(),
+                                                                                    clicked.getRepPhotoKey());
         List<FCMNotificationDTO> notificationDTOs = new ArrayList<>();
         notificationDTOs.add(notificationDTO);
         fcmService.sendNotifications(notificationDTOs);
     }
 
     @GetMapping("/send/notification/match")
-    public void sendDummyMatchNotification() {
+    public void sendDummyMatchNotification(@RequestParam("matcherId") String matcherId,
+                                           @RequestParam("matchedId") String matchedId)
+    throws AccountNotFoundException, FirebaseMessagingException {
+
+        Account matcher = accountDAO.findById(UUID.fromString(matcherId));
+        Account matched = accountDAO.findById(UUID.fromString(matchedId));
+
+        FCMNotificationDTO matcherNotification = FCMNotificationDTO.matchNotification(matcher.getFcmToken(),
+                                                                                      matcher.getRepPhotoKey());
+
+        FCMNotificationDTO matchedNotification = FCMNotificationDTO.matchNotification(matched.getFcmToken(),
+                                                                                      matched.getRepPhotoKey());
+
+        List<FCMNotificationDTO> notificationDTOs = new ArrayList<>();
+        notificationDTOs.add(matcherNotification);
+        notificationDTOs.add(matchedNotification);
+
+        fcmService.sendNotifications(notificationDTOs);
 
     }
 
-    @GetMapping("/send/notification")
-    public void sendDummyNotification(@RequestParam("token") String token,
-                                      @RequestParam("message") String message,
-                                      @RequestParam("notificationType") String notificationType)
-    throws FirebaseMessagingException {
-
-        Map<String, String> map = new HashMap<>();
-        map.put("dd", "dd");
-        map.put("ff", "ff");
-        System.out.println(map.toString());
-
-        FCMNotificationDTO fcmNotificationDTO = new FCMNotificationDTO();
-//        fcmNotificationDTO.getTokens().add(token);
-//        fcmNotificationDTO.setMessage(message);
-//        fcmNotificationDTO.setNotificationType(notificationType);
-//        fcmService.sendNotification(fcmNotificationDTO);
-    }
 
 //    @PostMapping("/change/swipe-count")
 //    public void changeSwipeCount(@RequestParam("count") int count,

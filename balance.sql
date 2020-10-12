@@ -194,7 +194,8 @@ create table account
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
 
-
+select *
+from account;
 
 CREATE INDEX account_location_idx ON account USING GIST (location);
 
