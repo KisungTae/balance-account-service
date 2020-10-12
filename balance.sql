@@ -211,6 +211,18 @@ create table photo
 create index photo_account_id_idx on photo (account_id);
 
 
+create table photo_info
+(
+    account_id uuid primary key not null,
+    last_sequence int not null,
+    photo_count int not null,
+    created_at timestamp not null,
+    updated_at timestamp not null,
+
+    constraint photo_info_account_id_fk foreign key (account_id) references account (id)
+);
+
+
 create table question
 (
     id            serial primary key,
@@ -394,9 +406,5 @@ create table unblock
     constraint unblock_admin_id_fk foreign key (admin_id) references admin (id)
 );
 
-
-
-select *
-from match;
 
 
