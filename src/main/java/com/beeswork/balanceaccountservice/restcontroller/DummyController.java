@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.hibernate.Session;
+import org.hibernate.StaleObjectStateException;
+import org.hibernate.StaleStateException;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -27,10 +29,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.RollbackException;
 import javax.transaction.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -304,20 +308,24 @@ public class DummyController {
 //        fcmService.sendNotification(fcmNotificationDTO);
     }
 
-    @PostMapping("/change/swipe-count")
-    public void changeSwipeCount(@RequestParam("count") int count,
-                                 @RequestParam("accountId") String accountId)
-    throws AccountNotFoundException, InterruptedException {
-
-        accountService.changeSwipeCount(accountId, count);
-    }
-
-    @PostMapping("/change/about")
-    public void changeAbout(@RequestParam("about") String about,
-                            @RequestParam("accountId") String accountId) throws AccountNotFoundException {
-
-        accountService.changeAbout(accountId, about);
-
-    }
+//    @PostMapping("/change/swipe-count")
+//    public void changeSwipeCount(@RequestParam("count") int count,
+//                                 @RequestParam("accountId") String accountId)
+//    throws AccountNotFoundException, InterruptedException {
+//        try {
+//            accountService.changeSwipeCount(accountId, count);
+//        } catch (ObjectOptimisticLockingFailureException exception) {
+//            System.out.println("ObjectOptimisticLockingFailureException in account controller");
+//            System.out.println("exception message: " + exception.getMessage());
+//        }
+//    }
+//
+//    @PostMapping("/change/about")
+//    public void changeAbout(@RequestParam("about") String about,
+//                            @RequestParam("accountId") String accountId) throws AccountNotFoundException {
+//
+//        accountService.changeAbout(accountId, about);
+//
+//    }
 
 }

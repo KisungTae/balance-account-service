@@ -58,9 +58,6 @@ public class SwipeServiceImpl implements SwipeService {
 //            throw new AccountShortOfPointException();
 
         Account swiped = accountDAO.findByIdWithQuestions(swipedUUId);
-        int swipedCount = swiped.getSwipedCount();
-        swipedCount++;
-        swiped.setSwipedCount(swipedCount);
 
         Swipe swipe = new Swipe(swiper, swiped, false, new Date(), new Date());
         swiper.getSwipes().add(swipe);

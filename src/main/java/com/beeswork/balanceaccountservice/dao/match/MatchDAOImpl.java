@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.dao.match;
 
 import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
+import com.beeswork.balanceaccountservice.entity.account.QAccount;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
@@ -21,6 +22,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
 
     private final QMatch qMatch = QMatch.match;
     private final QPhoto qPhoto = QPhoto.photo;
+    private final QAccount qAccount = QAccount.account;
 
     @Autowired
     public MatchDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
@@ -37,12 +39,11 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     @Override
     public List<MatchProjection> findAllByMatcherId(UUID matcherId) {
 
-        return jpaQueryFactory.select(new QMatchProjection(qMatch.matchedId, qPhoto.key))
+        return jpaQueryFactory.select(new QMatchProjection(qMatch.matchedId, qAccount.repPhotoKey))
                               .from(qMatch)
-                              .leftJoin(qPhoto)
-                              .on(qMatch.matchedId.eq(qPhoto.accountId))
-                              .where(qMatch.matcherId.eq(matcherId)
-                                                     .and(qPhoto.sequence.eq(AppConstant.REP_PHOTO_SEQUENCE)))
+                              .leftJoin(qAccount)
+                              .on(qMatch.matchedId.eq(qAccount.id))
+                              .where(qMatch.matcherId.eq(matcherId))
                               .fetch();
     }
 

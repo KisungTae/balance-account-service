@@ -194,6 +194,8 @@ create table account
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
 
+
+
 CREATE INDEX account_location_idx ON account USING GIST (location);
 
 
@@ -395,8 +397,6 @@ create table unblock
 
 
 select *
-from account;
+from match;
 
 
-update account set fcm_token = 'ceb88CXjTVCb5h-yjlxDrZ:APA91bEehgan19DLiHoyQsy3-5Q2F_eG1W0VQ3GE6inXjU1CaL_fNPdzmtcySsl2urwjw3b67jy49u8pJe-ho4SKbvtkegsLJ9I1RPb3fZLz7bsjWlf82doKAvizCveA2YEaVHAU3_oS'
-where id = '578ba923-f047-4354-92bd-7e8a9112aac8';

@@ -50,11 +50,11 @@ public class ClickController extends BaseController {
     }
 
     @GetMapping("/clicked/list")
-    public ResponseEntity<String> listClicked(@RequestParam("swiperId") @ValidUUID String swiperId)
+    public ResponseEntity<String> listClicked(@RequestParam("clickedId") @ValidUUID String clickedId)
     throws JsonProcessingException {
 
         return ResponseEntity.status(HttpStatus.OK)
-                             .body(objectMapper.writeValueAsString(clickService.listClicked(swiperId)));
+                             .body(objectMapper.writeValueAsString(clickService.listClicked(clickedId)));
     }
 
 

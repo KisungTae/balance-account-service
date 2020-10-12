@@ -34,6 +34,10 @@ public class BalanceAccountServiceApplication {
 //				 14. type.mismatch does not occur why? even if you map wrong type through JSON
 //				 15. if objectmapper has custom mapping and it is singleton, then object lock occurs?
 //				 16. check if account is blocked or not before proceeding to methods in services
+//				 17. when updating profile, update location as well because of concurrent transaction, location can be updated at the same time as profile update
+//				 18. schedule a function to update swipe_count because if you allow swipe() to plus swipe_count, then the number will be incorrect
+//					 if multiple transaction tries to update the same entity. Version should slow down swipe() when many people try to update
+
 
 
 

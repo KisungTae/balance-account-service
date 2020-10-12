@@ -17,9 +17,4 @@ public interface AccountService {
 
     void saveFCMToken(FCMTokenDTO FCMTokenDTO)
     throws AccountNotFoundException, AccountInvalidException;
-
-
-//    TODO: remove me
-    void changeSwipeCount(String accountId, int count) throws AccountNotFoundException, InterruptedException;
-    void changeAbout(String accountId, String about) throws AccountNotFoundException;
 }

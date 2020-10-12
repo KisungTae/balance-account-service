@@ -4,7 +4,6 @@ import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 
@@ -12,12 +11,12 @@ import java.util.UUID;
 @Setter
 public class ClickedProjection {
 
-    private UUID swiperId;
+    private UUID clickerId;
     private String photoKey;
 
     @QueryProjection
-    public ClickedProjection(UUID swiperId, String photoKey) {
-        this.swiperId = swiperId;
+    public ClickedProjection(UUID clickerId, String photoKey) {
+        this.clickerId = clickerId;
         this.photoKey = photoKey;
     }
 }

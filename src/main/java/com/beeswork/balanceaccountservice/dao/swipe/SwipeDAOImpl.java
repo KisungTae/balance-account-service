@@ -74,17 +74,16 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
 //    }
 
     public List<ClickedProjection> findAllClicked(UUID swipedId) {
-        return jpaQueryFactory.select(new QClickedProjection(qSwipe.swiperId, qPhoto.key))
+        return jpaQueryFactory.select(new QClickedProjection(qSwipe.swiperId, qAccount.repPhotoKey))
                               .from(qSwipe)
                               .leftJoin(qMatch)
                               .on(qSwipe.swiperId.eq(qMatch.matcherId)
                                                  .and(qSwipe.swipedId.eq(qMatch.matchedId)))
-                              .leftJoin(qPhoto)
-                              .on(qSwipe.swiperId.eq(qPhoto.accountId))
+                              .leftJoin(qAccount)
+                              .on(qSwipe.swiperId.eq(qAccount.id))
                               .where(qSwipe.swipedId.eq(swipedId)
                                                     .and(qSwipe.clicked.eq(true))
-                                                    .and(qMatch.matchedId.isNull())
-                                                    .and(qPhoto.sequence.eq(AppConstant.REP_PHOTO_SEQUENCE)))
+                                                    .and(qMatch.matchedId.isNull()))
                               .fetch();
     }
 
