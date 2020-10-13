@@ -38,8 +38,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
 
     @Override
     public List<MatchProjection> findAllByMatcherId(UUID matcherId) {
-
-        return jpaQueryFactory.select(new QMatchProjection(qMatch.matchedId, qAccount.repPhotoKey))
+        return jpaQueryFactory.select(new QMatchProjection(qMatch.matchedId, qAccount.name, qAccount.repPhotoKey, qMatch.unmatched))
                               .from(qMatch)
                               .leftJoin(qAccount)
                               .on(qMatch.matchedId.eq(qAccount.id))

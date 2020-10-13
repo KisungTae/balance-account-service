@@ -11,11 +11,15 @@ import java.util.UUID;
 public class MatchProjection {
 
     private UUID matchedId;
+    private String name;
     private String photoKey;
+    private boolean unmatched;
 
     @QueryProjection
-    public MatchProjection(UUID matchedId, String photoKey) {
+    public MatchProjection(UUID matchedId, String name, String photoKey, boolean unmatched) {
         this.matchedId = matchedId;
+        this.name = name;
         this.photoKey = photoKey;
+        this.unmatched = unmatched;
     }
 }
