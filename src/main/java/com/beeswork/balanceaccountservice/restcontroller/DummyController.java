@@ -9,6 +9,7 @@ import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
+import com.beeswork.balanceaccountservice.entity.photo.PhotoId;
 import com.beeswork.balanceaccountservice.entity.question.QQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
@@ -249,7 +250,8 @@ public class DummyController {
                     Photo photo = new Photo();
                     Thread.sleep(2);
                     String photoKey = new Date().toInstant().toString();
-                    photo.setKey(photoKey);
+                    photo.setPhotoId(new PhotoId(account.getId(), photoKey));
+
                     if (p == 0) {
                         account.setRepPhotoKey(photoKey);
                     }

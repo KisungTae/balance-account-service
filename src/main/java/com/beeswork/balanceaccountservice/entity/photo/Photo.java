@@ -17,9 +17,10 @@ import java.util.UUID;
 @Table(name = "photo")
 public class Photo {
 
+    @EmbeddedId
+    private PhotoId photoId;
 
-    @Id
-    @Column(name = "key")
+    @Column(name = "key", insertable = false, updatable = false)
     private String key;
 
     @Column(name = "sequence")
@@ -29,6 +30,6 @@ public class Photo {
     private UUID accountId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
+    @MapsId("accountId")
     private Account account;
 }

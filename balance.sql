@@ -149,6 +149,7 @@ drop table photo;
 drop table match;
 drop table swipe;
 drop table admin;
+drop table photo_info;
 drop table account;
 drop table account_type;
 
@@ -194,17 +195,16 @@ create table account
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
 
-
-
 CREATE INDEX account_location_idx ON account USING GIST (location);
 
 
 create table photo
 (
-    key        varchar(30) primary key not null,
-    sequence   int                     not null,
-    account_id uuid                    not null,
+    key        varchar(30) not null,
+    sequence   int         not null,
+    account_id uuid        not null,
 
+    primary key (account_id, key),
     constraint photo_account_id_fk foreign key (account_id) references account (id)
 );
 
@@ -213,11 +213,11 @@ create index photo_account_id_idx on photo (account_id);
 
 create table photo_info
 (
-    account_id uuid primary key not null,
-    last_sequence int not null,
-    photo_count int not null,
-    created_at timestamp not null,
-    updated_at timestamp not null,
+    account_id    uuid primary key not null,
+    last_sequence int              not null,
+    photo_count   int              not null,
+    created_at    timestamp        not null,
+    updated_at    timestamp        not null,
 
     constraint photo_info_account_id_fk foreign key (account_id) references account (id)
 );
@@ -405,6 +405,4 @@ create table unblock
     constraint unblock_unblocked_account_id_fk foreign key (unblocked_account_id) references account (id),
     constraint unblock_admin_id_fk foreign key (admin_id) references admin (id)
 );
-
-
 

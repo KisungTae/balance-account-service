@@ -37,6 +37,7 @@ public class BalanceAccountServiceApplication {
 //				 17. when updating profile, update location as well because of concurrent transaction, location can be updated at the same time as profile update
 //				 18. schedule a function to update swipe_count because if you allow swipe() to plus swipe_count, then the number will be incorrect
 //					 if multiple transaction tries to update the same entity. Version should slow down swipe() when many people try to update
+//				 19. when create a user at first, you should also create photo_info for the user
 
 
 
