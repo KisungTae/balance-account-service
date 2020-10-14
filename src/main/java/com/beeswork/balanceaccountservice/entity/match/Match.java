@@ -49,12 +49,13 @@ public class Match {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateAt;
 
-    public Match(Account matcher, Account matched, boolean unmatched, Date createdAt) {
+    public Match(Account matcher, Account matched, boolean unmatched, Date createdAt, Date updatedAt) {
         this.matchId = new MatchId(matcher.getId(), matched.getId());
         this.matcher = matcher;
         this.matched = matched;
         this.unmatched = unmatched;
         this.createdAt = createdAt;
+        this.updateAt = updatedAt;
     }
 
     public UUID getMatcherId() {

@@ -77,8 +77,8 @@ public class ClickServiceImpl implements ClickService {
                 throw new MatchExistsException();
 
             Date date = new Date();
-            swipe.getSwiper().getMatches().add(new Match(swiper, swiped, false, date));
-            swipe.getSwiped().getMatches().add(new Match(swiped, swiper, false, date));
+            swipe.getSwiper().getMatches().add(new Match(swiper, swiped, false, date, date));
+            swipe.getSwiped().getMatches().add(new Match(swiped, swiper, false, date, date));
 
             accountDAO.persist(swiper);
             accountDAO.persist(swiped);

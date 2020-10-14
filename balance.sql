@@ -189,18 +189,16 @@ create table account
     location        geography(point, 4326) not null,
     fcm_token       varchar(200)           not null,
     account_type_id int                    not null,
-    created_at      timestamp              not null,
-    updated_at      timestamp              not null,
+    created_at      timestamptz            not null,
+    updated_at      timestamptz            not null,
 
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
 
-<<<<<<< HEAD
-=======
 select *
 from account;
 
->>>>>>> 6d279d7d59a73de01df5a6c3c7671875f4492e3d
+
 CREATE INDEX account_location_idx ON account USING GIST (location);
 
 
@@ -222,8 +220,8 @@ create table photo_info
     account_id    uuid primary key not null,
     last_sequence int              not null,
     photo_count   int              not null,
-    created_at    timestamp        not null,
-    updated_at    timestamp        not null,
+    created_at    timestamptz      not null,
+    updated_at    timestamptz      not null,
 
     constraint photo_info_account_id_fk foreign key (account_id) references account (id)
 );
@@ -235,18 +233,18 @@ create table question
     description   varchar(100) not null,
     top_option    varchar(50)  not null,
     bottom_option varchar(50)  not null,
-    created_at    timestamp    not null,
-    updated_at    timestamp    not null
+    created_at    timestamptz  not null,
+    updated_at    timestamptz  not null
 );
 
 create table account_question
 (
-    account_id  uuid      not null,
-    question_id int       not null,
-    sequence    int       not null,
-    selected    boolean   not null,
-    created_at  timestamp not null,
-    updated_at  timestamp not null,
+    account_id  uuid        not null,
+    question_id int         not null,
+    sequence    int         not null,
+    selected    boolean     not null,
+    created_at  timestamptz not null,
+    updated_at  timestamptz not null,
 
     primary key (account_id, question_id),
     constraint account_question_account_id_fk foreign key (account_id) references account (id),
@@ -266,10 +264,10 @@ create table reward_type
 create table reward
 (
     id             serial primary key,
-    rewarded_point int       not null,
-    account_id     uuid      not null,
-    reward_type_id int       not null,
-    created_at     timestamp not null,
+    rewarded_point int         not null,
+    account_id     uuid        not null,
+    reward_type_id int         not null,
+    created_at     timestamptz not null,
 
     constraint reward_account_id_fk foreign key (account_id) references account (id),
     constraint reward_reward_type_id_fk foreign key (reward_type_id) references reward_type (id)
@@ -279,11 +277,11 @@ create table reward
 create table swipe
 (
     id         serial primary key,
-    swiper_id  uuid      not null,
-    swiped_id  uuid      not null,
-    clicked    boolean   not null,
-    created_at timestamp not null,
-    updated_at timestamp not null,
+    swiper_id  uuid        not null,
+    swiped_id  uuid        not null,
+    clicked    boolean     not null,
+    created_at timestamptz not null,
+    updated_at timestamptz not null,
 
     constraint swipe_swiper_id_fk foreign key (swiper_id) references account (id),
     constraint swipe_swiped_id_fk foreign key (swiped_id) references account (id)
@@ -299,12 +297,12 @@ create index swipe_swiped_id_idx on swipe (swiped_id);
 -- application can also have match table in its light database to store messages in the chat
 create table match
 (
-    matcher_id uuid      not null,
-    matched_id uuid      not null,
-    unmatched  boolean   not null,
-    unmatcher  boolean   not null,
-    created_at timestamp not null,
-    updated_at timestamp not null,
+    matcher_id uuid        not null,
+    matched_id uuid        not null,
+    unmatched  boolean     not null,
+    unmatcher  boolean     not null,
+    created_at timestamptz not null,
+    updated_at timestamptz not null,
 
     primary key (matcher_id, matched_id),
     constraint match_matcher_id_fk foreign key (matcher_id) references account (id),
@@ -321,7 +319,7 @@ create index match_matched_id_idx on match (matched_id);
 -- (
 --     unmatcher_id uuid      not null,
 --     unmatched_id uuid      not null,
---     created_at   timestamp not null,
+--     created_at   timestamptz not null,
 --
 --     primary key (unmatcher_id, unmatched_id),
 --     constraint unmatch_unmatcher_id_fk foreign key (unmatcher_id) references account (id),
@@ -340,8 +338,8 @@ create table admin
     email      varchar(100) not null,
     password   varchar(100) not null,
     account_id uuid         not null,
-    created_at timestamp    not null,
-    updated_at timestamp    not null,
+    created_at timestamptz  not null,
+    updated_at timestamptz  not null,
 
     constraint admin_account_id_fk foreign key (account_id) references account (id)
 );
@@ -367,7 +365,7 @@ create table report
     reported_id      uuid         not null,
     description      varchar(200) not null,
     report_reason_id int          not null,
-    created_at       timestamp    not null,
+    created_at       timestamptz  not null,
 
     constraint report_reporter_id_fk foreign key (reporter_id) references account (id),
     constraint report_reported_id_fk foreign key (reported_id) references account (id),
@@ -377,10 +375,10 @@ create table report
 create table report_resolution
 (
     id                        serial primary key,
-    admin_id                  int       not null,
-    report_id                 int       not null,
-    report_resolution_type_id int       not null,
-    created_at                timestamp not null,
+    admin_id                  int         not null,
+    report_id                 int         not null,
+    report_resolution_type_id int         not null,
+    created_at                timestamptz not null,
 
     constraint report_resolution_report_id_fk foreign key (report_id) references report (id),
     constraint report_resolution_report_resolution_type_id_fk foreign key (report_resolution_type_id) references report_resolution_type (id)
@@ -395,7 +393,7 @@ create table deleted_photo
     stored_at  varchar(256) not null,
     report_id  int          not null,
     admin_id   int          not null,
-    created_at timestamp    not null,
+    created_at timestamptz  not null,
 
     constraint deleted_photo_report_id_fk foreign key (report_id) references report (id)
 );
@@ -406,14 +404,29 @@ create table unblock
     description          varchar(200) not null,
     unblocked_account_id uuid         not null,
     admin_id             int          not null,
-    created_at           timestamp    not null,
+    created_at           timestamptz  not null,
 
     constraint unblock_unblocked_account_id_fk foreign key (unblocked_account_id) references account (id),
     constraint unblock_admin_id_fk foreign key (admin_id) references admin (id)
 );
 
 
+
+select *
+from account
+where id = 'adb01f9a-7268-49e7-8ae1-4738102ba57a';
+
+select matcher_id, count(*)
+from match
+group by matcher_id
+order by count(*) desc;
+
 select *
 from match
-where matcher_id = 'aafa2c2a-1a07-47c6-9dab-8e53834b8d75';
+where matcher_id = 'adb01f9a-7268-49e7-8ae1-4738102ba57a';
 
+
+update match
+set updated_at = updated_at + (30 * interval '1 minute')
+where matcher_id = 'adb01f9a-7268-49e7-8ae1-4738102ba57a'
+and matched_id = 'e3ca8624-9dc7-4610-b9aa-19db99f8f16a'

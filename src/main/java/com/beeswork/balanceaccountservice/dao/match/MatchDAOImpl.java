@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,12 +38,12 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public List<MatchProjection> findAllByMatcherId(UUID matcherId) {
+    public List<MatchProjection> findAllByMatcherId(UUID matcherId, Date fetchedAt) {
         return jpaQueryFactory.select(new QMatchProjection(qMatch.matchedId, qAccount.name, qAccount.repPhotoKey, qMatch.unmatched))
                               .from(qMatch)
                               .leftJoin(qAccount)
                               .on(qMatch.matchedId.eq(qAccount.id))
-                              .where(qMatch.matcherId.eq(matcherId))
+                              .where(qMatch.matcherId.eq(matcherId).and(qMatch.updateAt.after(fetchedAt)))
                               .fetch();
     }
 

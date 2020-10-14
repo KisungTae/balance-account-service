@@ -36,9 +36,9 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<MatchProjection> listMatches(String matcherId) {
+    public List<MatchProjection> listMatches(String matcherId, Date fetchedAt) {
 
-        return matchDAO.findAllByMatcherId(UUID.fromString(matcherId));
+        return matchDAO.findAllByMatcherId(UUID.fromString(matcherId), fetchedAt);
     }
 
     @Override
