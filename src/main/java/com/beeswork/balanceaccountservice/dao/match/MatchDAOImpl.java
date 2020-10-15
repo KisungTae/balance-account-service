@@ -9,6 +9,8 @@ import com.beeswork.balanceaccountservice.entity.match.QMatch;
 import com.beeswork.balanceaccountservice.entity.photo.QPhoto;
 import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import com.beeswork.balanceaccountservice.projection.QMatchProjection;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -38,12 +40,25 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public List<MatchProjection> findAllByMatcherId(UUID matcherId, Date fetchedAt) {
-        return jpaQueryFactory.select(new QMatchProjection(qMatch.matchedId, qAccount.name, qAccount.repPhotoKey, qMatch.unmatched))
+    public List<MatchProjection> findAllAfterRepPhotoKeyUpdatedAt(UUID matcherId, Date fetchedAt) {
+
+        Expression<Date> cases = new CaseBuilder().when(qMatch.updateAt.after(qAccount.repPhotoKeyUpdatedAt))
+                                                  .then(qMatch.updateAt)
+                                                  .otherwise(qAccount.repPhotoKeyUpdatedAt)
+                                                  .as("updated_at");
+
+        return jpaQueryFactory.select(new QMatchProjection(qMatch.matchedId,
+                                                           qAccount.name,
+                                                           qAccount.repPhotoKey,
+                                                           qMatch.unmatched,
+                                                           cases))
                               .from(qMatch)
                               .leftJoin(qAccount)
                               .on(qMatch.matchedId.eq(qAccount.id))
-                              .where(qMatch.matcherId.eq(matcherId).and(qMatch.updateAt.after(fetchedAt)))
+                              .where(qMatch.matcherId.eq(matcherId)
+                                                     .and(qMatch.updateAt.after(fetchedAt)
+                                                                         .or(qAccount.repPhotoKeyUpdatedAt.after(
+                                                                                 fetchedAt))))
                               .fetch();
     }
 

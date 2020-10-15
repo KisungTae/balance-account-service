@@ -114,7 +114,7 @@ public class DummyController {
 
     @Transactional
     @PostMapping("/create/match")
-    public void createDummyMatch() {
+    public void createDummyMatch() throws InterruptedException {
 
 
         List<Swipe> swipes = entityManager.unwrap(Session.class).createQuery("select s1 from Swipe s1 " +
@@ -125,6 +125,7 @@ public class DummyController {
 
         for (Swipe swipe : swipes) {
 
+            Thread.sleep(12);
 
             Match newMatch = new Match();
             newMatch.setMatcher(swipe.getSwiper());
@@ -243,11 +244,12 @@ public class DummyController {
                 account.setFcmToken("");
                 account.setCreatedAt(new Date());
                 account.setUpdatedAt(new Date());
+                account.setRepPhotoKeyUpdatedAt(new Date());
 
 
                 for (int p = 0; p < 5; p++) {
                     Photo photo = new Photo();
-                    Thread.sleep(2);
+                    Thread.sleep(12);
                     String photoKey = new Date().toInstant().toString();
                     photo.setPhotoId(new PhotoId(account.getId(), photoKey));
 

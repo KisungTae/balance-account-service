@@ -172,25 +172,26 @@ create table account_type
 -- liked count will be reset on every night
 create table account
 (
-    id              uuid primary key default uuid_generate_v4(),
-    enabled         boolean                not null,
-    blocked         boolean                not null,
-    name            varchar(50)            not null,
-    email           varchar(256) unique    not null,
-    birth_year      int                    not null,
-    birth           Date                   not null,
-    about           varchar(500)           not null,
-    gender          boolean                not null,
-    score           int                    not null,
-    index           int                    not null,
-    point           int                    not null,
-    swiped_count    int                    not null,
-    rep_photo_key   varchar(30)            not null,
-    location        geography(point, 4326) not null,
-    fcm_token       varchar(200)           not null,
-    account_type_id int                    not null,
-    created_at      timestamptz            not null,
-    updated_at      timestamptz            not null,
+    id                       uuid primary key default uuid_generate_v4(),
+    enabled                  boolean                not null,
+    blocked                  boolean                not null,
+    name                     varchar(50)            not null,
+    email                    varchar(256) unique    not null,
+    birth_year               int                    not null,
+    birth                    Date                   not null,
+    about                    varchar(500)           not null,
+    gender                   boolean                not null,
+    score                    int                    not null,
+    index                    int                    not null,
+    point                    int                    not null,
+    swiped_count             int                    not null,
+    rep_photo_key            varchar(30)            not null,
+    rep_photo_key_updated_at timestamp            not null,
+    location                 geography(point, 4326) not null,
+    fcm_token                varchar(200)           not null,
+    account_type_id          int                    not null,
+    created_at               timestamp            not null,
+    updated_at               timestamp            not null,
 
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
@@ -301,8 +302,8 @@ create table match
     matched_id uuid        not null,
     unmatched  boolean     not null,
     unmatcher  boolean     not null,
-    created_at timestamptz not null,
-    updated_at timestamptz not null,
+    created_at timestamp not null,
+    updated_at timestamp not null,
 
     primary key (matcher_id, matched_id),
     constraint match_matcher_id_fk foreign key (matcher_id) references account (id),
@@ -429,4 +430,23 @@ where matcher_id = 'adb01f9a-7268-49e7-8ae1-4738102ba57a';
 update match
 set updated_at = updated_at + (30 * interval '1 minute')
 where matcher_id = 'adb01f9a-7268-49e7-8ae1-4738102ba57a'
-and matched_id = 'e3ca8624-9dc7-4610-b9aa-19db99f8f16a'
+  and matched_id = 'e3ca8624-9dc7-4610-b9aa-19db99f8f16a';
+
+
+
+select a.id, case when m.updated_at > a.rep_photo_key_updated_at then m.updated_at
+                  else a.rep_photo_key_updated_at end as f
+from match m
+left join account a
+on m.matched_id = a.id
+where matcher_id = '7abec364-d869-4dfd-9b43-2810eb168926';
+
+
+select a.id, m.updated_at, a.rep_photo_key_updated_at
+from match m
+left join account a
+on m.matched_id = a.id
+where matcher_id = '7abec364-d869-4dfd-9b43-2810eb168926';
+
+
+update account set rep_photo_key_updated_at = '2020-10-15 16:58:20.016000' where id = '3588c734-8ed6-43ae-b1f3-e3d5aa6001e5'

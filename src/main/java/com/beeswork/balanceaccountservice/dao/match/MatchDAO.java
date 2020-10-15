@@ -13,6 +13,6 @@ public interface MatchDAO extends BaseDAO<Match> {
 
     boolean existsById(MatchId matchId);
 
-    List<MatchProjection> findAllByMatcherId(UUID matcherId, Date fetchedAt);
+    List<MatchProjection> findAllAfterRepPhotoKeyUpdatedAt(UUID matcherId, Date fetchedAt);
     List<Match> findPairById(UUID matcherId, UUID matchedId);
 }

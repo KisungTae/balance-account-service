@@ -2,7 +2,6 @@ package com.beeswork.balanceaccountservice.service.match;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
-import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.match.UnmatchDTO;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
@@ -38,7 +37,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<MatchProjection> listMatches(String matcherId, Date fetchedAt) {
 
-        return matchDAO.findAllByMatcherId(UUID.fromString(matcherId), fetchedAt);
+        return matchDAO.findAllAfterRepPhotoKeyUpdatedAt(UUID.fromString(matcherId), fetchedAt);
     }
 
     @Override

@@ -41,6 +41,9 @@ public class MatchController extends BaseController {
     throws JsonProcessingException {
 
         List<MatchProjection> projections = matchService.listMatches(matcherId, fetchedAt);
+
+        projections.forEach(System.out::println);
+
         return ResponseEntity.status(HttpStatus.OK)
                              .body(objectMapper.writeValueAsString(matchService.listMatches(matcherId, fetchedAt)));
     }

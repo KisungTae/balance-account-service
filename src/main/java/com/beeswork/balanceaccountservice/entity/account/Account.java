@@ -71,6 +71,10 @@ public class Account {
     @Column(name = "rep_photo_key")
     private String repPhotoKey;
 
+    @Column(name = "rep_photo_key_updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date repPhotoKeyUpdatedAt;
+
     @Column(name = "location",
             columnDefinition = "GEOGRAPHY(POINT)")
     private Point location;
