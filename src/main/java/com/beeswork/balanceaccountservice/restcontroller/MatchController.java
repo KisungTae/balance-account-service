@@ -19,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -37,12 +38,12 @@ public class MatchController extends BaseController {
     @GetMapping("/match/list")
     public ResponseEntity<String> listMatches(@RequestParam("matcherId") @ValidUUID String matcherId,
                                               @RequestParam("fetchedAt")
-                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fetchedAt)
+                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date fetchedAt)
     throws JsonProcessingException {
 
-        List<MatchProjection> projections = matchService.listMatches(matcherId, fetchedAt);
-
-        projections.forEach(System.out::println);
+//        List<MatchProjection> projections = matchService.listMatches(matcherId, fetchedAt);
+//
+//        projections.forEach(System.out::println);
 
         return ResponseEntity.status(HttpStatus.OK)
                              .body(objectMapper.writeValueAsString(matchService.listMatches(matcherId, fetchedAt)));

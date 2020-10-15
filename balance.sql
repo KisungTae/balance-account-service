@@ -186,12 +186,12 @@ create table account
     point                    int                    not null,
     swiped_count             int                    not null,
     rep_photo_key            varchar(30)            not null,
-    rep_photo_key_updated_at timestamp            not null,
+    rep_photo_key_updated_at timestamptz            not null,
     location                 geography(point, 4326) not null,
     fcm_token                varchar(200)           not null,
     account_type_id          int                    not null,
-    created_at               timestamp            not null,
-    updated_at               timestamp            not null,
+    created_at               timestamptz            not null,
+    updated_at               timestamptz            not null,
 
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
@@ -302,8 +302,8 @@ create table match
     matched_id uuid        not null,
     unmatched  boolean     not null,
     unmatcher  boolean     not null,
-    created_at timestamp not null,
-    updated_at timestamp not null,
+    created_at timestamptz not null,
+    updated_at timestamptz not null,
 
     primary key (matcher_id, matched_id),
     constraint match_matcher_id_fk foreign key (matcher_id) references account (id),
@@ -412,19 +412,26 @@ create table unblock
 );
 
 
-
-select *
-from account
-where id = 'adb01f9a-7268-49e7-8ae1-4738102ba57a';
-
 select matcher_id, count(*)
 from match
 group by matcher_id
 order by count(*) desc;
 
 select *
+from account;
+
+select *
 from match
-where matcher_id = 'adb01f9a-7268-49e7-8ae1-4738102ba57a';
+where matcher_id = 'd4bb601d-b0b1-40fe-9539-10046f1267f8';
+
+
+
+select *
+from account
+where id = 'd4bb601d-b0b1-40fe-9539-10046f1267f8';
+
+
+
 
 
 update match
@@ -435,11 +442,12 @@ where matcher_id = 'adb01f9a-7268-49e7-8ae1-4738102ba57a'
 
 
 select a.id, case when m.updated_at > a.rep_photo_key_updated_at then m.updated_at
-                  else a.rep_photo_key_updated_at end as f
+                  else a.rep_photo_key_updated_at end as updated_at
 from match m
 left join account a
 on m.matched_id = a.id
-where matcher_id = '7abec364-d869-4dfd-9b43-2810eb168926';
+where matcher_id = 'd4bb601d-b0b1-40fe-9539-10046f1267f8'
+order by updated_at;
 
 
 select a.id, m.updated_at, a.rep_photo_key_updated_at

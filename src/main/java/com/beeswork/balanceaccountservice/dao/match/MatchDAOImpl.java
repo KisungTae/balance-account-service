@@ -42,16 +42,15 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     @Override
     public List<MatchProjection> findAllAfterRepPhotoKeyUpdatedAt(UUID matcherId, Date fetchedAt) {
 
-        Expression<Date> cases = new CaseBuilder().when(qMatch.updateAt.after(qAccount.repPhotoKeyUpdatedAt))
+        Expression<Date> updatedAtCase = new CaseBuilder().when(qMatch.updateAt.after(qAccount.repPhotoKeyUpdatedAt))
                                                   .then(qMatch.updateAt)
-                                                  .otherwise(qAccount.repPhotoKeyUpdatedAt)
-                                                  .as("updated_at");
+                                                  .otherwise(qAccount.repPhotoKeyUpdatedAt);
 
         return jpaQueryFactory.select(new QMatchProjection(qMatch.matchedId,
                                                            qAccount.name,
                                                            qAccount.repPhotoKey,
                                                            qMatch.unmatched,
-                                                           cases))
+                                                           updatedAtCase))
                               .from(qMatch)
                               .leftJoin(qAccount)
                               .on(qMatch.matchedId.eq(qAccount.id))
