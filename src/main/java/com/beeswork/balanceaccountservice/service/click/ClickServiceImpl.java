@@ -45,8 +45,8 @@ public class ClickServiceImpl implements ClickService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<ClickedProjection> listClicked(String clickedId) {
-        return swipeDAO.findAllClicked(UUID.fromString(clickedId));
+    public List<ClickedProjection> listClicked(String clickedId, Date fetchedAt) {
+        return swipeDAO.findAllClickedAfter(UUID.fromString(clickedId), fetchedAt);
     }
 
     @Override

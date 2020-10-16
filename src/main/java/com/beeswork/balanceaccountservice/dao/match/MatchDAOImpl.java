@@ -40,10 +40,10 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public List<MatchProjection> findAllAfterRepPhotoKeyUpdatedAt(UUID matcherId, Date fetchedAt) {
+    public List<MatchProjection> findAllAfter(UUID matcherId, Date fetchedAt) {
 
-        Expression<Date> updatedAtCase = new CaseBuilder().when(qMatch.updateAt.after(qAccount.repPhotoKeyUpdatedAt))
-                                                  .then(qMatch.updateAt)
+        Expression<Date> updatedAtCase = new CaseBuilder().when(qMatch.updatedAt.after(qAccount.repPhotoKeyUpdatedAt))
+                                                  .then(qMatch.updatedAt)
                                                   .otherwise(qAccount.repPhotoKeyUpdatedAt);
 
         return jpaQueryFactory.select(new QMatchProjection(qMatch.matchedId,
@@ -55,7 +55,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                               .leftJoin(qAccount)
                               .on(qMatch.matchedId.eq(qAccount.id))
                               .where(qMatch.matcherId.eq(matcherId)
-                                                     .and(qMatch.updateAt.after(fetchedAt)
+                                                     .and(qMatch.updatedAt.after(fetchedAt)
                                                                          .or(qAccount.repPhotoKeyUpdatedAt.after(
                                                                                  fetchedAt))))
                               .fetch();

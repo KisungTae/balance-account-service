@@ -412,49 +412,35 @@ create table unblock
 );
 
 
-select matcher_id, count(*)
+-- '3ed89e79-6d81-4c40-b07e-fb8e16529a02'
+select swiped_id, count(*)
+from swipe
+group by swiped_id
+order by count(*) DESC;
+
+select *
+from swipe
+where swiped_id = '36f9284e-74fd-40f7-8f57-94dc94fc772c'
+and clicked = true;
+
+select *
 from match
-group by matcher_id
-order by count(*) desc;
+where matcher_id = '36f9284e-74fd-40f7-8f57-94dc94fc772c';
 
-select *
-from account;
+select swiper_id, s.updated_at, a.rep_photo_key_updated_at
+from swipe s
+left join match m on s.swiper_id = m.matcher_id and s.swiped_id = m.matched_id
+left join account a on s.swiper_id = a.id
+where swiped_id = '36f9284e-74fd-40f7-8f57-94dc94fc772c'
+and s.clicked = true
+and m.matched_id is null
+and (s.updated_at > '2020-10-15 16:38:20.737000' or a.rep_photo_key_updated_at > '2020-10-15 16:38:20.737000');
 
-select *
-from match
-where matcher_id = 'd4bb601d-b0b1-40fe-9539-10046f1267f8';
-
-
-
-select *
-from account
-where id = 'd4bb601d-b0b1-40fe-9539-10046f1267f8';
-
-
-
-
-
-update match
-set updated_at = updated_at + (30 * interval '1 minute')
-where matcher_id = 'adb01f9a-7268-49e7-8ae1-4738102ba57a'
-  and matched_id = 'e3ca8624-9dc7-4610-b9aa-19db99f8f16a';
-
-
-
-select a.id, case when m.updated_at > a.rep_photo_key_updated_at then m.updated_at
-                  else a.rep_photo_key_updated_at end as updated_at
-from match m
-left join account a
-on m.matched_id = a.id
-where matcher_id = 'd4bb601d-b0b1-40fe-9539-10046f1267f8'
-order by updated_at;
-
-
-select a.id, m.updated_at, a.rep_photo_key_updated_at
-from match m
-left join account a
-on m.matched_id = a.id
-where matcher_id = '7abec364-d869-4dfd-9b43-2810eb168926';
-
-
-update account set rep_photo_key_updated_at = '2020-10-15 16:58:20.016000' where id = '3588c734-8ed6-43ae-b1f3-e3d5aa6001e5'
+select swiper_id, s.updated_at, a.rep_photo_key_updated_at
+from swipe s
+         left join match m on s.swiper_id = m.matcher_id and s.swiped_id = m.matched_id
+         left join account a on s.swiper_id = a.id
+where swiped_id = '36f9284e-74fd-40f7-8f57-94dc94fc772c'
+  and s.clicked = true
+  and m.matched_id is null
+order by rep_photo_key_updated_at;

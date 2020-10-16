@@ -132,7 +132,7 @@ public class DummyController {
             newMatch.setMatched(swipe.getSwiped());
             newMatch.setUnmatcher(false);
             newMatch.setCreatedAt(new Date());
-            newMatch.setUpdateAt(new Date());
+            newMatch.setUpdatedAt(new Date());
             newMatch.setMatchId(new MatchId(swipe.getSwiperId(), swipe.getSwipedId()));
             matchDAO.persist(newMatch);
         }

@@ -7,11 +7,12 @@ import com.beeswork.balanceaccountservice.exception.account.AccountInvalidExcept
 import com.beeswork.balanceaccountservice.exception.match.MatchExistsException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ClickService {
 
     List<FCMNotificationDTO> click(ClickDTO clickDTO) throws SwipeNotFoundException, AccountInvalidException, MatchExistsException;
-    List<ClickedProjection> listClicked(String clickedId);
+    List<ClickedProjection> listClicked(String clickedId, Date fetchedAt);
 
 }

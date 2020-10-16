@@ -2,7 +2,6 @@ package com.beeswork.balanceaccountservice.entity.match;
 
 
 import com.beeswork.balanceaccountservice.entity.account.Account;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -47,7 +46,7 @@ public class Match {
 
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updateAt;
+    private Date updatedAt;
 
     public Match(Account matcher, Account matched, boolean unmatched, Date createdAt, Date updatedAt) {
         this.matchId = new MatchId(matcher.getId(), matched.getId());
@@ -55,7 +54,7 @@ public class Match {
         this.matched = matched;
         this.unmatched = unmatched;
         this.createdAt = createdAt;
-        this.updateAt = updatedAt;
+        this.updatedAt = updatedAt;
     }
 
     public UUID getMatcherId() {

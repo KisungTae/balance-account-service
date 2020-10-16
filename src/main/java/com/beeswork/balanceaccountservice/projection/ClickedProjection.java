@@ -4,6 +4,7 @@ import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.UUID;
 
 
@@ -13,10 +14,12 @@ public class ClickedProjection {
 
     private UUID clickerId;
     private String photoKey;
+    private Date updatedAt;
 
     @QueryProjection
-    public ClickedProjection(UUID clickerId, String photoKey) {
+    public ClickedProjection(UUID clickerId, String photoKey, Date updatedAt) {
         this.clickerId = clickerId;
         this.photoKey = photoKey;
+        this.updatedAt = updatedAt;
     }
 }

@@ -16,12 +16,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.List;
 
 @Validated
@@ -29,7 +31,7 @@ import java.util.List;
 public class ClickController extends BaseController {
 
     private final ClickService clickService;
-    private final FCMService   FCMService;
+    private final FCMService FCMService;
 
     @Autowired
     public ClickController(ObjectMapper objectMapper, ModelMapper modelMapper, ClickService clickService,
@@ -50,11 +52,13 @@ public class ClickController extends BaseController {
     }
 
     @GetMapping("/clicked/list")
-    public ResponseEntity<String> listClicked(@RequestParam("clickedId") @ValidUUID String clickedId)
+    public ResponseEntity<String> listClicked(@RequestParam("clickedId") @ValidUUID String clickedId,
+                                              @RequestParam("fetchedAt")
+                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date fetchedAt)
     throws JsonProcessingException {
 
         return ResponseEntity.status(HttpStatus.OK)
-                             .body(objectMapper.writeValueAsString(clickService.listClicked(clickedId)));
+                             .body(objectMapper.writeValueAsString(clickService.listClicked(clickedId, fetchedAt)));
     }
 
 
