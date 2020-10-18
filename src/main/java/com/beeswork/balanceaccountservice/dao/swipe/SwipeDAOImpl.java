@@ -27,7 +27,6 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     private final QAccount qAccount = QAccount.account;
     private final QSwipe qSwipe = QSwipe.swipe;
     private final QMatch qMatch = QMatch.match;
-    private final QPhoto qPhoto = QPhoto.photo;
 
     @Autowired
     public SwipeDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
@@ -64,17 +63,6 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
                                                     .and(qSwipe.clicked.eq(clicked)))
                               .fetchCount() > 0;
     }
-
-//    @Override
-//    public List<UUID> findAllClick(UUID swiperId) {
-//        return jpaQueryFactory.select(qSwipe.swipedId)
-//                              .from(qSwipe)
-//                              .leftJoin(qMatch).on(qSwipe.swiperId.eq(qMatch.matchedId))
-//                              .where(qSwipe.swipedId.eq(swiperId)
-//                                                    .and(qSwipe.clicked.eq(true))
-//                                                    .and(qMatch.matchedId.isNull()))
-//                              .fetch();
-//    }
 
     public List<ClickedProjection> findAllClickedAfter(UUID swipedId, Date fetchedAt) {
 

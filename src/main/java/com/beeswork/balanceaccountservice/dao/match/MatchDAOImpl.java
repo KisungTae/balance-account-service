@@ -24,7 +24,6 @@ import java.util.UUID;
 public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
 
     private final QMatch qMatch = QMatch.match;
-    private final QPhoto qPhoto = QPhoto.photo;
     private final QAccount qAccount = QAccount.account;
 
     @Autowired
