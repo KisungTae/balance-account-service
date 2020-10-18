@@ -149,6 +149,7 @@ drop table photo;
 drop table match;
 drop table swipe;
 drop table admin;
+drop table chat;
 drop table photo_info;
 drop table account;
 drop table account_type;
@@ -291,6 +292,11 @@ create table swipe
 create index swipe_swiper_id_idx on swipe (swiper_id);
 create index swipe_swiped_id_idx on swipe (swiped_id);
 
+create table chat
+(
+    id serial primary key
+);
+
 
 -- if match between 1 and 2 then
 -- 1 - 2 saved
@@ -300,6 +306,7 @@ create table match
 (
     matcher_id uuid        not null,
     matched_id uuid        not null,
+    chat_id    int         not null,
     unmatched  boolean     not null,
     unmatcher  boolean     not null,
     created_at timestamptz not null,
@@ -307,8 +314,10 @@ create table match
 
     primary key (matcher_id, matched_id),
     constraint match_matcher_id_fk foreign key (matcher_id) references account (id),
-    constraint match_matched_id_fk foreign key (matched_id) references account (id)
+    constraint match_matched_id_fk foreign key (matched_id) references account (id),
+    constraint match_chat_id_fk foreign key (chat_id) references chat (id)
 );
+
 
 
 create index match_matcher_id_idx on match (matcher_id);
@@ -412,6 +421,20 @@ create table unblock
 );
 
 
+
+create table chat_message
+(
+    id         bigserial primary key,
+    chat_id    int       not null,
+    sender_id  uuid      not null,
+    message    varchar(200),
+    created_at timestamp not null,
+
+    constraint chat_message_chat_id_fk foreign key (chat_id) references chat (id),
+    constraint chat_message_sender_id_fk foreign key (sender_id) references account (id)
+);
+
+
 -- '3ed89e79-6d81-4c40-b07e-fb8e16529a02'
 select swiped_id, count(*)
 from swipe
@@ -421,7 +444,7 @@ order by count(*) DESC;
 select *
 from swipe
 where swiped_id = '36f9284e-74fd-40f7-8f57-94dc94fc772c'
-and clicked = true;
+  and clicked = true;
 
 select *
 from match
@@ -432,15 +455,34 @@ from swipe s
 left join match m on s.swiper_id = m.matcher_id and s.swiped_id = m.matched_id
 left join account a on s.swiper_id = a.id
 where swiped_id = '36f9284e-74fd-40f7-8f57-94dc94fc772c'
-and s.clicked = true
-and m.matched_id is null
-and (s.updated_at > '2020-10-15 16:38:20.737000' or a.rep_photo_key_updated_at > '2020-10-15 16:38:20.737000');
+  and s.clicked = true
+  and m.matched_id is null
+  and (s.updated_at > '2020-10-15 16:38:20.737000' or a.rep_photo_key_updated_at > '2020-10-15 16:38:20.737000');
 
 select swiper_id, s.updated_at, a.rep_photo_key_updated_at
 from swipe s
-         left join match m on s.swiper_id = m.matcher_id and s.swiped_id = m.matched_id
-         left join account a on s.swiper_id = a.id
+left join match m on s.swiper_id = m.matcher_id and s.swiped_id = m.matched_id
+left join account a on s.swiper_id = a.id
 where swiped_id = '36f9284e-74fd-40f7-8f57-94dc94fc772c'
   and s.clicked = true
   and m.matched_id is null
 order by rep_photo_key_updated_at;
+
+
+select s1.id, s1.swiper_id, s1.swiped_id, s1.clicked, s2.id, s2.swiper_id, s2.swiped_id, s2.clicked
+from swipe s1
+left join swipe s2
+on s1.swiper_id = s2.swiped_id and s1.swiped_id = s2.swiper_id
+where s1.clicked = true and s2.clicked = false;
+
+
+select *
+from account
+where id = '10177a84-b6f1-487f-af69-9b10ea3d938e';
+
+select *
+from match
+where matcher_id = '10177a84-b6f1-487f-af69-9b10ea3d938e';
+
+
+

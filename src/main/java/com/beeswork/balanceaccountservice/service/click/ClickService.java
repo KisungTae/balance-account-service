@@ -13,6 +13,6 @@ import java.util.List;
 public interface ClickService {
 
     List<FCMNotificationDTO> click(ClickDTO clickDTO) throws SwipeNotFoundException, AccountInvalidException, MatchExistsException;
-    List<ClickedProjection> listClicked(String clickedId, Date fetchedAt);
+    List<ClickedProjection> listClicked(String clickedId, String email, Date fetchedAt) throws AccountInvalidException;
 
 }

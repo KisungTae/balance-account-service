@@ -12,6 +12,7 @@ import java.util.UUID;
 @Setter
 public class MatchProjection {
 
+    private Long chatId;
     private UUID matchedId;
     private String name;
     private String photoKey;
@@ -19,7 +20,8 @@ public class MatchProjection {
     private Date updatedAt;
 
     @QueryProjection
-    public MatchProjection(UUID matchedId, String name, String photoKey, boolean unmatched, Date updatedAt) {
+    public MatchProjection(Long chatId, UUID matchedId, String name, String photoKey, boolean unmatched, Date updatedAt) {
+        this.chatId = chatId;
         this.matchedId = matchedId;
         this.name = name;
         this.photoKey = photoKey;

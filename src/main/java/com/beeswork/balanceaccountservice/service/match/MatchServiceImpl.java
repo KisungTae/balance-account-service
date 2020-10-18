@@ -35,7 +35,12 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<MatchProjection> listMatches(String matcherId, Date fetchedAt) {
+    public List<MatchProjection> listMatches(String matcherId, String email, Date fetchedAt)
+    throws AccountInvalidException {
+
+        if (!accountDAO.existsByIdAndEmail(UUID.fromString(matcherId), email))
+            throw new AccountInvalidException();
+
         return matchDAO.findAllAfter(UUID.fromString(matcherId), fetchedAt);
     }
 

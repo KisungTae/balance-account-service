@@ -10,6 +10,6 @@ import java.util.List;
 public interface MatchService {
 
 
-    List<MatchProjection> listMatches(String matcherId, Date fetchedAt);
+    List<MatchProjection> listMatches(String matcherId, String email, Date fetchedAt) throws AccountInvalidException;
     void unmatch(UnmatchDTO unmatchDTO) throws AccountInvalidException;
 }

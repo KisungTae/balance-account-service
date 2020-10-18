@@ -53,12 +53,13 @@ public class ClickController extends BaseController {
 
     @GetMapping("/clicked/list")
     public ResponseEntity<String> listClicked(@RequestParam("clickedId") @ValidUUID String clickedId,
+                                              @RequestParam("email") String email,
                                               @RequestParam("fetchedAt")
                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date fetchedAt)
-    throws JsonProcessingException {
+    throws JsonProcessingException, AccountInvalidException {
 
         return ResponseEntity.status(HttpStatus.OK)
-                             .body(objectMapper.writeValueAsString(clickService.listClicked(clickedId, fetchedAt)));
+                             .body(objectMapper.writeValueAsString(clickService.listClicked(clickedId, email, fetchedAt)));
     }
 
 

@@ -37,16 +37,13 @@ public class MatchController extends BaseController {
 
     @GetMapping("/match/list")
     public ResponseEntity<String> listMatches(@RequestParam("matcherId") @ValidUUID String matcherId,
+                                              @RequestParam("email") String email,
                                               @RequestParam("fetchedAt")
                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date fetchedAt)
-    throws JsonProcessingException {
-
-//        List<MatchProjection> projections = matchService.listMatches(matcherId, fetchedAt);
-//
-//        projections.forEach(System.out::println);
+    throws JsonProcessingException, AccountInvalidException {
 
         return ResponseEntity.status(HttpStatus.OK)
-                             .body(objectMapper.writeValueAsString(matchService.listMatches(matcherId, fetchedAt)));
+                             .body(objectMapper.writeValueAsString(matchService.listMatches(matcherId, email, fetchedAt)));
     }
 
     @PostMapping("/unmatch")

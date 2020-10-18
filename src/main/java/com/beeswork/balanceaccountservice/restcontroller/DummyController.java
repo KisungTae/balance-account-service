@@ -3,9 +3,11 @@ package com.beeswork.balanceaccountservice.restcontroller;
 import com.beeswork.balanceaccountservice.config.properties.AWSProperties;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.accounttype.AccountTypeDAO;
+import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
 import com.beeswork.balanceaccountservice.entity.account.*;
+import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
@@ -72,6 +74,9 @@ public class DummyController {
     @Autowired
     private AccountDAO accountDAO;
 
+    @Autowired
+    private ChatDAO chatDAO;
+
 
     @Transactional
     @GetMapping("question-by-account-id")
@@ -126,14 +131,17 @@ public class DummyController {
         for (Swipe swipe : swipes) {
 
             Thread.sleep(12);
+            Chat chat = new Chat();
 
             Match newMatch = new Match();
+            newMatch.setChat(chat);
             newMatch.setMatcher(swipe.getSwiper());
             newMatch.setMatched(swipe.getSwiped());
             newMatch.setUnmatcher(false);
             newMatch.setCreatedAt(new Date());
             newMatch.setUpdatedAt(new Date());
             newMatch.setMatchId(new MatchId(swipe.getSwiperId(), swipe.getSwipedId()));
+            chatDAO.persist(chat);
             matchDAO.persist(newMatch);
         }
     }

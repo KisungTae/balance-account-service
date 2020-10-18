@@ -2,12 +2,14 @@ package com.beeswork.balanceaccountservice.service.click;
 
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
+import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.photo.PhotoDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.click.ClickDTO;
 import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
+import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
@@ -32,20 +34,27 @@ public class ClickServiceImpl implements ClickService {
     private final AccountDAO accountDAO;
     private final SwipeDAO   swipeDAO;
     private final MatchDAO   matchDAO;
+    private final ChatDAO    chatDAO;
     private final PhotoDAO   photoDAO;
 
     @Autowired
     public ClickServiceImpl(AccountDAO accountDAO, SwipeDAO swipeDAO, MatchDAO matchDAO,
-                            PhotoDAO photoDAO) {
+                            ChatDAO chatDAO, PhotoDAO photoDAO) {
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
         this.matchDAO = matchDAO;
+        this.chatDAO = chatDAO;
         this.photoDAO = photoDAO;
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<ClickedProjection> listClicked(String clickedId, Date fetchedAt) {
+    public List<ClickedProjection> listClicked(String clickedId, String email, Date fetchedAt)
+    throws AccountInvalidException {
+
+        if (!accountDAO.existsByIdAndEmail(UUID.fromString(clickedId), email))
+            throw new AccountInvalidException();
+
         return swipeDAO.findAllClickedAfter(UUID.fromString(clickedId), fetchedAt);
     }
 
@@ -76,10 +85,13 @@ public class ClickServiceImpl implements ClickService {
             if (matchDAO.existsById(new MatchId(swiperUUId, swipedUUId)))
                 throw new MatchExistsException();
 
-            Date date = new Date();
-            swipe.getSwiper().getMatches().add(new Match(swiper, swiped, false, date, date));
-            swipe.getSwiped().getMatches().add(new Match(swiped, swiper, false, date, date));
+            Chat chat = new Chat();
 
+            Date date = new Date();
+            swipe.getSwiper().getMatches().add(new Match(swiper, swiped, chat, false, date, date));
+            swipe.getSwiped().getMatches().add(new Match(swiped, swiper, chat, false, date, date));
+
+            chatDAO.persist(chat);
             accountDAO.persist(swiper);
             accountDAO.persist(swiped);
 
@@ -87,7 +99,7 @@ public class ClickServiceImpl implements ClickService {
             fcmNotificationDTOs.add(FCMNotificationDTO.matchNotification(swiped.getFcmToken(), swiper.getRepPhotoKey()));
 
         } else {
-            fcmNotificationDTOs.add(FCMNotificationDTO.clickedNotification(swiped.getFcmToken(), swiper.getRepPhotoKey()));
+//            fcmNotificationDTOs.add(FCMNotificationDTO.clickedNotification(swiped.getFcmToken(), swiper.getRepPhotoKey()));
         }
 
         return fcmNotificationDTOs;

@@ -46,7 +46,8 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                                                   .then(qMatch.updatedAt)
                                                   .otherwise(qAccount.repPhotoKeyUpdatedAt);
 
-        return jpaQueryFactory.select(new QMatchProjection(qMatch.matchedId,
+        return jpaQueryFactory.select(new QMatchProjection(qMatch.chatId,
+                                                           qMatch.matchedId,
                                                            qAccount.name,
                                                            qAccount.repPhotoKey,
                                                            qMatch.unmatched,
