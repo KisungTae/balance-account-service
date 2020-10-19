@@ -21,11 +21,9 @@ import java.util.UUID;
 @Repository
 public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
 
-    private final QAccount         qAccount         = QAccount.account;
+    private final QAccount qAccount = QAccount.account;
     private final QAccountQuestion qAccountQuestion = QAccountQuestion.accountQuestion;
     private final QQuestion qQuestion = QQuestion.question;
-    private final QPhoto    qPhoto    = QPhoto.photo;
-    private final QMatch    qMatch    = QMatch.match;
 
     @Autowired
     public AccountDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
@@ -33,15 +31,15 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     }
 
     @Override
-    public boolean existsByIdAndEmail(UUID id, String email) {
+    public boolean existsByIdAndEmail(UUID accountId, String email) {
         return jpaQueryFactory.selectFrom(qAccount)
-                              .where(qAccount.id.eq(id).and(qAccount.email.eq(email)))
+                              .where(qAccount.id.eq(accountId).and(qAccount.email.eq(email)))
                               .fetchCount() > 0;
     }
 
     @Override
-    public Account findById(UUID id) throws AccountNotFoundException {
-        Account account = jpaQueryFactory.selectFrom(qAccount).where(qAccount.id.eq(id)).fetchOne();
+    public Account findById(UUID accountId) throws AccountNotFoundException {
+        Account account = jpaQueryFactory.selectFrom(qAccount).where(qAccount.id.eq(accountId)).fetchOne();
         if (account == null) throw new AccountNotFoundException();
         return account;
     }

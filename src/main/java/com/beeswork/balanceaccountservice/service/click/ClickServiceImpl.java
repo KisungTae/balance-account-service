@@ -35,16 +35,14 @@ public class ClickServiceImpl implements ClickService {
     private final SwipeDAO   swipeDAO;
     private final MatchDAO   matchDAO;
     private final ChatDAO    chatDAO;
-    private final PhotoDAO   photoDAO;
 
     @Autowired
     public ClickServiceImpl(AccountDAO accountDAO, SwipeDAO swipeDAO, MatchDAO matchDAO,
-                            ChatDAO chatDAO, PhotoDAO photoDAO) {
+                            ChatDAO chatDAO) {
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
         this.matchDAO = matchDAO;
         this.chatDAO = chatDAO;
-        this.photoDAO = photoDAO;
     }
 
     @Override

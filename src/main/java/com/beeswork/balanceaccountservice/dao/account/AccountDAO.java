@@ -10,10 +10,10 @@ import java.util.UUID;
 
 public interface AccountDAO extends BaseDAO<Account> {
 
-    Account findById(UUID id) throws AccountNotFoundException;
+    Account findById(UUID accountId) throws AccountNotFoundException;
     List<Object[]> findAllWithin(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point point)
     throws AccountNotFoundException;
     Account findByIdWithQuestions(UUID accountId) throws AccountNotFoundException;
     Account findByIdWithAccountQuestions(UUID accountId) throws AccountNotFoundException;
-    boolean existsByIdAndEmail(UUID id, String email);
+    boolean existsByIdAndEmail(UUID accountId, String email);
 }

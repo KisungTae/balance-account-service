@@ -38,6 +38,7 @@ public class BalanceAccountServiceApplication {
 //				 18. schedule a function to update swipe_count because if you allow swipe() to plus swipe_count, then the number will be incorrect
 //					 if multiple transaction tries to update the same entity. Version should slow down swipe() when many people try to update
 //				 19. when create a user at first, you should also create photo_info for the user
+//				 20. when save account block, transaction should be [] to prevent block field to be overwritten by saving profiles or rep_photo_key
 
 
 

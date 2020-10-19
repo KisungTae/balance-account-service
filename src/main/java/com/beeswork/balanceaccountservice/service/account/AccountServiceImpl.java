@@ -9,13 +9,11 @@ import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestionId;
 import com.beeswork.balanceaccountservice.entity.question.Question;
-import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
+import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
-import org.hibernate.StaleObjectStateException;
-import org.hibernate.StaleStateException;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -23,8 +21,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.OptimisticLockException;
-import javax.persistence.RollbackException;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,6 +46,17 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     }
 
 
+
+
+//    public Account getValidAccount(UUID accountId, String email)
+//    throws AccountNotFoundException, AccountInvalidException, AccountBlockedException {
+//
+//        Account account = accountDAO.findById(accountId);
+//        if (!account.getEmail().equals(email)) throw new AccountInvalidException();
+//        if (account.isBlocked()) throw new AccountBlockedException();
+//        return account;
+//    }
+
     @Override
     @Transactional
     public void saveLocation(LocationDTO locationDTO) throws AccountNotFoundException {
@@ -72,9 +79,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         accountDAO.persist(account);
     }
 
-
-
-
     @Override
     @Transactional
     public void save(AccountDTO accountDTO) throws AccountNotFoundException, QuestionNotFoundException {
@@ -85,8 +89,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         account.setAbout(accountDTO.getAbout());
 
 //        modelMapper.map(accountDTO, account);
-
-
 //        saveQuestions(accountDTO.getAccountQuestionDTOs(), account);
         accountDAO.persist(account);
 
@@ -166,50 +168,4 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
             accountQuestionDTOs.remove(accountQuestionDTO);
         }
     }
-
-//  TODO: remove me
-//    @Override
-//    @Transactional
-//    public void changeSwipeCount(String accountId, int count) throws AccountNotFoundException, InterruptedException {
-//        Account account = accountDAO.findById(UUID.fromString(accountId));
-////        account.setSwipedCount(count);
-//
-////        Account account1 = accountDAO.findById(UUID.fromString("619419af-e0d7-49e8-b8bf-f5b1fd6c60fe"));
-////
-////
-////        account.getSwipes().add(new Swipe(account, account1, false, new Date(), new Date()));
-//        account.setSwipedCount(count);
-//        System.out.println("thread sleep start");
-//        System.out.println("thread sleep end");
-//        Thread.sleep(5000);
-//        try {
-//            accountDAO.persist(account);
-//        } catch (StaleObjectStateException exception) {
-//            account = accountDAO.findById(UUID.fromString(accountId));
-//            account.setSwipedCount(count);
-//
-//            System.out.println("StaleObjectStateException in account service");
-//            System.out.println("exception message: " + exception.getMessage());
-//            throw exception;
-//        } catch (StaleStateException exception) {
-//            System.out.println("StaleStateException in account service");
-//            System.out.println("exception message: " + exception.getMessage());
-//        } catch (RollbackException exception) {
-//            System.out.println("StaleStateException in account service");
-//            System.out.println("exception message: " + exception.getMessage());
-//        } catch (Exception exception) {
-//            System.out.println("Exception in account service");
-//            System.out.println("exception message: " + exception.getMessage());
-//        }
-//    }
-
-    //  TODO: remove me
-//    @Override
-//    @Transactional
-//    public void changeAbout(String accountId, String about) throws AccountNotFoundException {
-//        Account account = accountDAO.findById(UUID.fromString(accountId));
-//        account.setAbout(about);
-//        accountDAO.persist(account);
-//    }
-
 }
