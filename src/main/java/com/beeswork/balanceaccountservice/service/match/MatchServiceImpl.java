@@ -4,8 +4,10 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dto.match.UnmatchDTO;
 import com.beeswork.balanceaccountservice.entity.match.Match;
+import com.beeswork.balanceaccountservice.entity.match.MatchId;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.projection.MatchProjection;
+import com.beeswork.balanceaccountservice.service.account.AccountInterService;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +22,16 @@ import java.util.UUID;
 
 
 @Service
-public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
+public class MatchServiceImpl extends BaseServiceImpl implements MatchService, MatchInterService {
 
-    private final AccountDAO accountDAO;
+    private final AccountInterService accountInterService;
+
     private final MatchDAO   matchDAO;
 
     @Autowired
-    public MatchServiceImpl(ModelMapper modelMapper, AccountDAO accountDAO, MatchDAO matchDAO) {
+    public MatchServiceImpl(ModelMapper modelMapper, AccountInterService accountInterService, MatchDAO matchDAO) {
         super(modelMapper);
-        this.accountDAO = accountDAO;
+        this.accountInterService = accountInterService;
         this.matchDAO = matchDAO;
     }
 
@@ -38,9 +41,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     public List<MatchProjection> listMatches(String matcherId, String email, Date fetchedAt)
     throws AccountInvalidException {
 
-        if (!accountDAO.existsByIdAndEmail(UUID.fromString(matcherId), email))
-            throw new AccountInvalidException();
-
+        accountInterService.checkIfValid(UUID.fromString(matcherId), email);
         return matchDAO.findAllAfter(UUID.fromString(matcherId), fetchedAt);
     }
 
@@ -48,9 +49,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     @Transactional
     public void unmatch(UnmatchDTO unmatchDTO) throws AccountInvalidException {
 
-        if (!accountDAO.existsByIdAndEmail(UUID.fromString(unmatchDTO.getUnmatcherId()),
-                                           unmatchDTO.getUnmatcherEmail()))
-            throw new AccountInvalidException();
+        accountInterService.checkIfValid(UUID.fromString(unmatchDTO.getUnmatcherId()), unmatchDTO.getUnmatcherEmail());
 
         List<Match> matches = matchDAO.findPairById(UUID.fromString(unmatchDTO.getUnmatcherId()),
                                                     UUID.fromString(unmatchDTO.getUnmatchedId()));
@@ -64,5 +63,10 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
             matchDAO.persist(match);
         }
 
+    }
+
+    @Override
+    public boolean existsById(UUID matcherId, UUID matchedId) {
+        return matchDAO.existsById(new MatchId(matcherId, matchedId));
     }
 }

@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.swipe.BalanceGameDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
+import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
@@ -36,7 +37,7 @@ public class SwipeController extends BaseController {
     @PostMapping
     public ResponseEntity<String> swipe(@Valid @RequestBody SwipeVM swipeVM, BindingResult bindingResult)
     throws AccountNotFoundException, AccountInvalidException, SwipeClickedExistsException, JsonProcessingException,
-           AccountShortOfPointException {
+           AccountShortOfPointException, AccountBlockedException {
 
         if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
         BalanceGameDTO balanceGameDTO = swipeService.swipe(modelMapper.map(swipeVM, SwipeDTO.class));

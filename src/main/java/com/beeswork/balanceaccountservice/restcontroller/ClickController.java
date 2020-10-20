@@ -3,8 +3,11 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.click.ClickDTO;
 import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
+import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
+import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchExistsException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.click.ClickService;
@@ -43,8 +46,8 @@ public class ClickController extends BaseController {
 
     @PostMapping("/click")
     public ResponseEntity<String> click(@Valid @RequestBody ClickVM clickVM)
-    throws SwipeNotFoundException, AccountInvalidException, MatchExistsException, JsonProcessingException,
-           FirebaseMessagingException {
+    throws SwipeNotFoundException, AccountInvalidException, JsonProcessingException,
+           FirebaseMessagingException, AccountNotFoundException, AccountBlockedException, SwipeClickedExistsException {
 
         List<FCMNotificationDTO> FCMNotificationDTOs = clickService.click(modelMapper.map(clickVM, ClickDTO.class));
         FCMService.sendNotifications(FCMNotificationDTOs);
@@ -56,7 +59,7 @@ public class ClickController extends BaseController {
                                               @RequestParam("email") String email,
                                               @RequestParam("fetchedAt")
                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date fetchedAt)
-    throws JsonProcessingException, AccountInvalidException {
+    throws JsonProcessingException, AccountInvalidException, AccountNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK)
                              .body(objectMapper.writeValueAsString(clickService.listClicked(clickedId, email, fetchedAt)));

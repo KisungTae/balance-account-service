@@ -15,6 +15,8 @@ public class AccountQuestionSaveVM {
     @ValidUUID
     private String accountId;
 
+    private String email;
+
     @Size(min = 1, max = 3, message = "질문개수는 최소 {min}개 최대 {max}개 까지 입니다")
     private List<AccountQuestionVM> accountQuestionVMs = new ArrayList<>();
 }

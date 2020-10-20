@@ -15,6 +15,7 @@ import com.beeswork.balanceaccountservice.exception.account.AccountInvalidExcept
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
+import com.beeswork.balanceaccountservice.service.account.AccountInterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,15 +24,15 @@ import java.util.Date;
 import java.util.UUID;
 
 @Service
-public class SwipeServiceImpl implements SwipeService {
+public class SwipeServiceImpl implements SwipeService, SwipeInterService {
 
-    private final AccountInnerService accountEntityService;
+    private final AccountInterService accountInterService;
     private final AccountDAO accountDAO;
     private final SwipeDAO swipeDAO;
 
     @Autowired
-    public SwipeServiceImpl(AccountInnerService accountEntityService, AccountDAO accountDAO, SwipeDAO swipeDAO) {
-        this.accountEntityService = accountEntityService;
+    public SwipeServiceImpl(AccountInterService accountInterService, AccountDAO accountDAO, SwipeDAO swipeDAO) {
+        this.accountInterService = accountInterService;
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
     }
@@ -45,7 +46,8 @@ public class SwipeServiceImpl implements SwipeService {
         UUID swiperUUId = UUID.fromString(swipeDTO.getSwiperId());
         UUID swipedUUId = UUID.fromString(swipeDTO.getSwipedId());
 
-        Account swiper = accountEntityService.getValidAccount(swiperUUId, swipeDTO.getSwiperEmail());
+//        Account swiper = accountInterService.getValidAccount(swiperUUId, swipeDTO.getSwiperEmail());
+        Account swiper = accountDAO.findById(UUID.fromString(swipeDTO.getSwiperId()));
 
         if (swipeDAO.clickedExists(swiperUUId, swipedUUId))
             throw new SwipeClickedExistsException();
@@ -79,5 +81,10 @@ public class SwipeServiceImpl implements SwipeService {
         }
 
         return balanceGameDTO;
+    }
+
+    @Override
+    public boolean existsByClicked(UUID swiperId, UUID swipedId, boolean clicked) {
+        return swipeDAO.existsByClicked(swiperId, swipedId, true);
     }
 }

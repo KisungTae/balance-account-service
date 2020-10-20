@@ -12,5 +12,6 @@ import java.util.UUID;
 @Setter
 public class AccountQuestionSaveDTO {
     private UUID accountId;
+    private String email;
     private List<AccountQuestionDTO> accountQuestionDTOs = new ArrayList<>();
 }

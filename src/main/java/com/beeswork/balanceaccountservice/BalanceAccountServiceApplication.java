@@ -39,6 +39,9 @@ public class BalanceAccountServiceApplication {
 //					 if multiple transaction tries to update the same entity. Version should slow down swipe() when many people try to update
 //				 19. when create a user at first, you should also create photo_info for the user
 //				 20. when save account block, transaction should be [] to prevent block field to be overwritten by saving profiles or rep_photo_key
+//				 21. I have added email in LocationDTO and locationVM, AccountQuestionSaveVM and DTO, Recommend()
+//				 22. check if email id empty at controller
+//				 23.
 
 
 

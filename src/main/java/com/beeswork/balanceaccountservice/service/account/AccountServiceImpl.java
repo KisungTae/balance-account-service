@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.service.account;
 
 
+import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
 import com.beeswork.balanceaccountservice.dto.account.*;
@@ -26,7 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class AccountServiceImpl extends BaseServiceImpl implements AccountService {
+public class AccountServiceImpl extends BaseServiceImpl implements AccountService, AccountInterService {
 
 
     private final AccountDAO accountDAO;
@@ -45,22 +46,54 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         this.geometryFactory = geometryFactory;
     }
 
+    @Override
+    public Account findValid(UUID accountId, String email) {
 
+        Account account = accountDAO.findById(accountId);
+        checkIfValid(account, email);
+        return account;
+    }
 
+    @Override
+    public List<Object[]> findAllWithin(UUID accountId, String email, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude) {
 
-//    public Account getValidAccount(UUID accountId, String email)
-//    throws AccountNotFoundException, AccountInvalidException, AccountBlockedException {
-//
-//        Account account = accountDAO.findById(accountId);
-//        if (!account.getEmail().equals(email)) throw new AccountInvalidException();
-//        if (account.isBlocked()) throw new AccountBlockedException();
-//        return account;
-//    }
+        Account account = findValid(accountId, email);
+        Point location = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+        location.setSRID(AppConstant.SRID);
+        return accountDAO.findAllWithin(accountId, distance, minAge, maxAge, gender, AppConstant.LIMIT,
+                                        AppConstant.LIMIT * account.getIndex(), location);
+    }
+
+    public Account findValid(String accountId, String email) {
+        return findValid(UUID.fromString(accountId), email);
+    }
+
+    @Override
+    public void checkIfValid(UUID accountId, String email) {
+
+        Account account = accountDAO.findById(accountId);
+        checkIfValid(account, email);
+    }
+
+    @Override
+    public void checkIfValid(Account account, String email) {
+
+        checkIfBlocked(account);
+        if (!account.getEmail().equals(email)) throw new AccountInvalidException();
+    }
+
+    @Override
+    public void checkIfBlocked(Account account) {
+
+        if (account == null) throw new AccountNotFoundException();
+        if (account.isBlocked()) throw new AccountBlockedException();
+    }
 
     @Override
     @Transactional
-    public void saveLocation(LocationDTO locationDTO) throws AccountNotFoundException {
-        Account account = accountDAO.findById(UUID.fromString(locationDTO.getAccountId()));
+    public void saveLocation(LocationDTO locationDTO) {
+
+        Account account = findValid(locationDTO.getAccountId(), locationDTO.getEmail());
         Point location = geometryFactory.createPoint(new Coordinate(locationDTO.getLongitude(), locationDTO.getLatitude()));
         account.setLocation(location);
         accountDAO.persist(account);
@@ -68,29 +101,18 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
-    public void saveFCMToken(FCMTokenDTO fcmTokenDTO)
-    throws AccountNotFoundException, AccountInvalidException {
+    public void saveFCMToken(FCMTokenDTO fcmTokenDTO) {
 
-        Account account = accountDAO.findById(UUID.fromString(fcmTokenDTO.getAccountId()));
-        if (!account.getEmail().equals(fcmTokenDTO.getEmail()))
-            throw new AccountInvalidException();
-
+        Account account = findValid(fcmTokenDTO.getAccountId(), fcmTokenDTO.getEmail());
         account.setFcmToken(fcmTokenDTO.getToken());
         accountDAO.persist(account);
     }
 
     @Override
     @Transactional
-    public void save(AccountDTO accountDTO) throws AccountNotFoundException, QuestionNotFoundException {
+    public void save(AccountDTO accountDTO) {
 
-        Account account = accountDAO.findById(UUID.fromString(accountDTO.getId()));
-
-        account.setName(accountDTO.getName());
-        account.setAbout(accountDTO.getAbout());
-
-//        modelMapper.map(accountDTO, account);
-//        saveQuestions(accountDTO.getAccountQuestionDTOs(), account);
-        accountDAO.persist(account);
+//      TODO: create account with email
 
     }
 
@@ -102,17 +124,20 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          then Hibernate won't delete accountQuestions even if their size = 0
     @Override
     @Transactional
-    public void saveProfile(AccountDTO accountDTO) throws AccountNotFoundException {
+    public void saveProfile(AccountDTO accountDTO) {
 
-        Account account = accountDAO.findById(UUID.fromString(accountDTO.getId()));
+        Account account = findValid(accountDTO.getId(), accountDTO.getEmail());
         modelMapper.map(accountDTO, account);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(account.getBirth());
         account.setBirthYear(calendar.get(Calendar.YEAR));
+        account.setName(accountDTO.getName());
+        account.setAbout(accountDTO.getAbout());
         account.setUpdatedAt(new Date());
         account.setEnabled(true);
         accountDAO.persist(account);
     }
+
 
     //  TEST 1. save accountQuestionDTOs without setAccount() and setQuestion() --> Hibernate does not insert those objects, no exception thrown
     //  TEST 2. create new accountQuestionDTO with the same AccountQuestionId --> Hibernate throws exception of creating two object with the same Id
@@ -120,12 +145,13 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          accountQuestions to check if it needs to remove or insert or update entities
     @Override
     @Transactional
-    public void saveQuestions(AccountQuestionSaveDTO accountQuestionSaveDTO)
-    throws QuestionNotFoundException, AccountNotFoundException {
+    public void saveQuestions(AccountQuestionSaveDTO accountQuestionSaveDTO) {
 
         List<AccountQuestionDTO> accountQuestionDTOs = accountQuestionSaveDTO.getAccountQuestionDTOs();
 
         Account account = accountDAO.findByIdWithAccountQuestions(accountQuestionSaveDTO.getAccountId());
+        checkIfValid(account, accountQuestionSaveDTO.getEmail());
+
         List<AccountQuestion> accountQuestions = account.getAccountQuestions();
 
         for (int i = accountQuestions.size() - 1; i >= 0; i--) {
@@ -167,5 +193,10 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
             accountQuestions.add(accountQuestion);
             accountQuestionDTOs.remove(accountQuestionDTO);
         }
+    }
+
+    @Override
+    public void persist(Account account) {
+        accountDAO.persist(account);
     }
 }

@@ -149,10 +149,11 @@ drop table photo;
 drop table match;
 drop table swipe;
 drop table admin;
-drop table chat;
 drop table photo_info;
+drop table  chat_message;
+drop table chat;
 drop table account;
-drop table account_type;
+
 
 
 
@@ -485,6 +486,33 @@ from match
 where matcher_id = '10177a84-b6f1-487f-af69-9b10ea3d938e';
 
 
+select *
+from swipe;
+
 
 select *
-from account;
+from swipe
+where swiper_id not in (select swiper_id from swipe where swiped_id in (select swiped_id from swipe where clicked = true) and clicked = true);
+
+
+
+select *
+from swipe
+where swiper_id = '931413fb-9ab8-4753-9d79-97e3306a298d'
+and swiped_id = 'a99c23a7-4bc3-4c4d-a1ff-ad29f67487ef';
+
+
+select *
+from swipe
+where swiped_id = '931413fb-9ab8-4753-9d79-97e3306a298d'
+  and swiper_id = 'a99c23a7-4bc3-4c4d-a1ff-ad29f67487ef';
+
+
+select *
+from account
+where id = 'a99c23a7-4bc3-4c4d-a1ff-ad29f67487ef';
+
+
+select *
+from match;
+

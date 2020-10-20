@@ -13,6 +13,7 @@ public class LocationVM {
     @ValidUUID
     private String accountId;
 
+    private String email;
     private double latitude;
     private double longitude;
 }

@@ -31,35 +31,30 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     }
 
     @Override
-    public boolean existsByIdAndEmail(UUID accountId, String email) {
+    public Long countByEmail(UUID accountId, String email) {
         return jpaQueryFactory.selectFrom(qAccount)
                               .where(qAccount.id.eq(accountId).and(qAccount.email.eq(email)))
-                              .fetchCount() > 0;
+                              .fetchCount();
     }
 
     @Override
-    public Account findById(UUID accountId) throws AccountNotFoundException {
-        Account account = jpaQueryFactory.selectFrom(qAccount).where(qAccount.id.eq(accountId)).fetchOne();
-        if (account == null) throw new AccountNotFoundException();
-        return account;
+    public Account findById(UUID accountId) {
+        return jpaQueryFactory.selectFrom(qAccount).where(qAccount.id.eq(accountId)).fetchOne();
     }
 
     @Override
-    public Account findByIdWithAccountQuestions(UUID accountId) throws AccountNotFoundException {
-        Account account = jpaQueryFactory.selectFrom(qAccount)
-                                         .innerJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
-                                         .where(qAccount.id.eq(accountId))
-                                         .fetchOne();
+    public Account findByIdWithAccountQuestions(UUID accountId) {
 
-        if (account == null) throw new AccountNotFoundException();
-        return account;
+        return jpaQueryFactory.selectFrom(qAccount)
+                              .innerJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
+                              .where(qAccount.id.eq(accountId))
+                              .fetchOne();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Object[]> findAllWithin(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int limit,
                                         int offset, Point point) {
-
 
         return entityManager.createNativeQuery(
                 "select cast(b.id as varchar), b.name, b.about, b.birth_year, st_distance(b.location, :pivot), p.key " +
@@ -86,16 +81,13 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     }
 
     @Override
-    public Account findByIdWithQuestions(UUID accountId) throws AccountNotFoundException {
+    public Account findByIdWithQuestions(UUID accountId) {
 
-        Account account = jpaQueryFactory.selectFrom(qAccount)
-                                         .innerJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
-                                         .innerJoin(qAccountQuestion.question, qQuestion).fetchJoin()
-                                         .where(qAccount.id.eq(accountId))
-                                         .fetchOne();
-
-        if (account == null) throw new AccountNotFoundException();
-        return account;
+        return jpaQueryFactory.selectFrom(qAccount)
+                              .innerJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
+                              .innerJoin(qAccountQuestion.question, qQuestion).fetchJoin()
+                              .where(qAccount.id.eq(accountId))
+                              .fetchOne();
     }
 
 

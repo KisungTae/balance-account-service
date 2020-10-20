@@ -6,6 +6,7 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dto.account.CardDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
+import com.beeswork.balanceaccountservice.service.account.AccountInterService;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -22,29 +23,21 @@ import java.util.UUID;
 @Service
 public class RecommendServiceImpl implements RecommendService {
 
-    private final AccountDAO accountDAO;
+    private final AccountInterService accountInterService;
     private final GeometryFactory geometryFactory;
 
     @Autowired
-    public RecommendServiceImpl(AccountDAO accountDAO, GeometryFactory geometryFactory) {
-        this.accountDAO = accountDAO;
+    public RecommendServiceImpl(AccountInterService accountInterService, GeometryFactory geometryFactory) {
+        this.accountInterService = accountInterService;
         this.geometryFactory = geometryFactory;
     }
 
     // TEST 1. matches are mapped by matcher_id not matched_id
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<CardDTO> recommend(String accountId, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude)
-    throws AccountNotFoundException {
+    public List<CardDTO> recommend(String accountId, String email, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude) {
 
-        UUID accountUUID = UUID.fromString(accountId);
-
-        Account account = accountDAO.findById(accountUUID);
-        Point location = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-        location.setSRID(AppConstant.SRID);
-
-        List<Object[]> accounts = accountDAO.findAllWithin(accountUUID, distance, minAge, maxAge, gender, AppConstant.LIMIT,
-                                                           AppConstant.LIMIT * account.getIndex(), location);
+        List<Object[]> accounts = accountInterService.findAllWithin(UUID.fromString(accountId), email, distance, minAge, maxAge, gender, latitude, longitude);
 
         String previousId = "";
         List<CardDTO> cardDTOs = new ArrayList<>();

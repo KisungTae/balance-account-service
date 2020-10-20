@@ -11,6 +11,7 @@ import java.util.UUID;
 public class LocationDTO {
 
     private String accountId;
+    private String email;
     private double latitude;
     private double longitude;
 }
