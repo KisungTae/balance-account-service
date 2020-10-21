@@ -34,15 +34,6 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
     @Override
-    public boolean clickedExists(UUID swiperId, UUID swipedId) {
-        return jpaQueryFactory.selectFrom(qSwipe)
-                              .where(qSwipe.swiperId.eq(swiperId)
-                                                    .and(qSwipe.swipedId.eq(swipedId))
-                                                    .and(qSwipe.clicked.eq(true)))
-                              .fetchCount() > 0;
-    }
-
-    @Override
     public Swipe findByIdWithAccounts(Long swipeId, UUID swiperId, UUID swipedId) throws SwipeNotFoundException {
         Swipe swipe = jpaQueryFactory.selectFrom(qSwipe)
                                      .innerJoin(qSwipe.swiper, qAccount).fetchJoin()
@@ -56,12 +47,12 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
     @Override
-    public boolean existsByClicked(UUID swiperId, UUID swipedId, boolean clicked) {
+    public Long countByClicked(UUID swiperId, UUID swipedId, boolean clicked) {
         return jpaQueryFactory.selectFrom(qSwipe)
                               .where(qSwipe.swiperId.eq(swiperId)
                                                     .and(qSwipe.swipedId.eq(swipedId))
                                                     .and(qSwipe.clicked.eq(clicked)))
-                              .fetchCount() > 0;
+                              .fetchCount();
     }
 
     public List<ClickedProjection> findAllClickedAfter(UUID swipedId, Date fetchedAt) {

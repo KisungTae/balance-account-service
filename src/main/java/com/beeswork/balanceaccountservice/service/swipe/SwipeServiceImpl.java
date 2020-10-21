@@ -27,13 +27,11 @@ import java.util.UUID;
 public class SwipeServiceImpl implements SwipeService, SwipeInterService {
 
     private final AccountInterService accountInterService;
-    private final AccountDAO accountDAO;
     private final SwipeDAO swipeDAO;
 
     @Autowired
-    public SwipeServiceImpl(AccountInterService accountInterService, AccountDAO accountDAO, SwipeDAO swipeDAO) {
+    public SwipeServiceImpl(AccountInterService accountInterService, SwipeDAO swipeDAO) {
         this.accountInterService = accountInterService;
-        this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
     }
 
@@ -46,10 +44,9 @@ public class SwipeServiceImpl implements SwipeService, SwipeInterService {
         UUID swiperUUId = UUID.fromString(swipeDTO.getSwiperId());
         UUID swipedUUId = UUID.fromString(swipeDTO.getSwipedId());
 
-//        Account swiper = accountInterService.getValidAccount(swiperUUId, swipeDTO.getSwiperEmail());
-        Account swiper = accountDAO.findById(UUID.fromString(swipeDTO.getSwiperId()));
+        Account swiper = accountInterService.findValid(swiperUUId, swipeDTO.getSwiperEmail());
 
-        if (swipeDAO.clickedExists(swiperUUId, swipedUUId))
+        if (existsByClicked(swiperUUId, swipedUUId, true))
             throw new SwipeClickedExistsException();
 
         int currentPoint = swiper.getPoint();
@@ -57,16 +54,13 @@ public class SwipeServiceImpl implements SwipeService, SwipeInterService {
 //        if (currentPoint < AppConstant.SWIPE_POINT)
 //            throw new AccountShortOfPointException();
 
-        Account swiped = accountDAO.findByIdWithQuestions(swipedUUId);
+        Account swiped = accountInterService.findWithQuestions(swipedUUId);
 
         Swipe swipe = new Swipe(swiper, swiped, false, new Date(), new Date());
         swiper.getSwipes().add(swipe);
 
         currentPoint -= AppConstant.SWIPE_POINT;
         swiper.setPoint(currentPoint);
-
-        accountDAO.persist(swiper);
-        accountDAO.persist(swiped);
 
         BalanceGameDTO balanceGameDTO = new BalanceGameDTO();
         balanceGameDTO.setSwipeId(swipe.getId());
@@ -85,6 +79,6 @@ public class SwipeServiceImpl implements SwipeService, SwipeInterService {
 
     @Override
     public boolean existsByClicked(UUID swiperId, UUID swipedId, boolean clicked) {
-        return swipeDAO.existsByClicked(swiperId, swipedId, true);
+        return swipeDAO.countByClicked(swiperId, swipedId, true) > 0;
     }
 }

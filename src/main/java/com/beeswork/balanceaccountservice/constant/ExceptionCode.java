@@ -1,6 +1,9 @@
 package com.beeswork.balanceaccountservice.constant;
 
 public class ExceptionCode {
+
+    public static final String BAD_REQUEST_EXCEPTION = "bad.request.exception";
+
     public static final String EXCEPTION = "exception";
     public static final String QUERY_EXCEPTION = "query.exception";
 

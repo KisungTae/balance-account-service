@@ -1,26 +1,23 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.account.CardDTO;
+import com.beeswork.balanceaccountservice.dto.recommend.RecommendDTO;
+import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.service.recommend.RecommendService;
-import com.beeswork.balanceaccountservice.validator.ValidUUID;
+import com.beeswork.balanceaccountservice.vm.recommend.RecommendVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.Valid;
 import java.util.List;
 
-@Validated
 @RestController
 @RequestMapping("/recommend")
 public class RecommendController extends BaseController {
@@ -34,26 +31,14 @@ public class RecommendController extends BaseController {
     }
 
     @GetMapping
-    public ResponseEntity<String> recommend(@RequestParam("account_id") @ValidUUID String accountId,
-                                            @RequestParam("distance") @Min(1000) @Max(10000) int distance,
-                                            @RequestParam("min_age") int minAge,
-                                            @RequestParam("max_age") int maxAge,
-                                            @RequestParam("gender") boolean gender,
-                                            @RequestParam double latitude,
-                                            @RequestParam double longitude)
+    public ResponseEntity<String> recommend(@Valid @ModelAttribute RecommendVM recommendVM,
+                                            BindingResult bindingResult)
     throws AccountNotFoundException, JsonProcessingException {
 
-//        if (!accountId.isBlank()) throw new AccountNotFoundException();
+        if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        List<CardDTO> accountProfileDTOs = recommendService.recommend(accountId,
-                                                                      distance,
-                                                                      minAge,
-                                                                      maxAge,
-                                                                      gender,
-                                                                      latitude,
-                                                                      longitude);
-
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(accountProfileDTOs));
+        List<CardDTO> cardDTOs = recommendService.recommend(modelMapper.map(recommendVM, RecommendDTO.class));
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(cardDTOs));
     }
 
 

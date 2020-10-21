@@ -15,6 +15,7 @@ public interface AccountInterService {
     void checkIfBlocked(Account account);
     Account findValid(UUID accountId, String email);
     List<Object[]> findAllWithin(UUID accountId, String email, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude);
+    Account findWithQuestions(UUID accountId);
 
     void persist(Account account);
 }

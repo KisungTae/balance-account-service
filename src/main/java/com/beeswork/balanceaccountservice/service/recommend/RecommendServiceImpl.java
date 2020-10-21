@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.constant.ColumnIndex;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dto.account.CardDTO;
+import com.beeswork.balanceaccountservice.dto.recommend.RecommendDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.service.account.AccountInterService;
@@ -24,20 +25,27 @@ import java.util.UUID;
 public class RecommendServiceImpl implements RecommendService {
 
     private final AccountInterService accountInterService;
-    private final GeometryFactory geometryFactory;
 
     @Autowired
-    public RecommendServiceImpl(AccountInterService accountInterService, GeometryFactory geometryFactory) {
+    public RecommendServiceImpl(AccountInterService accountInterService) {
         this.accountInterService = accountInterService;
-        this.geometryFactory = geometryFactory;
     }
 
     // TEST 1. matches are mapped by matcher_id not matched_id
     @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<CardDTO> recommend(String accountId, String email, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude) {
+    @Transactional(propagation = Propagation.REQUIRED,
+                   isolation = Isolation.READ_COMMITTED,
+                   readOnly = true)
+    public List<CardDTO> recommend(RecommendDTO recommendDTO) {
 
-        List<Object[]> accounts = accountInterService.findAllWithin(UUID.fromString(accountId), email, distance, minAge, maxAge, gender, latitude, longitude);
+        List<Object[]> accounts = accountInterService.findAllWithin(UUID.fromString(recommendDTO.getAccountId()),
+                                                                    recommendDTO.getEmail(),
+                                                                    recommendDTO.getDistance(),
+                                                                    recommendDTO.getMinAge(),
+                                                                    recommendDTO.getMaxAge(),
+                                                                    recommendDTO.isGender(),
+                                                                    recommendDTO.getLatitude(),
+                                                                    recommendDTO.getLongitude());
 
         String previousId = "";
         List<CardDTO> cardDTOs = new ArrayList<>();

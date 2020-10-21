@@ -46,6 +46,10 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         this.geometryFactory = geometryFactory;
     }
 
+    public Account findValid(String accountId, String email) {
+        return findValid(UUID.fromString(accountId), email);
+    }
+
     @Override
     public Account findValid(UUID accountId, String email) {
 
@@ -64,8 +68,11 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
                                         AppConstant.LIMIT * account.getIndex(), location);
     }
 
-    public Account findValid(String accountId, String email) {
-        return findValid(UUID.fromString(accountId), email);
+    @Override
+    public Account findWithQuestions(UUID accountId) {
+        Account account = accountDAO.findByIdWithQuestions(accountId);
+        checkIfBlocked(account);
+        return account;
     }
 
     @Override

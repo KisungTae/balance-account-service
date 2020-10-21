@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Constraint(validatedBy = {})
 @Retention(RetentionPolicy.RUNTIME)
-@Pattern(regexp = RegexPattern.UUID, message = "유효하지않은 토큰")
+@Pattern(regexp = RegexPattern.UUID, message = "{uuid.invalid}")
 public @interface ValidUUID {
     String message() default "Invalid UUID";
     Class<?>[] groups() default {};
