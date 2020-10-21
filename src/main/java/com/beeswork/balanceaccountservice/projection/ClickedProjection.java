@@ -12,13 +12,13 @@ import java.util.UUID;
 @Setter
 public class ClickedProjection {
 
-    private UUID clickerId;
+    private UUID   swiperId;
     private String photoKey;
     private Date updatedAt;
 
     @QueryProjection
-    public ClickedProjection(UUID clickerId, String photoKey, Date updatedAt) {
-        this.clickerId = clickerId;
+    public ClickedProjection(UUID swiperId, String photoKey, Date updatedAt) {
+        this.swiperId = swiperId;
         this.photoKey = photoKey;
         this.updatedAt = updatedAt;
     }

@@ -421,8 +421,6 @@ create table unblock
     constraint unblock_admin_id_fk foreign key (admin_id) references admin (id)
 );
 
-
-
 create table chat_message
 (
     id         bigserial primary key,
@@ -436,83 +434,8 @@ create table chat_message
 );
 
 
--- '3ed89e79-6d81-4c40-b07e-fb8e16529a02'
-select swiped_id, count(*)
-from swipe
-group by swiped_id
-order by count(*) DESC;
-
-select *
-from swipe
-where swiped_id = '36f9284e-74fd-40f7-8f57-94dc94fc772c'
-  and clicked = true;
-
-select *
-from match
-where matcher_id = '36f9284e-74fd-40f7-8f57-94dc94fc772c';
-
-select swiper_id, s.updated_at, a.rep_photo_key_updated_at
-from swipe s
-left join match m on s.swiper_id = m.matcher_id and s.swiped_id = m.matched_id
-left join account a on s.swiper_id = a.id
-where swiped_id = '36f9284e-74fd-40f7-8f57-94dc94fc772c'
-  and s.clicked = true
-  and m.matched_id is null
-  and (s.updated_at > '2020-10-15 16:38:20.737000' or a.rep_photo_key_updated_at > '2020-10-15 16:38:20.737000');
-
-select swiper_id, s.updated_at, a.rep_photo_key_updated_at
-from swipe s
-left join match m on s.swiper_id = m.matcher_id and s.swiped_id = m.matched_id
-left join account a on s.swiper_id = a.id
-where swiped_id = '36f9284e-74fd-40f7-8f57-94dc94fc772c'
-  and s.clicked = true
-  and m.matched_id is null
-order by rep_photo_key_updated_at;
-
-
-select s1.id, s1.swiper_id, s1.swiped_id, s1.clicked, s2.id, s2.swiper_id, s2.swiped_id, s2.clicked
-from swipe s1
-left join swipe s2
-on s1.swiper_id = s2.swiped_id and s1.swiped_id = s2.swiper_id
-where s1.clicked = true and s2.clicked = false;
-
-
 select *
 from account
-where id = '10177a84-b6f1-487f-af69-9b10ea3d938e';
+where fcm_token != '';
 
-select *
-from match
-where matcher_id = '10177a84-b6f1-487f-af69-9b10ea3d938e';
-
-
-select *
-from swipe;
-
-
-select *
-from swipe
-where swiper_id not in (select swiper_id from swipe where swiped_id in (select swiped_id from swipe where clicked = true) and clicked = true);
-
-
-
-select *
-from swipe
-where swiper_id = '931413fb-9ab8-4753-9d79-97e3306a298d'
-and swiped_id = 'a99c23a7-4bc3-4c4d-a1ff-ad29f67487ef';
-
-
-select *
-from swipe
-where swiped_id = '931413fb-9ab8-4753-9d79-97e3306a298d'
-  and swiper_id = 'a99c23a7-4bc3-4c4d-a1ff-ad29f67487ef';
-
-
-select *
-from account
-where id = 'a99c23a7-4bc3-4c4d-a1ff-ad29f67487ef';
-
-
-select *
-from match;
-
+update account set fcm_token = '' where id = 'f8f1f36d-161f-48a4-a433-6c98e06d95b2'
