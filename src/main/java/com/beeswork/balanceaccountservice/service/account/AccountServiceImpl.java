@@ -46,71 +46,73 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         this.geometryFactory = geometryFactory;
     }
 
-    public Account findValid(String accountId, String email) {
-        return findValid(UUID.fromString(accountId), email);
-    }
-
     @Override
     public Account findValid(UUID accountId, String email) {
-
         Account account = accountDAO.findById(accountId);
         checkIfValid(account, email);
         return account;
     }
 
     @Override
-    public List<Object[]> findAllWithin(UUID accountId, String email, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude) {
-
-        Account account = findValid(accountId, email);
-        Point location = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-        location.setSRID(AppConstant.SRID);
-        return accountDAO.findAllWithin(accountId, distance, minAge, maxAge, gender, AppConstant.LIMIT,
-                                        AppConstant.LIMIT * account.getIndex(), location);
-    }
-
-    @Override
-    public Account findWithQuestions(UUID accountId) {
-        Account account = accountDAO.findByIdWithQuestions(accountId);
-        checkIfBlocked(account);
-        return account;
-    }
-
-    @Override
     public void checkIfValid(UUID accountId, String email) {
-
         Account account = accountDAO.findById(accountId);
         checkIfValid(account, email);
     }
 
     @Override
     public void checkIfValid(Account account, String email) {
-
         checkIfBlocked(account);
         if (!account.getEmail().equals(email)) throw new AccountInvalidException();
     }
 
     @Override
     public void checkIfBlocked(Account account) {
-
         if (account == null) throw new AccountNotFoundException();
         if (account.isBlocked()) throw new AccountBlockedException();
+    }
+
+    //  DESC 1. when registering, an account will be created with enabled = false, then when finish profiles,
+    //          it will update enabled = true because users might get cards for which profile has not been updated
+    //  TEST 2. save account without any changes but changes in accountQuestions --> Hibernate does not publish update DML for unchanged account even if you change accountQuestions
+    //  TEST 3. save account without accountQuestions with modemapper --> modelmapper call setAccountQuestions and Hibernate recognizes this call and
+    //          update persistence context which will delete all accountQuestions. Without modelmapper and update account fields only
+    //          then Hibernate won't delete accountQuestions even if their size = 0
+    @Override
+    @Transactional
+    public void saveProfile(AccountDTO accountDTO) {
+        Account account = findValid(UUID.fromString(accountDTO.getId()), accountDTO.getEmail());
+
+        if (!account.isEnabled()) {
+            account.setName(accountDTO.getName());
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(account.getBirth());
+
+            account.setBirthYear(calendar.get(Calendar.YEAR));
+            account.setBirth(accountDTO.getBirth());
+            account.setGender(accountDTO.isGender());
+        }
+
+        account.setAbout(accountDTO.getAbout());
+        account.setUpdatedAt(new Date());
+        account.setEnabled(true);
+        account.setLocation(geometryFactory.createPoint(new Coordinate(accountDTO.getLongitude(), accountDTO.getLatitude())));
+
+//        accountDAO.persist(account);
     }
 
     @Override
     @Transactional
     public void saveLocation(LocationDTO locationDTO) {
-
-        Account account = findValid(locationDTO.getAccountId(), locationDTO.getEmail());
-        Point location = geometryFactory.createPoint(new Coordinate(locationDTO.getLongitude(), locationDTO.getLatitude()));
-        account.setLocation(location);
+        Account account = findValid(UUID.fromString(locationDTO.getAccountId()), locationDTO.getEmail());
+        account.setLocation(geometryFactory.createPoint(new Coordinate(locationDTO.getLongitude(), locationDTO.getLatitude())));
         accountDAO.persist(account);
     }
 
     @Override
     @Transactional
     public void saveFCMToken(FCMTokenDTO fcmTokenDTO) {
-
-        Account account = findValid(fcmTokenDTO.getAccountId(), fcmTokenDTO.getEmail());
+        Account account = findValid(UUID.fromString(fcmTokenDTO.getAccountId()), fcmTokenDTO.getEmail());
         account.setFcmToken(fcmTokenDTO.getToken());
         accountDAO.persist(account);
     }
@@ -123,27 +125,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     }
 
-    //  DESC 1. when registering, an account will be created with enabled = false, then when finish profiles,
-    //          it will update enabled = true because users might get cards for which profile has not been updated
-    //  TEST 2. save account without any changes but changes in accountQuestions --> Hibernate does not publish update DML for unchanged account even if you change accountQuestions
-    //  TEST 3. save account without accountQuestions with modemapper --> modelmapper call setAccountQuestions and Hibernate recognizes this call and
-    //          update persistence context which will delete all accountQuestions. Without modelmapper and update account fields only
-    //          then Hibernate won't delete accountQuestions even if their size = 0
-    @Override
-    @Transactional
-    public void saveProfile(AccountDTO accountDTO) {
 
-        Account account = findValid(accountDTO.getId(), accountDTO.getEmail());
-        modelMapper.map(accountDTO, account);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(account.getBirth());
-        account.setBirthYear(calendar.get(Calendar.YEAR));
-        account.setName(accountDTO.getName());
-        account.setAbout(accountDTO.getAbout());
-        account.setUpdatedAt(new Date());
-        account.setEnabled(true);
-        accountDAO.persist(account);
-    }
 
 
     //  TEST 1. save accountQuestionDTOs without setAccount() and setQuestion() --> Hibernate does not insert those objects, no exception thrown
@@ -200,6 +182,23 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
             accountQuestions.add(accountQuestion);
             accountQuestionDTOs.remove(accountQuestionDTO);
         }
+    }
+
+    @Override
+    public List<Object[]> findAllWithin(UUID accountId, String email, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude) {
+
+        Account account = findValid(accountId, email);
+        Point location = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+        location.setSRID(AppConstant.SRID);
+        return accountDAO.findAllWithin(accountId, distance, minAge, maxAge, gender, AppConstant.LIMIT,
+                                        AppConstant.LIMIT * account.getIndex(), location);
+    }
+
+    @Override
+    public Account findWithQuestions(UUID accountId) {
+        Account account = accountDAO.findByIdWithQuestions(accountId);
+        checkIfBlocked(account);
+        return account;
     }
 
     @Override

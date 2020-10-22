@@ -9,9 +9,13 @@ import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointE
 import com.beeswork.balanceaccountservice.exception.match.MatchExistsException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
+import com.beeswork.balanceaccountservice.response.ExceptionResponse;
 import com.beeswork.balanceaccountservice.util.Convert;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.Http;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,16 +23,22 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 @RestControllerAdvice(annotations = RestController.class)
 public class ExceptionControllerAdvice {
 
     private final Convert convert;
+    private final MessageSource messageSource;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public ExceptionControllerAdvice(Convert convert) {
+    public ExceptionControllerAdvice(Convert convert, MessageSource messageSource, ObjectMapper objectMapper) {
         this.convert = convert;
+        this.messageSource = messageSource;
+        this.objectMapper = objectMapper;
     }
 
 //  TEST 1. if exception is thrown inside handleNotFoundException, then it will throw handleNotFoundException not route to General Exception handler
@@ -38,17 +48,29 @@ public class ExceptionControllerAdvice {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(convert.exceptionToJSON(exception.getExceptionCode(), locale));
+                             .body(exceptionResponse(HttpStatus.NOT_FOUND.value(), exception.getExceptionCode(), locale));
     }
 
     @ExceptionHandler({AccountInvalidException.class, SwipeClickedExistsException.class, AccountShortOfPointException.class,
                        MatchExistsException.class, BadRequestException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(convert.exceptionToJSON(exception.getExceptionCode(), locale));
+                             .body(exceptionResponse(HttpStatus.BAD_REQUEST.value(), exception.getExceptionCode(), locale));
     }
+
+    private String exceptionResponse(int httpStatus, String exceptionCode, Locale locale) throws JsonProcessingException {
+
+        String exceptionMessage = messageSource.getMessage(exceptionCode, null, locale);
+        ExceptionResponse exceptionResponse = new ExceptionResponse(httpStatus, exceptionCode, exceptionMessage, null);
+        return objectMapper.writeValueAsString(exceptionResponse);
+    }
+
+
+
+
 
 //    @ExceptionHandler({QueryException.class})
 //    public ResponseEntity<String> handleQueryException(QueryException exception, Locale locale) {

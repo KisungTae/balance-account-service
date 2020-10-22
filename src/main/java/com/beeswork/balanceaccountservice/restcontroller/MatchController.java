@@ -2,7 +2,6 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.match.UnmatchDTO;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
-import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.match.MatchService;
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
@@ -19,9 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.OffsetDateTime;
 import java.util.Date;
-import java.util.List;
 
 @Validated
 @RestController
@@ -51,7 +48,7 @@ public class MatchController extends BaseController {
                                           BindingResult bindingResult)
     throws JsonProcessingException, AccountInvalidException {
 
-        if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
+        if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
         matchService.unmatch(modelMapper.map(unmatchVM, UnmatchDTO.class));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }

@@ -41,7 +41,7 @@ public class BalanceAccountServiceApplication {
 //				 20. when save account block, transaction should be [] to prevent block field to be overwritten by saving profiles or rep_photo_key
 //				 21. I have added email in LocationDTO and locationVM, AccountQuestionSaveVM and DTO, Recommend()
 //				 22. check if email id empty at controller
-//				 23.
+//				 23. FCMService send notification should be async
 
 
 

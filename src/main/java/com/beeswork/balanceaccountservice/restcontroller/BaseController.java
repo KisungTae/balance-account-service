@@ -1,5 +1,7 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.constant.ExceptionCode;
+import com.beeswork.balanceaccountservice.response.ExceptionResponse;
 import com.beeswork.balanceaccountservice.util.Convert;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,11 +24,17 @@ public class BaseController {
         this.modelMapper = modelMapper;
     }
 
-    public ResponseEntity<String> fieldErrorsResponse(BindingResult bindingResult) throws JsonProcessingException {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<String> fieldExceptionResponse(BindingResult bindingResult) throws JsonProcessingException {
+
+        Map<String, String> fieldErrors = new HashMap<>();
         for (FieldError fieldError : bindingResult.getFieldErrors())
-            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(errors));
+            fieldErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
+
+        ExceptionResponse exceptionResponse = new ExceptionResponse(HttpStatus.BAD_REQUEST.value(),
+                                                                    ExceptionCode.FIELD_EXCEPTION,
+                                                                    "",
+                                                                    fieldErrors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(exceptionResponse));
     }
 
 

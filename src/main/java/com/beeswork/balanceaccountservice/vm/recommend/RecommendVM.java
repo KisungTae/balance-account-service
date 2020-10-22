@@ -21,7 +21,8 @@ public class RecommendVM {
     @Email
     private String email;
 
-//    @Size(min = 1000, max = 10000)
+    @Min(1000)
+    @Max(10000)
     private int distance;
 
     private int minAge;

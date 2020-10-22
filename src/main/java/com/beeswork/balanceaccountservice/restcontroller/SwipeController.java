@@ -39,7 +39,7 @@ public class SwipeController extends BaseController {
     throws AccountNotFoundException, AccountInvalidException, SwipeClickedExistsException, JsonProcessingException,
            AccountShortOfPointException, AccountBlockedException {
 
-        if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
+        if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
         BalanceGameDTO balanceGameDTO = swipeService.swipe(modelMapper.map(swipeVM, SwipeDTO.class));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(balanceGameDTO));
     }

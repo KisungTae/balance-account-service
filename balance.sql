@@ -198,10 +198,6 @@ create table account
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
 
-select *
-from account;
-
-
 CREATE INDEX account_location_idx ON account USING GIST (location);
 
 
@@ -434,8 +430,19 @@ create table chat_message
 );
 
 
+
+
+
+select *
+from account;
+
+
+
+update account set enabled = false where id = '7fabe7e0-b386-4759-a121-0eb1b7387ae7';
+
 select *
 from account
-where fcm_token != '';
+where id = '7fabe7e0-b386-4759-a121-0eb1b7387ae7';
 
-update account set fcm_token = '' where id = 'f8f1f36d-161f-48a4-a433-6c98e06d95b2'
+
+-- 0101000020E6100000A4FFE55AB4B35F40E122145B41BD4240

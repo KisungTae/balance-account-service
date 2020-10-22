@@ -24,8 +24,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.IOException;
-import java.util.Locale;
 
 @RestController
 @RequestMapping("/account")
@@ -43,24 +41,24 @@ public class AccountController extends BaseController {
         this.accountService = accountService;
     }
 
-    @PostMapping("/save")
-    public ResponseEntity<String> saveAccount(@Valid @RequestBody AccountVM accountVM,
-                                              BindingResult bindingResult)
-    throws JsonProcessingException, AccountNotFoundException, QuestionNotFoundException {
-
-        if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
-        accountService.save(modelMapper.map(accountVM, AccountDTO.class));
-        return ResponseEntity.status(HttpStatus.OK).body("");
-    }
+//    @PostMapping("/save")
+//    public ResponseEntity<String> saveAccount(@Valid @RequestBody AccountVM accountVM,
+//                                              BindingResult bindingResult)
+//    throws JsonProcessingException, AccountNotFoundException, QuestionNotFoundException {
+//
+//        if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
+//        accountService.save(modelMapper.map(accountVM, AccountDTO.class));
+//        return ResponseEntity.status(HttpStatus.OK).body("");
+//    }
 
     @PostMapping("/profile/save")
     public ResponseEntity<String> saveProfile(@Valid @RequestBody AccountVM accountVM,
                                               BindingResult bindingResult)
     throws JsonProcessingException, AccountNotFoundException {
 
-        if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
+        if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
         accountService.saveProfile(modelMapper.map(accountVM, AccountDTO.class));
-        return ResponseEntity.status(HttpStatus.OK).body("");
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
     @PostMapping("/questions/save")
@@ -68,7 +66,7 @@ public class AccountController extends BaseController {
                                                 BindingResult bindingResult)
     throws QuestionNotFoundException, AccountNotFoundException, JsonProcessingException {
 
-        if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
+        if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
         accountService.saveQuestions(modelMapper.map(accountQuestionSaveVM, AccountQuestionSaveDTO.class));
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
@@ -78,7 +76,7 @@ public class AccountController extends BaseController {
                                                BindingResult bindingResult)
     throws JsonProcessingException, AccountNotFoundException {
 
-        if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
+        if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
         accountService.saveLocation(modelMapper.map(locationVM, LocationDTO.class));
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
@@ -88,7 +86,7 @@ public class AccountController extends BaseController {
                                                BindingResult bindingResult)
     throws JsonProcessingException, AccountNotFoundException, AccountInvalidException {
 
-        if (bindingResult.hasErrors()) return super.fieldErrorsResponse(bindingResult);
+        if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
         accountService.saveFCMToken(modelMapper.map(fcmTokenVM, FCMTokenDTO.class));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }

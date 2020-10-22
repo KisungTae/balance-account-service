@@ -18,4 +18,6 @@ public class ExceptionCode {
     public static final String SWIPE_NOT_FOUND_EXCEPTION      = "swipe.not.found.exception";
 
     public static final String MATCH_EXISTS_EXCEPTION = "match.exists.exception";
+
+    public static final String FIELD_EXCEPTION = "field.exception";
 }

@@ -22,24 +22,25 @@ public class AccountVM {
     @ValidUUID
     private String id;
 
+    @NotEmpty(message = "{email.empty}")
+    @Email(message = "{email.invalid}")
+    private String email;
+
     @NotEmpty(message = "{name.empty}")
     @Length(min = 1, max = 50, message = "{name.length}")
     private String name;
 
+    @NotNull(message = "{birth.null}")
     private Date birth;
-
-    @NotEmpty(message = "{email.empty}")
-    @Email(message = "{email.invalid}")
-    private String email;
 
     @NotEmpty(message = "{about.empty}")
     @Length(min = 1, max = 500, message = "{about.length}")
     private String about;
 
-    private boolean gender;
+    @NotNull(message = "{gender.null}")
+    private Boolean gender;
 
     private double latitude;
-
     private double longitude;
 
 }
