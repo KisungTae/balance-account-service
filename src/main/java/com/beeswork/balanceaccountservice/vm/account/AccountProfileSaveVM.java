@@ -16,15 +16,7 @@ import java.util.*;
 
 @Getter
 @Setter
-public class AccountVM {
-
-    @NotEmpty(message = "{uuid.empty}")
-    @ValidUUID
-    private String id;
-
-    @NotEmpty(message = "{email.empty}")
-    @Email(message = "{email.invalid}")
-    private String email;
+public class AccountProfileSaveVM extends AccountIdentityVM {
 
     @NotEmpty(message = "{name.empty}")
     @Length(min = 1, max = 50, message = "{name.length}")
@@ -39,8 +31,5 @@ public class AccountVM {
 
     @NotNull(message = "{gender.null}")
     private Boolean gender;
-
-    private double latitude;
-    private double longitude;
 
 }

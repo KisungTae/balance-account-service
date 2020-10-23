@@ -42,6 +42,8 @@ public class BalanceAccountServiceApplication {
 //				 21. I have added email in LocationDTO and locationVM, AccountQuestionSaveVM and DTO, Recommend()
 //				 22. check if email id empty at controller
 //				 23. FCMService send notification should be async
+//				 24. minus point after checking the answers of balancegame
+//				 25. check fcm location update when saving profile can be overwritten by saving profiles
 
 
 

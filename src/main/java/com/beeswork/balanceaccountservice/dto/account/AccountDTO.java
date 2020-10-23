@@ -18,8 +18,6 @@ public class AccountDTO {
     private Date birth;
     private String about;
     private boolean gender;
-    private double latitude;
-    private double longitude;
 
     private List<AccountQuestionDTO> accountQuestionDTOs = new ArrayList<>();
 }

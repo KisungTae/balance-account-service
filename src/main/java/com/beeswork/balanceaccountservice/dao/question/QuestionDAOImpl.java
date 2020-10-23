@@ -21,8 +21,28 @@ public class QuestionDAOImpl extends BaseDAOImpl<Question> implements QuestionDA
         super(entityManager, jpaQueryFactory);
     }
 
+    @Override
+    public Question findById(long questionId) {
+        return jpaQueryFactory.selectFrom(qQuestion).where(qQuestion.id.eq(questionId)).fetchOne();
+    }
+
+    @Override
     public List<Question> findAllByIds(List<Long> ids) {
         return jpaQueryFactory.selectFrom(qQuestion).where(qQuestion.id.in(ids)).fetch();
+    }
+
+    @Override
+    public Question findNthNotIn(List<Long> questionIds, int offset) {
+        return jpaQueryFactory.selectFrom(qQuestion)
+                              .where(qQuestion.id.notIn(questionIds))
+                              .offset(offset)
+                              .limit(1)
+                              .fetchOne();
+    }
+
+    @Override
+    public long count() {
+        return jpaQueryFactory.selectFrom(qQuestion).fetchCount();
     }
 
 

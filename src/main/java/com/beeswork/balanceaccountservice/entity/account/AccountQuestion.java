@@ -42,6 +42,16 @@ public class AccountQuestion {
     @MapsId("questionId")
     private Question question;
 
+    public AccountQuestion(Account account, Question question, boolean selected, int sequence, Date createdAt, Date updatedAt) {
+        this.accountQuestionId = new AccountQuestionId(account.getId(), question.getId());
+        this.selected = selected;
+        this.sequence = sequence;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.account = account;
+        this.question = question;
+    }
+
     public UUID getAccountId() {
         return accountQuestionId.getAccountId();
     }

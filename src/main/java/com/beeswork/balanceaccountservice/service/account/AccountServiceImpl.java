@@ -5,10 +5,8 @@ import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
 import com.beeswork.balanceaccountservice.dto.account.*;
-import com.beeswork.balanceaccountservice.dto.firebase.FCMTokenDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
-import com.beeswork.balanceaccountservice.entity.account.AccountQuestionId;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
@@ -24,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImpl extends BaseServiceImpl implements AccountService, AccountInterService {
@@ -38,8 +35,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Autowired
     public AccountServiceImpl(AccountDAO accountDAO,
                               ModelMapper modelMapper,
-                              QuestionDAO questionDAO,
-                              GeometryFactory geometryFactory) {
+                              QuestionDAO questionDAO, GeometryFactory geometryFactory) {
         super(modelMapper);
         this.accountDAO = accountDAO;
         this.questionDAO = questionDAO;
@@ -71,52 +67,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         if (account.isBlocked()) throw new AccountBlockedException();
     }
 
-    //  DESC 1. when registering, an account will be created with enabled = false, then when finish profiles,
-    //          it will update enabled = true because users might get cards for which profile has not been updated
-    //  TEST 2. save account without any changes but changes in accountQuestions --> Hibernate does not publish update DML for unchanged account even if you change accountQuestions
-    //  TEST 3. save account without accountQuestions with modemapper --> modelmapper call setAccountQuestions and Hibernate recognizes this call and
-    //          update persistence context which will delete all accountQuestions. Without modelmapper and update account fields only
-    //          then Hibernate won't delete accountQuestions even if their size = 0
-    @Override
-    @Transactional
-    public void saveProfile(AccountDTO accountDTO) {
-        Account account = findValid(UUID.fromString(accountDTO.getId()), accountDTO.getEmail());
-
-        if (!account.isEnabled()) {
-            account.setName(accountDTO.getName());
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(account.getBirth());
-
-            account.setBirthYear(calendar.get(Calendar.YEAR));
-            account.setBirth(accountDTO.getBirth());
-            account.setGender(accountDTO.isGender());
-        }
-
-        account.setAbout(accountDTO.getAbout());
-        account.setUpdatedAt(new Date());
-        account.setEnabled(true);
-        account.setLocation(geometryFactory.createPoint(new Coordinate(accountDTO.getLongitude(), accountDTO.getLatitude())));
-
-//        accountDAO.persist(account);
-    }
-
-    @Override
-    @Transactional
-    public void saveLocation(LocationDTO locationDTO) {
-        Account account = findValid(UUID.fromString(locationDTO.getAccountId()), locationDTO.getEmail());
-        account.setLocation(geometryFactory.createPoint(new Coordinate(locationDTO.getLongitude(), locationDTO.getLatitude())));
-        accountDAO.persist(account);
-    }
-
-    @Override
-    @Transactional
-    public void saveFCMToken(FCMTokenDTO fcmTokenDTO) {
-        Account account = findValid(UUID.fromString(fcmTokenDTO.getAccountId()), fcmTokenDTO.getEmail());
-        account.setFcmToken(fcmTokenDTO.getToken());
-        accountDAO.persist(account);
-    }
-
     @Override
     @Transactional
     public void save(AccountDTO accountDTO) {
@@ -125,8 +75,46 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     }
 
+    //  DESC 1. when registering, an account will be created with enabled = false, then when finish profiles,
+    //          it will update enabled = true because users might get cards for which profile has not been updated
+    //  TEST 2. save account without any changes but changes in accountQuestions --> Hibernate does not publish update DML for unchanged account even if you change accountQuestions
+    //  TEST 3. save account without accountQuestions with modemapper --> modelmapper call setAccountQuestions and Hibernate recognizes this call and
+    //          update persistence context which will delete all accountQuestions. Without modelmapper and update account fields only
+    //          then Hibernate won't delete accountQuestions even if their size = 0
+    @Override
+    @Transactional
+    public void saveProfile(String accountId, String email, String name, Date birth, String about, boolean gender) {
+        Account account = findValid(UUID.fromString(accountId), email);
 
+        if (!account.isEnabled()) {
+            account.setName(name);
 
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(account.getBirth());
+
+            account.setBirthYear(calendar.get(Calendar.YEAR));
+            account.setBirth(birth);
+            account.setGender(gender);
+        }
+
+        account.setAbout(about);
+        account.setUpdatedAt(new Date());
+        account.setEnabled(true);
+    }
+
+    @Override
+    @Transactional
+    public void saveLocation(String accountId, String email, double latitude, double longitude) {
+        Account account = findValid(UUID.fromString(accountId), email);
+        account.setLocation(geometryFactory.createPoint(new Coordinate(latitude, longitude)));
+    }
+
+    @Override
+    @Transactional
+    public void saveFCMToken(String accountId, String email, String token) {
+        Account account = findValid(UUID.fromString(accountId), email);
+        account.setFcmToken(token);
+    }
 
     //  TEST 1. save accountQuestionDTOs without setAccount() and setQuestion() --> Hibernate does not insert those objects, no exception thrown
     //  TEST 2. create new accountQuestionDTO with the same AccountQuestionId --> Hibernate throws exception of creating two object with the same Id
@@ -134,59 +122,27 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          accountQuestions to check if it needs to remove or insert or update entities
     @Override
     @Transactional
-    public void saveQuestions(AccountQuestionSaveDTO accountQuestionSaveDTO) {
+    public void saveQuestions(String accountId, String email, List<AccountQuestionDTO> accountQuestionDTOs) {
+        Account account = accountDAO.findByIdWithAccountQuestions(UUID.fromString(accountId));
+        checkIfValid(account, email);
+        account.getAccountQuestions().clear();
 
-        List<AccountQuestionDTO> accountQuestionDTOs = accountQuestionSaveDTO.getAccountQuestionDTOs();
+        for (AccountQuestionDTO accountQuestionDTO : accountQuestionDTOs) {
+            Question question = questionDAO.findById(accountQuestionDTO.getQuestionId());
+            if (question == null) throw new QuestionNotFoundException();
 
-        Account account = accountDAO.findByIdWithAccountQuestions(accountQuestionSaveDTO.getAccountId());
-        checkIfValid(account, accountQuestionSaveDTO.getEmail());
-
-        List<AccountQuestion> accountQuestions = account.getAccountQuestions();
-
-        for (int i = accountQuestions.size() - 1; i >= 0; i--) {
-            AccountQuestion accountQuestion = accountQuestions.get(i);
-            AccountQuestionDTO accountQuestionDTO = accountQuestionDTOs.stream()
-                                                                       .filter(a -> a.getQuestionId() ==
-                                                                               accountQuestion.getQuestionId())
-                                                                       .findFirst()
-                                                                       .orElse(null);
-
-            if (accountQuestionDTO == null) accountQuestions.remove(accountQuestion);
-            else {
-                modelMapper.map(accountQuestionDTO, accountQuestion);
-                accountQuestion.setUpdatedAt(new Date());
-                accountQuestionDTOs.remove(accountQuestionDTO);
-            }
-        }
-
-
-        List<Long> questionIds = accountQuestionDTOs.stream()
-                                                    .map(AccountQuestionDTO::getQuestionId)
-                                                    .collect(Collectors.toList());
-
-        List<Question> questions = questionDAO.findAllByIds(questionIds);
-
-        for (int i = accountQuestionDTOs.size() - 1; i >= 0; i--) {
-            AccountQuestionDTO accountQuestionDTO = accountQuestionDTOs.get(i);
-            Question question = questions.stream()
-                                         .filter(q -> q.getId() == accountQuestionDTO.getQuestionId())
-                                         .findFirst()
-                                         .orElseThrow(QuestionNotFoundException::new);
-
-            AccountQuestion accountQuestion = modelMapper.map(accountQuestionDTO, AccountQuestion.class);
-            accountQuestion.setAccountQuestionId(new AccountQuestionId(account.getId(), question.getId()));
-            accountQuestion.setAccount(account);
-            accountQuestion.setQuestion(question);
-            accountQuestion.setCreatedAt(new Date());
-            accountQuestion.setUpdatedAt(new Date());
-            accountQuestions.add(accountQuestion);
-            accountQuestionDTOs.remove(accountQuestionDTO);
+            Date date = new Date();
+            account.getAccountQuestions().add(new AccountQuestion(account,
+                                                                  question,
+                                                                  accountQuestionDTO.isSelected(),
+                                                                  accountQuestionDTO.getSequence(),
+                                                                  date,
+                                                                  date));
         }
     }
 
     @Override
     public List<Object[]> findAllWithin(UUID accountId, String email, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude) {
-
         Account account = findValid(accountId, email);
         Point location = geometryFactory.createPoint(new Coordinate(longitude, latitude));
         location.setSRID(AppConstant.SRID);

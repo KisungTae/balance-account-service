@@ -150,10 +150,9 @@ drop table match;
 drop table swipe;
 drop table admin;
 drop table photo_info;
-drop table  chat_message;
+drop table chat_message;
 drop table chat;
 drop table account;
-
 
 
 
@@ -174,6 +173,7 @@ create table account_type
 -- liked count will be reset on every night
 create table account
 (
+    version                  int                    not null,
     id                       uuid primary key default uuid_generate_v4(),
     enabled                  boolean                not null,
     blocked                  boolean                not null,
@@ -197,6 +197,7 @@ create table account
 
     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
+
 
 CREATE INDEX account_location_idx ON account USING GIST (location);
 
@@ -431,18 +432,9 @@ create table chat_message
 
 
 
-
-
-select *
-from account;
-
-
-
-update account set enabled = false where id = '7fabe7e0-b386-4759-a121-0eb1b7387ae7';
-
 select *
 from account
-where id = '7fabe7e0-b386-4759-a121-0eb1b7387ae7';
+    where id = '27a28b07-44f8-40af-813d-bf0e8db69010';
 
+update account set enabled = false where id = '27a28b07-44f8-40af-813d-bf0e8db69010'
 
--- 0101000020E6100000A4FFE55AB4B35F40E122145B41BD4240

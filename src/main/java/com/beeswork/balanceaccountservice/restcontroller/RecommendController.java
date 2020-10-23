@@ -34,7 +34,6 @@ public class RecommendController extends BaseController {
     public ResponseEntity<String> recommend(@Valid @ModelAttribute RecommendVM recommendVM,
                                             BindingResult bindingResult)
     throws AccountNotFoundException, JsonProcessingException {
-
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
         List<CardDTO> cardDTOs = recommendService.recommend(modelMapper.map(recommendVM, RecommendDTO.class));

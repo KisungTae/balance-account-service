@@ -16,8 +16,16 @@ import javax.persistence.Id;
 @AllArgsConstructor
 public class QuestionDTO {
 
+    private long id;
     private String description;
     private String topOption;
     private String bottomOption;
     private boolean selected;
+
+    public QuestionDTO(String description, String topOption, String bottomOption, boolean selected) {
+        this.description = description;
+        this.topOption = topOption;
+        this.bottomOption = bottomOption;
+        this.selected = selected;
+    }
 }

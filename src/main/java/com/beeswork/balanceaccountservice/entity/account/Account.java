@@ -21,6 +21,9 @@ import java.util.*;
 @Table(name = "account")
 public class Account {
 
+    @Version
+    private int version;
+
     @Id
     @Column(name = "id")
     @GeneratedValue(generator = "UUID")

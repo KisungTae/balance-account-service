@@ -14,7 +14,4 @@ public class AccountQuestionDTO {
     private int sequence;
     private boolean selected;
 
-    public static AccountQuestionDTO findByQuestionId(List<AccountQuestionDTO> accountQuestionDTOs, long questionId) {
-        return accountQuestionDTOs.stream().filter(a -> a.getQuestionId() == questionId).findFirst().orElse(null);
-    }
 }

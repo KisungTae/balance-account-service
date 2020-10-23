@@ -44,7 +44,6 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
 
     @Override
     public Account findByIdWithAccountQuestions(UUID accountId) {
-
         return jpaQueryFactory.selectFrom(qAccount)
                               .innerJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
                               .where(qAccount.id.eq(accountId))
@@ -55,7 +54,6 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     @SuppressWarnings("unchecked")
     public List<Object[]> findAllWithin(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int limit,
                                         int offset, Point point) {
-
         return entityManager.createNativeQuery(
                 "select cast(b.id as varchar), b.name, b.about, b.birth_year, st_distance(b.location, :pivot), p.key " +
                 "from (select * " +
@@ -82,7 +80,6 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
 
     @Override
     public Account findByIdWithQuestions(UUID accountId) {
-
         return jpaQueryFactory.selectFrom(qAccount)
                               .innerJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
                               .innerJoin(qAccountQuestion.question, qQuestion).fetchJoin()
