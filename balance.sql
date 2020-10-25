@@ -430,11 +430,32 @@ create table chat_message
     constraint chat_message_sender_id_fk foreign key (sender_id) references account (id)
 );
 
+select *
+from account
+where id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897';
+
+select *
+from swipe s
+left join match m on s.swiper_id = m.matcher_id and s.swiped_id = m.matched_id
+left join account a on s.swiper_id = a.id
+where s.swiped_id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897'
+and s.clicked = true
+and m.matched_id is null
+and (s.updated_at > '2020-09-23 09:11:46.870000' or a.rep_photo_key_updated_at > '2020-09-23 09:11:46.870000');
+
+
+select *
+from swipe
+where swiped_id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897'
+and id not in (select id from swipe where swiped_id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897' and clicked = true);
+
+select *
+from swipe
+where swiper_id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897'
+and swiped_id = '85766235-d4a2-44b1-b865-29f18882e9be';
 
 
 select *
 from account
-    where id = '27a28b07-44f8-40af-813d-bf0e8db69010';
-
-update account set enabled = false where id = '27a28b07-44f8-40af-813d-bf0e8db69010'
+where id = '85766235-d4a2-44b1-b865-29f18882e9be';
 

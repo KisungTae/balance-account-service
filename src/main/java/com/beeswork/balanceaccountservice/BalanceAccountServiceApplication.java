@@ -44,6 +44,8 @@ public class BalanceAccountServiceApplication {
 //				 23. FCMService send notification should be async
 //				 24. minus point after checking the answers of balancegame
 //				 25. check fcm location update when saving profile can be overwritten by saving profiles
+//				 26. update to have check answers of balancegame and proceeed to create match or not and retunr the result even if it is match
+//				 27. update getClickedList to have last update time as field and remove udpatedAt in the ClickedDTO
 
 
 

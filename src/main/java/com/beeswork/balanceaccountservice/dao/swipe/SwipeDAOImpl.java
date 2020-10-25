@@ -55,7 +55,8 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
                               .fetchCount();
     }
 
-    public List<ClickedProjection> findAllClickedAfter(UUID swipedId, Date fetchedAt) {
+    public List<ClickedProjection>
+    findAllClickedAfter(UUID swipedId, Date fetchedAt) {
 
         Expression<Date> updatedAtCase = new CaseBuilder().when(qSwipe.updatedAt.after(qAccount.repPhotoKeyUpdatedAt))
                                                           .then(qSwipe.updatedAt)

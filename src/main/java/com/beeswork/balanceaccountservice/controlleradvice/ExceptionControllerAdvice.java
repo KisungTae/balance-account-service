@@ -10,6 +10,7 @@ import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointE
 import com.beeswork.balanceaccountservice.exception.match.MatchExistsException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,7 +42,7 @@ public class ExceptionControllerAdvice {
     }
 
     //  TEST 1. if exception is thrown inside handleNotFoundException, then it will throw handleNotFoundException not route to General Exception handler
-    @ExceptionHandler({AccountNotFoundException.class, QuestionNotFoundException.class})
+    @ExceptionHandler({AccountNotFoundException.class, QuestionNotFoundException.class, SwipeNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)
     throws Exception {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)

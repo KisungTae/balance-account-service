@@ -57,10 +57,10 @@ public class SwipeServiceImpl implements SwipeService, SwipeInterService {
         Account swiped = accountInterService.findWithQuestions(swipedUUId);
 
         Swipe swipe = new Swipe(swiper, swiped, false, new Date(), new Date());
-        swiper.getSwipes().add(swipe);
+        swipeDAO.persist(swipe);
 
-        currentPoint -= AppConstant.SWIPE_POINT;
-        swiper.setPoint(currentPoint);
+//        currentPoint -= AppConstant.SWIPE_POINT;
+//        swiper.setPoint(currentPoint);
 
         BalanceGameDTO balanceGameDTO = new BalanceGameDTO();
         balanceGameDTO.setSwipeId(swipe.getId());
@@ -73,7 +73,6 @@ public class SwipeServiceImpl implements SwipeService, SwipeInterService {
                                                       accountQuestion.isSelected());
             balanceGameDTO.getQuestions().add(questionDTO);
         }
-
         return balanceGameDTO;
     }
 
