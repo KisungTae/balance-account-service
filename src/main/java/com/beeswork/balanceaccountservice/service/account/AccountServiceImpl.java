@@ -2,15 +2,13 @@ package com.beeswork.balanceaccountservice.service.account;
 
 
 import com.beeswork.balanceaccountservice.constant.AppConstant;
+import com.beeswork.balanceaccountservice.constant.ColumnIndex;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
 import com.beeswork.balanceaccountservice.dto.account.*;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
-import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
-import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
-import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.locationtech.jts.geom.Coordinate;
@@ -19,13 +17,14 @@ import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
-public class AccountServiceImpl extends BaseServiceImpl implements AccountService, AccountInterService {
-
+public class AccountServiceImpl extends BaseServiceImpl implements AccountService {
 
     private final AccountDAO accountDAO;
     private final QuestionDAO questionDAO;
@@ -40,31 +39,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         this.accountDAO = accountDAO;
         this.questionDAO = questionDAO;
         this.geometryFactory = geometryFactory;
-    }
-
-    @Override
-    public Account findValid(UUID accountId, String email) {
-        Account account = accountDAO.findById(accountId);
-        checkIfValid(account, email);
-        return account;
-    }
-
-    @Override
-    public void checkIfValid(UUID accountId, String email) {
-        Account account = accountDAO.findById(accountId);
-        checkIfValid(account, email);
-    }
-
-    @Override
-    public void checkIfValid(Account account, String email) {
-        checkIfBlocked(account);
-        if (!account.getEmail().equals(email)) throw new AccountInvalidException();
-    }
-
-    @Override
-    public void checkIfBlocked(Account account) {
-        if (account == null) throw new AccountNotFoundException();
-        if (account.isBlocked()) throw new AccountBlockedException();
     }
 
     @Override
@@ -84,7 +58,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void saveProfile(String accountId, String email, String name, Date birth, String about, boolean gender) {
-        Account account = findValid(UUID.fromString(accountId), email);
+
+        Account account = accountDAO.findBy(UUID.fromString(accountId), email);
+        checkIfValid(account);
 
         if (!account.isEnabled()) {
             account.setName(name);
@@ -105,14 +81,18 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void saveLocation(String accountId, String email, double latitude, double longitude) {
-        Account account = findValid(UUID.fromString(accountId), email);
+
+        Account account = accountDAO.findBy(UUID.fromString(accountId), email);
+        checkIfValid(account);
         account.setLocation(geometryFactory.createPoint(new Coordinate(latitude, longitude)));
     }
 
     @Override
     @Transactional
     public void saveFCMToken(String accountId, String email, String token) {
-        Account account = findValid(UUID.fromString(accountId), email);
+
+        Account account = accountDAO.findBy(UUID.fromString(accountId), email);
+        checkIfValid(account);
         account.setFcmToken(token);
     }
 
@@ -123,15 +103,14 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void saveQuestions(String accountId, String email, List<AccountQuestionDTO> accountQuestionDTOs) {
-        Account account = accountDAO.findByIdWithAccountQuestions(UUID.fromString(accountId));
-        checkIfValid(account, email);
+        Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId), email);
+        checkIfValid(account);
         account.getAccountQuestions().clear();
 
+        Date date = new Date();
         for (AccountQuestionDTO accountQuestionDTO : accountQuestionDTOs) {
             Question question = questionDAO.findById(accountQuestionDTO.getQuestionId());
             if (question == null) throw new QuestionNotFoundException();
-
-            Date date = new Date();
             account.getAccountQuestions().add(new AccountQuestion(account,
                                                                   question,
                                                                   accountQuestionDTO.isSelected(),
@@ -141,24 +120,42 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         }
     }
 
+    // TEST 1. matches are mapped by matcher_id not matched_id
     @Override
-    public List<Object[]> findAllWithin(UUID accountId, String email, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude) {
-        Account account = findValid(accountId, email);
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public List<CardDTO> recommend(String accountId, String email, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude) {
+
+        Account account = accountDAO.findBy(UUID.fromString(accountId), email);
+        checkIfValid(account);
         Point location = geometryFactory.createPoint(new Coordinate(longitude, latitude));
         location.setSRID(AppConstant.SRID);
-        return accountDAO.findAllWithin(accountId, distance, minAge, maxAge, gender, AppConstant.LIMIT,
-                                        AppConstant.LIMIT * account.getIndex(), location);
+        List<Object[]> accounts = accountDAO.findAllWithin(distance, minAge, maxAge, gender, AppConstant.LIMIT,
+                                                           account.getIndex() * AppConstant.LIMIT, location);
+
+        String previousId = "";
+        List<CardDTO> cardDTOs = new ArrayList<>();
+        CardDTO cardDTO = new CardDTO();
+
+        for (Object[] cAccount : accounts) {
+            String id = cAccount[ColumnIndex.ACCOUNT_PROFILE_ID].toString();
+            if (!previousId.equals(id)) {
+
+                cardDTOs.add(cardDTO);
+                previousId = id;
+
+                String name = cAccount[ColumnIndex.ACCOUNT_PROFILE_NAME].toString();
+                String about = cAccount[ColumnIndex.ACCOUNT_PROFILE_ABOUT].toString();
+                int birthYear = Integer.parseInt(cAccount[ColumnIndex.ACCOUNT_PROFILE_BIRTH_YEAR].toString());
+                int distanceBetween = (int) ((double) cAccount[ColumnIndex.ACCOUNT_PROFILE_DISTANCE]);
+
+                cardDTO = new CardDTO(id, name, about, birthYear, distanceBetween);
+            }
+            cardDTO.getPhotos().add(cAccount[ColumnIndex.ACCOUNT_PROFILE_PHOTO_KEY].toString());
+        }
+
+        cardDTOs.add(cardDTO);
+        cardDTOs.remove(0);
+        return cardDTOs;
     }
 
-    @Override
-    public Account findWithQuestions(UUID accountId) {
-        Account account = accountDAO.findByIdWithQuestions(accountId);
-        checkIfBlocked(account);
-        return account;
-    }
-
-    @Override
-    public void persist(Account account) {
-        accountDAO.persist(account);
-    }
 }

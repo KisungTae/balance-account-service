@@ -1,6 +1,5 @@
 package com.beeswork.balanceaccountservice.config;
 
-import com.beeswork.balanceaccountservice.dto.account.AccountQuestionSaveDTO;
 import com.beeswork.balanceaccountservice.vm.account.AccountQuestionSaveVM;
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;

@@ -12,8 +12,6 @@ import java.util.UUID;
 public interface SwipeDAO extends BaseDAO<Swipe> {
 
     Swipe findByIdWithAccounts(Long swipeId, UUID swiperId, UUID swipedId) throws SwipeNotFoundException;
-
-    Long countByClicked(UUID swiperId, UUID swipedId, boolean clicked);
-
+    boolean existsByClicked(UUID swiperId, UUID swipedId, boolean clicked);
     List<ClickedProjection> findAllClickedAfter(UUID swipedId, Date fetchedAt);
 }

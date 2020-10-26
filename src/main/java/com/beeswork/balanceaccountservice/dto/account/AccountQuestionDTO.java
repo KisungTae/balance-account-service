@@ -13,5 +13,4 @@ public class AccountQuestionDTO {
     private long questionId;
     private int sequence;
     private boolean selected;
-
 }

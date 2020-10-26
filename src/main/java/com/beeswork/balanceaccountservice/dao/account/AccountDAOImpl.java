@@ -8,6 +8,8 @@ import com.beeswork.balanceaccountservice.entity.match.QMatch;
 import com.beeswork.balanceaccountservice.entity.photo.QPhoto;
 import com.beeswork.balanceaccountservice.entity.question.QQuestion;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,29 +33,37 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     }
 
     @Override
-    public Long countByEmail(UUID accountId, String email) {
-        return jpaQueryFactory.selectFrom(qAccount)
-                              .where(qAccount.id.eq(accountId).and(qAccount.email.eq(email)))
-                              .fetchCount();
+    public Account findBy(UUID accountId, String email) {
+        return jpaQueryFactory.selectFrom(qAccount).where(validAccount(accountId, email)).fetchOne();
     }
 
     @Override
-    public Account findById(UUID accountId) {
-        return jpaQueryFactory.selectFrom(qAccount).where(qAccount.id.eq(accountId)).fetchOne();
-    }
-
-    @Override
-    public Account findByIdWithAccountQuestions(UUID accountId) {
+    public Account findWithAccountQuestions(UUID accountId, String email) {
         return jpaQueryFactory.selectFrom(qAccount)
                               .innerJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
-                              .where(qAccount.id.eq(accountId))
+                              .where(validAccount(accountId, email))
                               .fetchOne();
     }
 
     @Override
+    public Account findWithQuestions(UUID accountId, String email) {
+        return jpaQueryFactory.selectFrom(qAccount)
+                              .innerJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
+                              .innerJoin(qAccountQuestion.question, qQuestion).fetchJoin()
+                              .where(validAccount(accountId, email))
+                              .fetchOne();
+    }
+
+    @Override
+    public boolean existsBy(UUID accountId, String email, boolean blocked) {
+        return jpaQueryFactory.selectFrom(qAccount)
+                              .where(qAccount.id.eq(accountId).and(qAccount.email.eq(email)).and(qAccount.blocked.eq(blocked)))
+                              .fetchCount() > 0;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
-    public List<Object[]> findAllWithin(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int limit,
-                                        int offset, Point point) {
+    public List<Object[]> findAllWithin(int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point point) {
         return entityManager.createNativeQuery(
                 "select cast(b.id as varchar), b.name, b.about, b.birth_year, st_distance(b.location, :pivot), p.key " +
                 "from (select * " +
@@ -78,13 +88,12 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
                             .getResultList();
     }
 
-    @Override
-    public Account findByIdWithQuestions(UUID accountId) {
-        return jpaQueryFactory.selectFrom(qAccount)
-                              .innerJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
-                              .innerJoin(qAccountQuestion.question, qQuestion).fetchJoin()
-                              .where(qAccount.id.eq(accountId))
-                              .fetchOne();
+    private BooleanBuilder validAccount(UUID accountId, String email) {
+        BooleanBuilder where = new BooleanBuilder();
+        where.and(qAccount.id.eq(accountId));
+        where.and(qAccount.blocked.eq(true));
+        if (email != null) where.and(qAccount.email.eq(email));
+        return where;
     }
 
 

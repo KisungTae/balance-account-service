@@ -46,6 +46,7 @@ public class BalanceAccountServiceApplication {
 //				 25. check fcm location update when saving profile can be overwritten by saving profiles
 //				 26. update to have check answers of balancegame and proceeed to create match or not and retunr the result even if it is match
 //				 27. update getClickedList to have last update time as field and remove udpatedAt in the ClickedDTO
+//				 28. consider whether to put {error.message} in vm's fields
 
 
 

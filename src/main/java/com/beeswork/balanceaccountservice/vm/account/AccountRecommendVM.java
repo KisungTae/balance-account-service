@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.vm.recommend;
+package com.beeswork.balanceaccountservice.vm.account;
 
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
 import lombok.Getter;
@@ -11,15 +11,7 @@ import javax.validation.constraints.*;
 
 @Getter
 @Setter
-public class RecommendVM {
-
-    @NotEmpty
-    @ValidUUID
-    private String accountId;
-
-    @NotEmpty
-    @Email
-    private String email;
+public class AccountRecommendVM extends AccountIdentityVM {
 
     @Min(1000)
     @Max(10000)

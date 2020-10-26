@@ -35,6 +35,7 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
 
     @Override
     public Swipe findByIdWithAccounts(Long swipeId, UUID swiperId, UUID swipedId) throws SwipeNotFoundException {
+
         Swipe swipe = jpaQueryFactory.selectFrom(qSwipe)
                                      .innerJoin(qSwipe.swiper, qAccount).fetchJoin()
                                      .innerJoin(qSwipe.swiped, qAccount).fetchJoin()
@@ -47,16 +48,16 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
     @Override
-    public Long countByClicked(UUID swiperId, UUID swipedId, boolean clicked) {
+    public boolean existsByClicked(UUID swiperId, UUID swipedId, boolean clicked) {
+
         return jpaQueryFactory.selectFrom(qSwipe)
                               .where(qSwipe.swiperId.eq(swiperId)
                                                     .and(qSwipe.swipedId.eq(swipedId))
                                                     .and(qSwipe.clicked.eq(clicked)))
-                              .fetchCount();
+                              .fetchCount() > 0;
     }
 
-    public List<ClickedProjection>
-    findAllClickedAfter(UUID swipedId, Date fetchedAt) {
+    public List<ClickedProjection> findAllClickedAfter(UUID swipedId, Date fetchedAt) {
 
         Expression<Date> updatedAtCase = new CaseBuilder().when(qSwipe.updatedAt.after(qAccount.repPhotoKeyUpdatedAt))
                                                           .then(qSwipe.updatedAt)
