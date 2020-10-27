@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class AccountLocationSaveVM extends AccountIdentityVM {
+public class SaveLocationVM extends AccountIdentityVM {
 
     @NotNull
     private Double latitude;

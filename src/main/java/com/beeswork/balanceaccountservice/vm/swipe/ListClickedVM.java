@@ -9,7 +9,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class SwipeClickedListVM extends AccountIdentityVM {
+public class ListClickedVM extends AccountIdentityVM {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date fetchedAt;

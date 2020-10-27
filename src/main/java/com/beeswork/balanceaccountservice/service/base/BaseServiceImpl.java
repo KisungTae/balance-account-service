@@ -13,6 +13,12 @@ public abstract class BaseServiceImpl {
         this.modelMapper = modelMapper;
     }
 
+    protected void checkIfValid(Account account, String email) {
+        checkIfValid(account);
+        if (email != null && !account.getEmail().equals(email)) throw new AccountInvalidException();
+        if (account.isBlocked()) throw new AccountInvalidException();
+    }
+
     protected void checkIfValid(Account account) {
         if (account == null) throw new AccountInvalidException();
     }

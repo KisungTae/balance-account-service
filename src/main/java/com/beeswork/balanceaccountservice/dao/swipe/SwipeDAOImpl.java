@@ -34,17 +34,15 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
     @Override
-    public Swipe findByIdWithAccounts(Long swipeId, UUID swiperId, UUID swipedId) throws SwipeNotFoundException {
+    public Swipe findWithAccounts(Long swipeId, UUID swiperId, UUID swipedId) throws SwipeNotFoundException {
 
-        Swipe swipe = jpaQueryFactory.selectFrom(qSwipe)
-                                     .innerJoin(qSwipe.swiper, qAccount).fetchJoin()
-                                     .innerJoin(qSwipe.swiped, qAccount).fetchJoin()
-                                     .where(qSwipe.id.eq(swipeId)
-                                                     .and(qSwipe.swiperId.eq(swiperId))
-                                                     .and(qSwipe.swipedId.eq(swipedId)))
-                                     .fetchOne();
-        if (swipe == null) throw new SwipeNotFoundException();
-        return swipe;
+        return jpaQueryFactory.selectFrom(qSwipe)
+                              .innerJoin(qSwipe.swiper, qAccount).fetchJoin()
+                              .innerJoin(qSwipe.swiped, qAccount).fetchJoin()
+                              .where(qSwipe.id.eq(swipeId)
+                                              .and(qSwipe.swiperId.eq(swiperId))
+                                              .and(qSwipe.swipedId.eq(swipedId)))
+                              .fetchOne();
     }
 
     @Override
@@ -74,7 +72,8 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
                                                     .and(qSwipe.clicked.eq(true))
                                                     .and(qMatch.matchedId.isNull())
                                                     .and(qSwipe.updatedAt.after(fetchedAt)
-                                                                         .or(qAccount.repPhotoKeyUpdatedAt.after(fetchedAt))))
+                                                                         .or(qAccount.repPhotoKeyUpdatedAt.after(
+                                                                                 fetchedAt))))
                               .fetch();
     }
 

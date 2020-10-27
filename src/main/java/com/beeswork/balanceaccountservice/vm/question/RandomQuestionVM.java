@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class QuestionRandomVM {
+public class RandomQuestionVM {
 
     @Size(min = 1, max = 6, message = "{current.question.ids.size}")
     private List<Long> currentQuestionIds = new ArrayList<>();

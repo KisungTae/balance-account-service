@@ -32,6 +32,12 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
         super(entityManager, jpaQueryFactory);
     }
 
+//  TODO: removeme
+    @Override
+    public Account findById(UUID accountId) {
+        return jpaQueryFactory.selectFrom(qAccount).where(qAccount.id.eq(accountId)).fetchOne();
+    }
+
     @Override
     public Account findBy(UUID accountId, String email) {
         return jpaQueryFactory.selectFrom(qAccount).where(validAccount(accountId, email)).fetchOne();

@@ -11,7 +11,7 @@ import javax.validation.constraints.*;
 
 @Getter
 @Setter
-public class AccountRecommendVM extends AccountIdentityVM {
+public class RecommendVM extends AccountIdentityVM {
 
     @Min(1000)
     @Max(10000)

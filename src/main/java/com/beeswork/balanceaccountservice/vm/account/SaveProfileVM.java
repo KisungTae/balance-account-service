@@ -16,7 +16,7 @@ import java.util.*;
 
 @Getter
 @Setter
-public class AccountProfileSaveVM extends AccountIdentityVM {
+public class SaveProfileVM extends AccountIdentityVM {
 
     @NotEmpty(message = "{name.empty}")
     @Length(min = 1, max = 50, message = "{name.length}")

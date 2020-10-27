@@ -10,6 +10,7 @@ import java.util.UUID;
 
 public interface AccountDAO extends BaseDAO<Account> {
 
+    Account findById(UUID accountId);
     Account findBy(UUID accountId, String email);
     Account findWithQuestions(UUID accountId, String email);
     Account findWithAccountQuestions(UUID accountId, String email);

@@ -34,95 +34,95 @@ public class AccountController extends BaseController {
     }
 
     @PostMapping("/profile")
-    public ResponseEntity<String> saveProfile(@Valid @RequestBody AccountProfileSaveVM accountProfileSaveVM,
+    public ResponseEntity<String> saveProfile(@Valid @RequestBody SaveProfileVM saveProfileVM,
                                               BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
 
         try {
-            accountService.saveProfile(accountProfileSaveVM.getAccountId(),
-                                       accountProfileSaveVM.getEmail(),
-                                       accountProfileSaveVM.getName(),
-                                       accountProfileSaveVM.getBirth(),
-                                       accountProfileSaveVM.getAbout(),
-                                       accountProfileSaveVM.getGender());
+            accountService.saveProfile(saveProfileVM.getAccountId(),
+                                       saveProfileVM.getEmail(),
+                                       saveProfileVM.getName(),
+                                       saveProfileVM.getBirth(),
+                                       saveProfileVM.getAbout(),
+                                       saveProfileVM.getGender());
         } catch (ObjectOptimisticLockingFailureException exception) {
-            accountService.saveProfile(accountProfileSaveVM.getAccountId(),
-                                       accountProfileSaveVM.getEmail(),
-                                       accountProfileSaveVM.getName(),
-                                       accountProfileSaveVM.getBirth(),
-                                       accountProfileSaveVM.getAbout(),
-                                       accountProfileSaveVM.getGender());
+            accountService.saveProfile(saveProfileVM.getAccountId(),
+                                       saveProfileVM.getEmail(),
+                                       saveProfileVM.getName(),
+                                       saveProfileVM.getBirth(),
+                                       saveProfileVM.getAbout(),
+                                       saveProfileVM.getGender());
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
     @PostMapping("/location")
-    public ResponseEntity<String> saveLocation(@Valid @RequestBody AccountLocationSaveVM accountLocationSaveVM,
+    public ResponseEntity<String> saveLocation(@Valid @RequestBody SaveLocationVM saveLocationVM,
                                                BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
         try {
-            accountService.saveLocation(accountLocationSaveVM.getAccountId(),
-                                        accountLocationSaveVM.getEmail(),
-                                        accountLocationSaveVM.getLatitude(),
-                                        accountLocationSaveVM.getLongitude());
+            accountService.saveLocation(saveLocationVM.getAccountId(),
+                                        saveLocationVM.getEmail(),
+                                        saveLocationVM.getLatitude(),
+                                        saveLocationVM.getLongitude());
         } catch (ObjectOptimisticLockingFailureException exception) {
-            accountService.saveLocation(accountLocationSaveVM.getAccountId(),
-                                        accountLocationSaveVM.getEmail(),
-                                        accountLocationSaveVM.getLatitude(),
-                                        accountLocationSaveVM.getLongitude());
+            accountService.saveLocation(saveLocationVM.getAccountId(),
+                                        saveLocationVM.getEmail(),
+                                        saveLocationVM.getLatitude(),
+                                        saveLocationVM.getLongitude());
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
     @PostMapping("/fcm/token")
-    public ResponseEntity<String> saveFCMToken(@Valid @RequestBody AccountFCMTokenSaveVM accountFCMTokenSaveVM, BindingResult bindingResult)
+    public ResponseEntity<String> saveFCMToken(@Valid @RequestBody SaveFCMTokenVM SaveFCMTokenVM, BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
         try {
-            accountService.saveFCMToken(accountFCMTokenSaveVM.getAccountId(),
-                                        accountFCMTokenSaveVM.getEmail(),
-                                        accountFCMTokenSaveVM.getToken());
+            accountService.saveFCMToken(SaveFCMTokenVM.getAccountId(),
+                                        SaveFCMTokenVM.getEmail(),
+                                        SaveFCMTokenVM.getToken());
         } catch (ObjectOptimisticLockingFailureException exception) {
-            accountService.saveFCMToken(accountFCMTokenSaveVM.getAccountId(),
-                                        accountFCMTokenSaveVM.getEmail(),
-                                        accountFCMTokenSaveVM.getToken());
+            accountService.saveFCMToken(SaveFCMTokenVM.getAccountId(),
+                                        SaveFCMTokenVM.getEmail(),
+                                        SaveFCMTokenVM.getToken());
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
     @PostMapping("/question")
-    public ResponseEntity<String> saveAccountQuestions(@Valid @RequestBody AccountQuestionSaveVM accountQuestionSaveVM,
+    public ResponseEntity<String> saveAccountQuestions(@Valid @RequestBody SaveAccountQuestionVM saveAccountQuestionVM,
                                                 BindingResult bindingResult)
     throws JsonProcessingException {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        accountService.saveQuestions(accountQuestionSaveVM.getAccountId(),
-                                     accountQuestionSaveVM.getEmail(),
-                                     modelMapper.map(accountQuestionSaveVM.getAccountQuestionVMs(),
+        accountService.saveQuestions(saveAccountQuestionVM.getAccountId(),
+                                     saveAccountQuestionVM.getEmail(),
+                                     modelMapper.map(saveAccountQuestionVM.getAccountQuestionVMs(),
                                                      new TypeToken<List<AccountQuestionDTO>>() {}.getType()));
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
     @GetMapping("/recommend")
-    public ResponseEntity<String> recommend(@Valid @ModelAttribute AccountRecommendVM accountRecommendVM, BindingResult bindingResult)
+    public ResponseEntity<String> recommend(@Valid @ModelAttribute RecommendVM recommendVM, BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        List<CardDTO> cardDTOs = accountService.recommend(accountRecommendVM.getAccountId(),
-                                                          accountRecommendVM.getEmail(),
-                                                          accountRecommendVM.getDistance(),
-                                                          accountRecommendVM.getMinAge(),
-                                                          accountRecommendVM.getMaxAge(),
-                                                          accountRecommendVM.isGender(),
-                                                          accountRecommendVM.getLatitude(),
-                                                          accountRecommendVM.getLongitude());
+        List<CardDTO> cardDTOs = accountService.recommend(recommendVM.getAccountId(),
+                                                          recommendVM.getEmail(),
+                                                          recommendVM.getDistance(),
+                                                          recommendVM.getMinAge(),
+                                                          recommendVM.getMaxAge(),
+                                                          recommendVM.isGender(),
+                                                          recommendVM.getLatitude(),
+                                                          recommendVM.getLongitude());
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(cardDTOs));
     }

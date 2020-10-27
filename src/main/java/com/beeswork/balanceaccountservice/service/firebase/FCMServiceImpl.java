@@ -43,6 +43,10 @@ public class FCMServiceImpl implements FCMService {
         FirebaseApp.initializeApp(options);
     }
 
+    public void sendNotification(FCMNotificationDTO fcmNotificationDTO) throws FirebaseMessagingException {
+        sendNotification(fcmNotificationDTO.getToken(), fcmNotificationDTO.getMessages());
+    }
+
     public void sendNotifications(List<FCMNotificationDTO> fcmNotificationDTOs) throws FirebaseMessagingException {
 
         for (FCMNotificationDTO fcmNotificationDTO : fcmNotificationDTOs) {

@@ -1,10 +1,12 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.dto.match.UnmatchDTO;
+import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
+import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.match.MatchService;
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
+import com.beeswork.balanceaccountservice.vm.match.ListMatchesVM;
 import com.beeswork.balanceaccountservice.vm.match.UnmatchVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Date;
+import java.util.List;
 
 @Validated
 @RestController
@@ -33,23 +36,25 @@ public class MatchController extends BaseController {
     }
 
     @GetMapping("/match/list")
-    public ResponseEntity<String> listMatches(@RequestParam("matcherId") @ValidUUID String matcherId,
-                                              @RequestParam("email") String email,
-                                              @RequestParam("fetchedAt")
-                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date fetchedAt)
-    throws JsonProcessingException, AccountInvalidException {
+    public ResponseEntity<String> listMatches(@Valid @ModelAttribute ListMatchesVM listMatchesVM,
+                                              BindingResult bindingResult)
+    throws JsonProcessingException {
 
-        return ResponseEntity.status(HttpStatus.OK)
-                             .body(objectMapper.writeValueAsString(matchService.listMatches(matcherId, email, fetchedAt)));
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+
+        List<MatchProjection> matchProjections = matchService.listMatches(listMatchesVM.getAccountId(),
+                                                                          listMatchesVM.getEmail(),
+                                                                          listMatchesVM.getFetchedAt());
+
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(matchProjections));
     }
 
     @PostMapping("/unmatch")
-    public ResponseEntity<String> unmatch(@Valid @RequestBody UnmatchVM unmatchVM,
-                                          BindingResult bindingResult)
-    throws JsonProcessingException, AccountInvalidException {
+    public ResponseEntity<String> unmatch(@Valid @RequestBody UnmatchVM unmatchVM, BindingResult bindingResult)
+    throws JsonProcessingException {
 
-        if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
-        matchService.unmatch(modelMapper.map(unmatchVM, UnmatchDTO.class));
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        matchService.unmatch(unmatchVM.getAccountId(), unmatchVM.getEmail(), unmatchVM.getUnmatchedId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 

@@ -41,13 +41,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         this.geometryFactory = geometryFactory;
     }
 
-    @Override
-    @Transactional
-    public void save(AccountDTO accountDTO) {
-
-//      TODO: create account with email
-
-    }
 
     //  DESC 1. when registering, an account will be created with enabled = false, then when finish profiles,
     //          it will update enabled = true because users might get cards for which profile has not been updated
@@ -103,11 +96,12 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void saveQuestions(String accountId, String email, List<AccountQuestionDTO> accountQuestionDTOs) {
+
         Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId), email);
         checkIfValid(account);
         account.getAccountQuestions().clear();
-
         Date date = new Date();
+
         for (AccountQuestionDTO accountQuestionDTO : accountQuestionDTOs) {
             Question question = questionDAO.findById(accountQuestionDTO.getQuestionId());
             if (question == null) throw new QuestionNotFoundException();

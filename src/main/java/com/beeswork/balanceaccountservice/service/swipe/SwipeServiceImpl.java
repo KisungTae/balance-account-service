@@ -1,9 +1,12 @@
 package com.beeswork.balanceaccountservice.service.swipe;
 
+import com.beeswork.balanceaccountservice.constant.AppConstant;
+import com.beeswork.balanceaccountservice.constant.NotificationType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
@@ -21,10 +24,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
@@ -83,48 +83,56 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         return swipeDAO.findAllClickedAfter(swipedUUID, fetchedAt);
     }
 
-
     @Override
     @Transactional
-    public List<FCMNotificationDTO> click(ClickDTO clickDTO) {
+    public ClickDTO click(Long swipeId, String swiperId, String swiperEmail, String swipedId, Map<Long, Boolean> answers) {
 
-        UUID swiperUUId = UUID.fromString(clickDTO.getSwiperId());
-        UUID swipedUUId = UUID.fromString(clickDTO.getSwipedId());
+        UUID swiperUUId = UUID.fromString(swiperId);
+        UUID swipedUUId = UUID.fromString(swipedId);
 
-        Swipe swipe = swipeDAO.findByIdWithAccounts(clickDTO.getSwipeId(), swiperUUId, swipedUUId);
-
-        if (swipe.isClicked()) throw new SwipeClickedExistsException();
+        Swipe swipe = swipeDAO.findWithAccounts(swipeId, swiperUUId, swipedUUId);
 
         Account swiper = swipe.getSwiper();
         Account swiped = swipe.getSwiped();
 
-        accountInterService.checkIfValid(swiper, clickDTO.getSwiperEmail());
-        accountInterService.checkIfBlocked(swiped);
+        checkIfValid(swiper, swiperEmail);
+        checkIfValid(swiped, null);
 
-        swipe.setClicked(true);
-        swipeDAO.persist(swipe);
+//        if (swiper.getPoint() < AppConstant.SWIPE_POINT)
+//            throw new AccountShortOfPointException();
 
-        List<FCMNotificationDTO> fcmNotificationDTOs = new ArrayList<>();
+        int point = swiper.getPoint();
+        point -= AppConstant.SWIPE_POINT;
+        swiper.setPoint(point);
+
+        ClickDTO clickDTO = new ClickDTO();
+        clickDTO.setClicked(true);
+
+        for (AccountQuestion accountQuestion : swiped.getAccountQuestions()) {
+            Boolean answer = answers.get(accountQuestion.getQuestionId());
+            if (answer == null || accountQuestion.isSelected() != answer) {
+                clickDTO.setClicked(false);
+                break;
+            }
+        }
+
+        if (!clickDTO.isClicked()) return clickDTO;
 
         // match
-        if (swipeInterService.existsByClicked(swipedUUId, swiperUUId, true)) {
+        if (swipeDAO.existsByClicked(swipedUUId, swiperUUId, true)) {
 
             Chat chat = new Chat();
             Date date = new Date();
-            swipe.getSwiper().getMatches().add(new Match(swiper, swiped, chat, false, date, date));
-            swipe.getSwiped().getMatches().add(new Match(swiped, swiper, chat, false, date, date));
 
-            chatInterService.persist(chat);
-//            accountInterService.persist(swiper);
-//            accountInterService.persist(swiped);
+            swiper.getMatches().add(new Match(swiper, swiped, chat, false, date, date));
+            swiped.getMatches().add(new Match(swiped, swiper, chat, false, date, date));
 
-            fcmNotificationDTOs.add(FCMNotificationDTO.matchNotification(swiper.getFcmToken(), swiped.getRepPhotoKey()));
-            fcmNotificationDTOs.add(FCMNotificationDTO.matchNotification(swiped.getFcmToken(), swiper.getRepPhotoKey()));
-
+            clickDTO.setupAsMatch(swiped.getId(), swiped.getRepPhotoKey(), swiped.getFcmToken());
         } else {
-            fcmNotificationDTOs.add(FCMNotificationDTO.clickedNotification(swiped.getFcmToken(), swiper.getRepPhotoKey()));
+
+            clickDTO.setupAsClicked(swiped.getId(), swiped.getRepPhotoKey(), swiped.getFcmToken());
         }
 
-        return fcmNotificationDTOs;
+        return clickDTO;
     }
 }

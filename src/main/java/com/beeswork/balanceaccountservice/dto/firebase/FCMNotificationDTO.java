@@ -16,19 +16,19 @@ public class FCMNotificationDTO {
     private Map<String, String> messages = new HashMap<>();
 
     public static FCMNotificationDTO matchNotification(String token, String matchedPhotoKey) {
-        return matchNotification(token, NotificationType.MATCH, matchedPhotoKey);
+        return matchNotification(token, NotificationType.MATCH, matchedPhotoKey, "");
     }
 
     public static FCMNotificationDTO clickedNotification(String token, String clickedPhotoKey) {
-        return matchNotification(token, NotificationType.CLICKED, clickedPhotoKey);
+        return matchNotification(token, NotificationType.CLICKED, clickedPhotoKey, "");
     }
 
-    private static FCMNotificationDTO matchNotification(String token, String notificationType, String photoKey) {
+    private static FCMNotificationDTO matchNotification(String token, String notificationType, String photoKey, String message) {
         FCMNotificationDTO fcmNotificationDTO = new FCMNotificationDTO();
         fcmNotificationDTO.setToken(token);
         fcmNotificationDTO.getMessages().put(FCMDataKey.NOTIFICATION_TYPE, notificationType);
         fcmNotificationDTO.getMessages().put(FCMDataKey.PHOTO_KEY, photoKey);
-        fcmNotificationDTO.getMessages().put(FCMDataKey.MESSAGE, "");
+        fcmNotificationDTO.getMessages().put(FCMDataKey.MESSAGE, message);
         return fcmNotificationDTO;
     }
 }
