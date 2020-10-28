@@ -7,7 +7,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BalanceAccountServiceApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(BalanceAccountServiceApplication.class, args);
+
+
 	}
 
 }
@@ -47,6 +50,7 @@ public class BalanceAccountServiceApplication {
 //				 26. update to have check answers of balancegame and proceeed to create match or not and retunr the result even if it is match
 //				 27. update getClickedList to have last update time as field and remove udpatedAt in the ClickedDTO
 //				 28. consider whether to put {error.message} in vm's fields
+//				 29. when token is not valid, Firebase returns error response, put try catch in FCMServiceImpl
 
 
 

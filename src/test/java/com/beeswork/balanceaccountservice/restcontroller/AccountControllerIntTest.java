@@ -27,9 +27,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-//@ExtendWith(SpringExtension.class)
-//@WebMvcTest(AccountController.class)
-//@ContextConfiguration(classes = {ModelMapper.class})
 @SpringBootTest
 @AutoConfigureMockMvc
 class AccountControllerIntTest {
@@ -67,44 +64,4 @@ class AccountControllerIntTest {
         System.out.println("status: " + response.getStatus());
         System.out.println("content: " + mvcResult.getResponse().getContentAsString());
     }
-//
-//    @Autowired
-//    private ObjectMapper objectMapper;
-
-//    @Test
-//    void saveProfile() throws Exception {
-//
-//        Map<String, Object> requestParams = new HashMap<>();
-//        requestParams.put("accountId", "27a28b07-44f8-40af-813d-bf0e8db69010");
-//        requestParams.put("name", "Michael Tae111");
-//        requestParams.put("email", "0@gmail.com");
-//        requestParams.put("birth", "1987-12-10");
-//        requestParams.put("about", "this is michel description1111");
-//        requestParams.put("gender", false);
-//
-//
-//        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/account/profile")
-//                                                              .content(MediaType.APPLICATION_JSON_VALUE)
-//                                                              .content(objectMapper.writeValueAsString(requestParams));
-//
-//        MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();
-//
-//
-//        MockHttpServletResponse response = mvcResult.getResponse();
-//
-//        System.out.println("error message: " + response.getErrorMessage());
-//        System.out.println("status: " + response.getStatus());
-//        System.out.println("content: " + mvcResult.getResponse().getContentAsString());
-//
-//        assertEquals("", mvcResult.getResponse().getContentAsString());
-//    }
-//
-//    public static String asJsonString(final Object obj) {
-//        try {
-//            return new ObjectMapper().writeValueAsString(obj);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
 }

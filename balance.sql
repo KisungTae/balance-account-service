@@ -431,3 +431,4 @@ create table chat_message
 );
 
 
+select * from account;
