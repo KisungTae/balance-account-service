@@ -47,35 +47,24 @@ import java.util.*;
 @RequestMapping("/dummy")
 public class DummyController {
 
-    @Autowired
-    private AWSProperties awsProperties;
-
-    @Autowired
-    private MessageSource messageSource;
-
-    @Autowired
-    private AccountTypeDAO accountTypeRepository;
-
-    @Autowired
-    private MatchDAO matchDAO;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
-    private FCMService fcmService;
+    private final MatchDAO matchDAO;
+    private final ObjectMapper objectMapper;
+    private final FCMService fcmService;
+    private final AccountDAO accountDAO;
+    private final ChatDAO chatDAO;
 
     @Autowired
-    private AccountService accountService;
-
-    @Autowired
-    private AccountDAO accountDAO;
-
-    @Autowired
-    private ChatDAO chatDAO;
+    public DummyController(MatchDAO matchDAO, ObjectMapper objectMapper, FCMService fcmService, AccountDAO accountDAO, ChatDAO chatDAO) {
+        this.matchDAO = matchDAO;
+        this.objectMapper = objectMapper;
+        this.fcmService = fcmService;
+        this.accountDAO = accountDAO;
+        this.chatDAO = chatDAO;
+    }
 
 
     @Transactional

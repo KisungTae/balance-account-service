@@ -35,7 +35,8 @@ public class AccountController extends BaseController {
 
     @PostMapping("/profile")
     public ResponseEntity<String> saveProfile(@Valid @RequestBody SaveProfileVM saveProfileVM,
-                                              BindingResult bindingResult) throws JsonProcessingException {
+                                              BindingResult bindingResult)
+    throws JsonProcessingException {
         if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
 
         try {

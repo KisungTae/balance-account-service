@@ -21,29 +21,8 @@ import java.util.Map;
 @Service
 public class FCMServiceImpl implements FCMService {
 
-    private final FirebaseProperties firebaseProperties;
-
-    @Autowired
-    public FCMServiceImpl(FirebaseProperties firebaseProperties)
-    throws IOException {
-
-        this.firebaseProperties = firebaseProperties;
-        setServiceAccount();
-    }
-
-    private void setServiceAccount() throws IOException {
-
-        FileInputStream serviceAccount = new FileInputStream(firebaseProperties.getServiceAccountKeyPath());
-
-        FirebaseOptions options = FirebaseOptions.builder()
-                                                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                                                 .setDatabaseUrl(firebaseProperties.getDatabaseURL())
-                                                 .build();
-
-        FirebaseApp.initializeApp(options);
-    }
-
     public void sendNotification(FCMNotificationDTO fcmNotificationDTO) throws FirebaseMessagingException {
+
         sendNotification(fcmNotificationDTO.getToken(), fcmNotificationDTO.getMessages());
     }
 
