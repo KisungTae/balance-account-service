@@ -97,7 +97,7 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     private BooleanBuilder validAccount(UUID accountId, String email) {
         BooleanBuilder where = new BooleanBuilder();
         where.and(qAccount.id.eq(accountId));
-        where.and(qAccount.blocked.eq(true));
+        where.and(qAccount.blocked.eq(false));
         if (email != null) where.and(qAccount.email.eq(email));
         return where;
     }
