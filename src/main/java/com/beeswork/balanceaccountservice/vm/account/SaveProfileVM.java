@@ -18,6 +18,9 @@ import java.util.*;
 @Setter
 public class SaveProfileVM extends AccountIdentityVM {
 
+
+//  TEST 1. when a value is invalid for multiple validator, then the last one win
+
     @NotEmpty(message = "{name.empty}")
     @Length(min = 1, max = 50, message = "{name.length}")
     private String name;

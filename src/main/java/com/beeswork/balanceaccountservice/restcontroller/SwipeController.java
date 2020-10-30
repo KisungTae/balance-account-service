@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.BalanceGameDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
@@ -44,11 +45,11 @@ public class SwipeController extends BaseController {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        List<QuestionDTO> questionDTOs = swipeService.swipe(swipeVM.getAccountId(),
-                                                            swipeVM.getEmail(),
-                                                            swipeVM.getSwipedId());
+        BalanceGameDTO balanceGameDTO = swipeService.swipe(swipeVM.getAccountId(),
+                                                           swipeVM.getEmail(),
+                                                           swipeVM.getSwipedId());
 
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(balanceGameDTO));
     }
 
     @GetMapping("/clicked/list")

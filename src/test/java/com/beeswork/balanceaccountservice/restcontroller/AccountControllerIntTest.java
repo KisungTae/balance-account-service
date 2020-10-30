@@ -1,44 +1,27 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.constant.ExceptionCode;
-import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
-import com.beeswork.balanceaccountservice.service.account.AccountService;
-import com.beeswork.balanceaccountservice.vm.account.SaveProfileVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
-import org.modelmapper.internal.asm.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import javax.persistence.EntityManager;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -56,90 +39,108 @@ class AccountControllerIntTest {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private MessageSource messageSource;
+
     private final QAccount qAccount = QAccount.account;
-
-    private final String ULR_SAVE_PROFILE = "/account/profile";
-
 
     @Test
     @DisplayName("saveProfileWithEmptyArguments")
     void saveProfileWithEmptyArguments() throws Exception {
-        String params = getSaveProfileArgumentsAsJson("", "", "", "", "", "");
-        MockHttpServletResponse response = mockMvc.perform(requestBuilder(ULR_SAVE_PROFILE, params))
+
+        String params = getSaveProfileArgumentsAsJson("", null, "", "", null, "");
+        MockHttpServletResponse response = mockMvc.perform(requestBuilder(URLPath.SAVE_PROFILE, params))
                                                   .andReturn()
                                                   .getResponse();
 
         Map content = objectMapper.readValue(response.getContentAsString(), Map.class);
-//        assertEquals(ExceptionCode.FIELD_EXCEPTION, content.get("errors"));
-//        Map fieldErrors = objectMapper.readValue(content.get("fieldErrorMessages").toString(), Map.class);
+        Map<String, String> fieldErrorMessages = (Map<String, String>) content.get(Field.FIELD_ERROR_MESSAGES);
 
-        response.getContentAsString();
+        // check if error is fieldException
+        assertEquals(ExceptionCode.FIELD_EXCEPTION, content.get(Field.ERROR));
+
+        // check if the number of errors is 6
+        assertEquals(6, fieldErrorMessages.size());
+
+        // check if error messages are correct
+        assertEquals(getErrorMessage(FieldError.UUID_EMPTY), fieldErrorMessages.get(Field.ACCOUNT_ID));
+        assertEquals(getErrorMessage(FieldError.NAME_EMPTY), fieldErrorMessages.get(Field.NAME));
+        assertEquals(getErrorMessage(FieldError.EMAIL_EMPTY), fieldErrorMessages.get(Field.EMAIL));
+        assertEquals(getErrorMessage(FieldError.BIRTH_NULL), fieldErrorMessages.get(Field.BIRTH));
+        assertEquals(getErrorMessage(FieldError.ABOUT_EMPTY), fieldErrorMessages.get(Field.ABOUT));
+        assertEquals(getErrorMessage(FieldError.GENDER_NULL), fieldErrorMessages.get(Field.GENDER));
     }
-
 
     @Test
     @DisplayName("saveProfileWithInvalidArguments")
     void saveProfileWithInvalidArguments() throws Exception {
 
+        Map<String, String> arguments = getValidSaveProfileArgumentsAsMap("12322-32432-1232",
+                                                                          getRandomString(Field.NAME_MAX + 1),
+                                                                          "c2gmail.com",
+                                                                          null,
+                                                                          getRandomString(Field.ABOUT_MAX + 1),
+                                                                          null);
 
-//        MockHttpServletResponse response = mockMvc.perform(requestBuilder(ULR_SAVE_PROFILE, params)).andReturn().getResponse();
+        MockHttpServletResponse response = mockMvc.perform(requestBuilder(URLPath.SAVE_PROFILE, objectMapper.writeValueAsString(arguments)))
+                                                  .andReturn()
+                                                  .getResponse();
 
+        Map content = objectMapper.readValue(response.getContentAsString(), Map.class);
+        Map<String, String> fieldErrorMessages = (Map<String, String>) content.get(Field.FIELD_ERROR_MESSAGES);
+
+        // check if error is fieldException
+        assertEquals(ExceptionCode.FIELD_EXCEPTION, content.get(Field.ERROR));
+
+        // check if the number of errors is 6
+        assertEquals(2, fieldErrorMessages.size());
+
+        // check if error messages are correct
+        assertEquals(getErrorMessage(FieldError.NAME_LENGTH, new Object[] {Field.NAME_MIN, Field.NAME_MAX}), fieldErrorMessages.get(Field.NAME));
+        assertEquals(getErrorMessage(FieldError.ABOUT_LENGTH), fieldErrorMessages.get(Field.ABOUT));
     }
 
-    private String getValidSaveProfileArgumentsAsJson() throws JsonProcessingException, ParseException {
+    private Map<String, String> getValidSaveProfileArgumentsAsMap(String accountId, String name, String email, String birth, String about, String gender) {
 
         Account account = jpaQueryFactory.selectFrom(qAccount).fetchFirst();
-        return getSaveProfileArgumentsAsJson(account.getId().toString(),
-                                             account.getName(),
-                                             account.getEmail(),
-                                             "2022-11-11",
-                                             account.getAbout(),
-                                             Boolean.toString(account.isGender()));
+        return getSaveProfileArgumentsAsMap(accountId == null ? account.getId().toString() : accountId,
+                                            name == null ? "init test name" : name,
+                                            email == null ? "initTest@gmail.com" : email,
+                                            birth == null ? "2022-11-11" : birth,
+                                            about == null ? "init test about" : about,
+                                            gender == null ? "false" : gender);
+    }
+
+    private Map<String, String> getSaveProfileArgumentsAsMap(String accountId, String name, String email, String birth, String about, String gender) {
+
+        Map<String, String> arguments = new HashMap<>();
+        arguments.put(Field.ACCOUNT_ID, accountId);
+        arguments.put(Field.NAME, name);
+        arguments.put(Field.EMAIL, email);
+        arguments.put(Field.BIRTH, birth);
+        arguments.put(Field.ABOUT, about);
+        arguments.put(Field.GENDER, gender);
+        return arguments;
     }
 
     private String getSaveProfileArgumentsAsJson(String accountId, String name, String email, String birth, String about, String gender)
     throws JsonProcessingException {
-
-        Map<String, Object> requestParams = new HashMap<>();
-        requestParams.put("accountId", accountId);
-        requestParams.put("name", name);
-        requestParams.put("email", email);
-        requestParams.put("birth", birth);
-        requestParams.put("about", about);
-        requestParams.put("gender", gender);
-        return objectMapper.writeValueAsString(requestParams);
+        return objectMapper.writeValueAsString(getSaveProfileArgumentsAsMap(accountId, name, email, birth, about, gender));
     }
-
 
     private RequestBuilder requestBuilder(String url, String content) {
         return MockMvcRequestBuilders.post(url).contentType(MediaType.APPLICATION_JSON).content(content);
     }
 
+    private String getRandomString(int length) {
+        return "d".repeat(Math.max(0, length));
+    }
 
-    @Test
-    @DisplayName("POST /account/profile")
-    void saveProfile() throws Exception {
+    private String getErrorMessage(String code) {
+        return getErrorMessage(code, null);
+    }
 
-//        String params = getValidSaveProfileArgumentsAsJson();
-//
-//        Map<String, Object> requestParams = new HashMap<>();
-//        requestParams.put("accountId", "27a28b07-44f8-40af-813d-bf0e8db69010");
-//        requestParams.put("name", "Michael Tae111");
-//        requestParams.put("email", "");
-//        requestParams.put("birth", "1987-12-10");
-//        requestParams.put("about", "this is michel description1111");
-//        requestParams.put("gender", false);
-//
-//        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/account/profile")
-//                                                              .contentType(MediaType.APPLICATION_JSON)
-//                                                              .content(objectMapper.writeValueAsString(requestParams));
-//
-//        MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();
-//
-//        MockHttpServletResponse response = mvcResult.getResponse();
-//
-//        System.out.println("error message: " + response.getErrorMessage());
-//        System.out.println("status: " + response.getStatus());
-//        System.out.println("content: " + mvcResult.getResponse().getContentAsString());
+    private String getErrorMessage(String code, Object[] args) {
+        return messageSource.getMessage(code, args, Locale.KOREA);
     }
 }

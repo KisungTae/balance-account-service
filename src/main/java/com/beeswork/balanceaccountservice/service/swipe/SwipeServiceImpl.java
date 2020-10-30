@@ -6,6 +6,7 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.BalanceGameDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
@@ -14,6 +15,7 @@ import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
+import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
@@ -42,7 +44,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public List<QuestionDTO> swipe(String swiperId, String swiperEmail, String swipedId) {
+    public BalanceGameDTO swipe(String swiperId, String swiperEmail, String swipedId) {
 
         Account swiper = accountDAO.findBy(UUID.fromString(swiperId), swiperEmail);
         checkIfValid(swiper);
@@ -53,21 +55,23 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         if (swipeDAO.existsByClicked(swiper.getId(), swiped.getId(), true))
             throw new SwipeClickedExistsException();
 
-//        if (swiper.getPoint() < AppConstant.SWIPE_POINT)
-//            throw new AccountShortOfPointException();
+        if (swiper.getPoint() < AppConstant.SWIPE_POINT)
+            throw new AccountShortOfPointException();
 
         Swipe swipe = new Swipe(swiper, swiped, false, new Date(), new Date());
         swipeDAO.persist(swipe);
 
-        List<QuestionDTO> questionDTOs = new ArrayList<>();
+        BalanceGameDTO balanceGameDTO = new BalanceGameDTO();
+        balanceGameDTO.setSwipeId(swipe.getId());
+
         for (AccountQuestion accountQuestion : swiped.getAccountQuestions()) {
             Question question = accountQuestion.getQuestion();
-            questionDTOs.add(new QuestionDTO(question.getId(),
+            balanceGameDTO.getQuestions().add(new QuestionDTO(question.getId(),
                                              question.getDescription(),
                                              question.getTopOption(),
                                              question.getBottomOption()));
         }
-        return questionDTOs;
+        return balanceGameDTO;
     }
 
 
@@ -98,8 +102,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         checkIfValid(swiper, swiperEmail);
         checkIfValid(swiped, null);
 
-//        if (swiper.getPoint() < AppConstant.SWIPE_POINT)
-//            throw new AccountShortOfPointException();
+        if (swiper.getPoint() < AppConstant.SWIPE_POINT)
+            throw new AccountShortOfPointException();
 
         int point = swiper.getPoint();
         point -= AppConstant.SWIPE_POINT;

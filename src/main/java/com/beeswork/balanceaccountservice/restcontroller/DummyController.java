@@ -237,7 +237,7 @@ public class DummyController {
                 account.setLocation(location);
                 account.setAccountType(accountType);
                 account.setScore(latCount);
-                account.setPoint(lonCount);
+                account.setPoint(50000);
                 account.setFcmToken("");
                 account.setCreatedAt(new Date());
                 account.setUpdatedAt(new Date());
