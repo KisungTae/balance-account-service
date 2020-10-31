@@ -1,10 +1,8 @@
 package com.beeswork.balanceaccountservice.service.swipe;
 
 import com.beeswork.balanceaccountservice.constant.AppConstant;
-import com.beeswork.balanceaccountservice.constant.NotificationType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
-import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.BalanceGameDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
@@ -32,7 +30,7 @@ import java.util.*;
 public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     private final AccountDAO accountDAO;
-    private final SwipeDAO swipeDAO;
+    private final SwipeDAO   swipeDAO;
 
     @Autowired
     public SwipeServiceImpl(ModelMapper modelMapper, AccountDAO accountDAO, SwipeDAO swipeDAO) {
@@ -67,9 +65,9 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         for (AccountQuestion accountQuestion : swiped.getAccountQuestions()) {
             Question question = accountQuestion.getQuestion();
             balanceGameDTO.getQuestions().add(new QuestionDTO(question.getId(),
-                                             question.getDescription(),
-                                             question.getTopOption(),
-                                             question.getBottomOption()));
+                                                              question.getDescription(),
+                                                              question.getTopOption(),
+                                                              question.getBottomOption()));
         }
         return balanceGameDTO;
     }
@@ -89,7 +87,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public ClickDTO click(Long swipeId, String swiperId, String swiperEmail, String swipedId, Map<Long, Boolean> answers) {
+    public ClickDTO click(Long swipeId, String swiperId, String swiperEmail, String swipedId,
+                          Map<Long, Boolean> answers) {
 
         UUID swiperUUId = UUID.fromString(swiperId);
         UUID swipedUUId = UUID.fromString(swipedId);
@@ -110,17 +109,15 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         swiper.setPoint(point);
 
         ClickDTO clickDTO = new ClickDTO();
-        clickDTO.setClicked(true);
 
         for (AccountQuestion accountQuestion : swiped.getAccountQuestions()) {
             Boolean answer = answers.get(accountQuestion.getQuestionId());
-            if (answer == null || accountQuestion.isSelected() != answer) {
-                clickDTO.setClicked(false);
-                break;
-            }
+            if (answer == null || accountQuestion.isSelected() != answer)
+                return clickDTO;
         }
 
-        if (!clickDTO.isClicked()) return clickDTO;
+        swipe.setClicked(true);
+        swipe.setUpdatedAt(new Date());
 
         // match
         if (swipeDAO.existsByClicked(swipedUUId, swiperUUId, true)) {
@@ -131,12 +128,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             swiper.getMatches().add(new Match(swiper, swiped, chat, false, date, date));
             swiped.getMatches().add(new Match(swiped, swiper, chat, false, date, date));
 
-            clickDTO.setupAsMatch(swiped.getId(), swiped.getRepPhotoKey(), swiped.getFcmToken());
+            clickDTO.setupAsMatch(swiped.getId(), swiped.getName(), swiped.getRepPhotoKey(),
+                                  chat.getId(), swiped.getFcmToken(), false);
         } else {
-
-            clickDTO.setupAsClicked(swiped.getId(), swiped.getRepPhotoKey(), swiped.getFcmToken());
+            clickDTO.setupAsClick(swiped.getId(), swiped.getRepPhotoKey(), swiped.getFcmToken(), swipe.getUpdatedAt());
         }
-
         return clickDTO;
     }
 }

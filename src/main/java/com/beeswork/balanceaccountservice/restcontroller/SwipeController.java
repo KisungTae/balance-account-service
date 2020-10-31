@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.constant.NotificationType;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.BalanceGameDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
@@ -79,8 +80,11 @@ public class SwipeController extends BaseController {
                                                clickVM.getSwipedId(),
                                                clickVM.getAnswers());
 
-        if (clickDTO.isClicked())
+
+
+        if (!clickDTO.getNotificationType().equals(NotificationType.NOT_CLICK))
             fcmService.sendNotification(clickDTO.getFcmNotificationDTO());
+
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO));
     }
 

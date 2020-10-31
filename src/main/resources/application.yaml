@@ -44,6 +44,11 @@ management:
       exposure:
         include: beans
 
+
+thread-pool:
+  max-pool-size: 13
+  queue-capacity: 13
+
 #spring:
 #  jpa:
 #    hibernate:

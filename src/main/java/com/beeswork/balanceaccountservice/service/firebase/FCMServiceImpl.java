@@ -6,6 +6,7 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +23,8 @@ public class FCMServiceImpl implements FCMService {
         this.firebaseMessaging = firebaseMessaging;
     }
 
+    @Async("processExecutor")
+    @Override
     public void sendNotification(FCMNotificationDTO fcmNotificationDTO) throws FirebaseMessagingException {
 
         sendNotification(fcmNotificationDTO.getToken(), fcmNotificationDTO.getMessages());
@@ -34,7 +37,7 @@ public class FCMServiceImpl implements FCMService {
         }
     }
 
-    private void sendNotification(String token, Map<String, String> messages)
+    public void sendNotification(String token, Map<String, String> messages)
     throws FirebaseMessagingException {
 
         Message.Builder messageBuilder = Message.builder();

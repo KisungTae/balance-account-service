@@ -19,6 +19,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -37,6 +39,7 @@ public class AccountController extends BaseController {
     public ResponseEntity<String> saveProfile(@Valid @RequestBody SaveProfileVM saveProfileVM,
                                               BindingResult bindingResult)
     throws JsonProcessingException {
+
         if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
 
         try {

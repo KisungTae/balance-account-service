@@ -431,4 +431,43 @@ create table chat_message
 );
 
 
-select * from account;
+
+select swiped_id, count(*)
+from swipe
+group by swiped_id
+order by count(*) desc;
+
+select *
+from account
+where id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897';
+
+select *
+from swipe
+where id not in (select id from swipe where swiper_id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897' and clicked = true)
+and swiper_id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897'
+order by swiped_id;
+
+select *
+from account_question
+where account_id = '248ec2b8-890c-4b49-baeb-6dbb8debad84';
+
+select *
+from swipe
+where id = 2134;
+
+
+select *
+from question;
+
+select *
+from swipe
+where id = 2145;
+
+update swipe set clicked = false
+where swiper_id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897'
+  and swiped_id = '248ec2b8-890c-4b49-baeb-6dbb8debad84';
+
+select *
+from swipe
+where swiper_id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897'
+and swiped_id = '248ec2b8-890c-4b49-baeb-6dbb8debad84';

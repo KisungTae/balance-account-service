@@ -174,7 +174,7 @@ public class DummyController {
     @Transactional
     @PostMapping("/create/questions")
     public void createDummyQuestions(@RequestParam int size) {
-        for (int i = 0; i < size; i++) {
+        for (int i = 1; i <= size; i++) {
             Question question = new Question();
             question.setDescription("question-" + i);
             question.setTopOption("question-" + i + " top option");
@@ -277,13 +277,13 @@ public class DummyController {
     public void sendDummyClickedNotification(@RequestParam("clickedId") String clickedId)
     throws AccountNotFoundException, FirebaseMessagingException {
 
-        Account clicked = accountDAO.findById(UUID.fromString(clickedId));
-
-        FCMNotificationDTO notificationDTO = FCMNotificationDTO.clickedNotification(clicked.getFcmToken(),
-                                                                                    clicked.getRepPhotoKey());
-        List<FCMNotificationDTO> notificationDTOs = new ArrayList<>();
-        notificationDTOs.add(notificationDTO);
-        fcmService.sendNotifications(notificationDTOs);
+//        Account clicked = accountDAO.findById(UUID.fromString(clickedId));
+//
+//        FCMNotificationDTO notificationDTO = FCMNotificationDTO.clickedNotification(clicked.getFcmToken(),
+//                                                                                    clicked.getRepPhotoKey());
+//        List<FCMNotificationDTO> notificationDTOs = new ArrayList<>();
+//        notificationDTOs.add(notificationDTO);
+//        fcmService.sendNotifications(notificationDTOs);
     }
 
     @GetMapping("/send/notification/match")
@@ -291,20 +291,20 @@ public class DummyController {
                                            @RequestParam("matchedId") String matchedId)
     throws AccountNotFoundException, FirebaseMessagingException {
 
-        Account matcher = accountDAO.findById(UUID.fromString(matcherId));
-        Account matched = accountDAO.findById(UUID.fromString(matchedId));
-
-        FCMNotificationDTO matcherNotification = FCMNotificationDTO.matchNotification(matcher.getFcmToken(),
-                                                                                      matcher.getRepPhotoKey());
-
-        FCMNotificationDTO matchedNotification = FCMNotificationDTO.matchNotification(matched.getFcmToken(),
-                                                                                      matched.getRepPhotoKey());
-
-        List<FCMNotificationDTO> notificationDTOs = new ArrayList<>();
-        notificationDTOs.add(matcherNotification);
-        notificationDTOs.add(matchedNotification);
-
-        fcmService.sendNotifications(notificationDTOs);
+//        Account matcher = accountDAO.findById(UUID.fromString(matcherId));
+//        Account matched = accountDAO.findById(UUID.fromString(matchedId));
+//
+//        FCMNotificationDTO matcherNotification = FCMNotificationDTO.matchNotification(matcher.getFcmToken(),
+//                                                                                      matcher.getRepPhotoKey());
+//
+//        FCMNotificationDTO matchedNotification = FCMNotificationDTO.matchNotification(matched.getFcmToken(),
+//                                                                                      matched.getRepPhotoKey());
+//
+//        List<FCMNotificationDTO> notificationDTOs = new ArrayList<>();
+//        notificationDTOs.add(matcherNotification);
+//        notificationDTOs.add(matchedNotification);
+//
+//        fcmService.sendNotifications(notificationDTOs);
 
     }
 

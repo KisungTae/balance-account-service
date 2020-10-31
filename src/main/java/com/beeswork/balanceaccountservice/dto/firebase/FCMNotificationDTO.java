@@ -5,6 +5,7 @@ import com.beeswork.balanceaccountservice.constant.NotificationType;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,15 +16,27 @@ public class FCMNotificationDTO {
     private String              token;
     private Map<String, String> messages = new HashMap<>();
 
-    public static FCMNotificationDTO matchNotification(String token, String matchedPhotoKey) {
-        return matchNotification(token, NotificationType.MATCH, matchedPhotoKey, "");
+    public static FCMNotificationDTO matchNotification(String token, String matchedId, String name, Long chatId,
+                                                       String matchedPhotoKey) {
+
+        FCMNotificationDTO fcmNotificationDTO = notification(token, NotificationType.MATCH, matchedPhotoKey, "");
+        fcmNotificationDTO.getMessages().put(FCMDataKey.MATCHED_ID, matchedId);
+        fcmNotificationDTO.getMessages().put(FCMDataKey.NAME, name);
+        fcmNotificationDTO.getMessages().put(FCMDataKey.CHAT_ID, chatId.toString());
+        return fcmNotificationDTO;
     }
 
-    public static FCMNotificationDTO clickedNotification(String token, String clickedPhotoKey) {
-        return matchNotification(token, NotificationType.CLICKED, clickedPhotoKey, "");
+    public static FCMNotificationDTO clickedNotification(String token, String swipedId, String clickedPhotoKey, String updatedAt) {
+
+        FCMNotificationDTO fcmNotificationDTO = notification(token, NotificationType.CLICKED, clickedPhotoKey, "");
+        fcmNotificationDTO.getMessages().put(FCMDataKey.SWIPED_ID, swipedId);
+        fcmNotificationDTO.getMessages().put(FCMDataKey.UPDATED_AT, updatedAt);
+        return fcmNotificationDTO;
     }
 
-    private static FCMNotificationDTO matchNotification(String token, String notificationType, String photoKey, String message) {
+    private static FCMNotificationDTO notification(String token, String notificationType, String photoKey,
+                                                   String message) {
+
         FCMNotificationDTO fcmNotificationDTO = new FCMNotificationDTO();
         fcmNotificationDTO.setToken(token);
         fcmNotificationDTO.getMessages().put(FCMDataKey.NOTIFICATION_TYPE, notificationType);

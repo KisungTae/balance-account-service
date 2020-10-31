@@ -1,16 +1,35 @@
 package com.beeswork.balanceaccountservice;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @SpringBootApplication
+@EnableAsync
 public class BalanceAccountServiceApplication {
 
+	@Value("${thread-pool.max-pool-size:1}")
+	private int maxPoolSize;
+
+	@Value("${thread-pool.queue-capacity:0}")
+	private int queueCapacity;
+
+	@Bean(name="processExecutor")
+	public TaskExecutor taskExecutor() {
+
+		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setMaxPoolSize(maxPoolSize);
+		taskExecutor.setQueueCapacity(queueCapacity);
+		taskExecutor.afterPropertiesSet();
+		return taskExecutor;
+	}
+
 	public static void main(String[] args) {
-
 		SpringApplication.run(BalanceAccountServiceApplication.class, args);
-
-
 	}
 
 }
