@@ -26,8 +26,8 @@ public class FCMServiceImpl implements FCMService {
     @Async("processExecutor")
     @Override
     public void sendNotification(FCMNotificationDTO fcmNotificationDTO)
-    throws FirebaseMessagingException, InterruptedException {
-        Thread.sleep(10000);
+    throws FirebaseMessagingException {
+
         sendNotification(fcmNotificationDTO.getToken(), fcmNotificationDTO.getMessages());
     }
 

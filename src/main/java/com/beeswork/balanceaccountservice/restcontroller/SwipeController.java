@@ -80,8 +80,6 @@ public class SwipeController extends BaseController {
                                                clickVM.getSwipedId(),
                                                clickVM.getAnswers());
 
-
-
         if (!clickDTO.getNotificationType().equals(NotificationType.NOT_CLICK))
             fcmService.sendNotification(clickDTO.getFcmNotificationDTO());
 

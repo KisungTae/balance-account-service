@@ -16,13 +16,13 @@ public class FCMNotificationDTO {
     private String              token;
     private Map<String, String> messages = new HashMap<>();
 
-    public static FCMNotificationDTO matchNotification(String token, String matchedId, String name, Long chatId,
+    public static FCMNotificationDTO matchNotification(String token, String matchedId, String name, String chatId,
                                                        String matchedPhotoKey) {
 
         FCMNotificationDTO fcmNotificationDTO = notification(token, NotificationType.MATCH, matchedPhotoKey, "");
         fcmNotificationDTO.getMessages().put(FCMDataKey.MATCHED_ID, matchedId);
         fcmNotificationDTO.getMessages().put(FCMDataKey.NAME, name);
-        fcmNotificationDTO.getMessages().put(FCMDataKey.CHAT_ID, chatId.toString());
+        fcmNotificationDTO.getMessages().put(FCMDataKey.CHAT_ID, chatId);
         return fcmNotificationDTO;
     }
 
