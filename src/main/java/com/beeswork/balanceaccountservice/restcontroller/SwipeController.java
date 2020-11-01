@@ -70,7 +70,7 @@ public class SwipeController extends BaseController {
 
     @PostMapping("/click")
     public ResponseEntity<String> click(@Valid @RequestBody ClickVM clickVM, BindingResult bindingResult)
-    throws JsonProcessingException, FirebaseMessagingException {
+    throws JsonProcessingException, FirebaseMessagingException, InterruptedException {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 

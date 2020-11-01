@@ -449,7 +449,7 @@ order by swiped_id;
 
 select *
 from account_question
-where account_id = '248ec2b8-890c-4b49-baeb-6dbb8debad84';
+where account_id = 'f5caa97f-7723-4c77-9a86-607c628ef5f5';
 
 select *
 from swipe
@@ -461,13 +461,15 @@ from question;
 
 select *
 from swipe
-where id = 2145;
+where id = 2154;
 
 update swipe set clicked = false
 where swiper_id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897'
-  and swiped_id = '248ec2b8-890c-4b49-baeb-6dbb8debad84';
+  and swiped_id = 'f838332d-e9c5-425e-8bc7-ac1b0a6f17aa';
 
 select *
 from swipe
 where swiper_id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897'
-and swiped_id = '248ec2b8-890c-4b49-baeb-6dbb8debad84';
+and swiped_id = 'f838332d-e9c5-425e-8bc7-ac1b0a6f17aa';
+
+

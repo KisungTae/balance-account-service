@@ -8,5 +8,6 @@ import java.util.Map;
 
 public interface FCMService {
     void sendNotifications(List<FCMNotificationDTO> FCMNotificationDTOs) throws FirebaseMessagingException;
-    void sendNotification(FCMNotificationDTO fcmNotificationDTO) throws FirebaseMessagingException;
+    void sendNotification(FCMNotificationDTO fcmNotificationDTO) throws FirebaseMessagingException,
+                                                                        InterruptedException;
 }
