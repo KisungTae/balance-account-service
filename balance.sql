@@ -463,9 +463,7 @@ select *
 from swipe
 where id = 2154;
 
-update swipe set clicked = false
-where swiper_id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897'
-  and swiped_id = 'f838332d-e9c5-425e-8bc7-ac1b0a6f17aa';
+
 
 select *
 from swipe
@@ -484,7 +482,18 @@ where swiped_id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897'
   and swiper_id = 'b329bfc6-78bc-4df5-936d-855a0fa4ed6a';
 
 
+
+update swipe set clicked = false
+where swiper_id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897'
+  and swiped_id = 'b329bfc6-78bc-4df5-936d-855a0fa4ed6a';
+
 select *
 from match
 where matcher_id = '65db8e52-a64d-4d0f-84a2-bd05b8c22897'
   and matched_id = 'b329bfc6-78bc-4df5-936d-855a0fa4ed6a';
+
+delete from match where matched_id is not null;
+
+
+select *
+from match;

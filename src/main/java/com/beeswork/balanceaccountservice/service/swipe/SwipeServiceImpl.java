@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.service.swipe;
 
 import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
+import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.BalanceGameDTO;
@@ -31,13 +32,16 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     private final AccountDAO accountDAO;
     private final SwipeDAO   swipeDAO;
+    private final ChatDAO chatDAO;
 
     @Autowired
-    public SwipeServiceImpl(ModelMapper modelMapper, AccountDAO accountDAO, SwipeDAO swipeDAO) {
+    public SwipeServiceImpl(ModelMapper modelMapper, AccountDAO accountDAO, SwipeDAO swipeDAO,
+                            ChatDAO chatDAO) {
 
         super(modelMapper);
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
+        this.chatDAO = chatDAO;
     }
 
     @Override
@@ -124,6 +128,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
             Chat chat = new Chat();
             Date date = new Date();
+
+            chatDAO.persist(chat);
 
             swiper.getMatches().add(new Match(swiper, swiped, chat, false, date, date));
             swiped.getMatches().add(new Match(swiped, swiper, chat, false, date, date));

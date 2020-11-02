@@ -87,6 +87,7 @@ public class SwipeController extends BaseController {
                                                clickVM.getAnswers());
 
         MatchProjection match = clickDTO.getMatch();
+
         if (clickDTO.getNotificationType().equals(NotificationType.MATCH)) {
             String message = messageSource.getMessage(MessageKey.MATCH_NOTIFICATION_MESSAGE, null, locale);
             fcmService.sendNotification(FCMNotificationDTO.matchNotification(clickDTO.getFcmToken(),
