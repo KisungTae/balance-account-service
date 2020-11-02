@@ -48,41 +48,13 @@ class AccountControllerIntTest {
     @DisplayName("saveProfileWithEmptyArguments")
     void saveProfileWithEmptyArguments() throws Exception {
 
-        String params = getSaveProfileArgumentsAsJson("", null, "", "", null, "");
-        MockHttpServletResponse response = mockMvc.perform(requestBuilder(URLPath.SAVE_PROFILE, params))
-                                                  .andReturn()
-                                                  .getResponse();
-
-        Map content = objectMapper.readValue(response.getContentAsString(), Map.class);
-        Map<String, String> fieldErrorMessages = (Map<String, String>) content.get(Field.FIELD_ERROR_MESSAGES);
-
-        // check if error is fieldException
-        assertEquals(ExceptionCode.FIELD_EXCEPTION, content.get(Field.ERROR));
-
-        // check if the number of errors is 6
-        assertEquals(6, fieldErrorMessages.size());
-
-        // check if error messages are correct
-        assertEquals(getErrorMessage(FieldError.UUID_EMPTY), fieldErrorMessages.get(Field.ACCOUNT_ID));
-        assertEquals(getErrorMessage(FieldError.NAME_EMPTY), fieldErrorMessages.get(Field.NAME));
-        assertEquals(getErrorMessage(FieldError.EMAIL_EMPTY), fieldErrorMessages.get(Field.EMAIL));
-        assertEquals(getErrorMessage(FieldError.BIRTH_NULL), fieldErrorMessages.get(Field.BIRTH));
-        assertEquals(getErrorMessage(FieldError.ABOUT_EMPTY), fieldErrorMessages.get(Field.ABOUT));
-        assertEquals(getErrorMessage(FieldError.GENDER_NULL), fieldErrorMessages.get(Field.GENDER));
-    }
-
-    @Test
-    @DisplayName("saveProfileWithInvalidArguments")
-    void saveProfileWithInvalidArguments() throws Exception {
-
-//        Map<String, String> arguments = getValidSaveProfileArgumentsAsMap("12322-32432-1232",
-//                                                                          getRandomString(Field.NAME_MAX + 1),
-//                                                                          "c2gmail.com",
-//                                                                          null,
-//                                                                          getRandomString(Field.ABOUT_MAX + 1),
-//                                                                          null);
+//        Map paramsMap = getSaveProfileArgumentsAsMap("", null, "", "", null, "");
 //
-//        MockHttpServletResponse response = mockMvc.perform(requestBuilder(URLPath.SAVE_PROFILE, objectMapper.writeValueAsString(arguments)))
+//        RequestBuilder requestBuilder = MockMvcRequestBuilders.post(URLPath.SAVE_PROFILE)
+//                                                              .contentType(MediaType.APPLICATION_JSON)
+//                                                              .content(objectMapper.writeValueAsString(paramsMap));
+//
+//        MockHttpServletResponse response = mockMvc.perform(requestBuilder)
 //                                                  .andReturn()
 //                                                  .getResponse();
 //
@@ -93,11 +65,57 @@ class AccountControllerIntTest {
 //        assertEquals(ExceptionCode.FIELD_EXCEPTION, content.get(Field.ERROR));
 //
 //        // check if the number of errors is 6
-//        assertEquals(2, fieldErrorMessages.size());
+//        assertEquals(6, fieldErrorMessages.size());
 //
 //        // check if error messages are correct
+//        assertEquals(getErrorMessage(FieldError.UUID_EMPTY), fieldErrorMessages.get(Field.ACCOUNT_ID));
+//        assertEquals(getErrorMessage(FieldError.NAME_EMPTY), fieldErrorMessages.get(Field.NAME));
+//        assertEquals(getErrorMessage(FieldError.EMAIL_EMPTY), fieldErrorMessages.get(Field.EMAIL));
+//        assertEquals(getErrorMessage(FieldError.BIRTH_NULL), fieldErrorMessages.get(Field.BIRTH));
+//        assertEquals(getErrorMessage(FieldError.ABOUT_EMPTY), fieldErrorMessages.get(Field.ABOUT));
+//        assertEquals(getErrorMessage(FieldError.GENDER_NULL), fieldErrorMessages.get(Field.GENDER));
+    }
+
+    @Test
+    @DisplayName("saveProfileWithInvalidArguments")
+    void saveProfileWithInvalidArguments() throws Exception {
+
+        Map paramsMap = getValidSaveProfileArgumentsAsMap("12322-32432-1232",
+                                                             getRandomString(Field.NAME_MAX + 1),
+                                                             "c2gmail.com",
+                                                             null,
+                                                             getRandomString(Field.ABOUT_MAX + 1),
+                                                             null);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post(URLPath.SAVE_PROFILE)
+                                                              .contentType(MediaType.APPLICATION_JSON)
+                                                              .content(objectMapper.writeValueAsString(paramsMap));
+
+        MockHttpServletResponse response = mockMvc.perform(requestBuilder)
+                                                  .andReturn()
+                                                  .getResponse();
+
+        Map content = objectMapper.readValue(response.getContentAsString(), Map.class);
+        Map<String, String> fieldErrorMessages = (Map<String, String>) content.get(Field.FIELD_ERROR_MESSAGES);
+
+        // check if error is fieldException
+        assertEquals(ExceptionCode.FIELD_EXCEPTION, content.get(Field.ERROR));
+
+        // check if the number of errors is 4
+        assertEquals(4, fieldErrorMessages.size());
+
+        // check if error messages are correct
+        assertEquals(getErrorMessage(FieldError.UUID_INVALID), fieldErrorMessages.get(Field.ACCOUNT_ID));
+        assertEquals(getErrorMessage(FieldError.EMAIL_INVALID), fieldErrorMessages.get(Field.EMAIL));
+
+        String nameLengthErrorMessage = messageSource.getMessage(FieldError.NAME_LENGTH, null, Locale.KOREA);
+        nameLengthErrorMessage = nameLengthErrorMessage.replaceAll("\\{min\\}", String.valueOf(Field.NAME_MIN));
+        System.out.println(nameLengthErrorMessage);
+
+//        assertEquals("이름은 최소 " + Field.NAME_MIN + "글자 최대" + Field.NAME_MAX + "글자까지 가능합니다", fieldErrorMessages.get(Field.NAME));
+//        assertEquals("자기소개는 최소 {min}글자 최대 {max}글자까지 가능합니다", fieldErrorMessages.get(Field.ABOUT));
 //        assertEquals(getErrorMessage(FieldError.NAME_LENGTH, new Object[] {Field.NAME_MIN, Field.NAME_MAX}), fieldErrorMessages.get(Field.NAME));
-//        assertEquals(getErrorMessage(FieldError.ABOUT_LENGTH), fieldErrorMessages.get(Field.ABOUT));
+
     }
 
     private Map<String, String> getValidSaveProfileArgumentsAsMap(String accountId, String name, String email, String birth, String about, String gender) {
@@ -121,15 +139,6 @@ class AccountControllerIntTest {
         arguments.put(Field.ABOUT, about);
         arguments.put(Field.GENDER, gender);
         return arguments;
-    }
-
-    private String getSaveProfileArgumentsAsJson(String accountId, String name, String email, String birth, String about, String gender)
-    throws JsonProcessingException {
-        return objectMapper.writeValueAsString(getSaveProfileArgumentsAsMap(accountId, name, email, birth, about, gender));
-    }
-
-    private RequestBuilder requestBuilder(String url, String content) {
-        return MockMvcRequestBuilders.post(url).contentType(MediaType.APPLICATION_JSON).content(content);
     }
 
     private String getRandomString(int length) {

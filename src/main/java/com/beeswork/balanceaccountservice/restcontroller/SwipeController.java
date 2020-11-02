@@ -1,12 +1,13 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.constant.MessageKey;
 import com.beeswork.balanceaccountservice.constant.NotificationType;
-import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
+import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.BalanceGameDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
-import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
+import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import com.beeswork.balanceaccountservice.service.firebase.FCMService;
 import com.beeswork.balanceaccountservice.service.swipe.SwipeService;
 import com.beeswork.balanceaccountservice.vm.swipe.ClickVM;
@@ -17,13 +18,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/swipe")
@@ -31,13 +35,15 @@ public class SwipeController extends BaseController {
 
     private final SwipeService swipeService;
     private final FCMService fcmService;
+    private final MessageSource messageSource;
 
     @Autowired
-    public SwipeController(ObjectMapper objectMapper, ModelMapper modelMapper, SwipeService swipeService, FCMService fcmService) {
+    public SwipeController(ObjectMapper objectMapper, ModelMapper modelMapper, SwipeService swipeService, FCMService fcmService, MessageSource messageSource) {
 
         super(objectMapper, modelMapper);
         this.swipeService = swipeService;
         this.fcmService = fcmService;
+        this.messageSource = messageSource;
     }
 
     @PostMapping
@@ -69,8 +75,8 @@ public class SwipeController extends BaseController {
 
 
     @PostMapping("/click")
-    public ResponseEntity<String> click(@Valid @RequestBody ClickVM clickVM, BindingResult bindingResult)
-    throws JsonProcessingException, FirebaseMessagingException, InterruptedException {
+    public ResponseEntity<String> click(@Valid @RequestBody ClickVM clickVM, BindingResult bindingResult, Locale locale)
+    throws JsonProcessingException, FirebaseMessagingException {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
@@ -80,8 +86,24 @@ public class SwipeController extends BaseController {
                                                clickVM.getSwipedId(),
                                                clickVM.getAnswers());
 
-        if (!clickDTO.getNotificationType().equals(NotificationType.NOT_CLICK))
-            fcmService.sendNotification(clickDTO.getFcmNotificationDTO());
+        MatchProjection match = clickDTO.getMatch();
+        if (clickDTO.getNotificationType().equals(NotificationType.MATCH)) {
+            String message = messageSource.getMessage(MessageKey.MATCH_NOTIFICATION_MESSAGE, null, locale);
+            fcmService.sendNotification(FCMNotificationDTO.matchNotification(clickDTO.getFcmToken(),
+                                                                             match.getMatchedId().toString(),
+                                                                             match.getName(),
+                                                                             match.getChatId().toString(),
+                                                                             match.getPhotoKey(),
+                                                                             message));
+        } else if (clickDTO.getNotificationType().equals(NotificationType.CLICK)) {
+            String message = messageSource.getMessage(MessageKey.CLICKED_NOTIFICATION_MESSAGE, null, locale);
+            String updatedAt = DateTimeFormatter.ISO_INSTANT.format(match.getUpdatedAt().toInstant());
+            fcmService.sendNotification(FCMNotificationDTO.clickedNotification(clickDTO.getFcmToken(),
+                                                                               match.getMatchedId().toString(),
+                                                                               match.getPhotoKey(),
+                                                                               updatedAt,
+                                                                               message));
+        }
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO));
     }
