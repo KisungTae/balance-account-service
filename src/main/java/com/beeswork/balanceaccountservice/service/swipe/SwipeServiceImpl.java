@@ -103,7 +103,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         Account swiped = swipe.getSwiped();
 
         checkIfValid(swiper, swiperEmail);
-        checkIfValid(swiped, null);
+        checkIfValid(swiped);
 
         if (swiper.getPoint() < AppConstant.SWIPE_POINT)
             throw new AccountShortOfPointException();

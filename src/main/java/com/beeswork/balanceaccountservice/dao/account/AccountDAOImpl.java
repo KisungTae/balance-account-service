@@ -7,9 +7,10 @@ import com.beeswork.balanceaccountservice.entity.account.QAccountQuestion;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
 import com.beeswork.balanceaccountservice.entity.photo.QPhoto;
 import com.beeswork.balanceaccountservice.entity.question.QQuestion;
-import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAQueryBase;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
         super(entityManager, jpaQueryFactory);
     }
 
-//  TODO: removeme
+    //  TODO: removeme
     @Override
     public Account findById(UUID accountId) {
         return jpaQueryFactory.selectFrom(qAccount).where(qAccount.id.eq(accountId)).fetchOne();
@@ -40,30 +41,41 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
 
     @Override
     public Account findBy(UUID accountId, String email) {
-        return jpaQueryFactory.selectFrom(qAccount).where(validAccount(accountId, email)).fetchOne();
+        return jpaQueryFactory.selectFrom(qAccount)
+                              .where(qAccount.id.eq(accountId).and(qAccount.email.eq(email)))
+                              .fetchOne();
     }
 
     @Override
     public Account findWithAccountQuestions(UUID accountId, String email) {
         return jpaQueryFactory.selectFrom(qAccount)
                               .innerJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
-                              .where(validAccount(accountId, email))
+                              .where(qAccount.id.eq(accountId).and(qAccount.email.eq(email)))
                               .fetchOne();
     }
 
     @Override
     public Account findWithQuestions(UUID accountId, String email) {
+        return findWithQuestions().where(qAccount.id.eq(accountId).and(qAccount.email.eq(email))).fetchOne();
+    }
+
+    @Override
+    public Account findWithQuestions(UUID accountId) {
+        return findWithQuestions().where(qAccount.id.eq(accountId)).fetchOne();
+    }
+
+    private JPAQuery<Account> findWithQuestions() {
         return jpaQueryFactory.selectFrom(qAccount)
                               .innerJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
-                              .innerJoin(qAccountQuestion.question, qQuestion).fetchJoin()
-                              .where(validAccount(accountId, email))
-                              .fetchOne();
+                              .innerJoin(qAccountQuestion.question, qQuestion).fetchJoin();
     }
 
     @Override
     public boolean existsBy(UUID accountId, String email, boolean blocked) {
         return jpaQueryFactory.selectFrom(qAccount)
-                              .where(qAccount.id.eq(accountId).and(qAccount.email.eq(email)).and(qAccount.blocked.eq(blocked)))
+                              .where(qAccount.id.eq(accountId)
+                                                .and(qAccount.email.eq(email))
+                                                .and(qAccount.blocked.eq(blocked)))
                               .fetchCount() > 0;
     }
 

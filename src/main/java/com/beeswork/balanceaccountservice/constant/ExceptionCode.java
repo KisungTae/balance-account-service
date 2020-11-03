@@ -5,14 +5,13 @@ public class ExceptionCode {
     public static final String INTERNAL_SERVER_EXCEPTION = "internal.server.exception";
     public static final String QUERY_EXCEPTION = "query.exception";
 
-
     public static final String BAD_REQUEST_EXCEPTION = "bad.request.exception";
-
 
     public static final String ACCOUNT_NOT_FOUND_EXCEPTION = "account.not.found.exception";
     public static final String ACCOUNT_INVALID_EXCEPTION = "account.invalid.exception";
     public static final String ACCOUNT_SHORT_OF_POINT_EXCEPTION = "account.short.of.point.exception";
     public static final String ACCOUNT_BLOCKED_EXCEPTION = "account.blocked.exception";
+    public static final String ACCOUNT_EMAIL_NOT_MATCH_EXCEPTION = "account.email.not.match.exception";
 
     public static final String QUESTION_NOT_FOUND_EXCEPTION = "question.not.found.exception";
 

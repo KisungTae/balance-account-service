@@ -174,6 +174,9 @@ public class DummyController {
     @Transactional
     @PostMapping("/create/questions")
     public void createDummyQuestions(@RequestParam int size) {
+
+
+
         for (int i = 1; i <= size; i++) {
             Question question = new Question();
             question.setDescription("question-" + i);
@@ -200,10 +203,7 @@ public class DummyController {
         GeometryFactory gf = new GeometryFactory();
         AccountType accountType = new JPAQueryFactory(entityManager).selectFrom(QAccountType.accountType).fetchFirst();
 
-
-        int count = 0;
-        int lonCount = 0;
-        int latCount = 0;
+        int count = 1;
 
         Calendar calendar = Calendar.getInstance();
 
@@ -216,33 +216,35 @@ public class DummyController {
                 int year = random.nextInt((2003 - 1970)) + 1970;
                 int month = random.nextInt((12 - 1)) + 1;
                 int day = random.nextInt((25 - 1)) + 1;
+
                 String birthString = String.valueOf(year) +
                                      (month < 10 ? "0" + month : month) +
                                      (day < 10 ? "0" + day : day);
                 Date birth = originalFormat.parse(birthString);
-                Point location = gf.createPoint(new Coordinate(lon, lat));
-                String name = "account | " + lat + " | " + lon;
                 calendar.setTime(birth);
 
-                Account account = new Account();
-                account.setBlocked(false);
-                account.setEnabled(true);
-                account.setName(name);
+                Point location = gf.createPoint(new Coordinate(lon, lat));
 
+                Account account = new Account();
+
+//              Blocked and Enabled for integration test
+                account.setBlocked(size == count);
+
+                account.setEnabled(count != (size - 10));
+                account.setName(String.valueOf(count));
                 account.setEmail(count + "@gmail.com");
-                account.setAbout("this is about");
+                account.setAbout(count + ": this is my profile");
                 account.setBirthYear(calendar.get(Calendar.YEAR));
                 account.setBirth(birth);
                 account.setGender(gender);
                 account.setLocation(location);
                 account.setAccountType(accountType);
-                account.setScore(latCount);
+                account.setScore(0);
                 account.setPoint(50000);
                 account.setFcmToken("");
                 account.setCreatedAt(new Date());
                 account.setUpdatedAt(new Date());
                 account.setRepPhotoKeyUpdatedAt(new Date());
-
 
                 for (int p = 0; p < 5; p++) {
                     Photo photo = new Photo();
@@ -257,19 +259,12 @@ public class DummyController {
                     photo.setAccount(account);
                     account.getPhotos().add(photo);
                 }
-
-
                 entityManager.persist(account);
-
                 count++;
-                latCount++;
                 if (count > size) break;
             }
-
             if (count > size) break;
-            lonCount++;
         }
-
         entityManager.flush();
     }
 

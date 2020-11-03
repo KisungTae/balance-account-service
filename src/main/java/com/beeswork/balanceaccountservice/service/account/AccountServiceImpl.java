@@ -52,8 +52,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Transactional
     public void saveProfile(String accountId, String email, String name, Date birth, String about, boolean gender) {
 
-        System.out.println("execute saveProfile() with accountId: " + accountId + " || email: " + email);
-
         Account account = accountDAO.findBy(UUID.fromString(accountId), email);
         checkIfValid(account);
 
