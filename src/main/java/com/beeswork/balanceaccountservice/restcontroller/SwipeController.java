@@ -89,21 +89,17 @@ public class SwipeController extends BaseController {
         MatchProjection match = clickDTO.getMatch();
 
         if (clickDTO.getNotificationType().equals(NotificationType.MATCH)) {
-            String message = messageSource.getMessage(MessageKey.MATCH_NOTIFICATION_MESSAGE, null, locale);
             fcmService.sendNotification(FCMNotificationDTO.matchNotification(clickDTO.getFcmToken(),
                                                                              match.getMatchedId().toString(),
                                                                              match.getName(),
                                                                              match.getChatId().toString(),
-                                                                             match.getPhotoKey(),
-                                                                             message));
-        } else if (clickDTO.getNotificationType().equals(NotificationType.CLICK)) {
-            String message = messageSource.getMessage(MessageKey.CLICKED_NOTIFICATION_MESSAGE, null, locale);
+                                                                             match.getPhotoKey()));
+        } else if (clickDTO.getNotificationType().equals(NotificationType.CLICKED)) {
             String updatedAt = DateTimeFormatter.ISO_INSTANT.format(match.getUpdatedAt().toInstant());
             fcmService.sendNotification(FCMNotificationDTO.clickedNotification(clickDTO.getFcmToken(),
                                                                                match.getMatchedId().toString(),
                                                                                match.getPhotoKey(),
-                                                                               updatedAt,
-                                                                               message));
+                                                                               updatedAt));
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO));

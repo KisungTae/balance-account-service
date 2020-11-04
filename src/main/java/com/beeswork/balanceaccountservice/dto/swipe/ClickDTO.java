@@ -1,16 +1,10 @@
 package com.beeswork.balanceaccountservice.dto.swipe;
 
 import com.beeswork.balanceaccountservice.constant.NotificationType;
-import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
-import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.projection.MatchProjection;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.UUID;
 
@@ -18,12 +12,12 @@ import java.util.UUID;
 @Setter
 public class ClickDTO {
 
-    private String notificationType = NotificationType.NOT_CLICK;
+    private String notificationType = NotificationType.NOT_CLICKED;
     private String fcmToken;
     private MatchProjection match;
 
-    public void setupAsClick(UUID swipedId, String swipedPhotoKey, String swipedFCMToken, Date updatedAt) {
-        this.notificationType = NotificationType.CLICK;
+    public void setupAsClicked(UUID swipedId, String swipedPhotoKey, String swipedFCMToken, Date updatedAt) {
+        this.notificationType = NotificationType.CLICKED;
         this.match = new MatchProjection();
         this.match.setMatchedId(swipedId);
         this.match.setPhotoKey(swipedPhotoKey);

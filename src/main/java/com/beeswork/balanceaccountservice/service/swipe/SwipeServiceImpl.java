@@ -13,7 +13,6 @@ import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
-import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
@@ -135,7 +134,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             clickDTO.setupAsMatch(swiped.getId(), swiped.getName(), swiped.getRepPhotoKey(),
                                   chat.getId(), swiped.getFcmToken(), false);
         } else {
-            clickDTO.setupAsClick(swiped.getId(), swiped.getRepPhotoKey(), swiped.getFcmToken(), swipe.getUpdatedAt());
+            clickDTO.setupAsClicked(swiped.getId(), swiped.getRepPhotoKey(), swiped.getFcmToken(), swipe.getUpdatedAt());
         }
         return clickDTO;
     }

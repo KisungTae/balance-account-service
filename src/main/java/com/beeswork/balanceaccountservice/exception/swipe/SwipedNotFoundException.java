@@ -6,6 +6,6 @@ import com.beeswork.balanceaccountservice.exception.BaseException;
 public class SwipedNotFoundException extends BaseException {
 
     public SwipedNotFoundException() {
-        super(ExceptionCode.SWIPE_NOT_FOUND_EXCEPTION);
+        super(ExceptionCode.SWIPED_NOT_FOUND_EXCEPTION);
     }
 }

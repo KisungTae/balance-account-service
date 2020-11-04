@@ -1,6 +1,5 @@
 package com.beeswork.balanceaccountservice.service.match;
 
-import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.projection.MatchProjection;
 
 import java.util.Date;

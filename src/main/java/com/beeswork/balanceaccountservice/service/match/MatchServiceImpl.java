@@ -4,7 +4,6 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.match.Match;
-import com.beeswork.balanceaccountservice.exception.account.AccountInvalidException;
 import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
@@ -48,8 +47,8 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     public void unmatch(String unmatcherId, String unmatcherEmail, String unmatchedId) {
 
         UUID unmatcherUUID = UUID.fromString(unmatchedId);
-        if (!accountDAO.existsBy(unmatcherUUID, unmatcherEmail, false))
-            throw new AccountInvalidException();
+//        if (!accountDAO.existsBy(unmatcherUUID, unmatcherEmail, false))
+//            throw new AccountInvalidException();
 
         List<Match> matches = matchDAO.findPairById(UUID.fromString(unmatcherId), UUID.fromString(unmatchedId));
 

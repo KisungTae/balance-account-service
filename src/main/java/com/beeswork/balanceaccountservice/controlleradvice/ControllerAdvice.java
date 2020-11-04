@@ -12,7 +12,7 @@ public class ControllerAdvice {
 
     @InitBinder
     public void initBinder (WebDataBinder binder ) {
-        StringTrimmerEditor stringtrimmer = new StringTrimmerEditor(true);
-        binder.registerCustomEditor(String.class, stringtrimmer);
+        StringTrimmerEditor stringTrimmerEditor = new StringTrimmerEditor(true);
+        binder.registerCustomEditor(String.class, stringTrimmerEditor);
     }
 }

@@ -19,31 +19,29 @@ public class FCMNotificationDTO {
 
 
     public static FCMNotificationDTO matchNotification(String token, String matchedId, String name, String chatId,
-                                                       String matchedPhotoKey, String message) {
+                                                       String matchedPhotoKey) {
 
-        FCMNotificationDTO fcmNotificationDTO = notification(token, NotificationType.MATCH, matchedPhotoKey, message);
+        FCMNotificationDTO fcmNotificationDTO = notification(token, NotificationType.MATCH, matchedPhotoKey);
         fcmNotificationDTO.getMessages().put(FCMDataKey.MATCHED_ID, matchedId);
         fcmNotificationDTO.getMessages().put(FCMDataKey.NAME, name);
         fcmNotificationDTO.getMessages().put(FCMDataKey.CHAT_ID, chatId);
         return fcmNotificationDTO;
     }
 
-    public static FCMNotificationDTO clickedNotification(String token, String swipedId, String clickedPhotoKey, String updatedAt, String message) {
+    public static FCMNotificationDTO clickedNotification(String token, String swipedId, String clickedPhotoKey, String updatedAt) {
 
-        FCMNotificationDTO fcmNotificationDTO = notification(token, NotificationType.CLICKED, clickedPhotoKey,message);
+        FCMNotificationDTO fcmNotificationDTO = notification(token, NotificationType.CLICKED, clickedPhotoKey);
         fcmNotificationDTO.getMessages().put(FCMDataKey.SWIPED_ID, swipedId);
         fcmNotificationDTO.getMessages().put(FCMDataKey.UPDATED_AT, updatedAt);
         return fcmNotificationDTO;
     }
 
-    private static FCMNotificationDTO notification(String token, String notificationType, String photoKey,
-                                                   String message) {
+    private static FCMNotificationDTO notification(String token, String notificationType, String photoKey) {
 
         FCMNotificationDTO fcmNotificationDTO = new FCMNotificationDTO();
         fcmNotificationDTO.setToken(token);
         fcmNotificationDTO.getMessages().put(FCMDataKey.NOTIFICATION_TYPE, notificationType);
         fcmNotificationDTO.getMessages().put(FCMDataKey.PHOTO_KEY, photoKey);
-        fcmNotificationDTO.getMessages().put(FCMDataKey.MESSAGE, message);
         return fcmNotificationDTO;
     }
 }
