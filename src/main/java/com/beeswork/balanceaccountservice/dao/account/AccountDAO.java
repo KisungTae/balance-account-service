@@ -11,6 +11,7 @@ public interface AccountDAO extends BaseDAO<Account> {
 
     Account findById(UUID accountId);
     Account findBy(UUID accountId, String email);
+    Account findWithPhotos(UUID accountId, String email);
     Account findWithQuestions(UUID accountId, String email);
     Account findWithQuestions(UUID accountId);
     Account findWithAccountQuestions(UUID accountId, String email);

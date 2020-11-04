@@ -27,6 +27,7 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     private final QAccount qAccount = QAccount.account;
     private final QAccountQuestion qAccountQuestion = QAccountQuestion.accountQuestion;
     private final QQuestion qQuestion = QQuestion.question;
+    private final QPhoto qPhoto = QPhoto.photo;
 
     @Autowired
     public AccountDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
@@ -42,6 +43,14 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     @Override
     public Account findBy(UUID accountId, String email) {
         return jpaQueryFactory.selectFrom(qAccount)
+                              .where(qAccount.id.eq(accountId).and(qAccount.email.eq(email)))
+                              .fetchOne();
+    }
+
+    @Override
+    public Account findWithPhotos(UUID accountId, String email) {
+        return jpaQueryFactory.selectFrom(qAccount)
+                              .innerJoin(qAccount.photos, qPhoto)
                               .where(qAccount.id.eq(accountId).and(qAccount.email.eq(email)))
                               .fetchOne();
     }

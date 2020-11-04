@@ -6,6 +6,7 @@ import com.beeswork.balanceaccountservice.constant.ColumnIndex;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
 import com.beeswork.balanceaccountservice.dto.account.*;
+import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
@@ -41,6 +42,37 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         this.geometryFactory = geometryFactory;
     }
 
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED,
+                   isolation = Isolation.READ_COMMITTED,
+                   readOnly = true)
+    public List<QuestionDTO> getQuestions(String accountId, String email) {
+
+        Account account = accountDAO.findWithQuestions(UUID.fromString(accountId), email);
+        checkIfAccountValid(account);
+
+        List<QuestionDTO> questionDTOs = new ArrayList<>();
+        for (AccountQuestion accountQuestion : account.getAccountQuestions()) {
+            Question question = accountQuestion.getQuestion();
+            questionDTOs.add(new QuestionDTO(accountQuestion.getQuestionId(),
+                                             question.getDescription(),
+                                             question.getTopOption(),
+                                             question.getBottomOption(),
+                                             accountQuestion.isSelected()));
+        }
+        return questionDTOs;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED,
+                   isolation = Isolation.READ_COMMITTED,
+                   readOnly = true)
+    public ProfileDTO getProfile(String accountId, String email) {
+
+        Account account = accountDAO.findWithPhotos(UUID.fromString(accountId), email);
+        checkIfAccountValid(account);
+        return modelMapper.map(account, ProfileDTO.class);
+    }
 
     //  DESC 1. when registering, an account will be created with enabled = false, then when finish profiles,
     //          it will update enabled = true because users might get cards for which profile has not been updated
@@ -53,7 +85,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     public void saveProfile(String accountId, String email, String name, Date birth, String about, boolean gender) {
 
         Account account = accountDAO.findBy(UUID.fromString(accountId), email);
-        checkIfValid(account);
+        checkIfAccountValid(account);
 
         if (!account.isEnabled()) {
             account.setName(name);
@@ -66,6 +98,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
             account.setGender(gender);
         }
 
+
         account.setAbout(about);
         account.setUpdatedAt(new Date());
         account.setEnabled(true);
@@ -76,7 +109,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     public void saveLocation(String accountId, String email, double latitude, double longitude) {
 
         Account account = accountDAO.findBy(UUID.fromString(accountId), email);
-        checkIfValid(account);
+        checkIfAccountValid(account);
         account.setLocation(geometryFactory.createPoint(new Coordinate(latitude, longitude)));
     }
 
@@ -85,7 +118,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     public void saveFCMToken(String accountId, String email, String token) {
 
         Account account = accountDAO.findBy(UUID.fromString(accountId), email);
-        checkIfValid(account);
+        checkIfAccountValid(account);
         account.setFcmToken(token);
     }
 
@@ -98,7 +131,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     public void saveQuestions(String accountId, String email, List<AccountQuestionDTO> accountQuestionDTOs) {
 
         Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId), email);
-        checkIfValid(account);
+        checkIfAccountValid(account);
         account.getAccountQuestions().clear();
         Date date = new Date();
 
@@ -116,15 +149,23 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     // TEST 1. matches are mapped by matcher_id not matched_id
     @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED,
+                   isolation = Isolation.READ_COMMITTED,
+                   readOnly = true)
     public List<CardDTO> recommend(String accountId, String email, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude) {
 
         Account account = accountDAO.findBy(UUID.fromString(accountId), email);
-        checkIfValid(account);
+        checkIfAccountValid(account);
         Point location = geometryFactory.createPoint(new Coordinate(longitude, latitude));
         location.setSRID(AppConstant.SRID);
-        List<Object[]> accounts = accountDAO.findAllWithin(distance, minAge, maxAge, gender, AppConstant.LIMIT,
-                                                           account.getIndex() * AppConstant.LIMIT, location);
+        List<Object[]> accounts = accountDAO.findAllWithin(distance, minAge, maxAge, gender, AppConstant.PAGE_LIMIT,
+                                                           account.getIndex() * AppConstant.PAGE_LIMIT, location);
+
+        //increment or reset index
+//        int index = account.getIndex() + 1;
+//        if (accounts.size() < AppConstant.PAGE_LIMIT)
+//            index = 0;
+//        account.setIndex(index);
 
         String previousId = "";
         List<CardDTO> cardDTOs = new ArrayList<>();

@@ -179,6 +179,7 @@ create table account
     blocked                  boolean                not null,
     name                     varchar(50)            not null,
     email                    varchar(256) unique    not null,
+    height                   int,
     birth_year               int                    not null,
     birth                    Date                   not null,
     about                    varchar(500)           not null,
@@ -430,3 +431,6 @@ create table chat_message
     constraint chat_message_sender_id_fk foreign key (sender_id) references account (id)
 );
 
+
+select *
+from account;

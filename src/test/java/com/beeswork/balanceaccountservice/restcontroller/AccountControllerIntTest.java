@@ -51,7 +51,7 @@ class AccountControllerIntTest {
     private final QAccount qAccount = QAccount.account;
 
 
-    @Test
+//    @Test
     @DisplayName("saveProfileWithInvalidEmail_shouldThrowAccountNotFoundException")
     void saveProfileWithInvalidEmail_shouldThrowAccountNotFoundException() throws Exception {
 
@@ -70,7 +70,7 @@ class AccountControllerIntTest {
                .andExpect(response -> assertTrue(response.getResolvedException() instanceof AccountNotFoundException));
     }
 
-    @Test
+//    @Test
     @DisplayName("saveProfileWithBlockedAccount_shouldThrowAccountBlockedException")
     void saveProfileWithBlockedAccount_shouldThrowAccountBlockedException() throws Exception {
 
@@ -88,7 +88,7 @@ class AccountControllerIntTest {
 
     }
 
-    @Test
+//    @Test
     @DisplayName("saveProfileWithInvalidUUID_shouldThrowAccountNotFoundException")
     void saveProfileWithInvalidUUID_shouldThrowAccountNotFoundException() throws Exception {
 
@@ -104,7 +104,7 @@ class AccountControllerIntTest {
                .andExpect(response -> assertTrue(response.getResolvedException() instanceof AccountNotFoundException));
     }
 
-    @Test
+//    @Test
     @DisplayName("saveProfileWithEmptyArguments")
     void saveProfileWithEmptyArguments_shouldThrowFieldException() throws Exception {
 
@@ -136,7 +136,7 @@ class AccountControllerIntTest {
         assertEquals(getErrorMessage(FieldError.GENDER_NULL), fieldErrorMessages.get(Field.GENDER));
     }
 
-    @Test
+//    @Test
     @DisplayName("saveProfileWithInvalidArguments")
     void saveProfileWithInvalidArguments_shouldThrowFieldException() throws Exception {
 

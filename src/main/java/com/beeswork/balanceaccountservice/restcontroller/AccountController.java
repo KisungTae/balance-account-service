@@ -3,12 +3,15 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.account.AccountQuestionDTO;
 import com.beeswork.balanceaccountservice.dto.account.CardDTO;
+import com.beeswork.balanceaccountservice.dto.account.ProfileDTO;
+import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
 import com.beeswork.balanceaccountservice.vm.account.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.coyote.Response;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,26 @@ public class AccountController extends BaseController {
     public AccountController(ObjectMapper objectMapper, ModelMapper modelMapper, AccountService accountService) {
         super(objectMapper, modelMapper);
         this.accountService = accountService;
+    }
+
+    @GetMapping("/questions")
+    public ResponseEntity<String> getQuestions(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
+                                               BindingResult bindingResult) throws JsonProcessingException {
+
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+
+        List<QuestionDTO> questionDTOs = accountService.getQuestions(accountIdentityVM.getAccountId(), accountIdentityVM.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<String> getProfile(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
+                                             BindingResult bindingResult) throws JsonProcessingException {
+
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+
+        ProfileDTO profileDTO = accountService.getProfile(accountIdentityVM.getAccountId(), accountIdentityVM.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(profileDTO));
     }
 
     @PostMapping("/profile")

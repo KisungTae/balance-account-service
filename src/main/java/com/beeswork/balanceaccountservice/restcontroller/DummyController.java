@@ -175,8 +175,6 @@ public class DummyController {
     @PostMapping("/create/questions")
     public void createDummyQuestions(@RequestParam int size) {
 
-
-
         for (int i = 1; i <= size; i++) {
             Question question = new Question();
             question.setDescription("question-" + i);
@@ -245,6 +243,9 @@ public class DummyController {
                 account.setCreatedAt(new Date());
                 account.setUpdatedAt(new Date());
                 account.setRepPhotoKeyUpdatedAt(new Date());
+
+                if (random.nextBoolean())
+                    account.setHeight(random.nextInt(50) + 150);
 
                 for (int p = 0; p < 5; p++) {
                     Photo photo = new Photo();

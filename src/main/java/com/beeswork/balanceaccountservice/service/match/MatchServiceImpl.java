@@ -38,9 +38,8 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     public List<MatchProjection> listMatches(String matcherId, String email, Date fetchedAt) {
 
         UUID matcherUUID = UUID.fromString(matcherId);
-        if (!accountDAO.existsBy(matcherUUID, email, false))
-            throw new AccountInvalidException();
-
+        Account account = accountDAO.findBy(matcherUUID, email);
+        checkIfAccountValid(account);
         return matchDAO.findAllAfter(matcherUUID, fetchedAt);
     }
 

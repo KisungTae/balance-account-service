@@ -4,12 +4,9 @@ package com.beeswork.balanceaccountservice.dto.account;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
-public class AccountQuestionDTO {
-    private long questionId;
+public class PhotoDTO {
+    private String key;
     private int sequence;
-    private boolean selected;
 }

@@ -34,4 +34,6 @@ public class SaveProfileVM extends AccountIdentityVM {
     @NotNull(message = "{gender.null}")
     private Boolean gender;
 
+    private Integer height;
+
 }

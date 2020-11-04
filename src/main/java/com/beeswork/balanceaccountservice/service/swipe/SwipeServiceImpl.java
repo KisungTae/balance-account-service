@@ -49,10 +49,10 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     public BalanceGameDTO swipe(String swiperId, String swiperEmail, String swipedId) {
 
         Account swiper = accountDAO.findBy(UUID.fromString(swiperId), swiperEmail);
-        checkIfValid(swiper);
+        checkIfAccountValid(swiper);
 
-        Account swiped = accountDAO.findWithQuestions(UUID.fromString(swipedId), null);
-        checkIfValid(swiped);
+        Account swiped = accountDAO.findWithQuestions(UUID.fromString(swipedId));
+        checkIfSwipedValid(swiped);
 
         if (swipeDAO.existsByClicked(swiper.getId(), swiped.getId(), true))
             throw new SwipeClickedExistsException();
@@ -82,10 +82,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     public List<ClickedProjection> listClicked(String swipedId, String email, Date fetchedAt) {
 
         UUID swipedUUID = UUID.fromString(swipedId);
-
-        if (!accountDAO.existsBy(swipedUUID, email, true))
-            throw new AccountInvalidException();
-
+        Account account = accountDAO.findBy(swipedUUID, email);
+        checkIfAccountValid(account);
         return swipeDAO.findAllClickedAfter(swipedUUID, fetchedAt);
     }
 
@@ -102,8 +100,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         Account swiper = swipe.getSwiper();
         Account swiped = swipe.getSwiped();
 
-        checkIfValid(swiper, swiperEmail);
-        checkIfValid(swiped);
+        checkIfAccountValid(swiper, swiperEmail);
+        checkIfSwipedValid(swiped);
 
         if (swiper.getPoint() < AppConstant.SWIPE_POINT)
             throw new AccountShortOfPointException();

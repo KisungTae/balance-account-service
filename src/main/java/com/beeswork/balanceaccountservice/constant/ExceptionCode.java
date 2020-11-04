@@ -17,6 +17,8 @@ public class ExceptionCode {
 
     public static final String SWIPE_CLICKED_EXISTS_EXCEPTION = "swipe.clicked.exists.exception";
     public static final String SWIPE_NOT_FOUND_EXCEPTION      = "swipe.not.found.exception";
+    public static final String SWIPED_NOT_FOUND_EXCEPTION = "swiped.not.found.exception";
+    public static final String SWIPED_BLOCKED_EXCEPTION = "swiped.blocked.exception";
 
     public static final String MATCH_EXISTS_EXCEPTION = "match.exists.exception";
 
