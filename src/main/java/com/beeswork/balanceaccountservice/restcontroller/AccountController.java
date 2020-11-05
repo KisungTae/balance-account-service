@@ -71,6 +71,7 @@ public class AccountController extends BaseController {
                                        saveProfileVM.getName(),
                                        saveProfileVM.getBirth(),
                                        saveProfileVM.getAbout(),
+                                       saveProfileVM.getHeight(),
                                        saveProfileVM.getGender());
         } catch (ObjectOptimisticLockingFailureException exception) {
             accountService.saveProfile(saveProfileVM.getAccountId(),
@@ -78,6 +79,7 @@ public class AccountController extends BaseController {
                                        saveProfileVM.getName(),
                                        saveProfileVM.getBirth(),
                                        saveProfileVM.getAbout(),
+                                       saveProfileVM.getHeight(),
                                        saveProfileVM.getGender());
         }
 

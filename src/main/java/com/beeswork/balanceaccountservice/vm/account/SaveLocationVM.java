@@ -4,9 +4,8 @@ import com.beeswork.balanceaccountservice.validator.ValidUUID;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.annotation.RegEx;
+import javax.validation.constraints.*;
 import java.util.UUID;
 
 @Getter
@@ -14,8 +13,12 @@ import java.util.UUID;
 public class SaveLocationVM extends AccountIdentityVM {
 
     @NotNull
+    @DecimalMin("-90.0")
+    @DecimalMax("90.0")
     private Double latitude;
 
     @NotNull
+    @DecimalMin("-180.0")
+    @DecimalMax("180.0")
     private Double longitude;
 }

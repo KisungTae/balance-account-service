@@ -82,7 +82,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          then Hibernate won't delete accountQuestions even if their size = 0
     @Override
     @Transactional
-    public void saveProfile(String accountId, String email, String name, Date birth, String about, boolean gender) {
+    public void saveProfile(String accountId, String email, String name, Date birth, String about, Integer height, boolean gender) {
 
         Account account = accountDAO.findBy(UUID.fromString(accountId), email);
         checkIfAccountValid(account);
@@ -96,8 +96,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
             account.setBirthYear(calendar.get(Calendar.YEAR));
             account.setBirth(birth);
             account.setGender(gender);
+            account.setHeight(height);
         }
-
 
         account.setAbout(about);
         account.setUpdatedAt(new Date());

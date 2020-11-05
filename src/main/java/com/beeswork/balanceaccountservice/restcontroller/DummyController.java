@@ -228,7 +228,7 @@ public class DummyController {
 //              Blocked and Enabled for integration test
                 account.setBlocked(size == count);
 
-                account.setEnabled(count != (size - 10));
+                account.setEnabled(random.nextBoolean());
                 account.setName(String.valueOf(count));
                 account.setEmail(count + "@gmail.com");
                 account.setAbout(count + ": this is my profile");

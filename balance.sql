@@ -432,5 +432,8 @@ create table chat_message
 );
 
 
+
 select *
 from account;
+
+update account set enabled = true;

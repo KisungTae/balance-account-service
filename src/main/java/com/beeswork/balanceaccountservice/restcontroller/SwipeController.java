@@ -1,6 +1,5 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.constant.MessageKey;
 import com.beeswork.balanceaccountservice.constant.NotificationType;
 import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.BalanceGameDTO;

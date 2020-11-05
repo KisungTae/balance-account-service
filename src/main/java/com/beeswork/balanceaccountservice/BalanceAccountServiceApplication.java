@@ -70,6 +70,7 @@ public class BalanceAccountServiceApplication {
 //				 27. update getClickedList to have last update time as field and remove udpatedAt in the ClickedDTO
 //				 28. consider whether to put {error.message} in vm's fields
 //				 29. when token is not valid, Firebase returns error response, put try catch in FCMServiceImpl
+//				 30. It seems like the integration runs twice and I don't know why
 
 
 
