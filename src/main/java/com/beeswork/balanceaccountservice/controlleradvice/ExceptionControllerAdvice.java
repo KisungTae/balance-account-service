@@ -8,6 +8,8 @@ import com.beeswork.balanceaccountservice.exception.account.*;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +32,7 @@ import java.util.Map;
 public class ExceptionControllerAdvice {
 
     private final MessageSource messageSource;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper  objectMapper;
 
     @Autowired
     public ExceptionControllerAdvice(MessageSource messageSource, ObjectMapper objectMapper) {
@@ -48,7 +50,8 @@ public class ExceptionControllerAdvice {
     }
 
     @ExceptionHandler({AccountShortOfPointException.class, AccountBlockedException.class,
-                       SwipeClickedExistsException.class, BadRequestException.class})
+                       SwipeClickedExistsException.class, BadRequestException.class,
+                       SwipedBlockedException.class, SwipedNotFoundException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

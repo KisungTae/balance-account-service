@@ -15,6 +15,8 @@ import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
@@ -72,6 +74,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
                                                               question.getTopOption(),
                                                               question.getBottomOption()));
         }
+
         return balanceGameDTO;
     }
 

@@ -10,6 +10,7 @@ import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
+import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.locationtech.jts.geom.Coordinate;
@@ -162,35 +163,38 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
                                                            account.getIndex() * AppConstant.PAGE_LIMIT, location);
 
         //increment or reset index
-//        int index = account.getIndex() + 1;
+        int index = account.getIndex() + 1;
 //        if (accounts.size() < AppConstant.PAGE_LIMIT)
 //            index = 0;
-//        account.setIndex(index);
+        account.setIndex(index);
 
         String previousId = "";
         List<CardDTO> cardDTOs = new ArrayList<>();
         CardDTO cardDTO = new CardDTO();
 
         for (Object[] cAccount : accounts) {
-            String id = cAccount[ColumnIndex.ACCOUNT_PROFILE_ID].toString();
+            String id = cAccount[ColumnIndex.CARD_ID].toString();
             if (!previousId.equals(id)) {
 
                 cardDTOs.add(cardDTO);
                 previousId = id;
 
-                String name = cAccount[ColumnIndex.ACCOUNT_PROFILE_NAME].toString();
-                String about = cAccount[ColumnIndex.ACCOUNT_PROFILE_ABOUT].toString();
-                int birthYear = Integer.parseInt(cAccount[ColumnIndex.ACCOUNT_PROFILE_BIRTH_YEAR].toString());
-                int distanceBetween = (int) ((double) cAccount[ColumnIndex.ACCOUNT_PROFILE_DISTANCE]);
+                String name = cAccount[ColumnIndex.CARD_NAME].toString();
+                String about = cAccount[ColumnIndex.CARD_ABOUT].toString();
+                int birthYear = Integer.parseInt(cAccount[ColumnIndex.CARD_BIRTH_YEAR].toString());
+                int distanceBetween = (int) ((double) cAccount[ColumnIndex.CARD_DISTANCE]);
+                Integer height = (Integer) cAccount[ColumnIndex.CARD_HEIGHT];
 
-                cardDTO = new CardDTO(id, name, about, birthYear, distanceBetween);
+                cardDTO = new CardDTO(id, name, about, height, birthYear, distanceBetween);
             }
-            cardDTO.getPhotos().add(cAccount[ColumnIndex.ACCOUNT_PROFILE_PHOTO_KEY].toString());
+            cardDTO.getPhotos().add(cAccount[ColumnIndex.CARD_PHOTO_KEY].toString());
         }
 
         cardDTOs.add(cardDTO);
         cardDTOs.remove(0);
-        return cardDTOs;
+
+        throw new AccountBlockedException();
+//        return cardDTOs;
     }
 
 }

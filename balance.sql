@@ -431,9 +431,16 @@ create table chat_message
     constraint chat_message_sender_id_fk foreign key (sender_id) references account (id)
 );
 
+select swiped_id, count(*)
+from swipe
+group by swiped_id
+order by count(*) desc;
+
+select *
+from account
+where id = 'e338f080-2a4b-4213-888c-5d8327720860';
 
 
 select *
-from account;
-
-update account set enabled = true;
+from account_question
+where account_id = 'e5733b9f-c371-437b-b67a-c542c0435fae';

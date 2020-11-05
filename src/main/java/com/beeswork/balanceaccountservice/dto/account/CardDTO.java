@@ -16,15 +16,17 @@ public class CardDTO {
     private String accountId;
     private String name;
     private String about;
+    private Integer height;
     private int birthYear;
     private int distance;
 
     private List<String> photos = new ArrayList<>();
 
-    public CardDTO(String accountId, String name, String about, int birthYear, int distance) {
+    public CardDTO(String accountId, String name, String about, Integer height, int birthYear, int distance) {
         this.accountId = accountId;
         this.name = name;
         this.about = about;
+        this.height = height;
         this.birthYear = birthYear;
         this.distance = distance;
     }

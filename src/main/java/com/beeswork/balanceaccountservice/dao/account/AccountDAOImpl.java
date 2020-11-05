@@ -92,7 +92,7 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     @SuppressWarnings("unchecked")
     public List<Object[]> findAllWithin(int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point point) {
         return entityManager.createNativeQuery(
-                "select cast(b.id as varchar), b.name, b.about, b.birth_year, st_distance(b.location, :pivot), p.key " +
+                "select cast(b.id as varchar), b.name, b.about, b.birth_year, st_distance(b.location, :pivot), p.key, b.height " +
                 "from (select * " +
                 "      from account a  " +
                 "      where st_dwithin(location, :pivot, :distance) " +

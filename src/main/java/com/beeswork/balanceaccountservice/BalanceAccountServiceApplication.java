@@ -71,6 +71,9 @@ public class BalanceAccountServiceApplication {
 //				 28. consider whether to put {error.message} in vm's fields
 //				 29. when token is not valid, Firebase returns error response, put try catch in FCMServiceImpl
 //				 30. It seems like the integration runs twice and I don't know why
+//				 31. account_question should have history, because a user has answers on old question and try to click and should have history to match
+//					 so, while balanceGame retrieves only the questions currently selected
+
 
 
 
