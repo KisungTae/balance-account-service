@@ -14,6 +14,7 @@ import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
+import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
@@ -116,8 +117,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         for (AccountQuestion accountQuestion : swiped.getAccountQuestions()) {
             Boolean answer = answers.get(accountQuestion.getQuestionId());
-            if (answer == null || accountQuestion.isSelected() != answer)
-                return clickDTO;
+            if (answer == null) throw new QuestionSetChangedException();
+            else if (accountQuestion.isSelected() != answer) return clickDTO;
         }
 
         swipe.setClicked(true);

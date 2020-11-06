@@ -12,6 +12,7 @@ public class ExceptionCode {
     public static final String ACCOUNT_BLOCKED_EXCEPTION = "account.blocked.exception";
 
     public static final String QUESTION_NOT_FOUND_EXCEPTION = "question.not.found.exception";
+    public static final String QUESTION_SET_CHANGED_EXCEPTION = "question.set.changed.exception";
 
     public static final String SWIPE_CLICKED_EXISTS_EXCEPTION = "swipe.clicked.exists.exception";
     public static final String SWIPE_NOT_FOUND_EXCEPTION      = "swipe.not.found.exception";

@@ -7,6 +7,7 @@ import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface AccountService {
@@ -15,6 +16,6 @@ public interface AccountService {
     void saveProfile(String accountId, String email, String name, Date birth, String about, Integer height, boolean gender);
     void saveLocation(String accountId, String email, double latitude, double longitude);
     void saveFCMToken(String accountId, String email, String token);
-    void saveQuestions(String accountId, String email, List<AccountQuestionDTO> accountQuestionDTOs);
+    void saveAnswers(String accountId, String email, Map<Long, Boolean> answers);
     List<CardDTO> recommend(String accountId, String email, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude);
 }

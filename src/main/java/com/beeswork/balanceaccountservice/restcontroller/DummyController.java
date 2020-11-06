@@ -1,11 +1,8 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.config.properties.AWSProperties;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
-import com.beeswork.balanceaccountservice.dao.accounttype.AccountTypeDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
-import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
 import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
@@ -16,28 +13,22 @@ import com.beeswork.balanceaccountservice.entity.question.QQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
-import com.beeswork.balanceaccountservice.service.account.AccountService;
-import com.beeswork.balanceaccountservice.service.firebase.FCMService;
+import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.hibernate.Session;
-import org.hibernate.StaleObjectStateException;
-import org.hibernate.StaleStateException;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.RollbackException;
 import javax.transaction.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -53,15 +44,15 @@ public class DummyController {
 
     private final MatchDAO matchDAO;
     private final ObjectMapper objectMapper;
-    private final FCMService fcmService;
+    private final FirebaseService firebaseService;
     private final AccountDAO accountDAO;
     private final ChatDAO chatDAO;
 
     @Autowired
-    public DummyController(MatchDAO matchDAO, ObjectMapper objectMapper, FCMService fcmService, AccountDAO accountDAO, ChatDAO chatDAO) {
+    public DummyController(MatchDAO matchDAO, ObjectMapper objectMapper, FirebaseService firebaseService, AccountDAO accountDAO, ChatDAO chatDAO) {
         this.matchDAO = matchDAO;
         this.objectMapper = objectMapper;
-        this.fcmService = fcmService;
+        this.firebaseService = firebaseService;
         this.accountDAO = accountDAO;
         this.chatDAO = chatDAO;
     }

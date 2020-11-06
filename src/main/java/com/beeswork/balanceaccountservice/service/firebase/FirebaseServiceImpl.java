@@ -1,6 +1,9 @@
 package com.beeswork.balanceaccountservice.service.firebase;
 
 import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
@@ -14,12 +17,12 @@ import java.util.Map;
 
 
 @Service
-public class FCMServiceImpl implements FCMService {
+public class FirebaseServiceImpl implements FirebaseService {
 
     private final FirebaseMessaging firebaseMessaging;
 
     @Autowired
-    public FCMServiceImpl(FirebaseMessaging firebaseMessaging) {
+    public FirebaseServiceImpl(FirebaseMessaging firebaseMessaging) {
         this.firebaseMessaging = firebaseMessaging;
     }
 
@@ -31,6 +34,7 @@ public class FCMServiceImpl implements FCMService {
         sendNotification(fcmNotificationDTO.getToken(), fcmNotificationDTO.getMessages());
     }
 
+    @Override
     public void sendNotifications(List<FCMNotificationDTO> fcmNotificationDTOs) throws FirebaseMessagingException {
 
         for (FCMNotificationDTO fcmNotificationDTO : fcmNotificationDTOs) {
@@ -52,5 +56,13 @@ public class FCMServiceImpl implements FCMService {
         messageBuilder.setNotification(notification);
         String response = firebaseMessaging.send(messageBuilder.build());
         System.out.println("response: " + response);
+    }
+
+    @Override
+    public void verifyToken(String fcmToken) throws FirebaseAuthException {
+        FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(fcmToken);
+        String uid = decodedToken.getUid();
+        System.out.println("uid: " + uid);
+        System.out.println(decodedToken.toString());
     }
 }

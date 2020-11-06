@@ -23,9 +23,6 @@ public class AccountQuestion {
     @Column(name = "selected")
     private boolean selected;
 
-    @Column(name = "sequence")
-    private int sequence;
-
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -42,10 +39,9 @@ public class AccountQuestion {
     @MapsId("questionId")
     private Question question;
 
-    public AccountQuestion(Account account, Question question, boolean selected, int sequence, Date createdAt, Date updatedAt) {
+    public AccountQuestion(Account account, Question question, boolean selected, Date createdAt, Date updatedAt) {
         this.accountQuestionId = new AccountQuestionId(account.getId(), question.getId());
         this.selected = selected;
-        this.sequence = sequence;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.account = account;

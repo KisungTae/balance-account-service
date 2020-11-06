@@ -8,12 +8,14 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
-public class SaveAccountQuestionVM extends AccountIdentityVM {
+public class SaveAnswersVM extends AccountIdentityVM {
 
     @Size(min = 1, max = 3, message = "질문개수는 최소 {min}개 최대 {max}개 까지 입니다")
-    private List<AccountQuestionVM> accountQuestionVMs = new ArrayList<>();
+    private Map<Long, Boolean> answers = new HashMap<>();
 }

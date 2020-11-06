@@ -7,7 +7,7 @@ import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.projection.MatchProjection;
-import com.beeswork.balanceaccountservice.service.firebase.FCMService;
+import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
 import com.beeswork.balanceaccountservice.service.swipe.SwipeService;
 import com.beeswork.balanceaccountservice.vm.swipe.ClickVM;
 import com.beeswork.balanceaccountservice.vm.swipe.ListClickedVM;
@@ -33,15 +33,15 @@ import java.util.Locale;
 public class SwipeController extends BaseController {
 
     private final SwipeService swipeService;
-    private final FCMService fcmService;
+    private final FirebaseService firebaseService;
     private final MessageSource messageSource;
 
     @Autowired
-    public SwipeController(ObjectMapper objectMapper, ModelMapper modelMapper, SwipeService swipeService, FCMService fcmService, MessageSource messageSource) {
+    public SwipeController(ObjectMapper objectMapper, ModelMapper modelMapper, SwipeService swipeService, FirebaseService firebaseService, MessageSource messageSource) {
 
         super(objectMapper, modelMapper);
         this.swipeService = swipeService;
-        this.fcmService = fcmService;
+        this.firebaseService = firebaseService;
         this.messageSource = messageSource;
     }
 
@@ -88,17 +88,17 @@ public class SwipeController extends BaseController {
         MatchProjection match = clickDTO.getMatch();
 
         if (clickDTO.getNotificationType().equals(NotificationType.MATCH)) {
-            fcmService.sendNotification(FCMNotificationDTO.matchNotification(clickDTO.getFcmToken(),
-                                                                             match.getMatchedId().toString(),
-                                                                             match.getName(),
-                                                                             match.getChatId().toString(),
-                                                                             match.getPhotoKey()));
+            firebaseService.sendNotification(FCMNotificationDTO.matchNotification(clickDTO.getFcmToken(),
+                                                                                  match.getMatchedId().toString(),
+                                                                                  match.getName(),
+                                                                                  match.getChatId().toString(),
+                                                                                  match.getPhotoKey()));
         } else if (clickDTO.getNotificationType().equals(NotificationType.CLICKED)) {
             String updatedAt = DateTimeFormatter.ISO_INSTANT.format(match.getUpdatedAt().toInstant());
-            fcmService.sendNotification(FCMNotificationDTO.clickedNotification(clickDTO.getFcmToken(),
-                                                                               match.getMatchedId().toString(),
-                                                                               match.getPhotoKey(),
-                                                                               updatedAt));
+            firebaseService.sendNotification(FCMNotificationDTO.clickedNotification(clickDTO.getFcmToken(),
+                                                                                    match.getMatchedId().toString(),
+                                                                                    match.getPhotoKey(),
+                                                                                    updatedAt));
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO));

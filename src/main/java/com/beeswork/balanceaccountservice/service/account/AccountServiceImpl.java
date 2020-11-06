@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImpl extends BaseServiceImpl implements AccountService {
@@ -111,7 +112,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
         Account account = accountDAO.findBy(UUID.fromString(accountId), email);
         checkIfAccountValid(account);
-        account.setLocation(geometryFactory.createPoint(new Coordinate(latitude, longitude)));
+        account.setLocation(geometryFactory.createPoint(new Coordinate(longitude, latitude)));
     }
 
     @Override
@@ -129,22 +130,24 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          accountQuestions to check if it needs to remove or insert or update entities
     @Override
     @Transactional
-    public void saveQuestions(String accountId, String email, List<AccountQuestionDTO> accountQuestionDTOs) {
+    public void saveAnswers(String accountId, String email, Map<Long, Boolean> answers) {
 
         Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId), email);
         checkIfAccountValid(account);
+
         account.getAccountQuestions().clear();
         Date date = new Date();
 
-        for (AccountQuestionDTO accountQuestionDTO : accountQuestionDTOs) {
-            Question question = questionDAO.findById(accountQuestionDTO.getQuestionId());
-            if (question == null) throw new QuestionNotFoundException();
-            account.getAccountQuestions().add(new AccountQuestion(account,
-                                                                  question,
-                                                                  accountQuestionDTO.isSelected(),
-                                                                  accountQuestionDTO.getSequence(),
-                                                                  date,
-                                                                  date));
+        List<Long> questionIds = new ArrayList<>(answers.keySet());
+        List<Question> questions = questionDAO.findAllByIds(questionIds);
+
+        if (answers.size() != questions.size())
+            throw new QuestionNotFoundException();
+
+        for (Question question : questions) {
+            Boolean answer = answers.get(question.getId());
+            if (answer == null) throw new QuestionNotFoundException();
+            account.getAccountQuestions().add(new AccountQuestion(account, question, answer, date, date));
         }
     }
 

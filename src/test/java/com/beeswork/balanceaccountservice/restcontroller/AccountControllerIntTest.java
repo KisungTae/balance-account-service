@@ -55,9 +55,88 @@ class AccountControllerIntTest {
 
     private final QAccount qAccount = QAccount.account;
 
+//  #################################################################################################  //
+//  #################################################################################################  //
+//  ################################      savaFCMToken()      #######################################  //
+//  #################################################################################################  //
+//  #################################################################################################  //
 
 
-    //@Test
+
+    @Test
+    @DisplayName("saveFCMTokenWithBlockedAccount_shouldThrowAccountBlockedException")
+    void saveFCMTokenWithBlockedAccount_shouldThrowAccountBlockedException() throws Exception {
+
+        Account account = jpaQueryFactory.selectFrom(qAccount).where(qAccount.blocked.eq(true)).fetchFirst();
+
+        Map<String, Object> paramsMap = getSaveFCMTokenArguments(account.getId(), account.getEmail(), RandomStringGenerator.generate(10));
+        System.out.println("saveFCMTokenWithBlockedAccount_shouldThrowAccountBlockedException - params");
+        paramsMap.forEach((key, value) -> System.out.printf("%s=%s%n", key, value));
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post(URLPath.ACCOUNT_LOCATION)
+                                                              .contentType(MediaType.APPLICATION_JSON)
+                                                              .content(objectMapper.writeValueAsString(paramsMap));
+
+        mockMvc.perform(requestBuilder)
+               .andExpect(status().isBadRequest())
+               .andExpect(response -> assertTrue(response.getResolvedException() instanceof AccountBlockedException));
+    }
+
+    @Test
+    @DisplayName("saveFCMTokenWithInvalidEmail_shouldThrowAccountNotFoundException")
+    void saveFCMTokenWithInvalidEmail_shouldThrowAccountNotFoundException() throws Exception {
+
+        Account account = jpaQueryFactory.selectFrom(qAccount).where(qAccount.blocked.eq(false)).fetchFirst();
+
+        Map<String, Object> paramsMap = getSaveFCMTokenArguments(account.getId(), "abc" + account.getEmail(), RandomStringGenerator.generate(10));
+        System.out.println("saveFCMTokenWithInvalidEmail_shouldThrowAccountNotFoundException - params");
+        paramsMap.forEach((key, value) -> System.out.printf("%s=%s%n", key, value));
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post(URLPath.ACCOUNT_LOCATION)
+                                                              .contentType(MediaType.APPLICATION_JSON)
+                                                              .content(objectMapper.writeValueAsString(paramsMap));
+
+        mockMvc.perform(requestBuilder)
+               .andExpect(status().isNotFound())
+               .andExpect(response -> assertTrue(response.getResolvedException() instanceof AccountNotFoundException));
+    }
+
+
+    @Test
+    @DisplayName("saveFCMTokenWithInvalidUUID_shouldThrowAccountNotFoundException")
+    void saveFCMTokenWithInvalidUUID_shouldThrowAccountNotFoundException() throws Exception {
+
+        Map<String, Object> paramsMap = getSaveFCMTokenArguments(UUID.randomUUID(), "c0go233@gmail.com", RandomStringGenerator.generate(10));
+        System.out.println("saveFCMTokenWithInvalidUUID_shouldThrowAccountNotFoundException - params");
+        paramsMap.forEach((key, value) -> System.out.printf("%s=%s%n", key, value));
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post(URLPath.ACCOUNT_FCM_TOKEN)
+                                                              .contentType(MediaType.APPLICATION_JSON)
+                                                              .content(objectMapper.writeValueAsString(paramsMap));
+
+        mockMvc.perform(requestBuilder)
+               .andExpect(status().isNotFound())
+               .andExpect(response -> assertTrue(response.getResolvedException() instanceof AccountNotFoundException));
+    }
+
+    private Map<String, Object> getSaveFCMTokenArguments(Object accountId, Object email, Object token) {
+        Map<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put(Field.ACCOUNT_ID, accountId);
+        paramsMap.put(Field.EMAIL, email);
+        paramsMap.put(Field.TOKEN, token);
+        return paramsMap;
+    }
+
+
+
+//  #################################################################################################  //
+//  #################################################################################################  //
+//  ################################      savaLocation()      #######################################  //
+//  #################################################################################################  //
+//  #################################################################################################  //
+
+
+    @Test
     @DisplayName("saveLocation_shouldUpdateLocationField")
     void saveLocation_shouldUpdateLocationField() throws Exception {
 
@@ -79,14 +158,14 @@ class AccountControllerIntTest {
 
         mockMvc.perform(requestBuilder).andExpect(status().isOk());
 
-        Account account1 = jpaQueryFactory.selectFrom(qAccount).where(qAccount.id.eq(account.getId())).fetchOne();
-        Point point = geometryFactory.createPoint(new Coordinate(latitude, longitude));
-        assertEquals(account1.getLocation(), point);
+        account = jpaQueryFactory.selectFrom(qAccount).where(qAccount.id.eq(account.getId())).fetchOne();
+        Point point = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+        assertEquals(account.getLocation(), point);
     }
 
 
 
-    //@Test
+    @Test
     @DisplayName("saveLocationWithOutOfRange_shouldThrowBadRequestException")
     void saveLocationWithOutOfRange_shouldThrowBadRequestException() throws Exception {
 
@@ -105,7 +184,7 @@ class AccountControllerIntTest {
                .andExpect(response -> assertTrue(response.getResolvedException() instanceof BadRequestException));
     }
 
-    //@Test
+    @Test
     @DisplayName("saveLocationWithEmptyArguments_shouldThrowBadRequestException")
     void saveLocationWithEmptyArguments_shouldThrowBadRequestException() throws Exception {
 
@@ -127,7 +206,7 @@ class AccountControllerIntTest {
 
 
 
-    //@Test
+    @Test
     @DisplayName("saveLocationWithBlockedAccount_shouldThrowAccountBlockedException")
     void saveLocationWithBlockedAccount_shouldThrowAccountBlockedException() throws Exception {
 
@@ -146,7 +225,7 @@ class AccountControllerIntTest {
                .andExpect(response -> assertTrue(response.getResolvedException() instanceof AccountBlockedException));
     }
 
-    //@Test
+    @Test
     @DisplayName("saveLocationWithInvalidEmail_shouldThrowAccountNotFoundException")
     void saveLocationWithInvalidEmail_shouldThrowAccountNotFoundException() throws Exception {
 
@@ -166,7 +245,7 @@ class AccountControllerIntTest {
     }
 
 
-    //@Test
+    @Test
     @DisplayName("saveLocationWithInvalidUUID_shouldThrowAccountNotFoundException")
     void saveLocationWithInvalidUUID_shouldThrowAccountNotFoundException() throws Exception {
 
