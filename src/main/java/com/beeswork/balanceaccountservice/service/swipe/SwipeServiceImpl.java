@@ -13,6 +13,7 @@ import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
+import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
@@ -48,7 +49,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public BalanceGameDTO swipe(String swiperId, String swiperEmail, String swipedId) {
+    public BalanceGameDTO swipe(String swiperId, String swiperEmail, Long swipeId,  String swipedId) {
 
         Account swiper = accountDAO.findBy(UUID.fromString(swiperId), swiperEmail);
         checkIfAccountValid(swiper);
@@ -62,12 +63,16 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         if (swiper.getPoint() < AppConstant.SWIPE_POINT)
             throw new AccountShortOfPointException();
 
-        Swipe swipe = new Swipe(swiper, swiped, false, new Date(), new Date());
-        swipeDAO.persist(swipe);
 
         BalanceGameDTO balanceGameDTO = new BalanceGameDTO();
-        balanceGameDTO.setSwipeId(swipe.getId());
+        balanceGameDTO.setSwipeId(swipeId);
 
+        if (swipeId == null) {
+            Swipe swipe = new Swipe(swiper, swiped, false, new Date(), new Date());
+            swipeDAO.persist(swipe);
+            balanceGameDTO.setSwipeId(swipe.getId());
+        }
+        
         for (AccountQuestion accountQuestion : swiped.getAccountQuestions()) {
             Question question = accountQuestion.getQuestion();
             balanceGameDTO.getQuestions().add(new QuestionDTO(question.getId(),
@@ -140,6 +145,9 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         } else {
             clickDTO.setupAsClicked(swiped.getId(), swiped.getRepPhotoKey(), swiped.getFcmToken(), swipe.getUpdatedAt());
         }
+
+//        throw new BadRequestException();
+//        throw new SwipedNotFoundException();
         return clickDTO;
     }
 }

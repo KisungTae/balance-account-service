@@ -53,6 +53,7 @@ public class SwipeController extends BaseController {
 
         BalanceGameDTO balanceGameDTO = swipeService.swipe(swipeVM.getAccountId(),
                                                            swipeVM.getEmail(),
+                                                           swipeVM.getSwipeId(),
                                                            swipeVM.getSwipedId());
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(balanceGameDTO));

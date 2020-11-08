@@ -58,11 +58,4 @@ public class FirebaseServiceImpl implements FirebaseService {
         System.out.println("response: " + response);
     }
 
-    @Override
-    public void verifyToken(String fcmToken) throws FirebaseAuthException {
-        FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(fcmToken);
-        String uid = decodedToken.getUid();
-        System.out.println("uid: " + uid);
-        System.out.println(decodedToken.toString());
-    }
 }

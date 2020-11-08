@@ -113,7 +113,6 @@ public class AccountController extends BaseController {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
-
         try {
             accountService.saveFCMToken(saveFCMTokenVM.getAccountId(),
                                         saveFCMTokenVM.getEmail(),

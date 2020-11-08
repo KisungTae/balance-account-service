@@ -135,20 +135,33 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId), email);
         checkIfAccountValid(account);
 
-        account.getAccountQuestions().clear();
         Date date = new Date();
 
-        List<Long> questionIds = new ArrayList<>(answers.keySet());
-        List<Question> questions = questionDAO.findAllByIds(questionIds);
-
-        if (answers.size() != questions.size())
-            throw new QuestionNotFoundException();
-
-        for (Question question : questions) {
-            Boolean answer = answers.get(question.getId());
-            if (answer == null) throw new QuestionNotFoundException();
-            account.getAccountQuestions().add(new AccountQuestion(account, question, answer, date, date));
+        for (int i = account.getAccountQuestions().size() - 1; i >= 0; i--) {
+            AccountQuestion accountQuestion = account.getAccountQuestions().get(i);
+            if (answers.containsKey(accountQuestion.getQuestionId())) {
+                accountQuestion.setSelected(answers.get(accountQuestion.getQuestionId()));
+                answers.remove(accountQuestion.getQuestionId());
+            } else {
+                account.getAccountQuestions().remove(accountQuestion);
+            }
         }
+
+        if (answers.size() > 0) {
+
+            List<Long> questionIds = new ArrayList<>(answers.keySet());
+            List<Question> questions = questionDAO.findAllByIds(questionIds);
+
+            if (answers.size() != questions.size())
+                throw new QuestionNotFoundException();
+
+            for (Question question : questions) {
+                Boolean answer = answers.get(question.getId());
+                if (answer == null) throw new QuestionNotFoundException();
+                account.getAccountQuestions().add(new AccountQuestion(account, question, answer, date, date));
+            }
+        }
+
     }
 
     // TEST 1. matches are mapped by matcher_id not matched_id
@@ -196,8 +209,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         cardDTOs.add(cardDTO);
         cardDTOs.remove(0);
 
-        throw new AccountBlockedException();
-//        return cardDTOs;
+//        throw new AccountBlockedException();
+        return cardDTOs;
     }
 
 }

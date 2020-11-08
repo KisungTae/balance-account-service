@@ -58,7 +58,7 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     @Override
     public Account findWithAccountQuestions(UUID accountId, String email) {
         return jpaQueryFactory.selectFrom(qAccount)
-                              .innerJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
+                              .leftJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
                               .where(qAccount.id.eq(accountId).and(qAccount.email.eq(email)))
                               .fetchOne();
     }

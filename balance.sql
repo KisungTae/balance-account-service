@@ -242,7 +242,6 @@ create table account_question
 (
     account_id  uuid        not null,
     question_id int         not null,
-    sequence    int         not null,
     selected    boolean     not null,
     created_at  timestamptz not null,
     updated_at  timestamptz not null,
@@ -431,5 +430,19 @@ create table chat_message
     constraint chat_message_sender_id_fk foreign key (sender_id) references account (id)
 );
 
+
+select swiped_id, count(*)
+from swipe
+group by swiped_id
+order by count(*) desc;
+
+
+
 select *
-from account;
+from swipe s
+left join match m on s.swiper_id = m.matcher_id and s.swiped_id = m.matched_id
+left join account a on s.swiper_id = a.id
+where s.swiped_id = 'e338f080-2a4b-4213-888c-5d8327720860'
+and s.clicked = true
+and m.matched_id is null
+and (s.updated_at > '2020-10-05 08:38:38.814000' or a.rep_photo_key_updated_at > '2020-01-05 08:38:38.814000');
