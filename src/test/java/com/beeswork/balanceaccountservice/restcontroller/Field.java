@@ -11,6 +11,7 @@ public class Field {
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
     public static final String TOKEN = "token";
+    public static final String ANSWERS = "answers";
     public static final int NAME_MIN = 1;
     public static final int NAME_MAX = 50;
     public static final int ABOUT_MIN = 1;

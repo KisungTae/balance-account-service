@@ -446,3 +446,19 @@ where s.swiped_id = 'e338f080-2a4b-4213-888c-5d8327720860'
 and s.clicked = true
 and m.matched_id is null
 and (s.updated_at > '2020-10-05 08:38:38.814000' or a.rep_photo_key_updated_at > '2020-01-05 08:38:38.814000');
+
+
+
+select *
+from question;
+
+
+select *
+from account_question;
+
+select *
+from account_question
+where account_id = '299facb4-f888-433f-9a20-f7ae2b1f20fe';
+
+select *
+from account;
