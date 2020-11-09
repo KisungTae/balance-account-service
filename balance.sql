@@ -431,34 +431,4 @@ create table chat_message
 );
 
 
-select swiped_id, count(*)
-from swipe
-group by swiped_id
-order by count(*) desc;
-
-
-
-select *
-from swipe s
-left join match m on s.swiper_id = m.matcher_id and s.swiped_id = m.matched_id
-left join account a on s.swiper_id = a.id
-where s.swiped_id = 'e338f080-2a4b-4213-888c-5d8327720860'
-and s.clicked = true
-and m.matched_id is null
-and (s.updated_at > '2020-10-05 08:38:38.814000' or a.rep_photo_key_updated_at > '2020-01-05 08:38:38.814000');
-
-
-
-select *
-from question;
-
-
-select *
-from account_question;
-
-select *
-from account_question
-where account_id = '299facb4-f888-433f-9a20-f7ae2b1f20fe';
-
-select *
-from account;
+select * from account;

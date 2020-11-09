@@ -776,7 +776,7 @@ class AccountControllerIntTest {
                                          .where(qAccount.blocked.eq(blocked).and(qAccount.enabled.eq(enabled)))
                                          .fetchFirst();
 
-        return getSaveProfileArgumentsAsMap(account.getId(),
+        return getSaveProfileArgumentsAsMap(account.getId().toString(),
                                             RandomStringGenerator.generate(10),
                                             account.getEmail(),
                                             "1910-01-01",
