@@ -15,7 +15,7 @@ public class AccountIdentityVM {
     @ValidUUID(message = "{uuid.invalid}")
     protected String accountId;
 
-    @NotEmpty(message = "{email.empty}")
-    @Email(message = "{email.invalid}")
-    protected String email;
+    @NotEmpty(message = "{uuid.empty}")
+    @ValidUUID(message = "{uuid.invalid}")
+    protected String identityToken;
 }

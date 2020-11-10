@@ -49,9 +49,9 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public BalanceGameDTO swipe(String swiperId, String swiperEmail, Long swipeId,  String swipedId) {
+    public BalanceGameDTO swipe(String accountId, String identityToken, Long swipeId, String swipedId) {
 
-        Account swiper = accountDAO.findBy(UUID.fromString(swiperId), swiperEmail);
+        Account swiper = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(swiper);
 
         Account swiped = accountDAO.findWithQuestions(UUID.fromString(swipedId));
@@ -87,20 +87,19 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<ClickedProjection> listClicked(String swipedId, String email, Date fetchedAt) {
+    public List<ClickedProjection> listClicked(String accountId, String identityToken, Date fetchedAt) {
 
-        UUID swipedUUID = UUID.fromString(swipedId);
-        Account account = accountDAO.findBy(swipedUUID, email);
+        UUID accountUUId = UUID.fromString(accountId);
+        Account account = accountDAO.findBy(accountUUId, UUID.fromString(identityToken));
         checkIfAccountValid(account);
-        return swipeDAO.findAllClickedAfter(swipedUUID, fetchedAt);
+        return swipeDAO.findAllClickedAfter(accountUUId, fetchedAt);
     }
 
     @Override
     @Transactional
-    public ClickDTO click(Long swipeId, String swiperId, String swiperEmail, String swipedId,
-                          Map<Long, Boolean> answers) {
+    public ClickDTO click(Long swipeId, String accountId, String identityToken, String swipedId, Map<Long, Boolean> answers) {
 
-        UUID swiperUUId = UUID.fromString(swiperId);
+        UUID swiperUUId = UUID.fromString(accountId);
         UUID swipedUUId = UUID.fromString(swipedId);
 
         Swipe swipe = swipeDAO.findWithAccounts(swipeId, swiperUUId, swipedUUId);
@@ -108,7 +107,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         Account swiper = swipe.getSwiper();
         Account swiped = swipe.getSwiped();
 
-        checkIfAccountValid(swiper, swiperEmail);
+        checkIfAccountValid(swiper, UUID.fromString(identityToken));
         checkIfSwipedValid(swiped);
 
         if (swiper.getPoint() < AppConstant.SWIPE_POINT)

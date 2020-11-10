@@ -48,9 +48,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Transactional(propagation = Propagation.REQUIRED,
                    isolation = Isolation.READ_COMMITTED,
                    readOnly = true)
-    public List<QuestionDTO> getQuestions(String accountId, String email) {
+    public List<QuestionDTO> getQuestions(String accountId, String identityToken) {
 
-        Account account = accountDAO.findWithQuestions(UUID.fromString(accountId), email);
+        Account account = accountDAO.findWithQuestions(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
 
         List<QuestionDTO> questionDTOs = new ArrayList<>();
@@ -69,9 +69,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Transactional(propagation = Propagation.REQUIRED,
                    isolation = Isolation.READ_COMMITTED,
                    readOnly = true)
-    public ProfileDTO getProfile(String accountId, String email) {
+    public ProfileDTO getProfile(String accountId, String identityToken) {
 
-        Account account = accountDAO.findWithPhotos(UUID.fromString(accountId), email);
+        Account account = accountDAO.findWithPhotos(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
         return modelMapper.map(account, ProfileDTO.class);
     }
@@ -84,9 +84,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          then Hibernate won't delete accountQuestions even if their size = 0
     @Override
     @Transactional
-    public void saveProfile(String accountId, String email, String name, Date birth, String about, Integer height, boolean gender) {
+    public void saveProfile(String accountId, String identityToken, String name, Date birth, String about, Integer height, boolean gender) {
 
-        Account account = accountDAO.findBy(UUID.fromString(accountId), email);
+        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
 
         if (!account.isEnabled()) {
@@ -108,18 +108,18 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
-    public void saveLocation(String accountId, String email, double latitude, double longitude) {
+    public void saveLocation(String accountId, String identityToken, double latitude, double longitude) {
 
-        Account account = accountDAO.findBy(UUID.fromString(accountId), email);
+        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
         account.setLocation(geometryFactory.createPoint(new Coordinate(longitude, latitude)));
     }
 
     @Override
     @Transactional
-    public void saveFCMToken(String accountId, String email, String token) {
+    public void saveFCMToken(String accountId, String identityToken, String token) {
 
-        Account account = accountDAO.findBy(UUID.fromString(accountId), email);
+        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
         account.setFcmToken(token);
     }
@@ -130,9 +130,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          accountQuestions to check if it needs to remove or insert or update entities
     @Override
     @Transactional
-    public void saveAnswers(String accountId, String email, Map<Long, Boolean> answers) {
+    public void saveAnswers(String accountId, String identityToken, Map<Long, Boolean> answers) {
 
-        Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId), email);
+        Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
 
         Date date = new Date();
@@ -169,9 +169,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Transactional(propagation = Propagation.REQUIRED,
                    isolation = Isolation.READ_COMMITTED,
                    readOnly = true)
-    public List<CardDTO> recommend(String accountId, String email, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude) {
+    public List<CardDTO> recommend(String accountId, String identityToken, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude) {
 
-        Account account = accountDAO.findBy(UUID.fromString(accountId), email);
+        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
         Point location = geometryFactory.createPoint(new Coordinate(longitude, latitude));
         location.setSRID(AppConstant.SRID);

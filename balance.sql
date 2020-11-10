@@ -175,6 +175,8 @@ create table account
 (
     version                  int                    not null,
     id                       uuid primary key default uuid_generate_v4(),
+    social_login_id          varchar(100),
+    identity_token           uuid                   not null,
     enabled                  boolean                not null,
     blocked                  boolean                not null,
     name                     varchar(50)            not null,
@@ -336,7 +338,7 @@ create index match_matched_id_idx on match (matched_id);
 --
 --
 -- create index unmatch_unmatcher_id_idx on unmatch (unmatcher_id);
--- create index unmatch_unmatched_id_idx on unmatch (unmatched_id);
+-- create index unmatch_unmatched_id_idx on unmatch (uanmatched_id);
 
 
 create table admin
@@ -431,4 +433,5 @@ create table chat_message
 );
 
 
-select * from account;
+select *
+from account;

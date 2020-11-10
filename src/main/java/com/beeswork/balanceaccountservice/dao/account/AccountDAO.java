@@ -9,12 +9,10 @@ import java.util.UUID;
 
 public interface AccountDAO extends BaseDAO<Account> {
 
-    Account findById(UUID accountId);
-    Account findBy(UUID accountId, String email);
-    Account findWithPhotos(UUID accountId, String email);
-    Account findWithQuestions(UUID accountId, String email);
+    Account findBy(UUID accountId, UUID identityToken);
+    Account findWithPhotos(UUID accountId, UUID identityToken);
+    Account findWithQuestions(UUID accountId, UUID identityToken);
     Account findWithQuestions(UUID accountId);
-    Account findWithAccountQuestions(UUID accountId, String email);
+    Account findWithAccountQuestions(UUID accountId, UUID identityToken);
     List<Object[]> findAllWithin(int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point point);
-    boolean existsBy(UUID accountId, String email, boolean blocked);
 }

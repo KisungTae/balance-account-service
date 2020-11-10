@@ -34,38 +34,32 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
         super(entityManager, jpaQueryFactory);
     }
 
-    //  TODO: removeme
     @Override
-    public Account findById(UUID accountId) {
-        return jpaQueryFactory.selectFrom(qAccount).where(qAccount.id.eq(accountId)).fetchOne();
-    }
-
-    @Override
-    public Account findBy(UUID accountId, String email) {
+    public Account findBy(UUID accountId, UUID identityToken) {
         return jpaQueryFactory.selectFrom(qAccount)
-                              .where(qAccount.id.eq(accountId).and(qAccount.email.eq(email)))
+                              .where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken)))
                               .fetchOne();
     }
 
     @Override
-    public Account findWithPhotos(UUID accountId, String email) {
+    public Account findWithPhotos(UUID accountId, UUID identityToken) {
         return jpaQueryFactory.selectFrom(qAccount)
                               .innerJoin(qAccount.photos, qPhoto)
-                              .where(qAccount.id.eq(accountId).and(qAccount.email.eq(email)))
+                              .where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken)))
                               .fetchOne();
     }
 
     @Override
-    public Account findWithAccountQuestions(UUID accountId, String email) {
+    public Account findWithAccountQuestions(UUID accountId, UUID identityToken) {
         return jpaQueryFactory.selectFrom(qAccount)
                               .leftJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
-                              .where(qAccount.id.eq(accountId).and(qAccount.email.eq(email)))
+                              .where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken)))
                               .fetchOne();
     }
 
     @Override
-    public Account findWithQuestions(UUID accountId, String email) {
-        return findWithQuestions().where(qAccount.id.eq(accountId).and(qAccount.email.eq(email))).fetchOne();
+    public Account findWithQuestions(UUID accountId, UUID identityToken) {
+        return findWithQuestions().where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken))).fetchOne();
     }
 
     @Override
@@ -77,15 +71,6 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
         return jpaQueryFactory.selectFrom(qAccount)
                               .innerJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
                               .innerJoin(qAccountQuestion.question, qQuestion).fetchJoin();
-    }
-
-    @Override
-    public boolean existsBy(UUID accountId, String email, boolean blocked) {
-        return jpaQueryFactory.selectFrom(qAccount)
-                              .where(qAccount.id.eq(accountId)
-                                                .and(qAccount.email.eq(email))
-                                                .and(qAccount.blocked.eq(blocked)))
-                              .fetchCount() > 0;
     }
 
     @Override
@@ -114,14 +99,5 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
                             .setParameter("offset", offset)
                             .getResultList();
     }
-
-    private BooleanBuilder validAccount(UUID accountId, String email) {
-        BooleanBuilder where = new BooleanBuilder();
-        where.and(qAccount.id.eq(accountId));
-        where.and(qAccount.blocked.eq(false));
-        if (email != null) where.and(qAccount.email.eq(email));
-        return where;
-    }
-
 
 }

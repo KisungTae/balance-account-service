@@ -20,13 +20,11 @@ import java.util.UUID;
 @Repository
 public class QuestionServiceImpl extends BaseServiceImpl implements QuestionService {
 
-    private final AccountDAO accountDAO;
     private final QuestionDAO questionDAO;
 
-    public QuestionServiceImpl(QuestionDAO questionDAO, ModelMapper modelMapper, AccountDAO accountDAO) {
+    public QuestionServiceImpl(QuestionDAO questionDAO, ModelMapper modelMapper) {
         super(modelMapper);
         this.questionDAO = questionDAO;
-        this.accountDAO = accountDAO;
     }
 
     @Override

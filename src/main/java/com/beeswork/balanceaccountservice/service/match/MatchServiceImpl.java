@@ -34,23 +34,23 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<MatchProjection> listMatches(String matcherId, String email, Date fetchedAt) {
+    public List<MatchProjection> listMatches(String accountId, String identityToken, Date fetchedAt) {
 
-        UUID matcherUUID = UUID.fromString(matcherId);
-        Account account = accountDAO.findBy(matcherUUID, email);
+        UUID accountUUId = UUID.fromString(accountId);
+        Account account = accountDAO.findBy(accountUUId, UUID.fromString(identityToken));
         checkIfAccountValid(account);
-        return matchDAO.findAllAfter(matcherUUID, fetchedAt);
+        return matchDAO.findAllAfter(accountUUId, fetchedAt);
     }
 
     @Override
     @Transactional
-    public void unmatch(String unmatcherId, String unmatcherEmail, String unmatchedId) {
+    public void unmatch(String accountId, String identityToken, String unmatchedId) {
 
-        UUID unmatcherUUID = UUID.fromString(unmatchedId);
+        UUID unmatcherUUID = UUID.fromString(accountId);
 //        if (!accountDAO.existsBy(unmatcherUUID, unmatcherEmail, false))
 //            throw new AccountInvalidException();
 
-        List<Match> matches = matchDAO.findPairById(UUID.fromString(unmatcherId), UUID.fromString(unmatchedId));
+        List<Match> matches = matchDAO.findPairById(UUID.fromString(accountId), UUID.fromString(unmatchedId));
 
         Date date = new Date();
         for (Match match : matches) {

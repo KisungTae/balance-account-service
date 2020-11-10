@@ -8,6 +8,6 @@ import java.util.List;
 public interface MatchService {
 
 
-    List<MatchProjection> listMatches(String matcherId, String email, Date fetchedAt);
-    void unmatch(String unmatcherId, String unmatcherEmail, String unmatchedId);
+    List<MatchProjection> listMatches(String accountId, String identityToken, Date fetchedAt);
+    void unmatch(String accountId, String identityToken, String unmatchedId);
 }

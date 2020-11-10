@@ -52,7 +52,7 @@ public class SwipeController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
         BalanceGameDTO balanceGameDTO = swipeService.swipe(swipeVM.getAccountId(),
-                                                           swipeVM.getEmail(),
+                                                           swipeVM.getIdentityToken(),
                                                            swipeVM.getSwipeId(),
                                                            swipeVM.getSwipedId());
 
@@ -67,7 +67,7 @@ public class SwipeController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
         List<ClickedProjection> clickedProjections = swipeService.listClicked(listClickedVM.getAccountId(),
-                                                                              listClickedVM.getEmail(),
+                                                                              listClickedVM.getIdentityToken(),
                                                                               listClickedVM.getFetchedAt());
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickedProjections));
@@ -82,7 +82,7 @@ public class SwipeController extends BaseController {
 
         ClickDTO clickDTO = swipeService.click(clickVM.getSwipeId(),
                                                clickVM.getAccountId(),
-                                               clickVM.getEmail(),
+                                               clickVM.getIdentityToken(),
                                                clickVM.getSwipedId(),
                                                clickVM.getAnswers());
 

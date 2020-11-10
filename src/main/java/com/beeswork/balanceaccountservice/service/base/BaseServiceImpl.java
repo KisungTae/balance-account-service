@@ -7,6 +7,8 @@ import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import org.modelmapper.ModelMapper;
 
+import java.util.UUID;
+
 public abstract class BaseServiceImpl {
 
     protected final ModelMapper modelMapper;
@@ -15,9 +17,9 @@ public abstract class BaseServiceImpl {
         this.modelMapper = modelMapper;
     }
 
-    protected void checkIfAccountValid(Account account, String email) {
+    protected void checkIfAccountValid(Account account, UUID identityToken) {
         checkIfAccountValid(account);
-        if (!account.getEmail().equals(email)) throw new AccountNotFoundException();
+        if (!account.getIdentityToken().equals(identityToken)) throw new AccountNotFoundException();
     }
 
     protected void checkIfAccountValid(Account account) {

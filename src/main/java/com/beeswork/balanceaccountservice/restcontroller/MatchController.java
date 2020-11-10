@@ -39,7 +39,7 @@ public class MatchController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
         List<MatchProjection> matchProjections = matchService.listMatches(listMatchesVM.getAccountId(),
-                                                                          listMatchesVM.getEmail(),
+                                                                          listMatchesVM.getIdentityToken(),
                                                                           listMatchesVM.getFetchedAt());
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(matchProjections));
@@ -50,7 +50,7 @@ public class MatchController extends BaseController {
     throws JsonProcessingException {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        matchService.unmatch(unmatchVM.getAccountId(), unmatchVM.getEmail(), unmatchVM.getUnmatchedId());
+        matchService.unmatch(unmatchVM.getAccountId(), unmatchVM.getIdentityToken(), unmatchVM.getUnmatchedId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 

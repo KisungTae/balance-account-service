@@ -11,7 +11,7 @@ import java.util.Map;
 
 public interface SwipeService {
 
-    BalanceGameDTO swipe(String swiperId, String swiperEmail, Long swipeId, String swipedId);
-    List<ClickedProjection> listClicked(String swipedId, String email, Date fetchedAt);
-    ClickDTO click(Long swipeId, String swiperId, String swiperEmail, String swipedId, Map<Long, Boolean> answers);
+    BalanceGameDTO swipe(String accountId, String identityToken, Long swipeId, String swipedId);
+    List<ClickedProjection> listClicked(String accountId, String identityToken, Date fetchedAt);
+    ClickDTO click(Long swipeId, String accountId, String identityToken, String swipedId, Map<Long, Boolean> answers);
 }

@@ -32,6 +32,13 @@ public class Account {
     @Type(type="pg-uuid")
     private UUID id;
 
+    @Column(name = "social_login_id")
+    private String socialLoginId;
+
+    @Column(name = "identity_token")
+    @Type(type = "pg-uuid")
+    private UUID identityToken;
+
     @Column(name = "enabled")
     private boolean enabled;
 

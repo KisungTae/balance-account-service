@@ -28,14 +28,11 @@ import java.util.List;
 public class AccountController extends BaseController {
 
     private final AccountService accountService;
-    private final FirebaseService firebaseService;
 
     @Autowired
-    public AccountController(ObjectMapper objectMapper, ModelMapper modelMapper, AccountService accountService, FirebaseService firebaseService) {
+    public AccountController(ObjectMapper objectMapper, ModelMapper modelMapper, AccountService accountService) {
         super(objectMapper, modelMapper);
-        this.accountService = accountService;
-        this.firebaseService = firebaseService;
-    }
+        this.accountService = accountService; }
 
     @GetMapping("/questions")
     public ResponseEntity<String> getQuestions(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
@@ -44,7 +41,7 @@ public class AccountController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
         List<QuestionDTO> questionDTOs = accountService.getQuestions(accountIdentityVM.getAccountId(),
-                                                                     accountIdentityVM.getEmail());
+                                                                     accountIdentityVM.getIdentityToken());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
     }
 
@@ -55,7 +52,7 @@ public class AccountController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
         ProfileDTO profileDTO = accountService.getProfile(accountIdentityVM.getAccountId(),
-                                                          accountIdentityVM.getEmail());
+                                                          accountIdentityVM.getIdentityToken());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(profileDTO));
     }
 
@@ -68,7 +65,7 @@ public class AccountController extends BaseController {
 
         try {
             accountService.saveProfile(saveProfileVM.getAccountId(),
-                                       saveProfileVM.getEmail(),
+                                       saveProfileVM.getIdentityToken(),
                                        saveProfileVM.getName(),
                                        saveProfileVM.getBirth(),
                                        saveProfileVM.getAbout(),
@@ -76,7 +73,7 @@ public class AccountController extends BaseController {
                                        saveProfileVM.getGender());
         } catch (ObjectOptimisticLockingFailureException exception) {
             accountService.saveProfile(saveProfileVM.getAccountId(),
-                                       saveProfileVM.getEmail(),
+                                       saveProfileVM.getIdentityToken(),
                                        saveProfileVM.getName(),
                                        saveProfileVM.getBirth(),
                                        saveProfileVM.getAbout(),
@@ -94,12 +91,12 @@ public class AccountController extends BaseController {
 
         try {
             accountService.saveLocation(saveLocationVM.getAccountId(),
-                                        saveLocationVM.getEmail(),
+                                        saveLocationVM.getIdentityToken(),
                                         saveLocationVM.getLatitude(),
                                         saveLocationVM.getLongitude());
         } catch (ObjectOptimisticLockingFailureException exception) {
             accountService.saveLocation(saveLocationVM.getAccountId(),
-                                        saveLocationVM.getEmail(),
+                                        saveLocationVM.getIdentityToken(),
                                         saveLocationVM.getLatitude(),
                                         saveLocationVM.getLongitude());
         }
@@ -115,11 +112,11 @@ public class AccountController extends BaseController {
 
         try {
             accountService.saveFCMToken(saveFCMTokenVM.getAccountId(),
-                                        saveFCMTokenVM.getEmail(),
+                                        saveFCMTokenVM.getIdentityToken(),
                                         saveFCMTokenVM.getToken());
         } catch (ObjectOptimisticLockingFailureException exception) {
             accountService.saveFCMToken(saveFCMTokenVM.getAccountId(),
-                                        saveFCMTokenVM.getEmail(),
+                                        saveFCMTokenVM.getIdentityToken(),
                                         saveFCMTokenVM.getToken());
         }
 
@@ -134,7 +131,7 @@ public class AccountController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
         accountService.saveAnswers(saveAnswersVM.getAccountId(),
-                                   saveAnswersVM.getEmail(),
+                                   saveAnswersVM.getIdentityToken(),
                                    saveAnswersVM.getAnswers());
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
@@ -146,7 +143,7 @@ public class AccountController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
         List<CardDTO> cardDTOs = accountService.recommend(recommendVM.getAccountId(),
-                                                          recommendVM.getEmail(),
+                                                          recommendVM.getIdentityToken(),
                                                           recommendVM.getDistance(),
                                                           recommendVM.getMinAge(),
                                                           recommendVM.getMaxAge(),
