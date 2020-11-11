@@ -1,9 +1,10 @@
 package com.beeswork.balanceaccountservice.exception;
 
-import com.beeswork.balanceaccountservice.constant.ExceptionCode;
-
 public class BadRequestException extends BaseException {
+
+    private static final String BAD_REQUEST_EXCEPTION = "bad.request.exception";
+
     public BadRequestException() {
-        super(ExceptionCode.BAD_REQUEST_EXCEPTION);
+        super(BAD_REQUEST_EXCEPTION);
     }
 }

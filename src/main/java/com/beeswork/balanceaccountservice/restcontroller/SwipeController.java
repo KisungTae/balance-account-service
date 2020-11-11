@@ -17,9 +17,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,15 +34,13 @@ public class SwipeController extends BaseController {
 
     private final SwipeService swipeService;
     private final FirebaseService firebaseService;
-    private final MessageSource messageSource;
 
     @Autowired
-    public SwipeController(ObjectMapper objectMapper, ModelMapper modelMapper, SwipeService swipeService, FirebaseService firebaseService, MessageSource messageSource) {
+    public SwipeController(ObjectMapper objectMapper, ModelMapper modelMapper, SwipeService swipeService, FirebaseService firebaseService) {
 
         super(objectMapper, modelMapper);
         this.swipeService = swipeService;
         this.firebaseService = firebaseService;
-        this.messageSource = messageSource;
     }
 
     @PostMapping
@@ -75,16 +73,26 @@ public class SwipeController extends BaseController {
 
 
     @PostMapping("/click")
-    public ResponseEntity<String> click(@Valid @RequestBody ClickVM clickVM, BindingResult bindingResult, Locale locale)
+    public ResponseEntity<String> click(@Valid @RequestBody ClickVM clickVM, BindingResult bindingResult)
     throws JsonProcessingException, FirebaseMessagingException {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        ClickDTO clickDTO = swipeService.click(clickVM.getSwipeId(),
-                                               clickVM.getAccountId(),
-                                               clickVM.getIdentityToken(),
-                                               clickVM.getSwipedId(),
-                                               clickVM.getAnswers());
+        ClickDTO clickDTO;
+
+        try {
+            clickDTO = swipeService.click(clickVM.getSwipeId(),
+                                          clickVM.getAccountId(),
+                                          clickVM.getIdentityToken(),
+                                          clickVM.getSwipedId(),
+                                          clickVM.getAnswers());
+        } catch (ObjectOptimisticLockingFailureException exception) {
+            clickDTO = swipeService.click(clickVM.getSwipeId(),
+                                          clickVM.getAccountId(),
+                                          clickVM.getIdentityToken(),
+                                          clickVM.getSwipedId(),
+                                          clickVM.getAnswers());
+        }
 
         MatchProjection match = clickDTO.getMatch();
 
@@ -104,6 +112,4 @@ public class SwipeController extends BaseController {
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO));
     }
-
-
 }

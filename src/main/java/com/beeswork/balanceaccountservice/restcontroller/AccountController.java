@@ -7,7 +7,6 @@ import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
-import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
 import com.beeswork.balanceaccountservice.vm.account.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +31,8 @@ public class AccountController extends BaseController {
     @Autowired
     public AccountController(ObjectMapper objectMapper, ModelMapper modelMapper, AccountService accountService) {
         super(objectMapper, modelMapper);
-        this.accountService = accountService; }
+        this.accountService = accountService;
+    }
 
     @GetMapping("/questions")
     public ResponseEntity<String> getQuestions(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
@@ -79,6 +79,24 @@ public class AccountController extends BaseController {
                                        saveProfileVM.getAbout(),
                                        saveProfileVM.getHeight(),
                                        saveProfileVM.getGender());
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+    }
+
+    @PostMapping("/about")
+    public ResponseEntity<String> saveAbout(@RequestBody SaveAboutVM saveAboutVM) throws JsonProcessingException {
+
+        try {
+            accountService.saveAbout(saveAboutVM.getAccountId(),
+                                     saveAboutVM.getIdentityToken(),
+                                     saveAboutVM.getAbout(),
+                                     saveAboutVM.getHeight());
+        } catch (ObjectOptimisticLockingFailureException exception) {
+            accountService.saveAbout(saveAboutVM.getAccountId(),
+                                     saveAboutVM.getIdentityToken(),
+                                     saveAboutVM.getAbout(),
+                                     saveAboutVM.getHeight());
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
@@ -148,8 +166,7 @@ public class AccountController extends BaseController {
                                                           recommendVM.getMinAge(),
                                                           recommendVM.getMaxAge(),
                                                           recommendVM.isGender(),
-                                                          recommendVM.getLatitude(),
-                                                          recommendVM.getLongitude());
+                                                          recommendVM.getIndex());
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(cardDTOs));
     }

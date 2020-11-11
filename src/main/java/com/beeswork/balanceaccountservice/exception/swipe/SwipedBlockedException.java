@@ -1,11 +1,12 @@
 package com.beeswork.balanceaccountservice.exception.swipe;
 
-import com.beeswork.balanceaccountservice.constant.ExceptionCode;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 
 public class SwipedBlockedException extends BaseException {
 
+    private static final String SWIPED_BLOCKED_EXCEPTION = "swiped.blocked.exception";
+
     public SwipedBlockedException() {
-        super(ExceptionCode.SWIPED_BLOCKED_EXCEPTION);
+        super(SWIPED_BLOCKED_EXCEPTION);
     }
 }

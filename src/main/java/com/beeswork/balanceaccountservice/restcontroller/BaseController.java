@@ -1,6 +1,5 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.constant.ExceptionCode;
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BaseController {
+
+    private static final String FIELD_EXCEPTION = "field.exception";
 
     protected final ObjectMapper objectMapper;
     protected final ModelMapper modelMapper;
@@ -29,7 +30,7 @@ public class BaseController {
         for (FieldError fieldError : bindingResult.getFieldErrors())
             fieldErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
 
-        ExceptionResponse exceptionResponse = new ExceptionResponse(ExceptionCode.FIELD_EXCEPTION, "", fieldErrors);
+        ExceptionResponse exceptionResponse = new ExceptionResponse(FIELD_EXCEPTION, "", fieldErrors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(exceptionResponse));
     }
 

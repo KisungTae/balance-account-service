@@ -1,6 +1,5 @@
 package com.beeswork.balanceaccountservice.service.swipe;
 
-import com.beeswork.balanceaccountservice.constant.AppConstant;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
@@ -13,12 +12,9 @@ import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
-import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
@@ -32,6 +28,8 @@ import java.util.*;
 
 @Service
 public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
+
+    private static final int SWIPE_POINT = 50;
 
     private final AccountDAO accountDAO;
     private final SwipeDAO   swipeDAO;
@@ -60,9 +58,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         if (swipeDAO.existsByClicked(swiper.getId(), swiped.getId(), true))
             throw new SwipeClickedExistsException();
 
-        if (swiper.getPoint() < AppConstant.SWIPE_POINT)
+        if (swiper.getPoint() < SWIPE_POINT)
             throw new AccountShortOfPointException();
-
 
         BalanceGameDTO balanceGameDTO = new BalanceGameDTO();
         balanceGameDTO.setSwipeId(swipeId);
@@ -110,11 +107,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         checkIfAccountValid(swiper, UUID.fromString(identityToken));
         checkIfSwipedValid(swiped);
 
-        if (swiper.getPoint() < AppConstant.SWIPE_POINT)
+        if (swiper.getPoint() < SWIPE_POINT)
             throw new AccountShortOfPointException();
 
         int point = swiper.getPoint();
-        point -= AppConstant.SWIPE_POINT;
+        point -= SWIPE_POINT;
         swiper.setPoint(point);
 
         ClickDTO clickDTO = new ClickDTO();

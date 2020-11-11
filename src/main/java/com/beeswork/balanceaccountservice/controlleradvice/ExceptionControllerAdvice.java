@@ -1,7 +1,6 @@
 package com.beeswork.balanceaccountservice.controlleradvice;
 
 
-import com.beeswork.balanceaccountservice.constant.ExceptionCode;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 import com.beeswork.balanceaccountservice.exception.account.*;
@@ -14,23 +13,22 @@ import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundExceptio
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.api.Http;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 @RestControllerAdvice(annotations = RestController.class)
 public class ExceptionControllerAdvice {
+
+    private static final String INTERNAL_SERVER_EXCEPTION = "internal.server.exception";
+    private static final String QUERY_EXCEPTION = "query.exception";
 
     private final MessageSource messageSource;
     private final ObjectMapper  objectMapper;
@@ -60,6 +58,7 @@ public class ExceptionControllerAdvice {
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(exceptionResponse(exception.getExceptionCode(), locale));
     }
+
 
 
 //    @ExceptionHandler({QueryException.class})

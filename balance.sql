@@ -184,16 +184,16 @@ create table account
     height                   int,
     birth_year               int                    not null,
     birth                    Date                   not null,
-    about                    varchar(500)           not null,
+    about                    varchar(500),
     gender                   boolean                not null,
     score                    int                    not null,
-    index                    int                    not null,
+--     index                    int                    not null,
     point                    int                    not null,
     swiped_count             int                    not null,
-    rep_photo_key            varchar(30)            not null,
-    rep_photo_key_updated_at timestamptz            not null,
+    rep_photo_key            varchar(30),
+    rep_photo_key_updated_at timestamptz,
     location                 geography(point, 4326) not null,
-    fcm_token                varchar(200)           not null,
+    fcm_token                varchar(200),
     account_type_id          int                    not null,
     created_at               timestamptz            not null,
     updated_at               timestamptz            not null,
@@ -434,4 +434,10 @@ create table chat_message
 
 
 select *
-from account;
+from account
+where id = 'ff7562eb-379b-44f7-aded-9674bd374ebf';
+
+
+update account set version = 2
+where id = 'ff7562eb-379b-44f7-aded-9674bd374ebf';
+

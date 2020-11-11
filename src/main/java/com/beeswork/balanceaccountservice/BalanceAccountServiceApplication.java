@@ -74,6 +74,8 @@ public class BalanceAccountServiceApplication {
 //				 31. account_question should have history, because a user has answers on old question and try to click and should have history to match
 //					 so, while balanceGame retrieves only the questions currently selected
 //				 32. consider CSRF token implementation
+//				 33. when create account very first time, you should give it default location
+//				 34. in lambda for photos, when they update account plus version++ so that spring does  not overwrite
 
 
 

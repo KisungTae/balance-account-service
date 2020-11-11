@@ -1,16 +1,11 @@
 package com.beeswork.balanceaccountservice.vm.account;
 
-import com.beeswork.balanceaccountservice.constant.RegexPattern;
-import com.beeswork.balanceaccountservice.validator.ValidUUID;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.util.*;
 
 
@@ -27,13 +22,10 @@ public class SaveProfileVM extends AccountIdentityVM {
     @NotNull(message = "{birth.null}")
     private Date birth;
 
-    @NotEmpty(message = "{about.empty}")
-    @Length(min = 1, max = 500, message = "{about.length}")
-    private String about;
-
     @NotNull(message = "{gender.null}")
     private Boolean gender;
 
+    private String about;
     private Integer height;
 
 }

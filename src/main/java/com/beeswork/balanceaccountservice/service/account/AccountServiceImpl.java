@@ -1,8 +1,6 @@
 package com.beeswork.balanceaccountservice.service.account;
 
 
-import com.beeswork.balanceaccountservice.constant.AppConstant;
-import com.beeswork.balanceaccountservice.constant.ColumnIndex;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
 import com.beeswork.balanceaccountservice.dto.account.*;
@@ -10,12 +8,10 @@ import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
-import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,10 +20,22 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImpl extends BaseServiceImpl implements AccountService {
+
+    private static final int CARD_ID = 0;
+    private static final int CARD_NAME = 1;
+    private static final int CARD_ABOUT = 2;
+    private static final int CARD_BIRTH_YEAR = 3;
+    private static final int CARD_DISTANCE = 4;
+    private static final int CARD_PHOTO_KEY = 5;
+    private static final int CARD_HEIGHT = 6;
+
+    private static final int PAGE_LIMIT = 15;
+
+    private static final int maxDistance = 10000;
+    private static final int minDistance = 1000;
 
     private final AccountDAO accountDAO;
     private final QuestionDAO questionDAO;
@@ -99,11 +107,22 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
             account.setBirth(birth);
             account.setGender(gender);
             account.setHeight(height);
+            account.setAbout(about);
+            account.setUpdatedAt(new Date());
+            account.setEnabled(true);
         }
+    }
 
+    @Override
+    @Transactional
+    public void saveAbout(String accountId, String identityToken, String about, Integer height) {
+
+        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
+        checkIfAccountValid(account);
+
+        account.setHeight(height);
         account.setAbout(about);
         account.setUpdatedAt(new Date());
-        account.setEnabled(true);
     }
 
     @Override
@@ -132,7 +151,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Transactional
     public void saveAnswers(String accountId, String identityToken, Map<Long, Boolean> answers) {
 
-        Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId), UUID.fromString(identityToken));
+        Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId),
+                                                              UUID.fromString(identityToken));
         checkIfAccountValid(account);
 
         Date date = new Date();
@@ -169,47 +189,41 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Transactional(propagation = Propagation.REQUIRED,
                    isolation = Isolation.READ_COMMITTED,
                    readOnly = true)
-    public List<CardDTO> recommend(String accountId, String identityToken, int distance, int minAge, int maxAge, boolean gender, double latitude, double longitude) {
+    public List<CardDTO> recommend(String accountId, String identityToken, int distance, int minAge, int maxAge, boolean gender, int index) {
 
         Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
-        Point location = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-        location.setSRID(AppConstant.SRID);
-        List<Object[]> accounts = accountDAO.findAllWithin(distance, minAge, maxAge, gender, AppConstant.PAGE_LIMIT,
-                                                           account.getIndex() * AppConstant.PAGE_LIMIT, location);
 
-        //increment or reset index
-        int index = account.getIndex() + 1;
-//        if (accounts.size() < AppConstant.PAGE_LIMIT)
-//            index = 0;
-        account.setIndex(index);
+        if (distance < minDistance || distance > maxDistance)
+            distance = maxDistance;
+
+        List<Object[]> accounts = accountDAO.findAllWithin(distance, minAge, maxAge, gender, PAGE_LIMIT,
+                                                           index * PAGE_LIMIT, account.getLocation());
 
         String previousId = "";
         List<CardDTO> cardDTOs = new ArrayList<>();
         CardDTO cardDTO = new CardDTO();
 
         for (Object[] cAccount : accounts) {
-            String id = cAccount[ColumnIndex.CARD_ID].toString();
+            String id = cAccount[CARD_ID].toString();
             if (!previousId.equals(id)) {
 
                 cardDTOs.add(cardDTO);
                 previousId = id;
 
-                String name = cAccount[ColumnIndex.CARD_NAME].toString();
-                String about = cAccount[ColumnIndex.CARD_ABOUT].toString();
-                int birthYear = Integer.parseInt(cAccount[ColumnIndex.CARD_BIRTH_YEAR].toString());
-                int distanceBetween = (int) ((double) cAccount[ColumnIndex.CARD_DISTANCE]);
-                Integer height = (Integer) cAccount[ColumnIndex.CARD_HEIGHT];
+                String name = cAccount[CARD_NAME].toString();
+                String about = cAccount[CARD_ABOUT].toString();
+                int birthYear = Integer.parseInt(cAccount[CARD_BIRTH_YEAR].toString());
+                int distanceBetween = (int) ((double) cAccount[CARD_DISTANCE]);
+                Integer height = (Integer) cAccount[CARD_HEIGHT];
 
                 cardDTO = new CardDTO(id, name, about, height, birthYear, distanceBetween);
             }
-            cardDTO.getPhotos().add(cAccount[ColumnIndex.CARD_PHOTO_KEY].toString());
+            cardDTO.getPhotos().add(cAccount[CARD_PHOTO_KEY].toString());
         }
 
         cardDTOs.add(cardDTO);
         cardDTOs.remove(0);
-
-//        throw new AccountBlockedException();
         return cardDTOs;
     }
 
