@@ -13,9 +13,10 @@ import javax.validation.constraints.*;
 @Setter
 public class RecommendVM extends AccountIdentityVM {
 
-    private int distance;
-    private int minAge;
-    private int maxAge;
+    private int     distance;
+    private int     minAge;
+    private int     maxAge;
     private boolean gender;
-    private int index;
+    private Double latitude;
+    private Double longitude;
 }

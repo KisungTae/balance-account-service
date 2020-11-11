@@ -24,20 +24,20 @@ import java.util.*;
 @Service
 public class AccountServiceImpl extends BaseServiceImpl implements AccountService {
 
-    private static final int CARD_ID = 0;
-    private static final int CARD_NAME = 1;
-    private static final int CARD_ABOUT = 2;
+    private static final int CARD_ID         = 0;
+    private static final int CARD_NAME       = 1;
+    private static final int CARD_ABOUT      = 2;
     private static final int CARD_BIRTH_YEAR = 3;
-    private static final int CARD_DISTANCE = 4;
-    private static final int CARD_PHOTO_KEY = 5;
-    private static final int CARD_HEIGHT = 6;
+    private static final int CARD_DISTANCE   = 4;
+    private static final int CARD_PHOTO_KEY  = 5;
+    private static final int CARD_HEIGHT     = 6;
 
     private static final int PAGE_LIMIT = 15;
 
     private static final int maxDistance = 10000;
     private static final int minDistance = 1000;
 
-    private final AccountDAO accountDAO;
+    private final AccountDAO  accountDAO;
     private final QuestionDAO questionDAO;
 
     private final GeometryFactory geometryFactory;
@@ -92,7 +92,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          then Hibernate won't delete accountQuestions even if their size = 0
     @Override
     @Transactional
-    public void saveProfile(String accountId, String identityToken, String name, Date birth, String about, Integer height, boolean gender) {
+    public void saveProfile(String accountId, String identityToken, String name, Date birth, String about,
+                            Integer height, boolean gender) {
 
         Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
@@ -186,10 +187,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     // TEST 1. matches are mapped by matcher_id not matched_id
     @Override
-    @Transactional(propagation = Propagation.REQUIRED,
-                   isolation = Isolation.READ_COMMITTED,
-                   readOnly = true)
-    public List<CardDTO> recommend(String accountId, String identityToken, int distance, int minAge, int maxAge, boolean gender, int index) {
+    @Transactional
+    public List<CardDTO> recommend(String accountId, String identityToken, int distance, int minAge, int maxAge,
+                                   boolean gender, Double latitude, Double longitude) {
 
         Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
@@ -197,8 +197,13 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         if (distance < minDistance || distance > maxDistance)
             distance = maxDistance;
 
+//      TODO: if lat and lon are not null, then make point and search based on the point and update it to account
+
         List<Object[]> accounts = accountDAO.findAllWithin(distance, minAge, maxAge, gender, PAGE_LIMIT,
-                                                           index * PAGE_LIMIT, account.getLocation());
+                                                           account.getIndex() * PAGE_LIMIT, account.getLocation());
+
+//        int index = accounts.size() < PAGE_LIMIT ? 0 : account.getIndex() + 1;
+//        account.setIndex(index);
 
         String previousId = "";
         List<CardDTO> cardDTOs = new ArrayList<>();

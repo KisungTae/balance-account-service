@@ -69,8 +69,8 @@ public class Account {
     @Column(name = "score")
     private int score;
 
-//    @Column(name = "index")
-//    private int index;
+    @Column(name = "index")
+    private int index;
 
     @Column(name = "point")
     private int point;

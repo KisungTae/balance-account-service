@@ -160,13 +160,27 @@ public class AccountController extends BaseController {
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        List<CardDTO> cardDTOs = accountService.recommend(recommendVM.getAccountId(),
-                                                          recommendVM.getIdentityToken(),
-                                                          recommendVM.getDistance(),
-                                                          recommendVM.getMinAge(),
-                                                          recommendVM.getMaxAge(),
-                                                          recommendVM.isGender(),
-                                                          recommendVM.getIndex());
+        List<CardDTO> cardDTOs;
+
+        try {
+            cardDTOs = accountService.recommend(recommendVM.getAccountId(),
+                                                recommendVM.getIdentityToken(),
+                                                recommendVM.getDistance(),
+                                                recommendVM.getMinAge(),
+                                                recommendVM.getMaxAge(),
+                                                recommendVM.isGender(),
+                                                recommendVM.getLatitude(),
+                                                recommendVM.getLongitude());
+        } catch (ObjectOptimisticLockingFailureException exception) {
+            cardDTOs = accountService.recommend(recommendVM.getAccountId(),
+                                                recommendVM.getIdentityToken(),
+                                                recommendVM.getDistance(),
+                                                recommendVM.getMinAge(),
+                                                recommendVM.getMaxAge(),
+                                                recommendVM.isGender(),
+                                                recommendVM.getLatitude(),
+                                                recommendVM.getLongitude());
+        }
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(cardDTOs));
     }

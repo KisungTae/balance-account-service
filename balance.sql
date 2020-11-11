@@ -187,7 +187,7 @@ create table account
     about                    varchar(500),
     gender                   boolean                not null,
     score                    int                    not null,
---     index                    int                    not null,
+    index                    int                    not null,
     point                    int                    not null,
     swiped_count             int                    not null,
     rep_photo_key            varchar(30),
@@ -441,3 +441,4 @@ where id = 'ff7562eb-379b-44f7-aded-9674bd374ebf';
 update account set version = 2
 where id = 'ff7562eb-379b-44f7-aded-9674bd374ebf';
 
+select * from account;
