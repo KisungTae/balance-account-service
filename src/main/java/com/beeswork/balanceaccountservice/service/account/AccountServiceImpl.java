@@ -128,11 +128,16 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
-    public void saveLocation(String accountId, String identityToken, double latitude, double longitude) {
+    public void saveLocation(String accountId, String identityToken, double latitude, double longitude, Date locationUpdatedAt) {
 
         Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
+        saveLocation(account, latitude, longitude, locationUpdatedAt);
+    }
+
+    private void saveLocation(Account account, double latitude, double longitude, Date locationUpdatedAt) {
         account.setLocation(geometryFactory.createPoint(new Coordinate(longitude, latitude)));
+        account.setLocationUpdatedAt(locationUpdatedAt);
     }
 
     @Override
@@ -185,19 +190,33 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     }
 
-    // TEST 1. matches are mapped by matcher_id not matched_id
     @Override
-    @Transactional
-    public List<CardDTO> recommend(String accountId, String identityToken, int distance, int minAge, int maxAge,
-                                   boolean gender, Double latitude, Double longitude) {
+    public PreRecommendDTO preRecommend(String accountId, String identityToken, Double latitude, Double longitude, Date locationUpdatedAt) {
 
         Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
 
+        if (latitude != null && longitude != null && locationUpdatedAt.after(account.getLocationUpdatedAt()))
+            saveLocation(account, latitude, longitude, locationUpdatedAt);
+
+
+        return null;
+    }
+
+    // TEST 1. matches are mapped by matcher_id not matched_id
+    @Override
+    @Transactional
+    public List<CardDTO> recommend(String accountId, String identityToken, int distance, int minAge, int maxAge,
+                                   boolean gender, Double latitude, Double longitude, Date locationUpdatedAt) {
+
+        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
+        checkIfAccountValid(account);
+
+        if (latitude != null && longitude != null && locationUpdatedAt.after(account.getLocationUpdatedAt()))
+            saveLocation(account, latitude, longitude, locationUpdatedAt);
+
         if (distance < minDistance || distance > maxDistance)
             distance = maxDistance;
-
-//      TODO: if lat and lon are not null, then make point and search based on the point and update it to account
 
         List<Object[]> accounts = accountDAO.findAllWithin(distance, minAge, maxAge, gender, PAGE_LIMIT,
                                                            account.getIndex() * PAGE_LIMIT, account.getLocation());

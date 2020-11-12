@@ -111,12 +111,14 @@ public class AccountController extends BaseController {
             accountService.saveLocation(saveLocationVM.getAccountId(),
                                         saveLocationVM.getIdentityToken(),
                                         saveLocationVM.getLatitude(),
-                                        saveLocationVM.getLongitude());
+                                        saveLocationVM.getLongitude(),
+                                        saveLocationVM.getLocationUpdatedAt());
         } catch (ObjectOptimisticLockingFailureException exception) {
             accountService.saveLocation(saveLocationVM.getAccountId(),
                                         saveLocationVM.getIdentityToken(),
                                         saveLocationVM.getLatitude(),
-                                        saveLocationVM.getLongitude());
+                                        saveLocationVM.getLongitude(),
+                                        saveLocationVM.getLocationUpdatedAt());
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
@@ -124,7 +126,7 @@ public class AccountController extends BaseController {
 
     @PostMapping("/fcm/token")
     public ResponseEntity<String> saveFCMToken(@Valid @RequestBody SaveFCMTokenVM saveFCMTokenVM, BindingResult bindingResult)
-    throws JsonProcessingException, FirebaseAuthException {
+    throws JsonProcessingException {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
@@ -170,7 +172,8 @@ public class AccountController extends BaseController {
                                                 recommendVM.getMaxAge(),
                                                 recommendVM.isGender(),
                                                 recommendVM.getLatitude(),
-                                                recommendVM.getLongitude());
+                                                recommendVM.getLongitude(),
+                                                recommendVM.getLocationUpdatedAt());
         } catch (ObjectOptimisticLockingFailureException exception) {
             cardDTOs = accountService.recommend(recommendVM.getAccountId(),
                                                 recommendVM.getIdentityToken(),
@@ -179,7 +182,8 @@ public class AccountController extends BaseController {
                                                 recommendVM.getMaxAge(),
                                                 recommendVM.isGender(),
                                                 recommendVM.getLatitude(),
-                                                recommendVM.getLongitude());
+                                                recommendVM.getLongitude(),
+                                                recommendVM.getLocationUpdatedAt());
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(cardDTOs));

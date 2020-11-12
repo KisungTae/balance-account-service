@@ -192,6 +192,7 @@ create table account
     swiped_count             int                    not null,
     rep_photo_key            varchar(30),
     rep_photo_key_updated_at timestamptz,
+    location_updated_at      timestamptz,
     location                 geography(point, 4326) not null,
     fcm_token                varchar(200),
     account_type_id          int                    not null,
@@ -318,11 +319,9 @@ create table match
     constraint match_chat_id_fk foreign key (chat_id) references chat (id)
 );
 
-
-
 create index match_matcher_id_idx on match (matcher_id);
 create index match_matched_id_idx on match (matched_id);
-
+create index match_matcher_id_matched_id_chat_id on match (matcher_id, matched_id, chat_id);
 
 
 -- create table unmatch
@@ -432,13 +431,3 @@ create table chat_message
     constraint chat_message_sender_id_fk foreign key (sender_id) references account (id)
 );
 
-
-select *
-from account
-where id = 'ff7562eb-379b-44f7-aded-9674bd374ebf';
-
-
-update account set version = 2
-where id = 'ff7562eb-379b-44f7-aded-9674bd374ebf';
-
-select * from account;

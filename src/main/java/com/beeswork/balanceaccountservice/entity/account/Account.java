@@ -88,6 +88,10 @@ public class Account {
     @Temporal(TemporalType.TIMESTAMP)
     private Date repPhotoKeyUpdatedAt;
 
+    @Column(name = "location_updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date locationUpdatedAt;
+
     @Column(name = "location",
             columnDefinition = "GEOGRAPHY(POINT)")
     private Point location;

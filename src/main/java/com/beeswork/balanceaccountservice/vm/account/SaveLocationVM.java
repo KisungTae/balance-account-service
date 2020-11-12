@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.annotation.RegEx;
 import javax.validation.constraints.*;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -21,4 +22,8 @@ public class SaveLocationVM extends AccountIdentityVM {
     @DecimalMin("-180.0")
     @DecimalMax("180.0")
     private Double longitude;
+
+    @NotNull
+    private Date locationUpdatedAt;
+
 }

@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.Length;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.constraints.*;
+import java.util.Date;
 
 
 @Getter
@@ -19,4 +20,5 @@ public class RecommendVM extends AccountIdentityVM {
     private boolean gender;
     private Double latitude;
     private Double longitude;
+    private Date locationUpdatedAt;
 }
