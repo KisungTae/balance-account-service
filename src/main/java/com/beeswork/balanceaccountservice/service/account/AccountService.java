@@ -5,6 +5,7 @@ import com.beeswork.balanceaccountservice.dto.account.CardDTO;
 import com.beeswork.balanceaccountservice.dto.account.PreRecommendDTO;
 import com.beeswork.balanceaccountservice.dto.account.ProfileDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
+import org.locationtech.jts.geom.Point;
 
 import java.util.Date;
 import java.util.List;
@@ -21,14 +22,15 @@ public interface AccountService {
 
     void saveAbout(String accountId, String identityToken, String about, Integer height);
 
-    void saveLocation(String accountId, String identityToken, double latitude, double longitude, Date locationUpdatedAt);
+    void saveLocation(String accountId, String identityToken, double latitude, double longitude,
+                      Date locationUpdatedAt);
 
     void saveFCMToken(String accountId, String identityToken, String token);
 
     void saveAnswers(String accountId, String identityToken, Map<Long, Boolean> answers);
 
-    PreRecommendDTO preRecommend(String accountId, String identityToken, Double latitude, Double longitude, Date locationUpdatedAt);
+    PreRecommendDTO preRecommend(String accountId, String identityToken, Double latitude, Double longitude,
+                                 Date locationUpdatedAt, boolean reset);
 
-    List<CardDTO> recommend(String accountId, String identityToken, int distance, int minAge, int maxAge,
-                            boolean gender, Double latitude, Double longitude, Date locationUpdatedAt);
+    List<CardDTO> recommend(int distance, int minAge, int maxAge, boolean gender, Point location, int index);
 }

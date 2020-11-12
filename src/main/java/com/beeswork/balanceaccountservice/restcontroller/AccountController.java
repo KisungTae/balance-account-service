@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 
 import com.beeswork.balanceaccountservice.dto.account.CardDTO;
+import com.beeswork.balanceaccountservice.dto.account.PreRecommendDTO;
 import com.beeswork.balanceaccountservice.dto.account.ProfileDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
@@ -107,6 +108,8 @@ public class AccountController extends BaseController {
                                                BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
+        System.out.println(bindingResult.getAllErrors());
+
         try {
             accountService.saveLocation(saveLocationVM.getAccountId(),
                                         saveLocationVM.getIdentityToken(),
@@ -125,7 +128,8 @@ public class AccountController extends BaseController {
     }
 
     @PostMapping("/fcm/token")
-    public ResponseEntity<String> saveFCMToken(@Valid @RequestBody SaveFCMTokenVM saveFCMTokenVM, BindingResult bindingResult)
+    public ResponseEntity<String> saveFCMToken(@Valid @RequestBody SaveFCMTokenVM saveFCMTokenVM,
+                                               BindingResult bindingResult)
     throws JsonProcessingException {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
@@ -158,33 +162,29 @@ public class AccountController extends BaseController {
     }
 
     @GetMapping("/recommend")
-    public ResponseEntity<String> recommend(@Valid @ModelAttribute RecommendVM recommendVM, BindingResult bindingResult)
+    public ResponseEntity<String> recommend(@Valid @ModelAttribute RecommendVM recommendVM,
+                                            BindingResult bindingResult)
     throws JsonProcessingException {
+
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        List<CardDTO> cardDTOs;
-
+        PreRecommendDTO preRecommendDTO;
         try {
-            cardDTOs = accountService.recommend(recommendVM.getAccountId(),
-                                                recommendVM.getIdentityToken(),
-                                                recommendVM.getDistance(),
-                                                recommendVM.getMinAge(),
-                                                recommendVM.getMaxAge(),
-                                                recommendVM.isGender(),
-                                                recommendVM.getLatitude(),
-                                                recommendVM.getLongitude(),
-                                                recommendVM.getLocationUpdatedAt());
+            preRecommendDTO = accountService.preRecommend(recommendVM.getAccountId(), recommendVM.getIdentityToken(),
+                                                          recommendVM.getLatitude(), recommendVM.getLongitude(),
+                                                          recommendVM.getLocationUpdatedAt(), recommendVM.isReset());
         } catch (ObjectOptimisticLockingFailureException exception) {
-            cardDTOs = accountService.recommend(recommendVM.getAccountId(),
-                                                recommendVM.getIdentityToken(),
-                                                recommendVM.getDistance(),
-                                                recommendVM.getMinAge(),
-                                                recommendVM.getMaxAge(),
-                                                recommendVM.isGender(),
-                                                recommendVM.getLatitude(),
-                                                recommendVM.getLongitude(),
-                                                recommendVM.getLocationUpdatedAt());
+            preRecommendDTO = accountService.preRecommend(recommendVM.getAccountId(), recommendVM.getIdentityToken(),
+                                                          recommendVM.getLatitude(), recommendVM.getLongitude(),
+                                                          recommendVM.getLocationUpdatedAt(), recommendVM.isReset());
         }
+
+        List<CardDTO> cardDTOs = accountService.recommend(recommendVM.getDistance(),
+                                                          recommendVM.getMinAge(),
+                                                          recommendVM.getMaxAge(),
+                                                          recommendVM.isGender(),
+                                                          preRecommendDTO.getLocation(),
+                                                          preRecommendDTO.getIndex());
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(cardDTOs));
     }
