@@ -23,15 +23,10 @@ public class ModelMapperConfig {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         modelMapper.getConfiguration().setSkipNullEnabled(true);
-        setAccountToProfileDTO(modelMapper);
         setCustomMapping(modelMapper);
         return modelMapper;
     }
 
-    private void setAccountToProfileDTO(ModelMapper modelMapper) {
-        TypeMap<Account, ProfileDTO> typeMap = modelMapper.createTypeMap(Account.class, ProfileDTO.class);
-        typeMap.addMapping(Account::getPhotos, ProfileDTO::setPhotoDTOs);
-    }
 
     private void setCustomMapping(ModelMapper modelMapper) {
         modelMapper.addConverter(stringToUUIDConverter());

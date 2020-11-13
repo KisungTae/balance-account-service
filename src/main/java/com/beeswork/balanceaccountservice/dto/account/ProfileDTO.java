@@ -16,5 +16,5 @@ public class ProfileDTO {
     private String about;
     private boolean gender;
     private int point;
-    private List<PhotoDTO> photoDTOs = new ArrayList<>();
+    private String email;
 }

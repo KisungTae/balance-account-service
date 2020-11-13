@@ -50,21 +50,27 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     }
 
     @Override
-    public Account findWithAccountQuestions(UUID accountId, UUID identityToken) {
+    public Account findWithAccountQuestionsWithQuestionIdIn(UUID accountId, UUID identityToken, List<Long> questionIds) {
         return jpaQueryFactory.selectFrom(qAccount)
                               .leftJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
-                              .where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken)))
+                              .where(qAccount.id.eq(accountId)
+                                                .and(qAccount.identityToken.eq(identityToken))
+                                                .and(qAccountQuestion.selected.eq(true)
+                                                                              .or(qAccountQuestion.questionId.in(questionIds))))
                               .fetchOne();
     }
 
     @Override
     public Account findWithQuestions(UUID accountId, UUID identityToken) {
-        return findWithQuestions().where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken))).fetchOne();
+        return findWithQuestions().where(qAccount.id.eq(accountId)
+                                                    .and(qAccount.identityToken.eq(identityToken))
+                                                    .and(qAccountQuestion.selected.eq(true)))
+                                  .fetchOne();
     }
 
     @Override
     public Account findWithQuestions(UUID accountId) {
-        return findWithQuestions().where(qAccount.id.eq(accountId)).fetchOne();
+        return findWithQuestions().where(qAccount.id.eq(accountId).and(qAccountQuestion.selected.eq(true))).fetchOne();
     }
 
     private JPAQuery<Account> findWithQuestions() {

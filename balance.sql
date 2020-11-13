@@ -246,6 +246,8 @@ create table account_question
     account_id  uuid        not null,
     question_id int         not null,
     selected    boolean     not null,
+    answer      boolean     not null,
+    sequence    int         not null,
     created_at  timestamptz not null,
     updated_at  timestamptz not null,
 
@@ -431,3 +433,12 @@ create table chat_message
     constraint chat_message_sender_id_fk foreign key (sender_id) references account (id)
 );
 
+
+select *
+from account_question
+where account_id = '2c9a853f-af25-4dcb-88f3-0faef94740b3'
+order by selected, sequence;
+
+select *
+from account
+where id = '82fe3b4b-bb92-4c75-ad0f-7c4f259653b6';

@@ -20,12 +20,4 @@ public class QuestionDTO {
     private String description;
     private String topOption;
     private String bottomOption;
-    private boolean selected;
-
-    public QuestionDTO(long id, String description, String topOption, String bottomOption) {
-        this.id = id;
-        this.description = description;
-        this.topOption = topOption;
-        this.bottomOption = bottomOption;
-    }
 }

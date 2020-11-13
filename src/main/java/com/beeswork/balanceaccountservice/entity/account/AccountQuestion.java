@@ -23,6 +23,12 @@ public class AccountQuestion {
     @Column(name = "selected")
     private boolean selected;
 
+    @Column(name = "answer")
+    private boolean answer;
+
+    @Column(name = "sequence")
+    private int sequence;
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -35,13 +41,20 @@ public class AccountQuestion {
     @MapsId("accountId")
     private Account account;
 
+    @Column(name = "question_id",
+            insertable = false,
+            updatable = false)
+    private long questionId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("questionId")
     private Question question;
 
-    public AccountQuestion(Account account, Question question, boolean selected, Date createdAt, Date updatedAt) {
+    public AccountQuestion(boolean selected, boolean answer, int sequence, Date createdAt, Date updatedAt, Account account, Question question) {
         this.accountQuestionId = new AccountQuestionId(account.getId(), question.getId());
         this.selected = selected;
+        this.answer = answer;
+        this.sequence = sequence;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.account = account;

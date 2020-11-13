@@ -7,6 +7,7 @@ import com.beeswork.balanceaccountservice.dto.account.*;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
+import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
@@ -14,6 +15,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -25,20 +27,20 @@ import java.util.*;
 @Service
 public class AccountServiceImpl extends BaseServiceImpl implements AccountService {
 
-    private static final int CARD_ID         = 0;
-    private static final int CARD_NAME       = 1;
-    private static final int CARD_ABOUT      = 2;
+    private static final int CARD_ID = 0;
+    private static final int CARD_NAME = 1;
+    private static final int CARD_ABOUT = 2;
     private static final int CARD_BIRTH_YEAR = 3;
-    private static final int CARD_DISTANCE   = 4;
-    private static final int CARD_PHOTO_KEY  = 5;
-    private static final int CARD_HEIGHT     = 6;
+    private static final int CARD_DISTANCE = 4;
+    private static final int CARD_PHOTO_KEY = 5;
+    private static final int CARD_HEIGHT = 6;
 
     private static final int PAGE_LIMIT = 15;
 
     private static final int maxDistance = 10000;
     private static final int minDistance = 1000;
 
-    private final AccountDAO  accountDAO;
+    private final AccountDAO accountDAO;
     private final QuestionDAO questionDAO;
 
     private final GeometryFactory geometryFactory;
@@ -68,8 +70,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
             questionDTOs.add(new QuestionDTO(accountQuestion.getQuestionId(),
                                              question.getDescription(),
                                              question.getTopOption(),
-                                             question.getBottomOption(),
-                                             accountQuestion.isSelected()));
+                                             question.getBottomOption()));
         }
         return questionDTOs;
     }
@@ -85,6 +86,18 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         return modelMapper.map(account, ProfileDTO.class);
     }
 
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED,
+                   isolation = Isolation.READ_COMMITTED,
+                   readOnly = true)
+    public List<PhotoDTO> getPhotos(String accountId, String identityToken) {
+
+        Account account = accountDAO.findWithPhotos(UUID.fromString(accountId), UUID.fromString(identityToken));
+        checkIfAccountValid(account);
+        return modelMapper.map(account.getPhotos(), new TypeToken<List<PhotoDTO>>() {
+        }.getType());
+    }
+
     //  DESC 1. when registering, an account will be created with enabled = false, then when finish profiles,
     //          it will update enabled = true because users might get cards for which profile has not been updated
     //  TEST 2. save account without any changes but changes in accountQuestions --> Hibernate does not publish update DML for unchanged account even if you change accountQuestions
@@ -93,7 +106,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          then Hibernate won't delete accountQuestions even if their size = 0
     @Override
     @Transactional
-    public void saveProfile(String accountId, String identityToken, String name, Date birth, String about,
+    public void saveProfile(String accountId, String identityToken, String name, String email, Date birth, String about,
                             Integer height, boolean gender) {
 
         Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
@@ -101,6 +114,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
         if (!account.isEnabled()) {
             account.setName(name);
+            account.setEmail(email);
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(account.getBirth());
@@ -159,34 +173,61 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Transactional
     public void saveAnswers(String accountId, String identityToken, Map<Long, Boolean> answers) {
 
-        Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId),
-                                                              UUID.fromString(identityToken));
+        List<Long> questionIds = new ArrayList<>(answers.keySet());
+
+        Account account = accountDAO.findWithAccountQuestionsWithQuestionIdIn(UUID.fromString(accountId),
+                                                                              UUID.fromString(identityToken),
+                                                                              questionIds);
         checkIfAccountValid(account);
 
-        Date date = new Date();
+        Map<Long, Integer> sequences = new LinkedHashMap<>();
+        int sequence = 1;
+
+        for (Long key : answers.keySet()) {
+            sequences.put(key, sequence);
+            sequence++;
+        }
 
         for (int i = account.getAccountQuestions().size() - 1; i >= 0; i--) {
             AccountQuestion accountQuestion = account.getAccountQuestions().get(i);
-            if (answers.containsKey(accountQuestion.getQuestionId())) {
-                accountQuestion.setSelected(answers.get(accountQuestion.getQuestionId()));
-                answers.remove(accountQuestion.getQuestionId());
+
+
+            long questionId = accountQuestion.getQuestionId();
+
+            if (answers.containsKey(questionId)) {
+
+                accountQuestion.setSelected(true);
+                accountQuestion.setAnswer(answers.get(questionId));
+                accountQuestion.setSequence(sequences.get(questionId));
+                accountQuestion.setUpdatedAt(new Date());
+
+                answers.remove(questionId);
+                sequences.remove(questionId);
+                questionIds.remove(questionId);
             } else {
-                account.getAccountQuestions().remove(accountQuestion);
+                accountQuestion.setSelected(false);
             }
+
+
         }
 
-        if (answers.size() > 0) {
+        if (questionIds.size() > 0) {
 
-            List<Long> questionIds = new ArrayList<>(answers.keySet());
             List<Question> questions = questionDAO.findAllByIds(questionIds);
 
             if (answers.size() != questions.size())
                 throw new QuestionNotFoundException();
 
             for (Question question : questions) {
-                Boolean answer = answers.get(question.getId());
-                if (answer == null) throw new QuestionNotFoundException();
-                account.getAccountQuestions().add(new AccountQuestion(account, question, answer, date, date));
+                Date date = new Date();
+                account.getAccountQuestions()
+                       .add(new AccountQuestion(true,
+                                                answers.get(question.getId()),
+                                                sequences.get(question.getId()),
+                                                date,
+                                                date,
+                                                account,
+                                                question));
             }
         }
 
@@ -215,7 +256,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     // TEST 1. matches are mapped by matcher_id not matched_id
     @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED,
+                   isolation = Isolation.READ_COMMITTED,
+                   readOnly = true)
     public List<CardDTO> recommend(int distance, int minAge, int maxAge, boolean gender, Point location, int index) {
 
         if (distance < minDistance || distance > maxDistance)

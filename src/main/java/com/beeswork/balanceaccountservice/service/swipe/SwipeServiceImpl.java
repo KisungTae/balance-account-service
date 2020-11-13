@@ -119,7 +119,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         for (AccountQuestion accountQuestion : swiped.getAccountQuestions()) {
             Boolean answer = answers.get(accountQuestion.getQuestionId());
             if (answer == null) throw new QuestionSetChangedException();
-            else if (accountQuestion.isSelected() != answer) return clickDTO;
+            else if (accountQuestion.isAnswer() != answer) return clickDTO;
         }
 
         swipe.setClicked(true);

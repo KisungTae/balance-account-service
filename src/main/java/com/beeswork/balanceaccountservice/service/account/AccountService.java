@@ -1,9 +1,6 @@
 package com.beeswork.balanceaccountservice.service.account;
 
-import com.beeswork.balanceaccountservice.dto.account.AccountQuestionDTO;
-import com.beeswork.balanceaccountservice.dto.account.CardDTO;
-import com.beeswork.balanceaccountservice.dto.account.PreRecommendDTO;
-import com.beeswork.balanceaccountservice.dto.account.ProfileDTO;
+import com.beeswork.balanceaccountservice.dto.account.*;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import org.locationtech.jts.geom.Point;
 
@@ -17,7 +14,9 @@ public interface AccountService {
 
     List<QuestionDTO> getQuestions(String accountId, String identityToken);
 
-    void saveProfile(String accountId, String identityToken, String name, Date birth, String about, Integer height,
+    List<PhotoDTO> getPhotos(String accountId, String identityToken);
+
+    void saveProfile(String accountId, String identityToken, String name, String email, Date birth, String about, Integer height,
                      boolean gender);
 
     void saveAbout(String accountId, String identityToken, String about, Integer height);

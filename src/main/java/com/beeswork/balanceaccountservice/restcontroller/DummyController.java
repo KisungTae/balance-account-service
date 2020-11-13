@@ -137,13 +137,15 @@ public class DummyController {
 
         for (Account account : accounts) {
             int index = random.nextInt(questions.size() - 6);
-            for (int k = 0; k < 3; k++) {
+            for (int k = 1; k <= 3; k++) {
                 Question question = questions.get(index + k);
                 AccountQuestion accountQuestion = new AccountQuestion();
                 accountQuestion.setAccount(account);
                 accountQuestion.setQuestion(question);
                 accountQuestion.setAccountQuestionId(new AccountQuestionId(account.getId(), question.getId()));
-                accountQuestion.setSelected(random.nextBoolean());
+                accountQuestion.setSelected(true);
+                accountQuestion.setAnswer(random.nextBoolean());
+                accountQuestion.setSequence(k);
                 accountQuestion.setCreatedAt(new Date());
                 accountQuestion.setUpdatedAt(new Date());
                 account.getAccountQuestions().add(accountQuestion);
