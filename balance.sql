@@ -442,3 +442,15 @@ order by selected, sequence;
 select *
 from account
 where id = '82fe3b4b-bb92-4c75-ad0f-7c4f259653b6';
+
+select swiped_id, count(*)
+from swipe
+group by swiped_id
+order by count(*) desc;
+
+select *
+from account
+where id = '9c766da7-7a95-4ce1-8393-22c1b6d7db41';
+
+update account set index = 10
+where id = '9c766da7-7a95-4ce1-8393-22c1b6d7db41';

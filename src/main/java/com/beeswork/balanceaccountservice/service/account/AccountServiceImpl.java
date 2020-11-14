@@ -144,16 +144,16 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void saveLocation(String accountId, String identityToken, double latitude, double longitude,
-                             Date locationUpdatedAt) {
+                             Date updatedAt) {
 
         Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
-        saveLocation(account, latitude, longitude, locationUpdatedAt);
+        saveLocation(account, latitude, longitude, updatedAt);
     }
 
-    private void saveLocation(Account account, double latitude, double longitude, Date locationUpdatedAt) {
+    private void saveLocation(Account account, double latitude, double longitude, Date updatedAt) {
         account.setLocation(geometryFactory.createPoint(new Coordinate(longitude, latitude)));
-        account.setLocationUpdatedAt(locationUpdatedAt);
+        account.setLocationUpdatedAt(updatedAt);
     }
 
     @Override

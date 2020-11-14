@@ -22,7 +22,7 @@ public interface AccountService {
     void saveAbout(String accountId, String identityToken, String about, Integer height);
 
     void saveLocation(String accountId, String identityToken, double latitude, double longitude,
-                      Date locationUpdatedAt);
+                      Date updatedAt);
 
     void saveFCMToken(String accountId, String identityToken, String token);
 

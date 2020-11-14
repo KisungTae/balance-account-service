@@ -24,6 +24,6 @@ public class SaveLocationVM extends AccountIdentityVM {
     private Double longitude;
 
     @NotNull
-    private Date locationUpdatedAt;
+    private Date updatedAt;
 
 }

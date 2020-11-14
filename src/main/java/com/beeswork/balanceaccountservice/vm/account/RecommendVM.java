@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.validator.ValidUUID;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.constraints.*;
@@ -27,6 +28,8 @@ public class RecommendVM extends AccountIdentityVM {
     @DecimalMax("180.0")
     private Double longitude;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date locationUpdatedAt;
+
     private boolean reset;
 }

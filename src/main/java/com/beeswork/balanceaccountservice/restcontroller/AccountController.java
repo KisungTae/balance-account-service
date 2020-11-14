@@ -108,22 +108,21 @@ public class AccountController extends BaseController {
     @PostMapping("/location")
     public ResponseEntity<String> saveLocation(@Valid @RequestBody SaveLocationVM saveLocationVM,
                                                BindingResult bindingResult) throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        System.out.println(bindingResult.getAllErrors());
+        if (bindingResult.hasErrors()) throw new BadRequestException();
 
         try {
             accountService.saveLocation(saveLocationVM.getAccountId(),
                                         saveLocationVM.getIdentityToken(),
                                         saveLocationVM.getLatitude(),
                                         saveLocationVM.getLongitude(),
-                                        saveLocationVM.getLocationUpdatedAt());
+                                        saveLocationVM.getUpdatedAt());
         } catch (ObjectOptimisticLockingFailureException exception) {
             accountService.saveLocation(saveLocationVM.getAccountId(),
                                         saveLocationVM.getIdentityToken(),
                                         saveLocationVM.getLatitude(),
                                         saveLocationVM.getLongitude(),
-                                        saveLocationVM.getLocationUpdatedAt());
+                                        saveLocationVM.getUpdatedAt());
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
