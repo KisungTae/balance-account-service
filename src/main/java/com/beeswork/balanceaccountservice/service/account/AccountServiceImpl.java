@@ -241,8 +241,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
 
-//        int index = reset ? 0 : account.getIndex() + 1;
-//        account.setIndex(index);
+        int index = reset ? 0 : account.getIndex() + 1;
+        account.setIndex(index);
 
         if (latitude != null && longitude != null && locationUpdatedAt.after(account.getLocationUpdatedAt()))
             saveLocation(account, latitude, longitude, locationUpdatedAt);
