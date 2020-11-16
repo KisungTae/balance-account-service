@@ -454,3 +454,7 @@ where id = '9c766da7-7a95-4ce1-8393-22c1b6d7db41';
 
 update account set index = 10
 where id = '9c766da7-7a95-4ce1-8393-22c1b6d7db41';
+
+
+select *
+from account;
