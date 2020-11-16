@@ -16,6 +16,8 @@ public class BaseController {
 
     private static final String FIELD_EXCEPTION = "field.exception";
 
+    protected final int MAX_OPTIMISTIC_LOCK_EXCEPTION_RETRY_COUNT = 5;
+
     protected final ObjectMapper objectMapper;
     protected final ModelMapper modelMapper;
 
@@ -32,6 +34,10 @@ public class BaseController {
 
         ExceptionResponse exceptionResponse = new ExceptionResponse(FIELD_EXCEPTION, "", fieldErrors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(exceptionResponse));
+    }
+
+    protected void runAsOptimisticRetryFunction(Runnable function) {
+
     }
 
 

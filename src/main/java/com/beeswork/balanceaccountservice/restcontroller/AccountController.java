@@ -11,7 +11,6 @@ import com.beeswork.balanceaccountservice.service.account.AccountService;
 import com.beeswork.balanceaccountservice.vm.account.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.firebase.auth.FirebaseAuthException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -64,25 +63,28 @@ public class AccountController extends BaseController {
 
         if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
 
-        try {
-            accountService.saveProfile(saveProfileVM.getAccountId(),
-                                       saveProfileVM.getIdentityToken(),
-                                       saveProfileVM.getName(),
-                                       saveProfileVM.getEmail(),
-                                       saveProfileVM.getBirth(),
-                                       saveProfileVM.getAbout(),
-                                       saveProfileVM.getHeight(),
-                                       saveProfileVM.getGender());
-        } catch (ObjectOptimisticLockingFailureException exception) {
-            accountService.saveProfile(saveProfileVM.getAccountId(),
-                                       saveProfileVM.getIdentityToken(),
-                                       saveProfileVM.getName(),
-                                       saveProfileVM.getEmail(),
-                                       saveProfileVM.getBirth(),
-                                       saveProfileVM.getAbout(),
-                                       saveProfileVM.getHeight(),
-                                       saveProfileVM.getGender());
-        }
+
+        boolean optimisticLockException = true;
+        int retryCount = 0;
+
+        do {
+            try {
+                accountService.saveProfile(saveProfileVM.getAccountId(),
+                                           saveProfileVM.getIdentityToken(),
+                                           saveProfileVM.getName(),
+                                           saveProfileVM.getEmail(),
+                                           saveProfileVM.getBirth(),
+                                           saveProfileVM.getAbout(),
+                                           saveProfileVM.getHeight(),
+                                           saveProfileVM.getGender());
+
+                optimisticLockException = false;
+                retryCount++;
+            } catch (ObjectOptimisticLockingFailureException exception) {
+                System.out.println(exception.getMessage());
+                retryCount++;
+            }
+        } while (optimisticLockException && retryCount < MAX_OPTIMISTIC_LOCK_EXCEPTION_RETRY_COUNT);
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
@@ -90,17 +92,23 @@ public class AccountController extends BaseController {
     @PostMapping("/about")
     public ResponseEntity<String> saveAbout(@RequestBody SaveAboutVM saveAboutVM) throws JsonProcessingException {
 
-        try {
-            accountService.saveAbout(saveAboutVM.getAccountId(),
-                                     saveAboutVM.getIdentityToken(),
-                                     saveAboutVM.getAbout(),
-                                     saveAboutVM.getHeight());
-        } catch (ObjectOptimisticLockingFailureException exception) {
-            accountService.saveAbout(saveAboutVM.getAccountId(),
-                                     saveAboutVM.getIdentityToken(),
-                                     saveAboutVM.getAbout(),
-                                     saveAboutVM.getHeight());
-        }
+        boolean optimisticLockException = true;
+        int retryCount = 0;
+
+        do {
+            try {
+                accountService.saveAbout(saveAboutVM.getAccountId(),
+                                         saveAboutVM.getIdentityToken(),
+                                         saveAboutVM.getAbout(),
+                                         saveAboutVM.getHeight());
+
+                optimisticLockException = false;
+                retryCount++;
+            } catch (ObjectOptimisticLockingFailureException exception) {
+                retryCount++;
+                System.out.println(exception.getMessage());
+            }
+        } while (optimisticLockException && retryCount < MAX_OPTIMISTIC_LOCK_EXCEPTION_RETRY_COUNT);
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
