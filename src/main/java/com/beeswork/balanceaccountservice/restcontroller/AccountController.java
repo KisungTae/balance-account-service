@@ -63,7 +63,6 @@ public class AccountController extends BaseController {
 
         if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
 
-
         boolean optimisticLockException = true;
         int retryCount = 0;
 

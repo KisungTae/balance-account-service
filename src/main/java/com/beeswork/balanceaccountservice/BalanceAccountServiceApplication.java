@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.beeswork.balanceaccountservice.config.properties.TaskExecutorProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -12,18 +13,26 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableAsync
 public class BalanceAccountServiceApplication {
 
-	@Value("${thread-pool.max-pool-size:1}")
-	private int maxPoolSize;
+//	@Value("${task-executor.max-pool-size:1}")
+//	private int maxPoolSize;
+//
+//	@Value("${task-executor.queue-capacity:0}")
+//	private int queueCapacity;
 
-	@Value("${thread-pool.queue-capacity:0}")
-	private int queueCapacity;
+	private final TaskExecutorProperties taskExecutorProperties;
+
+	@Autowired
+	public BalanceAccountServiceApplication(TaskExecutorProperties taskExecutorProperties) {
+		this.taskExecutorProperties = taskExecutorProperties;
+	}
+
 
 	@Bean(name="processExecutor")
 	public TaskExecutor taskExecutor() {
 
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-		taskExecutor.setMaxPoolSize(maxPoolSize);
-		taskExecutor.setQueueCapacity(queueCapacity);
+		taskExecutor.setMaxPoolSize(taskExecutorProperties.getMaxPoolSize());
+		taskExecutor.setQueueCapacity(taskExecutorProperties.getQueueCapacity());
 		taskExecutor.afterPropertiesSet();
 		return taskExecutor;
 	}

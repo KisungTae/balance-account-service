@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.vm.question;
 
+import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import lombok.Getter;
 import lombok.Setter;
 import javax.validation.constraints.Size;
@@ -8,7 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class RandomQuestionVM {
+public class RandomQuestionVM extends AccountIdentityVM {
 
     @Size(min = 1, max = 6, message = "{current.question.ids.size}")
     private List<Long> currentQuestionIds = new ArrayList<>();

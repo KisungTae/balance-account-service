@@ -38,6 +38,4 @@ public class QuestionController extends BaseController {
     }
 
 
-
-
 }
