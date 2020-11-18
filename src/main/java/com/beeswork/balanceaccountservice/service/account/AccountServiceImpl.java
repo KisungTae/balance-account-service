@@ -171,19 +171,19 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          accountQuestions to check if it needs to remove or insert or update entities
     @Override
     @Transactional
-    public void saveAnswers(String accountId, String identityToken, Map<Long, Boolean> answers) {
+    public void saveAnswers(String accountId, String identityToken, Map<Integer, Boolean> answers) {
 
-        List<Long> questionIds = new ArrayList<>(answers.keySet());
+        List<Integer> questionIds = new ArrayList<>(answers.keySet());
 
         Account account = accountDAO.findWithAccountQuestionsWithQuestionIdIn(UUID.fromString(accountId),
                                                                               UUID.fromString(identityToken),
                                                                               questionIds);
         checkIfAccountValid(account);
 
-        Map<Long, Integer> sequences = new LinkedHashMap<>();
+        Map<Integer, Integer> sequences = new LinkedHashMap<>();
         int sequence = 1;
 
-        for (Long key : answers.keySet()) {
+        for (Integer key : answers.keySet()) {
             sequences.put(key, sequence);
             sequence++;
         }

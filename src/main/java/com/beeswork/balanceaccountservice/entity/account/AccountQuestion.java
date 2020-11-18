@@ -44,7 +44,7 @@ public class AccountQuestion {
     @Column(name = "question_id",
             insertable = false,
             updatable = false)
-    private long questionId;
+    private Integer questionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("questionId")
@@ -65,7 +65,7 @@ public class AccountQuestion {
         return accountQuestionId.getAccountId();
     }
 
-    public Long getQuestionId() {
+    public Integer getQuestionId() {
         return accountQuestionId.getQuestionId();
     }
 }

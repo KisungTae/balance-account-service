@@ -31,7 +31,7 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public QuestionDTO randomQuestion(List<Long> currentQuestionIds) {
+    public QuestionDTO randomQuestion(List<Integer> currentQuestionIds) {
 
         long count = questionDAO.count() - currentQuestionIds.size();
         int random = new Random().nextInt((int) count);

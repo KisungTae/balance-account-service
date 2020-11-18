@@ -209,7 +209,7 @@ CREATE INDEX account_location_idx ON account USING GIST (location);
 create table photo
 (
     key        varchar(30) not null,
-    sequence   int         not null,
+    sequence   bigserial   not null,
     account_id uuid        not null,
 
     primary key (account_id, key),
@@ -219,16 +219,16 @@ create table photo
 create index photo_account_id_idx on photo (account_id);
 
 
-create table photo_info
-(
-    account_id    uuid primary key not null,
-    last_sequence int              not null,
-    photo_count   int              not null,
-    created_at    timestamptz      not null,
-    updated_at    timestamptz      not null,
-
-    constraint photo_info_account_id_fk foreign key (account_id) references account (id)
-);
+-- create table photo_info
+-- (
+--     account_id    uuid primary key not null,
+--     last_sequence int              not null,
+--     photo_count   int              not null,
+--     created_at    timestamptz      not null,
+--     updated_at    timestamptz      not null,
+--
+--     constraint photo_info_account_id_fk foreign key (account_id) references account (id)
+-- );
 
 
 create table question
@@ -268,7 +268,7 @@ create table reward_type
 -- this table does not include the purchase
 create table reward
 (
-    id             serial primary key,
+    id             bigserial primary key,
     rewarded_point int         not null,
     account_id     uuid        not null,
     reward_type_id int         not null,
@@ -281,7 +281,7 @@ create table reward
 
 create table swipe
 (
-    id         serial primary key,
+    id         bigserial primary key,
     swiper_id  uuid        not null,
     swiped_id  uuid        not null,
     clicked    boolean     not null,
@@ -297,7 +297,7 @@ create index swipe_swiped_id_idx on swipe (swiped_id);
 
 create table chat
 (
-    id serial primary key
+    id bigserial primary key
 );
 
 
@@ -309,7 +309,7 @@ create table match
 (
     matcher_id uuid        not null,
     matched_id uuid        not null,
-    chat_id    int         not null,
+    chat_id    bigint         not null,
     unmatched  boolean     not null,
     unmatcher  boolean     not null,
     created_at timestamptz not null,
@@ -434,27 +434,7 @@ create table chat_message
 );
 
 
-select *
-from account_question
-where account_id = '2c9a853f-af25-4dcb-88f3-0faef94740b3'
-order by selected, sequence;
-
-select *
-from account
-where id = '82fe3b4b-bb92-4c75-ad0f-7c4f259653b6';
-
-select swiped_id, count(*)
-from swipe
-group by swiped_id
-order by count(*) desc;
-
-select *
-from account
-where id = '9c766da7-7a95-4ce1-8393-22c1b6d7db41';
-
-update account set index = 10
-where id = '9c766da7-7a95-4ce1-8393-22c1b6d7db41';
 
 
-select *
-from account;
+delete from photo;
+delete from account;

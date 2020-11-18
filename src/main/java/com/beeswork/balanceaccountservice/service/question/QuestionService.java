@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface QuestionService {
 
-    QuestionDTO randomQuestion(List<Long> currentQuestionIds);
+    QuestionDTO randomQuestion(List<Integer> currentQuestionIds);
 }

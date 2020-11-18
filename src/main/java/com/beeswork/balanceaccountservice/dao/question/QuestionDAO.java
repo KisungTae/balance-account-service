@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface QuestionDAO extends BaseDAO<Question> {
 
-    Question findById(long questionId);
-    List<Question> findAllByIds(List<Long> ids);
-    Question findNthNotIn(List<Long> questionIds, int offset);
+    Question findById(Integer questionId);
+    List<Question> findAllByIds(List<Integer> ids);
+    Question findNthNotIn(List<Integer> questionIds, int offset);
     long count();
 }

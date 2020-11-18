@@ -12,5 +12,5 @@ import java.util.List;
 public class RandomQuestionVM extends AccountIdentityVM {
 
     @Size(min = 1, max = 6, message = "{current.question.ids.size}")
-    private List<Long> currentQuestionIds = new ArrayList<>();
+    private List<Integer> currentQuestionIds = new ArrayList<>();
 }

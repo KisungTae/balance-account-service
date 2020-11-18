@@ -1,6 +1,8 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.photo.GenerateS3PreSignedURLDTO;
+import com.beeswork.balanceaccountservice.exception.BadRequestException;
+import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.photo.PhotoService;
 import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,17 +28,14 @@ public class PhotoController extends BaseController {
         this.photoService = photoService;
     }
 
-    @PostMapping("/upload-url")
-    public ResponseEntity<String> getUploadURL(@Valid @RequestBody AccountIdentityVM accountIdentityVM,
-                                               BindingResult bindingResult)
-    throws JsonProcessingException {
+    @PostMapping("/delete")
+    public ResponseEntity<String> deletePhoto(@Valid @RequestBody AccountIdentityVM identityVM,
+                                              BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
-
-        GenerateS3PreSignedURLDTO generateS3PreSignedURLDTO = photoService.generateS3PreSignedURL(accountIdentityVM.getAccountId(),
-                                                                                                  accountIdentityVM.getIdentityToken());
+        if (bindingResult.hasErrors()) throw new BadRequestException();
 
 
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(generateS3PreSignedURLDTO));
+
+        return null;
     }
 }

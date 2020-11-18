@@ -17,5 +17,5 @@ import java.util.Map;
 public class SaveAnswersVM extends AccountIdentityVM {
 
     @Size(min = 3, max = 3)
-    private Map<Long, Boolean> answers = new HashMap<>();
+    private Map<Integer, Boolean> answers = new HashMap<>();
 }

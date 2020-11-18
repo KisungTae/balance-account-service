@@ -26,7 +26,7 @@ public interface AccountService {
 
     void saveFCMToken(String accountId, String identityToken, String token);
 
-    void saveAnswers(String accountId, String identityToken, Map<Long, Boolean> answers);
+    void saveAnswers(String accountId, String identityToken, Map<Integer, Boolean> answers);
 
     PreRecommendDTO preRecommend(String accountId, String identityToken, Double latitude, Double longitude,
                                  Date locationUpdatedAt, boolean reset);

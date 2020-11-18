@@ -22,17 +22,17 @@ public class QuestionDAOImpl extends BaseDAOImpl<Question> implements QuestionDA
     }
 
     @Override
-    public Question findById(long questionId) {
+    public Question findById(Integer questionId) {
         return jpaQueryFactory.selectFrom(qQuestion).where(qQuestion.id.eq(questionId)).fetchOne();
     }
 
     @Override
-    public List<Question> findAllByIds(List<Long> ids) {
+    public List<Question> findAllByIds(List<Integer> ids) {
         return jpaQueryFactory.selectFrom(qQuestion).where(qQuestion.id.in(ids)).fetch();
     }
 
     @Override
-    public Question findNthNotIn(List<Long> questionIds, int offset) {
+    public Question findNthNotIn(List<Integer> questionIds, int offset) {
         return jpaQueryFactory.selectFrom(qQuestion)
                               .where(qQuestion.id.notIn(questionIds))
                               .offset(offset)

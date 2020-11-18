@@ -23,7 +23,8 @@ public class Photo {
     @Column(name = "key", insertable = false, updatable = false)
     private String key;
 
-    @Column(name = "sequence")
+    @Column(name = "sequence", unique = true, nullable = false, insertable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer sequence;
 
     @Column(name = "account_id", insertable = false, updatable = false)

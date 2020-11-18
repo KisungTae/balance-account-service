@@ -249,7 +249,7 @@ public class DummyController {
                     if (p == 0) {
                         account.setRepPhotoKey(photoKey);
                     }
-                    photo.setSequence(p);
+//                    photo.setSequence(p);
                     photo.setAccount(account);
                     account.getPhotos().add(photo);
                 }
