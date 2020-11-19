@@ -3,6 +3,9 @@ package com.beeswork.balanceaccountservice.service.account;
 import com.beeswork.balanceaccountservice.dto.account.*;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import org.locationtech.jts.geom.Point;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 
 import java.util.Date;
 import java.util.List;
@@ -16,6 +19,8 @@ public interface AccountService {
 
     List<PhotoDTO> getPhotos(String accountId, String identityToken);
 
+    // delay = 0 then default to 1 second
+    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3,   backoff = @Backoff(delay = 1))
     void saveProfile(String accountId, String identityToken, String name, String email, Date birth, String about, Integer height,
                      boolean gender);
 

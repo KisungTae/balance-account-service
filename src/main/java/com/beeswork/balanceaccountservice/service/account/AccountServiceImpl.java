@@ -112,7 +112,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
 
-        if (!account.isEnabled()) {
+        if (account.isEnabled()) {
             account.setName(name);
             account.setEmail(email);
 

@@ -149,7 +149,7 @@ drop table photo;
 drop table match;
 drop table swipe;
 drop table admin;
-drop table photo_info;
+-- drop table photo_info;
 drop table chat_message;
 drop table chat;
 drop table account;
@@ -433,8 +433,11 @@ create table chat_message
     constraint chat_message_sender_id_fk foreign key (sender_id) references account (id)
 );
 
+select *
+from account
+where id = 'b02a4dc8-0743-4f4b-aa99-55bbfde5835d';
 
 
+update account set version = version + 1
+where id = 'b02a4dc8-0743-4f4b-aa99-55bbfde5835d';
 
-delete from photo;
-delete from account;

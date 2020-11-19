@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,27 +64,14 @@ public class AccountController extends BaseController {
 
         if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
 
-        boolean optimisticLockException = true;
-        int retryCount = 0;
-
-        do {
-            try {
-                accountService.saveProfile(saveProfileVM.getAccountId(),
-                                           saveProfileVM.getIdentityToken(),
-                                           saveProfileVM.getName(),
-                                           saveProfileVM.getEmail(),
-                                           saveProfileVM.getBirth(),
-                                           saveProfileVM.getAbout(),
-                                           saveProfileVM.getHeight(),
-                                           saveProfileVM.getGender());
-
-                optimisticLockException = false;
-                retryCount++;
-            } catch (ObjectOptimisticLockingFailureException exception) {
-                System.out.println(exception.getMessage());
-                retryCount++;
-            }
-        } while (optimisticLockException && retryCount < MAX_OPTIMISTIC_LOCK_EXCEPTION_RETRY_COUNT);
+        accountService.saveProfile(saveProfileVM.getAccountId(),
+                                   saveProfileVM.getIdentityToken(),
+                                   saveProfileVM.getName(),
+                                   saveProfileVM.getEmail(),
+                                   saveProfileVM.getBirth(),
+                                   saveProfileVM.getAbout(),
+                                   saveProfileVM.getHeight(),
+                                   saveProfileVM.getGender());
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
