@@ -438,6 +438,21 @@ from account
 where id = 'b02a4dc8-0743-4f4b-aa99-55bbfde5835d';
 
 
+
+select *
+from account a
+left join account_question aq on a.id = aq.account_id
+left join question q on aq.question_id = q.id
+where a.id = 'b02a4dc8-0743-4f4b-aa99-55bbfde5835d' and a.identity_token = '3622edd9-fed5-4727-92ce-169238b3d080'
+and (aq.selected = true or aq.account_id is null);
+
+
 update account set version = version + 1
 where id = 'b02a4dc8-0743-4f4b-aa99-55bbfde5835d';
 
+select *
+from photo
+where account_id = 'b02a4dc8-0743-4f4b-aa99-55bbfde5835d';
+
+select *
+from photo;

@@ -94,7 +94,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public ClickDTO click(Long swipeId, String accountId, String identityToken, String swipedId, Map<Long, Boolean> answers) {
+    public ClickDTO click(Long swipeId, String accountId, String identityToken, String swipedId, Map<Integer, Boolean> answers) {
 
         UUID swiperUUId = UUID.fromString(accountId);
         UUID swipedUUId = UUID.fromString(swipedId);

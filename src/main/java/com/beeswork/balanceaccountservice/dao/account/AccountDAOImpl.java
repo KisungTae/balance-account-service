@@ -50,13 +50,14 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     }
 
     @Override
-    public Account findWithAccountQuestionsWithQuestionIdIn(UUID accountId, UUID identityToken, List<Integer> questionIds) {
+    public Account findWithAccountQuestionsIn(UUID accountId, UUID identityToken, List<Integer> questionIds) {
         return jpaQueryFactory.selectFrom(qAccount)
                               .leftJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
                               .where(qAccount.id.eq(accountId)
                                                 .and(qAccount.identityToken.eq(identityToken))
                                                 .and(qAccountQuestion.selected.eq(true)
-                                                                              .or(qAccountQuestion.questionId.in(questionIds))))
+                                                                              .or(qAccountQuestion.questionId.in(
+                                                                                      questionIds))))
                               .fetchOne();
     }
 
@@ -64,19 +65,23 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     public Account findWithQuestions(UUID accountId, UUID identityToken) {
         return findWithQuestions().where(qAccount.id.eq(accountId)
                                                     .and(qAccount.identityToken.eq(identityToken))
-                                                    .and(qAccountQuestion.selected.eq(true)))
+                                                    .and(qAccountQuestion.selected.eq(true)
+                                                                                  .or(qAccountQuestion.accountId.isNull())))
                                   .fetchOne();
     }
 
     @Override
     public Account findWithQuestions(UUID accountId) {
-        return findWithQuestions().where(qAccount.id.eq(accountId).and(qAccountQuestion.selected.eq(true))).fetchOne();
+        return findWithQuestions().where(qAccount.id.eq(accountId)
+                                                    .and(qAccountQuestion.selected.eq(true)
+                                                                                  .or(qAccountQuestion.accountId.isNull())))
+                                  .fetchOne();
     }
 
     private JPAQuery<Account> findWithQuestions() {
         return jpaQueryFactory.selectFrom(qAccount)
-                              .innerJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
-                              .innerJoin(qAccountQuestion.question, qQuestion).fetchJoin();
+                              .leftJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
+                              .leftJoin(qAccountQuestion.question, qQuestion).fetchJoin();
     }
 
     @Override

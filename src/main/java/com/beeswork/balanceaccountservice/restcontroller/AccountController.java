@@ -35,17 +35,6 @@ public class AccountController extends BaseController {
         this.accountService = accountService;
     }
 
-    @GetMapping("/questions")
-    public ResponseEntity<String> getQuestions(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
-                                               BindingResult bindingResult) throws JsonProcessingException {
-
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-
-        List<QuestionDTO> questionDTOs = accountService.getQuestions(accountIdentityVM.getAccountId(),
-                                                                     accountIdentityVM.getIdentityToken());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
-    }
-
     @GetMapping("/profile")
     public ResponseEntity<String> getProfile(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
                                              BindingResult bindingResult) throws JsonProcessingException {
@@ -54,6 +43,7 @@ public class AccountController extends BaseController {
 
         ProfileDTO profileDTO = accountService.getProfile(accountIdentityVM.getAccountId(),
                                                           accountIdentityVM.getIdentityToken());
+
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(profileDTO));
     }
 
@@ -79,23 +69,10 @@ public class AccountController extends BaseController {
     @PostMapping("/about")
     public ResponseEntity<String> saveAbout(@RequestBody SaveAboutVM saveAboutVM) throws JsonProcessingException {
 
-        boolean optimisticLockException = true;
-        int retryCount = 0;
-
-        do {
-            try {
-                accountService.saveAbout(saveAboutVM.getAccountId(),
-                                         saveAboutVM.getIdentityToken(),
-                                         saveAboutVM.getAbout(),
-                                         saveAboutVM.getHeight());
-
-                optimisticLockException = false;
-                retryCount++;
-            } catch (ObjectOptimisticLockingFailureException exception) {
-                retryCount++;
-                System.out.println(exception.getMessage());
-            }
-        } while (optimisticLockException && retryCount < MAX_OPTIMISTIC_LOCK_EXCEPTION_RETRY_COUNT);
+        accountService.saveAbout(saveAboutVM.getAccountId(),
+                                 saveAboutVM.getIdentityToken(),
+                                 saveAboutVM.getAbout(),
+                                 saveAboutVM.getHeight());
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
@@ -106,19 +83,11 @@ public class AccountController extends BaseController {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        try {
-            accountService.saveLocation(saveLocationVM.getAccountId(),
-                                        saveLocationVM.getIdentityToken(),
-                                        saveLocationVM.getLatitude(),
-                                        saveLocationVM.getLongitude(),
-                                        saveLocationVM.getUpdatedAt());
-        } catch (ObjectOptimisticLockingFailureException exception) {
-            accountService.saveLocation(saveLocationVM.getAccountId(),
-                                        saveLocationVM.getIdentityToken(),
-                                        saveLocationVM.getLatitude(),
-                                        saveLocationVM.getLongitude(),
-                                        saveLocationVM.getUpdatedAt());
-        }
+        accountService.saveLocation(saveLocationVM.getAccountId(),
+                                    saveLocationVM.getIdentityToken(),
+                                    saveLocationVM.getLatitude(),
+                                    saveLocationVM.getLongitude(),
+                                    saveLocationVM.getUpdatedAt());
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
@@ -130,15 +99,9 @@ public class AccountController extends BaseController {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        try {
-            accountService.saveFCMToken(saveFCMTokenVM.getAccountId(),
-                                        saveFCMTokenVM.getIdentityToken(),
-                                        saveFCMTokenVM.getToken());
-        } catch (ObjectOptimisticLockingFailureException exception) {
-            accountService.saveFCMToken(saveFCMTokenVM.getAccountId(),
-                                        saveFCMTokenVM.getIdentityToken(),
-                                        saveFCMTokenVM.getToken());
-        }
+        accountService.saveFCMToken(saveFCMTokenVM.getAccountId(),
+                                    saveFCMTokenVM.getIdentityToken(),
+                                    saveFCMTokenVM.getToken());
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
@@ -164,16 +127,12 @@ public class AccountController extends BaseController {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        PreRecommendDTO preRecommendDTO;
-        try {
-            preRecommendDTO = accountService.preRecommend(recommendVM.getAccountId(), recommendVM.getIdentityToken(),
-                                                          recommendVM.getLatitude(), recommendVM.getLongitude(),
-                                                          recommendVM.getLocationUpdatedAt(), recommendVM.isReset());
-        } catch (ObjectOptimisticLockingFailureException exception) {
-            preRecommendDTO = accountService.preRecommend(recommendVM.getAccountId(), recommendVM.getIdentityToken(),
-                                                          recommendVM.getLatitude(), recommendVM.getLongitude(),
-                                                          recommendVM.getLocationUpdatedAt(), recommendVM.isReset());
-        }
+        PreRecommendDTO preRecommendDTO = accountService.preRecommend(recommendVM.getAccountId(),
+                                                                      recommendVM.getIdentityToken(),
+                                                                      recommendVM.getLatitude(),
+                                                                      recommendVM.getLongitude(),
+                                                                      recommendVM.getLocationUpdatedAt(),
+                                                                      recommendVM.isReset());
 
         List<CardDTO> cardDTOs = accountService.recommend(recommendVM.getDistance(),
                                                           recommendVM.getMinAge(),

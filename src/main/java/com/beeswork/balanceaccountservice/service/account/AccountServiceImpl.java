@@ -4,10 +4,8 @@ package com.beeswork.balanceaccountservice.service.account;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
 import com.beeswork.balanceaccountservice.dto.account.*;
-import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
-import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
@@ -15,7 +13,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -55,25 +52,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         this.geometryFactory = geometryFactory;
     }
 
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED,
-                   isolation = Isolation.READ_COMMITTED,
-                   readOnly = true)
-    public List<QuestionDTO> getQuestions(String accountId, String identityToken) {
 
-        Account account = accountDAO.findWithQuestions(UUID.fromString(accountId), UUID.fromString(identityToken));
-        checkIfAccountValid(account);
-
-        List<QuestionDTO> questionDTOs = new ArrayList<>();
-        for (AccountQuestion accountQuestion : account.getAccountQuestions()) {
-            Question question = accountQuestion.getQuestion();
-            questionDTOs.add(new QuestionDTO(accountQuestion.getQuestionId(),
-                                             question.getDescription(),
-                                             question.getTopOption(),
-                                             question.getBottomOption()));
-        }
-        return questionDTOs;
-    }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED,
@@ -86,17 +65,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         return modelMapper.map(account, ProfileDTO.class);
     }
 
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED,
-                   isolation = Isolation.READ_COMMITTED,
-                   readOnly = true)
-    public List<PhotoDTO> getPhotos(String accountId, String identityToken) {
-
-        Account account = accountDAO.findWithPhotos(UUID.fromString(accountId), UUID.fromString(identityToken));
-        checkIfAccountValid(account);
-        return modelMapper.map(account.getPhotos(), new TypeToken<List<PhotoDTO>>() {
-        }.getType());
-    }
 
     //  DESC 1. when registering, an account will be created with enabled = false, then when finish profiles,
     //          it will update enabled = true because users might get cards for which profile has not been updated
@@ -175,9 +143,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
         List<Integer> questionIds = new ArrayList<>(answers.keySet());
 
-        Account account = accountDAO.findWithAccountQuestionsWithQuestionIdIn(UUID.fromString(accountId),
-                                                                              UUID.fromString(identityToken),
-                                                                              questionIds);
+        Account account = accountDAO.findWithAccountQuestionsIn(UUID.fromString(accountId),
+                                                                UUID.fromString(identityToken),
+                                                                questionIds);
         checkIfAccountValid(account);
 
         Map<Integer, Integer> sequences = new LinkedHashMap<>();
@@ -192,7 +160,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
             AccountQuestion accountQuestion = account.getAccountQuestions().get(i);
 
 
-            long questionId = accountQuestion.getQuestionId();
+            int questionId = accountQuestion.getQuestionId();
 
             if (answers.containsKey(questionId)) {
 

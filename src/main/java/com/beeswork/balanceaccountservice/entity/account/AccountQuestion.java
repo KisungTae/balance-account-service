@@ -41,6 +41,11 @@ public class AccountQuestion {
     @MapsId("accountId")
     private Account account;
 
+    @Column(name = "account_id",
+            insertable = false,
+            updatable = false)
+    private Integer accountId;
+
     @Column(name = "question_id",
             insertable = false,
             updatable = false)

@@ -1,9 +1,12 @@
 package com.beeswork.balanceaccountservice.controlleradvice;
 
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 import com.beeswork.balanceaccountservice.exception.account.*;
+import com.beeswork.balanceaccountservice.exception.photo.PhotoNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
@@ -31,7 +34,7 @@ public class ExceptionControllerAdvice {
     private static final String QUERY_EXCEPTION = "query.exception";
 
     private final MessageSource messageSource;
-    private final ObjectMapper  objectMapper;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public ExceptionControllerAdvice(MessageSource messageSource, ObjectMapper objectMapper) {
@@ -40,7 +43,8 @@ public class ExceptionControllerAdvice {
     }
 
     //  TEST 1. if exception is thrown inside handleNotFoundException, then it will throw handleNotFoundException not route to General Exception handler
-    @ExceptionHandler({AccountNotFoundException.class, QuestionNotFoundException.class, SwipeNotFoundException.class})
+    @ExceptionHandler({AccountNotFoundException.class, QuestionNotFoundException.class, SwipeNotFoundException.class,
+                       PhotoNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)
     throws Exception {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -59,6 +63,12 @@ public class ExceptionControllerAdvice {
                              .body(exceptionResponse(exception.getExceptionCode(), locale));
     }
 
+    @ExceptionHandler({AmazonServiceException.class, SdkClientException.class})
+    public ResponseEntity<String> handleAWSException(Exception exception, Locale locale) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(messageSource.getMessage(QUERY_EXCEPTION, null, locale));
+    }
 
 
 //    @ExceptionHandler({QueryException.class})

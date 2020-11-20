@@ -78,21 +78,11 @@ public class SwipeController extends BaseController {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        ClickDTO clickDTO;
-
-        try {
-            clickDTO = swipeService.click(clickVM.getSwipeId(),
-                                          clickVM.getAccountId(),
-                                          clickVM.getIdentityToken(),
-                                          clickVM.getSwipedId(),
-                                          clickVM.getAnswers());
-        } catch (ObjectOptimisticLockingFailureException exception) {
-            clickDTO = swipeService.click(clickVM.getSwipeId(),
-                                          clickVM.getAccountId(),
-                                          clickVM.getIdentityToken(),
-                                          clickVM.getSwipedId(),
-                                          clickVM.getAnswers());
-        }
+        ClickDTO clickDTO = swipeService.click(clickVM.getSwipeId(),
+                                               clickVM.getAccountId(),
+                                               clickVM.getIdentityToken(),
+                                               clickVM.getSwipedId(),
+                                               clickVM.getAnswers());
 
         MatchProjection match = clickDTO.getMatch();
 

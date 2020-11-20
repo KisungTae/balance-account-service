@@ -23,5 +23,5 @@ public class ClickVM extends AccountIdentityVM {
     private String swipedId;
 
     @Size(min = 1, max = 3, message = "{swipe.click.answers.size}")
-    private Map<Long, Boolean> answers = new HashMap<>();
+    private Map<Integer, Boolean> answers = new HashMap<>();
 }

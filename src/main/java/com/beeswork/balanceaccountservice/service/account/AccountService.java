@@ -13,26 +13,27 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface AccountService {
+
     ProfileDTO getProfile(String accountId, String identityToken);
-
-    List<QuestionDTO> getQuestions(String accountId, String identityToken);
-
-    List<PhotoDTO> getPhotos(String accountId, String identityToken);
 
     // delay = 0 then default to 1 second
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3,   backoff = @Backoff(delay = 1))
     void saveProfile(String accountId, String identityToken, String name, String email, Date birth, String about, Integer height,
                      boolean gender);
 
+    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3,   backoff = @Backoff(delay = 1))
     void saveAbout(String accountId, String identityToken, String about, Integer height);
 
+    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3,   backoff = @Backoff(delay = 1))
     void saveLocation(String accountId, String identityToken, double latitude, double longitude,
                       Date updatedAt);
 
+    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3,   backoff = @Backoff(delay = 1))
     void saveFCMToken(String accountId, String identityToken, String token);
 
     void saveAnswers(String accountId, String identityToken, Map<Integer, Boolean> answers);
 
+    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3,   backoff = @Backoff(delay = 1))
     PreRecommendDTO preRecommend(String accountId, String identityToken, Double latitude, Double longitude,
                                  Date locationUpdatedAt, boolean reset);
 

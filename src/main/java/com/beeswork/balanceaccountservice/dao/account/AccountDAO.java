@@ -13,6 +13,6 @@ public interface AccountDAO extends BaseDAO<Account> {
     Account findWithPhotos(UUID accountId, UUID identityToken);
     Account findWithQuestions(UUID accountId, UUID identityToken);
     Account findWithQuestions(UUID accountId);
-    Account findWithAccountQuestionsWithQuestionIdIn(UUID accountId, UUID identityToken, List<Integer> questionIds);
+    Account findWithAccountQuestionsIn(UUID accountId, UUID identityToken, List<Integer> questionIds);
     List<Object[]> findAllWithin(int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point point);
 }
