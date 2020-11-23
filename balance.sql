@@ -309,7 +309,7 @@ create table match
 (
     matcher_id uuid        not null,
     matched_id uuid        not null,
-    chat_id    bigint         not null,
+    chat_id    bigint      not null,
     unmatched  boolean     not null,
     unmatcher  boolean     not null,
     created_at timestamptz not null,
@@ -433,21 +433,23 @@ create table chat_message
     constraint chat_message_sender_id_fk foreign key (sender_id) references account (id)
 );
 
+
+
 select *
 from account
 where id = 'b02a4dc8-0743-4f4b-aa99-55bbfde5835d';
 
-
-
 select *
 from account a
-left join account_question aq on a.id = aq.account_id
-left join question q on aq.question_id = q.id
-where a.id = 'b02a4dc8-0743-4f4b-aa99-55bbfde5835d' and a.identity_token = '3622edd9-fed5-4727-92ce-169238b3d080'
-and (aq.selected = true or aq.account_id is null);
+         left join account_question aq on a.id = aq.account_id
+         left join question q on aq.question_id = q.id
+where a.id = 'b02a4dc8-0743-4f4b-aa99-55bbfde5835d'
+  and a.identity_token = '3622edd9-fed5-4727-92ce-169238b3d080'
+  and (aq.selected = true or aq.account_id is null);
 
 
-update account set version = version + 1
+update account
+set version = version + 1
 where id = 'b02a4dc8-0743-4f4b-aa99-55bbfde5835d';
 
 select *
@@ -456,3 +458,47 @@ where account_id = 'b02a4dc8-0743-4f4b-aa99-55bbfde5835d';
 
 select *
 from photo;
+
+select *
+from account a
+         left join photo p on a.id = p.account_id
+where a.id = 'b02a4dc8-0743-4f4b-aa99-55bbfde5835d'
+  and a.identity_token = '3622edd9-fed5-4727-92ce-169238b3d080';
+
+select *
+from account;
+
+
+
+select *
+from account_question;
+
+
+
+select cast(b.id as varchar),
+       b.name,
+       b.about,
+       b.birth_year,
+       st_distance(b.location, st_makepoint(126.807881, 37.463559)),
+       p.key,
+       b.height
+from (select *
+      from account a
+      where st_dwithin(location, ST_SetSRID(ST_MakePoint(126.807883, 37.463557),4326), 100000)
+        and gender = false
+        and birth_year <= 2013
+        and birth_year >= 1970
+        and enabled = true
+        and blocked = false
+      limit 15 offset 0) as b
+left join photo as p on p.account_id = b.id;
+
+
+select *
+from account;
+
+insert into photo values ('test photo', 1, 'ac393715-45f5-4da6-a9f1-747a648c8306')
+
+
+delete from photo
+

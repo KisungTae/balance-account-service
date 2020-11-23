@@ -6,6 +6,7 @@ import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
+import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
@@ -37,8 +38,11 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
                    readOnly = true)
     public List<QuestionDTO> getQuestions(String accountId, String identityToken) {
 
-        Account account = accountDAO.findWithQuestions(UUID.fromString(accountId), UUID.fromString(identityToken));
+        Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
+
+        if (account.getAccountQuestions().size() == 0)
+            throw new AccountQuestionNotFoundException();
 
         List<QuestionDTO> questionDTOs = new ArrayList<>();
         for (AccountQuestion accountQuestion : account.getAccountQuestions()) {
@@ -64,3 +68,7 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
 
 
 }
+
+
+
+

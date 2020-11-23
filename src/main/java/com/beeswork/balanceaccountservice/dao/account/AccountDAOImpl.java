@@ -4,15 +4,12 @@ import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
 import com.beeswork.balanceaccountservice.entity.account.QAccountQuestion;
-import com.beeswork.balanceaccountservice.entity.match.QMatch;
 import com.beeswork.balanceaccountservice.entity.photo.QPhoto;
 import com.beeswork.balanceaccountservice.entity.question.QQuestion;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.locationtech.jts.geom.Point;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -44,7 +41,7 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     @Override
     public Account findWithPhotos(UUID accountId, UUID identityToken) {
         return jpaQueryFactory.selectFrom(qAccount)
-                              .innerJoin(qAccount.photos, qPhoto)
+                              .leftJoin(qAccount.photos, qPhoto)
                               .where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken)))
                               .fetchOne();
     }
@@ -56,29 +53,28 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
                               .where(qAccount.id.eq(accountId)
                                                 .and(qAccount.identityToken.eq(identityToken))
                                                 .and(qAccountQuestion.selected.eq(true)
-                                                                              .or(qAccountQuestion.questionId.in(
-                                                                                      questionIds))))
+                                                                              .or(qAccountQuestion.questionId.in(questionIds))))
                               .fetchOne();
     }
 
     @Override
-    public Account findWithQuestions(UUID accountId, UUID identityToken) {
-        return findWithQuestions().where(qAccount.id.eq(accountId)
-                                                    .and(qAccount.identityToken.eq(identityToken))
-                                                    .and(qAccountQuestion.selected.eq(true)
-                                                                                  .or(qAccountQuestion.accountId.isNull())))
-                                  .fetchOne();
+    public Account findWithAccountQuestions(UUID accountId, UUID identityToken) {
+        return findWithAccountQuestions().where(qAccount.id.eq(accountId)
+                                                           .and(qAccount.identityToken.eq(identityToken))
+                                                           .and(qAccountQuestion.selected.eq(true)
+                                                                                         .or(qAccountQuestion.accountId.isNull())))
+                                         .fetchOne();
     }
 
     @Override
-    public Account findWithQuestions(UUID accountId) {
-        return findWithQuestions().where(qAccount.id.eq(accountId)
-                                                    .and(qAccountQuestion.selected.eq(true)
-                                                                                  .or(qAccountQuestion.accountId.isNull())))
-                                  .fetchOne();
+    public Account findWithAccountQuestions(UUID accountId) {
+        return findWithAccountQuestions().where(qAccount.id.eq(accountId)
+                                                           .and(qAccountQuestion.selected.eq(true)
+                                                                                         .or(qAccountQuestion.accountId.isNull())))
+                                         .fetchOne();
     }
 
-    private JPAQuery<Account> findWithQuestions() {
+    private JPAQuery<Account> findWithAccountQuestions() {
         return jpaQueryFactory.selectFrom(qAccount)
                               .leftJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
                               .leftJoin(qAccountQuestion.question, qQuestion).fetchJoin();
@@ -99,8 +95,8 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
                 "        and blocked = false " +
                 "       limit :limit " +
                 "       offset :offset) as b " +
-                "inner join photo as p " +
-                "on p.account_id = b.id")
+                "left join photo as p " +
+                "on p.account_id = b.id", Object[].class)
                             .setParameter("pivot", point)
                             .setParameter("distance", distance)
                             .setParameter("gender", gender)

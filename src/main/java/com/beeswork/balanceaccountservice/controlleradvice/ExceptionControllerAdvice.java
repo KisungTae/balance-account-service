@@ -44,7 +44,7 @@ public class ExceptionControllerAdvice {
 
     //  TEST 1. if exception is thrown inside handleNotFoundException, then it will throw handleNotFoundException not route to General Exception handler
     @ExceptionHandler({AccountNotFoundException.class, QuestionNotFoundException.class, SwipeNotFoundException.class,
-                       PhotoNotFoundException.class})
+                       PhotoNotFoundException.class, AccountQuestionNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)
     throws Exception {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)

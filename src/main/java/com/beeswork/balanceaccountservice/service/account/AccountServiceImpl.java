@@ -209,14 +209,16 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
 
-        int index = reset ? 0 : account.getIndex() + 1;
+        PreRecommendDTO preRecommendDTO = new PreRecommendDTO();
+
+        int index = reset ? 0 : account.getIndex();
+        preRecommendDTO.setIndex(index);
+        index++;
         account.setIndex(index);
 
-        if (latitude != null && longitude != null && locationUpdatedAt.after(account.getLocationUpdatedAt()))
+        if (latitude != null && longitude != null && locationUpdatedAt != null && locationUpdatedAt.after(account.getLocationUpdatedAt()))
             saveLocation(account, latitude, longitude, locationUpdatedAt);
 
-        PreRecommendDTO preRecommendDTO = new PreRecommendDTO();
-        preRecommendDTO.setIndex(account.getIndex());
         preRecommendDTO.setLocation(account.getLocation());
         return preRecommendDTO;
     }
@@ -254,7 +256,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
                 cardDTO = new CardDTO(id, name, about, height, birthYear, distanceBetween);
             }
-            cardDTO.getPhotos().add(cAccount[CARD_PHOTO_KEY].toString());
+
+            if (cAccount[CARD_PHOTO_KEY] != null)
+                cardDTO.getPhotos().add(cAccount[CARD_PHOTO_KEY].toString());
         }
 
         cardDTOs.add(cardDTO);

@@ -21,23 +21,24 @@ public class FCMNotificationDTO {
     private static final String UPDATED_AT = "updatedAt";
 
     private String              token;
-    private Map<String, String> messages = new HashMap<>();
+    private Map<String, String> data = new HashMap<>();
 
     public static FCMNotificationDTO matchNotification(String token, String matchedId, String name, String chatId,
                                                        String matchedPhotoKey) {
 
         FCMNotificationDTO fcmNotificationDTO = notification(token, NotificationType.MATCH, matchedPhotoKey);
-        fcmNotificationDTO.getMessages().put(MATCHED_ID, matchedId);
-        fcmNotificationDTO.getMessages().put(NAME, name);
-        fcmNotificationDTO.getMessages().put(CHAT_ID, chatId);
+        fcmNotificationDTO.getData().put(MATCHED_ID, matchedId);
+        fcmNotificationDTO.getData().put(NAME, name);
+        fcmNotificationDTO.getData().put(CHAT_ID, chatId);
         return fcmNotificationDTO;
     }
+
 
     public static FCMNotificationDTO clickedNotification(String token, String swipedId, String clickedPhotoKey, String updatedAt) {
 
         FCMNotificationDTO fcmNotificationDTO = notification(token, NotificationType.CLICKED, clickedPhotoKey);
-        fcmNotificationDTO.getMessages().put(SWIPED_ID, swipedId);
-        fcmNotificationDTO.getMessages().put(UPDATED_AT, updatedAt);
+        fcmNotificationDTO.getData().put(SWIPED_ID, swipedId);
+        fcmNotificationDTO.getData().put(UPDATED_AT, updatedAt);
         return fcmNotificationDTO;
     }
 
@@ -45,8 +46,8 @@ public class FCMNotificationDTO {
 
         FCMNotificationDTO fcmNotificationDTO = new FCMNotificationDTO();
         fcmNotificationDTO.setToken(token);
-        fcmNotificationDTO.getMessages().put(NOTIFICATION_TYPE, notificationType);
-        fcmNotificationDTO.getMessages().put(PHOTO_KEY, photoKey);
+        fcmNotificationDTO.getData().put(NOTIFICATION_TYPE, notificationType);
+        fcmNotificationDTO.getData().put(PHOTO_KEY, photoKey);
         return fcmNotificationDTO;
     }
 }

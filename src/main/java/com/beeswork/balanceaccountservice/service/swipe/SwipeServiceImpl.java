@@ -12,6 +12,7 @@ import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
+import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
@@ -32,7 +33,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     private static final int SWIPE_POINT = 50;
 
     private final AccountDAO accountDAO;
-    private final SwipeDAO   swipeDAO;
+    private final SwipeDAO swipeDAO;
     private final ChatDAO chatDAO;
 
     @Autowired
@@ -52,8 +53,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         Account swiper = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(swiper);
 
-        Account swiped = accountDAO.findWithQuestions(UUID.fromString(swipedId));
+        Account swiped = accountDAO.findWithAccountQuestions(UUID.fromString(swipedId));
         checkIfSwipedValid(swiped);
+
+        if (swiped.getAccountQuestions().size() == 0)
+            throw new AccountQuestionNotFoundException();
 
         if (swipeDAO.existsByClicked(swiper.getId(), swiped.getId(), true))
             throw new SwipeClickedExistsException();
@@ -69,7 +73,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             swipeDAO.persist(swipe);
             balanceGameDTO.setSwipeId(swipe.getId());
         }
-        
+
         for (AccountQuestion accountQuestion : swiped.getAccountQuestions()) {
             Question question = accountQuestion.getQuestion();
             balanceGameDTO.getQuestions().add(new QuestionDTO(question.getId(),
@@ -83,7 +87,9 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED,
+                   isolation = Isolation.READ_COMMITTED,
+                   readOnly = true)
     public List<ClickedProjection> listClicked(String accountId, String identityToken, Date fetchedAt) {
 
         UUID accountUUId = UUID.fromString(accountId);
@@ -136,14 +142,19 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             swiper.getMatches().add(new Match(swiper, swiped, chat, false, date, date));
             swiped.getMatches().add(new Match(swiped, swiper, chat, false, date, date));
 
-            clickDTO.setupAsMatch(swiped.getId(), swiped.getName(), swiped.getRepPhotoKey(),
-                                  chat.getId(), swiped.getFcmToken(), false);
+            clickDTO.setupAsMatch(swiped.getId(),
+                                  swiped.getName(),
+                                  swiped.getRepPhotoKey(),
+                                  chat.getId(),
+                                  swiped.getFcmToken(),
+                                  false);
         } else {
-            clickDTO.setupAsClicked(swiped.getId(), swiped.getRepPhotoKey(), swiped.getFcmToken(), swipe.getUpdatedAt());
+            clickDTO.setupAsClick(swiped.getId(),
+                                  swiped.getRepPhotoKey(),
+                                  swiped.getFcmToken(),
+                                  swipe.getUpdatedAt());
         }
 
-//        throw new BadRequestException();
-//        throw new SwipedNotFoundException();
         return clickDTO;
     }
 }

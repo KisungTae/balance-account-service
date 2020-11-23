@@ -12,12 +12,23 @@ import java.util.UUID;
 @Setter
 public class ClickDTO {
 
-    private String notificationType = NotificationType.NOT_CLICKED;
-    private String fcmToken;
-    private MatchProjection match;
+    enum ClickResult {
+        NOT_CLICK,
+        CLICK,
+        MATCH
+    }
 
-    public void setupAsClicked(UUID swipedId, String swipedPhotoKey, String swipedFCMToken, Date updatedAt) {
-        this.notificationType = NotificationType.CLICKED;
+    private ClickResult clickResult = ClickResult.NOT_CLICK;
+    private String swipedId;
+    private String swipedPhotoKey;
+    private String swipedFCMToken;
+    private String swipedName;
+    private Long chatId;
+    private Date updatedAt;
+
+    public void setupAsClick(UUID swipedId, String swipedPhotoKey, String swipedFCMToken, Date updatedAt) {
+        this.clickResult = ClickResult.CLICK;
+
         this.match = new MatchProjection();
         this.match.setMatchedId(swipedId);
         this.match.setPhotoKey(swipedPhotoKey);
