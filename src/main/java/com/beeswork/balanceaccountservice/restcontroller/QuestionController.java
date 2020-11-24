@@ -36,8 +36,8 @@ public class QuestionController extends BaseController {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        List<QuestionDTO> questionDTOs = questionService.getQuestions(accountIdentityVM.getAccountId(),
-                                                                     accountIdentityVM.getIdentityToken());
+        List<QuestionDTO> questionDTOs = questionService.listQuestions(accountIdentityVM.getAccountId(),
+                                                                       accountIdentityVM.getIdentityToken());
 
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
     }

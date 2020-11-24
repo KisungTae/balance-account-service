@@ -5,6 +5,6 @@ import java.util.List;
 
 public interface QuestionService {
 
-    List<QuestionDTO> getQuestions(String accountId, String identityToken);
+    List<QuestionDTO> listQuestions(String accountId, String identityToken);
     QuestionDTO randomQuestion(List<Integer> currentQuestionIds);
 }

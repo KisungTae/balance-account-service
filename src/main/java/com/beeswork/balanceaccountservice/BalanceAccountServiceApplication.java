@@ -170,6 +170,8 @@ public class BalanceAccountServiceApplication {
 // TODO			40. updatedAt.after() does not include equal, you should subtract 1 milisecond from the date to include equal, check listclicked, listClick, listMatches
 
 
+// TODO			41. implement randomQuestions for initializing balancegamequestions at first, and when no question is found in listQuestions then call randomQuestions and pass new random questiosn
+
 
 
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one
