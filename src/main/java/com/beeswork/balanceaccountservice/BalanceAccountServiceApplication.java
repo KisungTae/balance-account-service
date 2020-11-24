@@ -162,3 +162,14 @@ public class BalanceAccountServiceApplication {
 // TODO			37. add log to services and controllers
 
 // TODO 		38. check unmatch in regards to check blocked and identity token
+//					--> does not need to check blocked and identity token
+
+// TODO 		39. create a function to list "click" because you don't store the clickedId before click() in android level
+//					--> created
+
+// TODO			40. updatedAt.after() does not include equal, you should subtract 1 milisecond from the date to include equal, check listclicked, listClick, listMatches
+
+
+
+
+// TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one

@@ -66,7 +66,7 @@ public class DummyController {
 
     @Transactional
     @PostMapping("/create/swipe")
-    public void createDummySwipe() {
+    public void createDummySwipe() throws InterruptedException {
         List<Account> accounts = new JPAQueryFactory(entityManager).selectFrom(QAccount.account).fetch();
 
         Random random = new Random();
@@ -86,10 +86,12 @@ public class DummyController {
 
                     for (int k = 0; k < count; k++) {
                         Swipe swipe = new Swipe(swiper, accounts.get(j), false, new Date(), new Date());
+                        Thread.sleep(5);
                         swiper.getSwipes().add(swipe);
                     }
 
                     Swipe swipe = new Swipe(swiper, accounts.get(j), random.nextBoolean(), new Date(), new Date());
+                    Thread.sleep(5);
                     swiper.getSwipes().add(swipe);
                 }
             }

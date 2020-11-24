@@ -16,6 +16,7 @@ import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFo
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
+import com.beeswork.balanceaccountservice.projection.ClickProjection;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
@@ -86,6 +87,19 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     }
 
 
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED,
+                   isolation = Isolation.READ_COMMITTED,
+                   readOnly = true)
+    public List<ClickProjection> listClick(String accountId, String identityToken, Date fetchedAt) {
+
+        UUID accountUUId = UUID.fromString(accountId);
+        Account account = accountDAO.findBy(accountUUId, UUID.fromString(identityToken));
+        checkIfAccountValid(account);
+        return swipeDAO.findAllClickAfter(accountUUId, fetchedAt);
+    }
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED,
                    isolation = Isolation.READ_COMMITTED,
@@ -97,6 +111,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         checkIfAccountValid(account);
         return swipeDAO.findAllClickedAfter(accountUUId, fetchedAt);
     }
+
+
 
     @Override
     @Transactional
@@ -129,30 +145,33 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         }
 
         swipe.setClicked(true);
-        swipe.setUpdatedAt(new Date());
+
+        Date updatedAt = new Date();
+        swipe.setUpdatedAt(updatedAt);
 
         // match
         if (swipeDAO.existsByClicked(swipedUUId, swiperUUId, true)) {
 
             Chat chat = new Chat();
-            Date date = new Date();
-
             chatDAO.persist(chat);
 
-            swiper.getMatches().add(new Match(swiper, swiped, chat, false, date, date));
-            swiped.getMatches().add(new Match(swiped, swiper, chat, false, date, date));
+            swiper.getMatches().add(new Match(swiper, swiped, chat, false, updatedAt, updatedAt));
+            swiped.getMatches().add(new Match(swiped, swiper, chat, false, updatedAt, updatedAt));
 
-            clickDTO.setupAsMatch(swiped.getId(),
+            clickDTO.setupAsMatch(swiper.getName(),
+                                  swiper.getRepPhotoKey(),
+                                  chat.getId(),
+                                  swiped.getId(),
                                   swiped.getName(),
                                   swiped.getRepPhotoKey(),
-                                  chat.getId(),
                                   swiped.getFcmToken(),
-                                  false);
+                                  updatedAt);
         } else {
-            clickDTO.setupAsClick(swiped.getId(),
-                                  swiped.getRepPhotoKey(),
+            clickDTO.setupAsClick(swiper.getName(),
+                                  swiper.getRepPhotoKey(),
+                                  swiped.getId(),
                                   swiped.getFcmToken(),
-                                  swipe.getUpdatedAt());
+                                  updatedAt);
         }
 
         return clickDTO;

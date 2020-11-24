@@ -3,18 +3,23 @@ package com.beeswork.balanceaccountservice.dao.swipe;
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
+import com.beeswork.balanceaccountservice.projection.ClickProjection;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.entity.swipe.QSwipe;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
+import com.beeswork.balanceaccountservice.projection.QClickProjection;
 import com.beeswork.balanceaccountservice.projection.QClickedProjection;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.time.Instant;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +35,7 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     public SwipeDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
         super(entityManager, jpaQueryFactory);
     }
+
 
     @Override
     public Swipe findWithAccounts(Long swipeId, UUID swiperId, UUID swipedId) throws SwipeNotFoundException {
@@ -51,6 +57,16 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
                                                     .and(qSwipe.swipedId.eq(swipedId))
                                                     .and(qSwipe.clicked.eq(clicked)))
                               .fetchCount() > 0;
+    }
+
+    @Override
+    public List<ClickProjection> findAllClickAfter(UUID swiperId, Date fetchedAt) {
+        return jpaQueryFactory.select(new QClickProjection(qSwipe.swipedId, qSwipe.updatedAt))
+                              .from(qSwipe)
+                              .where(qSwipe.swiperId.eq(swiperId)
+                                                    .and(qSwipe.updatedAt.after(fetchedAt))
+                                                    .and(qSwipe.clicked.eq(true)))
+                              .fetch();
     }
 
     public List<ClickedProjection> findAllClickedAfter(UUID swipedId, Date fetchedAt) {

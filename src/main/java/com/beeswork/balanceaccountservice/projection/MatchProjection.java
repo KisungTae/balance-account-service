@@ -31,6 +31,11 @@ public class MatchProjection {
         this.updatedAt = updatedAt;
     }
 
+    public MatchProjection(UUID matchedId, Date updatedAt) {
+        this.matchedId = matchedId;
+        this.updatedAt = updatedAt;
+    }
+
     @Override
     public String toString() {
         return "MatchProjection{" +

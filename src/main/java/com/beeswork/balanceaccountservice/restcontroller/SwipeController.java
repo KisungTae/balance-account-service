@@ -5,16 +5,19 @@ import com.beeswork.balanceaccountservice.dto.firebase.FCMNotificationDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.BalanceGameDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
+import com.beeswork.balanceaccountservice.projection.ClickProjection;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
 import com.beeswork.balanceaccountservice.service.swipe.SwipeService;
 import com.beeswork.balanceaccountservice.vm.swipe.ClickVM;
+import com.beeswork.balanceaccountservice.vm.swipe.ListClickVM;
 import com.beeswork.balanceaccountservice.vm.swipe.ListClickedVM;
 import com.beeswork.balanceaccountservice.vm.swipe.SwipeVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
+import org.apache.tomcat.jni.Local;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -57,6 +60,19 @@ public class SwipeController extends BaseController {
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(balanceGameDTO));
     }
 
+    @GetMapping("/click/list")
+    public ResponseEntity<String> listClick(@Valid @ModelAttribute ListClickVM listClickVM,
+                                            BindingResult bindingResult) throws JsonProcessingException {
+
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+
+        List<ClickProjection> clickProjections = swipeService.listClick(listClickVM.getAccountId(),
+                                                                        listClickVM.getIdentityToken(),
+                                                                        listClickVM.getFetchedAt());
+
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickProjections));
+    }
+
     @GetMapping("/clicked/list")
     public ResponseEntity<String> listClicked(@Valid @ModelAttribute ListClickedVM listClickedVM,
                                               BindingResult bindingResult)
@@ -73,8 +89,10 @@ public class SwipeController extends BaseController {
 
 
     @PostMapping("/click")
-    public ResponseEntity<String> click(@Valid @RequestBody ClickVM clickVM, BindingResult bindingResult)
-    throws JsonProcessingException, FirebaseMessagingException {
+    public ResponseEntity<String> click(@Valid @RequestBody ClickVM clickVM,
+                                        BindingResult bindingResult,
+                                        Locale locale)
+    throws JsonProcessingException {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
@@ -84,22 +102,7 @@ public class SwipeController extends BaseController {
                                                clickVM.getSwipedId(),
                                                clickVM.getAnswers());
 
-        MatchProjection match = clickDTO.getMatch();
-
-        if (clickDTO.getNotificationType().equals(NotificationType.MATCH)) {
-            firebaseService.sendNotification(FCMNotificationDTO.matchNotification(clickDTO.getFcmToken(),
-                                                                                  match.getMatchedId().toString(),
-                                                                                  match.getName(),
-                                                                                  match.getChatId().toString(),
-                                                                                  match.getPhotoKey()));
-        } else if (clickDTO.getNotificationType().equals(NotificationType.CLICKED)) {
-            String updatedAt = DateTimeFormatter.ISO_INSTANT.format(match.getUpdatedAt().toInstant());
-            firebaseService.sendNotification(FCMNotificationDTO.clickedNotification(clickDTO.getFcmToken(),
-                                                                                    match.getMatchedId().toString(),
-                                                                                    match.getPhotoKey(),
-                                                                                    updatedAt));
-        }
-
+        firebaseService.sendNotification(clickDTO, locale);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO));
     }
 }
