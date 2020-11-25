@@ -10,6 +10,7 @@ import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFo
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,6 +26,8 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
 
     private final QuestionDAO questionDAO;
     private final AccountDAO accountDAO;
+
+    private static final int MAX_NUM_OF_QUESTIONS = 3;
 
     public QuestionServiceImpl(QuestionDAO questionDAO, ModelMapper modelMapper, AccountDAO accountDAO) {
         super(modelMapper);
@@ -65,6 +68,17 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
         Question question = questionDAO.findNthNotIn(currentQuestionIds, random);
         if (question == null) throw new QuestionNotFoundException();
         return modelMapper.map(question, QuestionDTO.class);
+    }
+
+    @Override
+    public List<QuestionDTO> listRandomQuestions(String accountId, String identityToken) {
+
+        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
+        checkIfAccountValid(account);
+
+        long count = questionDAO.count();
+        int startIndex = new Random().nextInt((int)(count - MAX_NUM_OF_QUESTIONS));
+        return modelMapper.map(questionDAO.findAllWithLimitAndOffset(MAX_NUM_OF_QUESTIONS, startIndex), new TypeToken<List<QuestionDTO>>() {}.getType());
     }
 
 

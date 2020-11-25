@@ -18,7 +18,7 @@ public interface AccountService {
 
     // delay = 0 then default to 1 second
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3,   backoff = @Backoff(delay = 1))
-    void saveProfile(String accountId, String identityToken, String name, String email, Date birth, String about, Integer height,
+    void saveProfile(String accountId, String identityToken, String name, Date birth, String about, Integer height,
                      boolean gender);
 
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3,   backoff = @Backoff(delay = 1))
@@ -32,6 +32,9 @@ public interface AccountService {
     void saveFCMToken(String accountId, String identityToken, String token);
 
     void saveAnswers(String accountId, String identityToken, Map<Integer, Boolean> answers);
+
+    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3,   backoff = @Backoff(delay = 1))
+    void saveEmail(String accountId, String identityToken, String email);
 
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3,   backoff = @Backoff(delay = 1))
     PreRecommendDTO preRecommend(String accountId, String identityToken, Double latitude, Double longitude,

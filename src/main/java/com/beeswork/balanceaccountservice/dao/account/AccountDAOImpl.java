@@ -39,6 +39,11 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     }
 
     @Override
+    public boolean existsByEmail(String email) {
+        return jpaQueryFactory.selectFrom(qAccount).where(qAccount.email.eq(email)).fetchCount() > 0;
+    }
+
+    @Override
     public Account findWithPhotos(UUID accountId, UUID identityToken) {
         return jpaQueryFactory.selectFrom(qAccount)
                               .leftJoin(qAccount.photos, qPhoto)

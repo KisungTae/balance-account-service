@@ -155,7 +155,6 @@ drop table chat;
 drop table account;
 
 
-
 -- TODO: 2020-09-14 execute these
 
 
@@ -195,11 +194,11 @@ create table account
     location_updated_at      timestamptz,
     location                 geography(point, 4326) not null,
     fcm_token                varchar(200),
-    account_type_id          int                    not null,
+    account_type             int                    not null,
     created_at               timestamptz            not null,
-    updated_at               timestamptz            not null,
+    updated_at               timestamptz            not null
 
-    constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
+--     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
 
 
@@ -443,9 +442,15 @@ order by count(*) desc;
 select id, swiper_id, swiped_id, updated_at
 from swipe
 where swiper_id = '751b4cd8-2e1b-41e4-90c3-2b4b07a63533'
-and clicked = true
+  and clicked = true
 order by updated_at desc;
 
 select *
 from account
-where id ='751b4cd8-2e1b-41e4-90c3-2b4b07a63533';
+where id = '51864ba4-1640-47f0-b170-89f29c20b6be';
+
+
+select *
+from account;
+
+update account set account_type = 1 where id = '51864ba4-1640-47f0-b170-89f29c20b6be'

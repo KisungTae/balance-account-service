@@ -31,8 +31,8 @@ public class QuestionController extends BaseController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<String> getQuestions(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
-                                               BindingResult bindingResult) throws JsonProcessingException {
+    public ResponseEntity<String> listQuestions(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
+                                                BindingResult bindingResult) throws JsonProcessingException {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
@@ -49,6 +49,18 @@ public class QuestionController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         QuestionDTO questionDTO = questionService.randomQuestion(randomQuestionVM.getCurrentQuestionIds());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTO));
+    }
+
+    @GetMapping("/random/list")
+    public ResponseEntity<String> listRandomQuestions(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
+                                                      BindingResult bindingResult) throws JsonProcessingException {
+
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        List<QuestionDTO> questionDTOs = questionService.listRandomQuestions(accountIdentityVM.getAccountId(),
+                                                                             accountIdentityVM.getIdentityToken());
+
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
+
     }
 
 

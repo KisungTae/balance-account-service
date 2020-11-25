@@ -11,4 +11,5 @@ public interface QuestionDAO extends BaseDAO<Question> {
     List<Question> findAllByIds(List<Integer> ids);
     Question findNthNotIn(List<Integer> questionIds, int offset);
     long count();
+    List<Question> findAllWithLimitAndOffset(int limit, int offset);
 }

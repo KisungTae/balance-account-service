@@ -14,6 +14,7 @@ import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
+import com.beeswork.balanceaccountservice.vm.account.AccountEmailDuplicateException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,8 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler({AccountShortOfPointException.class, AccountBlockedException.class,
                        SwipeClickedExistsException.class, BadRequestException.class,
                        SwipedBlockedException.class, SwipedNotFoundException.class,
-                       QuestionSetChangedException.class})
+                       QuestionSetChangedException.class, AccountEmailNotMutableException.class,
+                       AccountEmailDuplicateException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

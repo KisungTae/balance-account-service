@@ -10,6 +10,7 @@ import com.beeswork.balanceaccountservice.projection.QMatchProjection;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -38,6 +39,8 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
 
     @Override
     public List<MatchProjection> findAllAfter(UUID matcherId, Date fetchedAt) {
+
+        fetchedAt = DateUtils.addMilliseconds(fetchedAt, -1);
 
         Expression<Date> updatedAtCase = new CaseBuilder().when(qMatch.updatedAt.after(qAccount.repPhotoKeyUpdatedAt))
                                                   .then(qMatch.updatedAt)

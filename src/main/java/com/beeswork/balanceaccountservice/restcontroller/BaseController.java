@@ -35,10 +35,4 @@ public class BaseController {
         ExceptionResponse exceptionResponse = new ExceptionResponse(FIELD_EXCEPTION, "", fieldErrors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(exceptionResponse));
     }
-
-    protected void runAsOptimisticRetryFunction(Runnable function) {
-
-    }
-
-
 }

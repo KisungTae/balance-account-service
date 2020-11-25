@@ -14,6 +14,7 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -61,6 +62,9 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
 
     @Override
     public List<ClickProjection> findAllClickAfter(UUID swiperId, Date fetchedAt) {
+
+        fetchedAt = DateUtils.addMilliseconds(fetchedAt, -1);
+
         return jpaQueryFactory.select(new QClickProjection(qSwipe.swipedId, qSwipe.updatedAt))
                               .from(qSwipe)
                               .where(qSwipe.swiperId.eq(swiperId)
@@ -70,6 +74,8 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
     public List<ClickedProjection> findAllClickedAfter(UUID swipedId, Date fetchedAt) {
+
+        fetchedAt = DateUtils.addMilliseconds(fetchedAt, -1);
 
         Expression<Date> updatedAtCase = new CaseBuilder().when(qSwipe.updatedAt.after(qAccount.repPhotoKeyUpdatedAt))
                                                           .then(qSwipe.updatedAt)

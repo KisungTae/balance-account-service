@@ -20,16 +20,11 @@ public class SaveProfileVM extends AccountIdentityVM {
     @Length(min = 1, max = 50, message = "{name.length}")
     private String name;
 
-    @NotEmpty(message = "{email.empty}")
-    @Email(message = "{email.invalid}")
-    private String email;
-
     @NotNull(message = "{birth.null}")
     private Date birth;
 
     @NotNull(message = "{gender.null}")
     private Boolean gender;
-
 
     private String about;
     private Integer height;

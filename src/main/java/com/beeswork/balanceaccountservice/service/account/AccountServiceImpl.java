@@ -1,14 +1,17 @@
 package com.beeswork.balanceaccountservice.service.account;
 
 
+import com.beeswork.balanceaccountservice.constant.AccountType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
 import com.beeswork.balanceaccountservice.dto.account.*;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
+import com.beeswork.balanceaccountservice.exception.account.AccountEmailNotMutableException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
+import com.beeswork.balanceaccountservice.vm.account.AccountEmailDuplicateException;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -74,15 +77,13 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          then Hibernate won't delete accountQuestions even if their size = 0
     @Override
     @Transactional
-    public void saveProfile(String accountId, String identityToken, String name, String email, Date birth, String about,
+    public void saveProfile(String accountId, String identityToken, String name, Date birth, String about,
                             Integer height, boolean gender) {
 
-        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
-        checkIfAccountValid(account);
+        Account account = findValidAccount(accountId, identityToken);
 
         if (account.isEnabled()) {
             account.setName(name);
-            account.setEmail(email);
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(account.getBirth());
@@ -101,9 +102,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Transactional
     public void saveAbout(String accountId, String identityToken, String about, Integer height) {
 
-        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
-        checkIfAccountValid(account);
-
+        Account account = findValidAccount(accountId, identityToken);
         account.setHeight(height);
         account.setAbout(about);
         account.setUpdatedAt(new Date());
@@ -114,8 +113,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     public void saveLocation(String accountId, String identityToken, double latitude, double longitude,
                              Date updatedAt) {
 
-        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
-        checkIfAccountValid(account);
+        Account account = findValidAccount(accountId, identityToken);
         saveLocation(account, latitude, longitude, updatedAt);
     }
 
@@ -128,8 +126,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Transactional
     public void saveFCMToken(String accountId, String identityToken, String token) {
 
-        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
-        checkIfAccountValid(account);
+        Account account = findValidAccount(accountId, identityToken);
         account.setFcmToken(token);
     }
 
@@ -157,9 +154,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         }
 
         for (int i = account.getAccountQuestions().size() - 1; i >= 0; i--) {
+
             AccountQuestion accountQuestion = account.getAccountQuestions().get(i);
-
-
             int questionId = accountQuestion.getQuestionId();
 
             if (answers.containsKey(questionId)) {
@@ -203,11 +199,25 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
+    public void saveEmail(String accountId, String identityToken, String email) {
+
+        Account account = findValidAccount(accountId, identityToken);
+
+        if (account.getAccountType() == AccountType.NAVER || account.getAccountType() == AccountType.GOOGLE)
+            throw new AccountEmailNotMutableException();
+
+        if (accountDAO.existsByEmail(email))
+            throw new AccountEmailDuplicateException();
+
+        account.setEmail(email);
+    }
+
+    @Override
+    @Transactional
     public PreRecommendDTO preRecommend(String accountId, String identityToken, Double latitude, Double longitude,
                                         Date locationUpdatedAt, boolean reset) {
 
-        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
-        checkIfAccountValid(account);
+        Account account = findValidAccount(accountId, identityToken);
 
         PreRecommendDTO preRecommendDTO = new PreRecommendDTO();
 
@@ -266,4 +276,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         return cardDTOs;
     }
 
+    private Account findValidAccount(String accountId, String identityToken) {
+        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
+        checkIfAccountValid(account);
+        return account;
+    }
 }

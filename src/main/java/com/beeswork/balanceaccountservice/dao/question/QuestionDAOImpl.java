@@ -45,5 +45,10 @@ public class QuestionDAOImpl extends BaseDAOImpl<Question> implements QuestionDA
         return jpaQueryFactory.selectFrom(qQuestion).fetchCount();
     }
 
+    @Override
+    public List<Question> findAllWithLimitAndOffset(int limit, int offset) {
+        return jpaQueryFactory.selectFrom(qQuestion).limit(limit).offset(offset).fetch();
+    }
+
 
 }

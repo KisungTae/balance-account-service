@@ -127,7 +127,7 @@ public class BalanceAccountServiceApplication {
 //					--> @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3,   backoff = @Backoff(delay = 1)) has been added
 
 // TODO			26. update to have check answers of balancegame and proceeed to create match or not and retunr the result even if it is match
-//					-->
+//					--> click() returns empty ClickDTO with clickResult = NOT_CLICK
 
 // TODO			27. update getClickedList to have last update time as field and remove udpatedAt in the ClickedDTO
 //					-->
@@ -157,7 +157,7 @@ public class BalanceAccountServiceApplication {
 //					--> includes accounts with no questions by including account.question.accountId is null in findWithAccountQuestions()
 
 // TODO 		36. add saveEmail after implementing login logic, if accountType == Google or Naver, then don't let user change email, you should add logic in saveProfile() in AccountService
-//					-->
+//					--> saveEmail() has been implemented
 
 // TODO			37. add log to services and controllers
 
@@ -165,13 +165,13 @@ public class BalanceAccountServiceApplication {
 //					--> does not need to check blocked and identity token
 
 // TODO 		39. create a function to list "click" because you don't store the clickedId before click() in android level
-//					--> created
+//					--> listClick() has been implemented
 
 // TODO			40. updatedAt.after() does not include equal, you should subtract 1 milisecond from the date to include equal, check listclicked, listClick, listMatches
-
+//					-->  fetchedAt = DateUtils.addMilliseconds(fetchedAt, -1); has bee added
 
 // TODO			41. implement randomQuestions for initializing balancegamequestions at first, and when no question is found in listQuestions then call randomQuestions and pass new random questiosn
-
+//					--> listRandomQuestions() has been implemented
 
 
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one

@@ -57,7 +57,6 @@ public class AccountController extends BaseController {
         accountService.saveProfile(saveProfileVM.getAccountId(),
                                    saveProfileVM.getIdentityToken(),
                                    saveProfileVM.getName(),
-                                   saveProfileVM.getEmail(),
                                    saveProfileVM.getBirth(),
                                    saveProfileVM.getAbout(),
                                    saveProfileVM.getHeight(),
@@ -120,6 +119,14 @@ public class AccountController extends BaseController {
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
+    @PostMapping("/email")
+    public ResponseEntity<String> saveEmail(@Valid @RequestBody SaveEmailVM saveEmailVM,
+                                            BindingResult bindingResult) throws JsonProcessingException {
+
+        if (bindingResult.hasErrors()) super.fieldExceptionResponse(bindingResult);
+        accountService.saveEmail(saveEmailVM.getAccountId(), saveEmailVM.getIdentityToken(), saveEmailVM.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+    }
     @GetMapping("/recommend")
     public ResponseEntity<String> recommend(@Valid @ModelAttribute RecommendVM recommendVM,
                                             BindingResult bindingResult)

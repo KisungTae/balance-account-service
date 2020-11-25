@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.entity.account;
 
+import com.beeswork.balanceaccountservice.constant.AccountType;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.match.Match;
@@ -96,9 +97,15 @@ public class Account {
             columnDefinition = "GEOGRAPHY(POINT)")
     private Point location;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_type_id")
+    @Enumerated
     private AccountType accountType;
+
+//    @Column(name = "account_type_id", insertable = false, updatable = false)
+//    private int accountTypeId;
+//
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "account_type_id")
+//    private AccountType accountType;
 
     @OneToMany(mappedBy = "account",
                fetch = FetchType.LAZY,

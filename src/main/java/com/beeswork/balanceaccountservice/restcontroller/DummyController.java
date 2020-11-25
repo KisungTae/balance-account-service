@@ -194,7 +194,7 @@ public class DummyController {
         Random random = new Random();
         SimpleDateFormat originalFormat = new SimpleDateFormat("yyyyMMdd");
         GeometryFactory gf = new GeometryFactory();
-        AccountType accountType = new JPAQueryFactory(entityManager).selectFrom(QAccountType.accountType).fetchFirst();
+//        AccountType accountType = new JPAQueryFactory(entityManager).selectFrom(QAccountType.accountType).fetchFirst();
 
         int count = 1;
 
@@ -231,7 +231,7 @@ public class DummyController {
                 account.setBirth(birth);
                 account.setGender(gender);
                 account.setLocation(location);
-                account.setAccountType(accountType);
+                account.setAccountType(com.beeswork.balanceaccountservice.constant.AccountType.values()[random.nextInt(4)]);
                 account.setScore(0);
                 account.setPoint(50000);
                 account.setFcmToken("");
