@@ -436,25 +436,7 @@ create table chat_message
 
 
 
-select swiper_id, count(*)
-from swipe s
-group by swiper_id
-order by count(*) desc;
-
-select id, swiper_id, swiped_id, updated_at
-from swipe
-where swiper_id = '751b4cd8-2e1b-41e4-90c3-2b4b07a63533'
-  and clicked = true
-order by updated_at desc;
-
 select *
-from account
-where id = '51864ba4-1640-47f0-b170-89f29c20b6be';
-
-
-select *
-from account;
-
-update account
-set account_type = 1
-where id = '51864ba4-1640-47f0-b170-89f29c20b6be'
+from account_question
+where account_id = 'eb68283c-b8db-4177-9e56-908c283608a6'
+order by sequence;

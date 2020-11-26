@@ -15,7 +15,9 @@ import org.springframework.stereotype.Repository;
 
 
 import javax.persistence.EntityManager;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -52,7 +54,7 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     }
 
     @Override
-    public Account findWithAccountQuestionsIn(UUID accountId, UUID identityToken, List<Integer> questionIds) {
+    public Account findWithAccountQuestionsIn(UUID accountId, UUID identityToken, Set<Integer> questionIds) {
         return jpaQueryFactory.selectFrom(qAccount)
                               .leftJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
                               .where(qAccount.id.eq(accountId)
@@ -68,6 +70,7 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
                                                            .and(qAccount.identityToken.eq(identityToken))
                                                            .and(qAccountQuestion.selected.eq(true)
                                                                                          .or(qAccountQuestion.accountId.isNull())))
+                                         .orderBy(qAccountQuestion.sequence.asc())
                                          .fetchOne();
     }
 

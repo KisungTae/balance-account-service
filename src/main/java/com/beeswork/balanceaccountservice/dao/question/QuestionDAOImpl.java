@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class QuestionDAOImpl extends BaseDAOImpl<Question> implements QuestionDAO {
@@ -27,7 +28,7 @@ public class QuestionDAOImpl extends BaseDAOImpl<Question> implements QuestionDA
     }
 
     @Override
-    public List<Question> findAllByIds(List<Integer> ids) {
+    public List<Question> findAllByIds(Set<Integer> ids) {
         return jpaQueryFactory.selectFrom(qQuestion).where(qQuestion.id.in(ids)).fetch();
     }
 

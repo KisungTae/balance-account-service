@@ -44,7 +44,7 @@ public class AccountQuestion {
     @Column(name = "account_id",
             insertable = false,
             updatable = false)
-    private Integer accountId;
+    private UUID accountId;
 
     @Column(name = "question_id",
             insertable = false,

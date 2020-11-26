@@ -25,7 +25,7 @@ import java.util.UUID;
 public class QuestionServiceImpl extends BaseServiceImpl implements QuestionService {
 
     private final QuestionDAO questionDAO;
-    private final AccountDAO accountDAO;
+    private final AccountDAO  accountDAO;
 
     private static final int MAX_NUM_OF_QUESTIONS = 3;
 
@@ -41,11 +41,12 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
                    readOnly = true)
     public List<QuestionDTO> listQuestions(String accountId, String identityToken) {
 
-        Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId), UUID.fromString(identityToken));
+        Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId),
+                                                              UUID.fromString(identityToken));
         checkIfAccountValid(account);
 
         if (account.getAccountQuestions().size() == 0)
-            throw new AccountQuestionNotFoundException();
+            return listRandomQuestions();
 
         List<QuestionDTO> questionDTOs = new ArrayList<>();
         for (AccountQuestion accountQuestion : account.getAccountQuestions()) {
@@ -61,13 +62,21 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public QuestionDTO randomQuestion(List<Integer> currentQuestionIds) {
+    public QuestionDTO randomQuestion(List<Integer> questionIds) {
 
-        long count = questionDAO.count() - currentQuestionIds.size();
+        long count = questionDAO.count() - questionIds.size();
         int random = new Random().nextInt((int) count);
-        Question question = questionDAO.findNthNotIn(currentQuestionIds, random);
+        Question question = questionDAO.findNthNotIn(questionIds, random);
         if (question == null) throw new QuestionNotFoundException();
         return modelMapper.map(question, QuestionDTO.class);
+    }
+
+    private List<QuestionDTO> listRandomQuestions() {
+
+        long count = questionDAO.count();
+        int startIndex = new Random().nextInt((int) (count - MAX_NUM_OF_QUESTIONS));
+        return modelMapper.map(questionDAO.findAllWithLimitAndOffset(MAX_NUM_OF_QUESTIONS, startIndex),
+                               new TypeToken<List<QuestionDTO>>() {}.getType());
     }
 
     @Override
@@ -75,10 +84,7 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
 
         Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
-
-        long count = questionDAO.count();
-        int startIndex = new Random().nextInt((int)(count - MAX_NUM_OF_QUESTIONS));
-        return modelMapper.map(questionDAO.findAllWithLimitAndOffset(MAX_NUM_OF_QUESTIONS, startIndex), new TypeToken<List<QuestionDTO>>() {}.getType());
+        return listRandomQuestions();
     }
 
 

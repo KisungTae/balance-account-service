@@ -138,11 +138,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Transactional
     public void saveAnswers(String accountId, String identityToken, Map<Integer, Boolean> answers) {
 
-        List<Integer> questionIds = new ArrayList<>(answers.keySet());
-
         Account account = accountDAO.findWithAccountQuestionsIn(UUID.fromString(accountId),
                                                                 UUID.fromString(identityToken),
-                                                                questionIds);
+                                                                answers.keySet());
         checkIfAccountValid(account);
 
         Map<Integer, Integer> sequences = new LinkedHashMap<>();
@@ -167,17 +165,14 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
                 answers.remove(questionId);
                 sequences.remove(questionId);
-                questionIds.remove(questionId);
             } else {
                 accountQuestion.setSelected(false);
             }
-
-
         }
 
-        if (questionIds.size() > 0) {
+        if (answers.size() > 0) {
 
-            List<Question> questions = questionDAO.findAllByIds(questionIds);
+            List<Question> questions = questionDAO.findAllByIds(answers.keySet());
 
             if (answers.size() != questions.size())
                 throw new QuestionNotFoundException();

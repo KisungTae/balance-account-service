@@ -156,17 +156,6 @@ public class DummyController {
     }
 
     @Transactional
-    @PostMapping("/create/account-types")
-    public void createDummyAccountTypes(@RequestParam int size) {
-        for (int i = 0; i < size; i++) {
-            AccountType accountType = new AccountType();
-            accountType.setDescription("login type - " + i);
-            entityManager.persist(accountType);
-        }
-        entityManager.flush();
-    }
-
-    @Transactional
     @PostMapping("/create/questions")
     public void createDummyQuestions(@RequestParam int size) {
 

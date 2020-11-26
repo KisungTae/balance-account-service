@@ -9,8 +9,8 @@ import java.util.List;
 
 @Getter
 @Setter
-public class RandomQuestionVM extends AccountIdentityVM {
+public class RandomQuestionVM {
 
     @Size(min = 1, max = 6, message = "{current.question.ids.size}")
-    private List<Integer> currentQuestionIds = new ArrayList<>();
+    private List<Integer> questionIds = new ArrayList<>();
 }

@@ -47,7 +47,7 @@ public class QuestionController extends BaseController {
                                                  BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        QuestionDTO questionDTO = questionService.randomQuestion(randomQuestionVM.getCurrentQuestionIds());
+        QuestionDTO questionDTO = questionService.randomQuestion(randomQuestionVM.getQuestionIds());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTO));
     }
 
