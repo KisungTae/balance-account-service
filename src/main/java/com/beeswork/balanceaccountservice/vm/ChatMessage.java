@@ -1,26 +1,21 @@
-package com.beeswork.balanceaccountservice.dto.chat;
+package com.beeswork.balanceaccountservice.vm;
 
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class ChatMessage {
 
+    private Long chatId;
     private String from;
-    private String recipient;
     private String text;
+    private String recipient;
     private String time;
 
-    public ChatMessage() {
-
-    }
 
     public ChatMessage(String from, String text, String recipient) {
         this.from = from;

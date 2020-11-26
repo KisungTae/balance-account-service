@@ -22,4 +22,10 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToMany(mappedBy = "chat",
+               fetch = FetchType.LAZY,
+               cascade = CascadeType.ALL,
+               orphanRemoval = true)
+    private List<ChatMessage> chatMessages = new ArrayList<>();
+
 }

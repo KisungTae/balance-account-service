@@ -422,14 +422,16 @@ create table unblock
 
 create table chat_message
 (
-    id         bigserial primary key,
-    chat_id    int       not null,
-    sender_id  uuid      not null,
-    message    varchar(200),
-    created_at timestamp not null,
+    id           bigserial primary key,
+    chat_id      bigint    not null,
+    account_id   uuid      not null,
+    recipient_id uuid      not null,
+    message      varchar(200),
+    created_at   timestamp not null,
 
     constraint chat_message_chat_id_fk foreign key (chat_id) references chat (id),
-    constraint chat_message_sender_id_fk foreign key (sender_id) references account (id)
+    constraint chat_message_account_id_fk foreign key (account_id) references account (id),
+    constraint chat_message_recipient_id_fk foreign key (recipient_id) references account (id)
 );
 
 
@@ -453,4 +455,6 @@ where id = '51864ba4-1640-47f0-b170-89f29c20b6be';
 select *
 from account;
 
-update account set account_type = 1 where id = '51864ba4-1640-47f0-b170-89f29c20b6be'
+update account
+set account_type = 1
+where id = '51864ba4-1640-47f0-b170-89f29c20b6be'

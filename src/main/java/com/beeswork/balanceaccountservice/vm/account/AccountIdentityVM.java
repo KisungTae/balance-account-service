@@ -11,11 +11,11 @@ import javax.validation.constraints.NotEmpty;
 @Setter
 public class AccountIdentityVM {
 
-    @NotEmpty(message = "{uuid.empty}")
-    @ValidUUID(message = "{uuid.invalid}")
+    @NotEmpty(message = "{account.uuid.empty}")
+    @ValidUUID(message = "{account.uuid.invalid}")
     protected String accountId;
 
-    @NotEmpty(message = "{uuid.empty}")
-    @ValidUUID(message = "{uuid.invalid}")
+    @NotEmpty(message = "{identity.token.uuid.empty}")
+    @ValidUUID(message = "{identity.token.uuid.invalid}")
     protected String identityToken;
 }
