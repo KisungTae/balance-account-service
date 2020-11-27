@@ -32,9 +32,14 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public boolean existsById(MatchId matchId) {
+    public Match findWithAccounts(UUID matcherId, UUID matchedId, Long chatId) {
 
-        return jpaQueryFactory.selectFrom(qMatch).where(qMatch.matchId.eq(matchId)).fetchCount() > 0;
+        return jpaQueryFactory.selectFrom(qMatch)
+                              .innerJoin(qMatch.matcher, qAccount)
+                              .innerJoin(qMatch.matched, qAccount)
+                              .where(qMatch.matcherId.eq(matcherId)
+                                                     .and(qMatch.matchedId.eq(matchedId))
+                                                     .and(qMatch.chatId.eq(chatId))).fetchOne();
     }
 
     @Override
@@ -43,8 +48,8 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
         fetchedAt = DateUtils.addMilliseconds(fetchedAt, -1);
 
         Expression<Date> updatedAtCase = new CaseBuilder().when(qMatch.updatedAt.after(qAccount.repPhotoKeyUpdatedAt))
-                                                  .then(qMatch.updatedAt)
-                                                  .otherwise(qAccount.repPhotoKeyUpdatedAt);
+                                                          .then(qMatch.updatedAt)
+                                                          .otherwise(qAccount.repPhotoKeyUpdatedAt);
 
         return jpaQueryFactory.select(new QMatchProjection(qMatch.chatId,
                                                            qMatch.matchedId,
@@ -57,8 +62,8 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                               .on(qMatch.matchedId.eq(qAccount.id))
                               .where(qMatch.matcherId.eq(matcherId)
                                                      .and(qMatch.updatedAt.after(fetchedAt)
-                                                                         .or(qAccount.repPhotoKeyUpdatedAt.after(
-                                                                                 fetchedAt))))
+                                                                          .or(qAccount.repPhotoKeyUpdatedAt.after(
+                                                                                  fetchedAt))))
                               .fetch();
     }
 

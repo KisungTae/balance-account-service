@@ -14,18 +14,15 @@ import java.util.UUID;
 @Setter
 public class ChatMessageVM extends AccountIdentityVM {
 
-//    @NotEmpty
-//    private Long id;
+    @NotEmpty
+    private Long id;
 
-//    @NotEmpty(message = "{account.uuid.empty}")
-//    @ValidUUID(message = "{account.uuid.invalid}")
+    @NotEmpty(message = "{account.uuid.empty}")
+    @ValidUUID(message = "{account.uuid.invalid}")
     private String recipientId;
 
-//    @NotEmpty(message = "{chat.message.empty}")
+    @NotEmpty(message = "{chat.message.empty}")
     private String message;
-
-//    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private Date createdAt;
 
     public ChatMessageVM(String accountId, String message, String recipientId) {
         this.accountId = accountId;

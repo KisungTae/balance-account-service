@@ -57,8 +57,10 @@
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="http://cdn.sockjs.org/sockjs-0.3.min.js"/>
 <script type="text/javascript">
     var stompClient = null
+    var sockJs = null
     var userName = $('#from').val()
 
     function setConnected(connected) {
@@ -81,14 +83,23 @@
 
         var url = 'ws://localhost:8080/broadcast'
         // var url = '//localhost:8080/broadcast'
+        sockJs = new SockJS(url)
+        stompClient = Stomp.over(sockJs)
 
-        stompClient = Stomp.client(url)
-        stompClient.connect({}, function () {
-            stompClient.subscribe('/topic/messages', function (output) {
+
+        let header = {
+            "login": $('#from').val(),
+            "passcode": 'custom passcode',
+            "userId": $('#from').val(),
+            "chatId": $('#topic').val()
+        }
+
+        stompClient.connect(header, function () {
+            stompClient.subscribe('/topic/messages/' + $('#topic').val() , function (output) {
                 showBroadcastMessage(createTextNode(JSON.parse(output.body)))
             })
 
-            sendConnection(' connected to server')
+            // sendConnection(' connected to server')
             setConnected(true)
         }, function (err) {
             alert('error' + err)
@@ -117,7 +128,7 @@
 
     function send() {
         var text = $('#message').val()
-        sendBroadcast({ 'from': userName, 'text': text })
+        sendBroadcast({ 'from': userName, 'text': text, 'chatId': $('#topic').val() })
         $('#message').val('')
     }
 
@@ -144,3 +155,12 @@
 </script>
 </body>
 </html>
+
+
+
+<!--
+
+https://stackoverflow.com/questions/25486889/websocket-stomp-over-sockjs-http-custom-headers
+https://postitforhooney.tistory.com/entry/SpringStomp-Spring-stomp%EC%99%80-Socjks%EB%A5%BC-%ED%86%B5%ED%95%9C-%EC%9B%B9%EC%86%8C%EC%BC%93-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%EC%9E%A5%EB%8B%A8%EC%A0%90
+
+-->

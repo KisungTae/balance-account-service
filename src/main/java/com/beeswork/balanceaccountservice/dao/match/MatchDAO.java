@@ -11,8 +11,8 @@ import java.util.UUID;
 
 public interface MatchDAO extends BaseDAO<Match> {
 
-    boolean existsById(MatchId matchId);
 
     List<MatchProjection> findAllAfter(UUID matcherId, Date fetchedAt);
     List<Match> findPairById(UUID matcherId, UUID matchedId);
+    Match findWithAccounts(UUID matcherId, UUID matchedId, Long chatId);
 }
