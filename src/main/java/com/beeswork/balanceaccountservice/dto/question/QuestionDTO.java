@@ -20,7 +20,7 @@ public class QuestionDTO {
     private String description;
     private String topOption;
     private String bottomOption;
-    private boolean answer;
+    private Boolean answer;
 
     public QuestionDTO(long id, String description, String topOption, String bottomOption) {
         this.id = id;

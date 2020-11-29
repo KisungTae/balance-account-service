@@ -438,20 +438,27 @@ create table chat_message
 
 select *
 from account_question
-where account_id = 'eb68283c-b8db-4177-9e56-908c283608a6'
-order by sequence;
+where account_id = '824b8cae-6f45-4c7e-b165-d1111a5b904b'
+order by selected, sequence;
+
+
+select swiped_id, count(*)
+from swipe
+group by swiped_id
+order by count(*) desc;
+
+select *
+from account
+where id = 'f0629e5d-47ca-4fb9-83bf-96d5232598b7';
 
 
 
 select *
-from match;
+from match
+where matched_id = '824b8cae-6f45-4c7e-b165-d1111a5b904b';
 
 
-
-
-
-
-
-
-
-
+select matched_id, count(*)
+from match
+group by matched_id
+order by count(*) desc;

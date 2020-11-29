@@ -6,6 +6,7 @@ import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
+import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
@@ -57,6 +58,7 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
                                              question.getBottomOption(),
                                              accountQuestion.isAnswer()));
         }
+//        throw new BadRequestException();
         return questionDTOs;
     }
 
