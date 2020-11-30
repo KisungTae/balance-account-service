@@ -80,7 +80,7 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
 
     @Override
     @Transactional
-    public void reorderPhotos(String accountId, String identityToken, Map<String, Integer> photoOrders) {
+    public void reorderPhotos(String accountId, String identityToken, Map<String, Long> photoOrders) {
 
         Account account = accountDAO.findWithPhotos(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);

@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 public class PhotoDTO {
     private String key;
-    private int sequence;
+    private Long sequence;
 }

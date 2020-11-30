@@ -240,7 +240,7 @@ public class DummyController {
                     if (p == 0) {
                         account.setRepPhotoKey(photoKey);
                     }
-                    photo.setSequence(count);
+                    photo.setSequence((long) count);
                     photo.setAccount(account);
                     account.getPhotos().add(photo);
                 }

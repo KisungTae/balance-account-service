@@ -12,5 +12,5 @@ import java.util.Map;
 public class ReorderPhotosVM extends AccountIdentityVM {
 
     @Size(min = 2, max = 6)
-    private Map<String, Integer> photoOrders;
+    private Map<String, Long> photoOrders;
 }

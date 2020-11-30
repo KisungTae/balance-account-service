@@ -76,8 +76,8 @@ public class Account {
     @Column(name = "point")
     private int point;
 
-    @Column(name = "deleted")
-    private boolean deleted;
+//    @Column(name = "deleted")
+//    private boolean deleted;
 
     @Column(name = "fcm_token")
     private String fcmToken;
