@@ -41,4 +41,6 @@ public interface AccountService {
                                  Date locationUpdatedAt, boolean reset);
 
     List<CardDTO> recommend(int distance, int minAge, int maxAge, boolean gender, Point location, int index);
+
+    void deleteAccount(String accountId, String identityToken);
 }

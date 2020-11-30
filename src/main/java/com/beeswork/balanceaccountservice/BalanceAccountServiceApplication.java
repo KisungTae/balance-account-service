@@ -176,4 +176,8 @@ public class BalanceAccountServiceApplication {
 // TODO			42. consider when account deleted or blocked, for listClicked, listMatches,
 
 
+// TODO 		43. add logic to plus milisseocnds of photo name when there is ducpiate in the lamdba of getPresignuro
+
+// TODO			44. when you block an account or delete an account, you should update "updatedAt" so that listClicked and listMatches get the matches and clicked on the updated account
+
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one

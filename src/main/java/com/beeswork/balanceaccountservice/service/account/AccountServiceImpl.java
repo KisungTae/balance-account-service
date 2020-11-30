@@ -271,6 +271,23 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         return cardDTOs;
     }
 
+    @Override
+    public void deleteAccount(String accountId, String identityToken) {
+
+        Account account = findValidAccount(accountId, identityToken);
+
+        // remove photos in database and in s3
+
+        // remove account_questions
+
+        //
+
+
+
+
+
+    }
+
     private Account findValidAccount(String accountId, String identityToken) {
         Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);

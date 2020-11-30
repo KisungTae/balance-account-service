@@ -35,6 +35,16 @@ public class AccountController extends BaseController {
         this.accountService = accountService;
     }
 
+    public ResponseEntity<String> deleteAccount(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
+                                                BindingResult bindingResult) throws JsonProcessingException {
+
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+
+        accountService.deleteAccount(accountIdentityVM.getAccountId(), accountIdentityVM.getIdentityToken());
+
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+    }
+
     @GetMapping("/profile")
     public ResponseEntity<String> getProfile(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
                                              BindingResult bindingResult) throws JsonProcessingException {

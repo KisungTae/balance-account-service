@@ -76,6 +76,9 @@ public class Account {
     @Column(name = "point")
     private int point;
 
+    @Column(name = "deleted")
+    private boolean deleted;
+
     @Column(name = "fcm_token")
     private String fcmToken;
 
@@ -99,13 +102,6 @@ public class Account {
 
     @Enumerated
     private AccountType accountType;
-
-//    @Column(name = "account_type_id", insertable = false, updatable = false)
-//    private int accountTypeId;
-//
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "account_type_id")
-//    private AccountType accountType;
 
     @OneToMany(mappedBy = "account",
                fetch = FetchType.LAZY,

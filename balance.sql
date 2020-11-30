@@ -178,6 +178,7 @@ create table account
     identity_token           uuid                   not null,
     enabled                  boolean                not null,
     blocked                  boolean                not null,
+    deleted                  boolean                not null,
     name                     varchar(50)            not null,
     email                    varchar(256) unique    not null,
     height                   int,
@@ -255,29 +256,6 @@ create table account_question
     constraint account_question_question_id_fk foreign key (question_id) references question (id)
 );
 
-
--- watch ad, liked, etc...
-create table reward_type
-(
-    id          serial primary key,
-    description varchar(50) not null,
-    point       int         not null
-);
-
--- this table does not include the purchase
-create table reward
-(
-    id             bigserial primary key,
-    rewarded_point int         not null,
-    account_id     uuid        not null,
-    reward_type_id int         not null,
-    created_at     timestamptz not null,
-
-    constraint reward_account_id_fk foreign key (account_id) references account (id),
-    constraint reward_reward_type_id_fk foreign key (reward_type_id) references reward_type (id)
-);
-
-
 create table swipe
 (
     id         bigserial primary key,
@@ -325,20 +303,44 @@ create index match_matched_id_idx on match (matched_id);
 create index match_matcher_id_matched_id_chat_id on match (matcher_id, matched_id, chat_id);
 
 
--- create table unmatch
--- (
---     unmatcher_id uuid      not null,
---     unmatched_id uuid      not null,
---     created_at   timestamptz not null,
---
---     primary key (unmatcher_id, unmatched_id),
---     constraint unmatch_unmatcher_id_fk foreign key (unmatcher_id) references account (id),
---     constraint unmatch_unmatched_id_fk foreign key (unmatched_id) references account (id)
--- );
---
---
--- create index unmatch_unmatcher_id_idx on unmatch (unmatcher_id);
--- create index unmatch_unmatched_id_idx on unmatch (uanmatched_id);
+-- watch ad, liked, etc...
+create table reward_type
+(
+    id          serial primary key,
+    description varchar(50) not null,
+    point       int         not null
+);
+
+-- this table does not include the purchase
+create table reward
+(
+    id             bigserial primary key,
+    rewarded_point int         not null,
+    account_id     uuid        not null,
+    reward_type_id int         not null,
+    created_at     timestamptz not null,
+
+    constraint reward_account_id_fk foreign key (account_id) references account (id),
+    constraint reward_reward_type_id_fk foreign key (reward_type_id) references reward_type (id)
+);
+
+
+create table chat_message
+(
+    id           bigserial primary key,
+    chat_id      bigint    not null,
+    account_id   uuid      not null,
+    recipient_id uuid      not null,
+    message      varchar(200),
+    created_at   timestamp not null,
+
+    constraint chat_message_chat_id_fk foreign key (chat_id) references chat (id),
+    constraint chat_message_account_id_fk foreign key (account_id) references account (id),
+    constraint chat_message_recipient_id_fk foreign key (recipient_id) references account (id)
+);
+
+
+-- ================================ ADMIN =========================================
 
 
 create table admin
@@ -418,20 +420,6 @@ create table unblock
 
     constraint unblock_unblocked_account_id_fk foreign key (unblocked_account_id) references account (id),
     constraint unblock_admin_id_fk foreign key (admin_id) references admin (id)
-);
-
-create table chat_message
-(
-    id           bigserial primary key,
-    chat_id      bigint    not null,
-    account_id   uuid      not null,
-    recipient_id uuid      not null,
-    message      varchar(200),
-    created_at   timestamp not null,
-
-    constraint chat_message_chat_id_fk foreign key (chat_id) references chat (id),
-    constraint chat_message_account_id_fk foreign key (account_id) references account (id),
-    constraint chat_message_recipient_id_fk foreign key (recipient_id) references account (id)
 );
 
 
