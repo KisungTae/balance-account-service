@@ -76,21 +76,14 @@ public class Account {
     @Column(name = "point")
     private int point;
 
-//    @Column(name = "deleted")
-//    private boolean deleted;
+    @Column(name = "deleted")
+    private boolean deleted;
 
     @Column(name = "fcm_token")
     private String fcmToken;
 
-    @Column(name = "swiped_count")
-    private int swipedCount;
-
     @Column(name = "rep_photo_key")
     private String repPhotoKey;
-
-    @Column(name = "rep_photo_key_updated_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date repPhotoKeyUpdatedAt;
 
     @Column(name = "location_updated_at")
     @Temporal(TemporalType.TIMESTAMP)

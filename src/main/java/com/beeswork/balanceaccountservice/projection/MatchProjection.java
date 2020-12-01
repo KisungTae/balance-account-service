@@ -19,6 +19,8 @@ public class MatchProjection {
     private String name;
     private String photoKey;
     private boolean unmatched;
+    private boolean blocked;
+    private boolean deleted;
     private Date updatedAt;
 
     @QueryProjection

@@ -51,6 +51,9 @@ task-executor:
   queue-capacity: 13
 
 
+aws:
+  balance-photo-bucket: balance-photo-bucket
+
 
 #spring:
 #  jpa:

@@ -138,6 +138,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         ClickDTO clickDTO = new ClickDTO();
 
+
+
         for (AccountQuestion accountQuestion : swiped.getAccountQuestions()) {
             Boolean answer = answers.get(accountQuestion.getQuestionId());
             if (answer == null) throw new QuestionSetChangedException();

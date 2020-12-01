@@ -47,9 +47,9 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
 
         fetchedAt = DateUtils.addMilliseconds(fetchedAt, -1);
 
-        Expression<Date> updatedAtCase = new CaseBuilder().when(qMatch.updatedAt.after(qAccount.repPhotoKeyUpdatedAt))
+        Expression<Date> updatedAtCase = new CaseBuilder().when(qMatch.updatedAt.after(qAccount.updatedAt))
                                                           .then(qMatch.updatedAt)
-                                                          .otherwise(qAccount.repPhotoKeyUpdatedAt);
+                                                          .otherwise(qAccount.updatedAt);
 
         return jpaQueryFactory.select(new QMatchProjection(qMatch.chatId,
                                                            qMatch.matchedId,
@@ -62,8 +62,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                               .on(qMatch.matchedId.eq(qAccount.id))
                               .where(qMatch.matcherId.eq(matcherId)
                                                      .and(qMatch.updatedAt.after(fetchedAt)
-                                                                          .or(qAccount.repPhotoKeyUpdatedAt.after(
-                                                                                  fetchedAt))))
+                                                                          .or(qAccount.updatedAt.after(fetchedAt))))
                               .fetch();
     }
 

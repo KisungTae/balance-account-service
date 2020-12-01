@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.service.base;
 
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
+import com.beeswork.balanceaccountservice.exception.account.AccountDeletedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
@@ -25,6 +26,7 @@ public abstract class BaseServiceImpl {
     protected void checkIfAccountValid(Account account) {
         if (account == null) throw new AccountNotFoundException();
         if (account.isBlocked()) throw new AccountBlockedException();
+        if (account.isDeleted()) throw new AccountDeletedException();
     }
 
     protected void checkIfSwipedValid(Account account) {

@@ -226,7 +226,6 @@ public class DummyController {
                 account.setFcmToken("");
                 account.setCreatedAt(new Date());
                 account.setUpdatedAt(new Date());
-                account.setRepPhotoKeyUpdatedAt(new Date());
 
                 if (random.nextBoolean())
                     account.setHeight(random.nextInt(50) + 150);

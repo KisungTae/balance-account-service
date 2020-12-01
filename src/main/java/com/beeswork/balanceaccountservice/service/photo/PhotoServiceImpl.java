@@ -74,7 +74,7 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
 
         if (!account.getRepPhotoKey().equals(repPhoto.getKey())) {
             account.setRepPhotoKey(repPhoto.getKey());
-            account.setRepPhotoKeyUpdatedAt(new Date());
+            account.setUpdatedAt(new Date());
         }
     }
 

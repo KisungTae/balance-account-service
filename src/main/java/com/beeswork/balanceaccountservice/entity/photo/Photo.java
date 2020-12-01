@@ -40,15 +40,4 @@ public class Photo implements Comparable<Photo> {
         if (sequence == null || o.sequence == null) return 0;
         return this.sequence.compareTo(o.sequence);
     }
-
-    @Override
-    public String toString() {
-        return "Photo{" +
-               "photoId=" + photoId +
-               ", key='" + key + '\'' +
-               ", accountId=" + accountId +
-               ", sequence=" + sequence +
-               ", account=" + account +
-               '}';
-    }
 }

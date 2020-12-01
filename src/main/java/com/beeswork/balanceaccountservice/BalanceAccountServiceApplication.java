@@ -173,13 +173,13 @@ public class BalanceAccountServiceApplication {
 // TODO			41. implement randomQuestions for initializing balancegamequestions at first, and when no question is found in listQuestions then call randomQuestions and pass new random questiosn
 //					--> listRandomQuestions() has been implemented
 
-// TODO			42. consider when account deleted or blocked, for listClicked, listMatches,
-
-
 // TODO 		43. add logic to plus milisseocnds of photo name when there is ducpiate in the lamdba of getPresignuro
+//					-->	fetchedAt = DateUtils.addMilliseconds(fetchedAt, -1); implemented
 
-// TODO			44. when you block an account or delete an account, you should update "updatedAt" so that listClicked and listMatches get the matches and clicked on the updated account
+// TODO			45. delete, block, update photo should update the updatedAt column so that listClicked and listMatches can query on them
 
-// TODO			45. delete, block, update photo should update the updatedAt column so that listClicked and listMatches can query on them 
+// TODO			47. modify logic to check answers in clickservice
+
+// TODO			48. add deleted and blocked field to matchProject and clickedProject
 
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one

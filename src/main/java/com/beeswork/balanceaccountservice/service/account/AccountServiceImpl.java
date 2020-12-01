@@ -1,14 +1,21 @@
 package com.beeswork.balanceaccountservice.service.account;
 
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
+import com.amazonaws.services.s3.model.DeleteObjectsResult;
+import com.beeswork.balanceaccountservice.config.properties.AWSProperties;
 import com.beeswork.balanceaccountservice.constant.AccountType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
 import com.beeswork.balanceaccountservice.dto.account.*;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
+import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.question.Question;
-import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.account.AccountEmailNotMutableException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
@@ -43,19 +50,22 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     private final AccountDAO accountDAO;
     private final QuestionDAO questionDAO;
+    private final AmazonS3 amazonS3;
+    private final AWSProperties awsProperties;
 
     private final GeometryFactory geometryFactory;
 
     @Autowired
     public AccountServiceImpl(AccountDAO accountDAO,
                               ModelMapper modelMapper,
-                              QuestionDAO questionDAO, GeometryFactory geometryFactory) {
+                              QuestionDAO questionDAO, AmazonS3 amazonS3, AWSProperties awsProperties, GeometryFactory geometryFactory) {
         super(modelMapper);
         this.accountDAO = accountDAO;
         this.questionDAO = questionDAO;
+        this.amazonS3 = amazonS3;
+        this.awsProperties = awsProperties;
         this.geometryFactory = geometryFactory;
     }
-
 
 
     @Override
@@ -221,7 +231,10 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         index++;
         account.setIndex(index);
 
-        if (latitude != null && longitude != null && locationUpdatedAt != null && locationUpdatedAt.after(account.getLocationUpdatedAt()))
+        if (latitude != null &&
+            longitude != null &&
+            locationUpdatedAt != null &&
+            locationUpdatedAt.after(account.getLocationUpdatedAt()))
             saveLocation(account, latitude, longitude, locationUpdatedAt);
 
         preRecommendDTO.setLocation(account.getLocation());
@@ -272,20 +285,51 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     }
 
     @Override
+    @Transactional
     public void deleteAccount(String accountId, String identityToken) {
 
         Account account = findValidAccount(accountId, identityToken);
 
-        // remove photos in database and in s3
 
-        // remove account_questions
+        // delete photos in s3
+        ArrayList<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<>();
 
-        //
+        for (Photo photo : account.getPhotos()) {
+            keys.add(new DeleteObjectsRequest.KeyVersion(account.getId().toString() + "/" + photo.getKey()));
+        }
+
+        DeleteObjectsRequest deleteObjectsRequest =
+                new DeleteObjectsRequest(awsProperties.getBalancePhotoBucket()).withKeys(keys).withQuiet(true);
+
+        amazonS3.deleteObjects(deleteObjectsRequest);
 
 
+        // delete photos in database
+        account.getPhotos().clear();
 
+        // delete account_questions
+        account.getAccountQuestions().clear();
 
+        // delete profiles
+        Date today = new Date();
 
+        account.setDeleted(true);
+        account.setSocialLoginId(null);
+        account.setIdentityToken(null);
+        account.setName("");
+        account.setEmail("");
+        account.setHeight(0);
+        account.setBirthYear(0);
+        account.setBirth(today);
+        account.setAbout("");
+        account.setScore(0);
+        account.setIndex(0);
+        account.setPoint(0);
+        account.setLocation(null);
+        account.setRepPhotoKey(null);
+        account.setLocationUpdatedAt(today);
+        account.setFcmToken(null);
+        account.setUpdatedAt(today);
     }
 
     private Account findValidAccount(String accountId, String identityToken) {

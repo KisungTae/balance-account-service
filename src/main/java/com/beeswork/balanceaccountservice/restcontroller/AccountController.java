@@ -35,7 +35,8 @@ public class AccountController extends BaseController {
         this.accountService = accountService;
     }
 
-    public ResponseEntity<String> deleteAccount(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
+    @PostMapping("/delete")
+    public ResponseEntity<String> deleteAccount(@Valid @RequestBody AccountIdentityVM accountIdentityVM,
                                                 BindingResult bindingResult) throws JsonProcessingException {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();

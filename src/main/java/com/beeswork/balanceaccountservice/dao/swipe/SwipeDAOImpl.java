@@ -77,9 +77,9 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
 
         fetchedAt = DateUtils.addMilliseconds(fetchedAt, -1);
 
-        Expression<Date> updatedAtCase = new CaseBuilder().when(qSwipe.updatedAt.after(qAccount.repPhotoKeyUpdatedAt))
+        Expression<Date> updatedAtCase = new CaseBuilder().when(qSwipe.updatedAt.after(qAccount.updatedAt))
                                                           .then(qSwipe.updatedAt)
-                                                          .otherwise(qAccount.repPhotoKeyUpdatedAt);
+                                                          .otherwise(qAccount.updatedAt);
 
         return jpaQueryFactory.select(new QClickedProjection(qSwipe.swiperId, qAccount.repPhotoKey, updatedAtCase))
                               .from(qSwipe)
@@ -92,8 +92,7 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
                                                     .and(qSwipe.clicked.eq(true))
                                                     .and(qMatch.matchedId.isNull())
                                                     .and(qSwipe.updatedAt.after(fetchedAt)
-                                                                         .or(qAccount.repPhotoKeyUpdatedAt.after(
-                                                                                 fetchedAt))))
+                                                                         .or(qAccount.updatedAt.after(fetchedAt))))
                               .fetch();
     }
 

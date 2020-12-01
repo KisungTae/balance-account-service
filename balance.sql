@@ -143,13 +143,14 @@ drop table deleted_photo;
 drop table report;
 drop table report_reason;
 drop table report_resolution_type;
+drop table admin;
+
+
 drop table account_question;
 drop table question;
 drop table photo;
 drop table match;
 drop table swipe;
-drop table admin;
--- drop table photo_info;
 drop table chat_message;
 drop table chat;
 drop table account;
@@ -161,45 +162,35 @@ drop table account;
 -- create UUID extension
 create extension if not exists "uuid-ossp";
 
--- facebook, kakao, naver, google
-create table account_type
-(
-    id          serial primary key,
-    description varchar(20)
-);
-
 -- unregister deletes account
 -- liked count will be reset on every night
 create table account
 (
-    version                  int                    not null,
-    id                       uuid primary key default uuid_generate_v4(),
-    social_login_id          varchar(100),
-    identity_token           uuid                   not null,
-    enabled                  boolean                not null,
-    blocked                  boolean                not null,
-    deleted                  boolean                not null,
-    name                     varchar(50)            not null,
-    email                    varchar(256) unique    not null,
-    height                   int,
-    birth_year               int                    not null,
-    birth                    Date                   not null,
-    about                    varchar(500),
-    gender                   boolean                not null,
-    score                    int                    not null,
-    index                    int                    not null,
-    point                    int                    not null,
-    swiped_count             int                    not null,
-    rep_photo_key            varchar(30),
-    rep_photo_key_updated_at timestamptz,
-    location_updated_at      timestamptz,
-    location                 geography(point, 4326) not null,
-    fcm_token                varchar(200),
-    account_type             int                    not null,
-    created_at               timestamptz            not null,
-    updated_at               timestamptz            not null
+    version             int          not null,
+    id                  uuid primary key default uuid_generate_v4(),
+    social_login_id     varchar(100),
+    identity_token      uuid,
+    enabled             boolean      not null,
+    blocked             boolean      not null,
+    deleted             boolean      not null,
+    name                varchar(50)  not null,
+    email               varchar(256) not null,
+    height              int,
+    birth_year          int          not null,
+    birth               Date         not null,
+    about               varchar(500),
+    gender              boolean      not null,
+    score               int          not null,
+    index               int          not null,
+    point               int          not null,
+    rep_photo_key       varchar(30),
+    location_updated_at timestamptz,
+    location            geography(point, 4326),
+    fcm_token           varchar(200),
+    account_type        int          not null,
+    created_at          timestamptz  not null,
+    updated_at          timestamptz  not null
 
---     constraint account_account_type_id_fk foreign key (account_type_id) references account_type (id)
 );
 
 
@@ -302,6 +293,20 @@ create index match_matcher_id_idx on match (matcher_id);
 create index match_matched_id_idx on match (matched_id);
 create index match_matcher_id_matched_id_chat_id on match (matcher_id, matched_id, chat_id);
 
+create table chat_message
+(
+    id           bigserial primary key,
+    chat_id      bigint    not null,
+    account_id   uuid      not null,
+    recipient_id uuid      not null,
+    message      varchar(200),
+    created_at   timestamp not null,
+
+    constraint chat_message_chat_id_fk foreign key (chat_id) references chat (id),
+    constraint chat_message_account_id_fk foreign key (account_id) references account (id),
+    constraint chat_message_recipient_id_fk foreign key (recipient_id) references account (id)
+);
+
 
 -- watch ad, liked, etc...
 create table reward_type
@@ -322,21 +327,6 @@ create table reward
 
     constraint reward_account_id_fk foreign key (account_id) references account (id),
     constraint reward_reward_type_id_fk foreign key (reward_type_id) references reward_type (id)
-);
-
-
-create table chat_message
-(
-    id           bigserial primary key,
-    chat_id      bigint    not null,
-    account_id   uuid      not null,
-    recipient_id uuid      not null,
-    message      varchar(200),
-    created_at   timestamp not null,
-
-    constraint chat_message_chat_id_fk foreign key (chat_id) references chat (id),
-    constraint chat_message_account_id_fk foreign key (account_id) references account (id),
-    constraint chat_message_recipient_id_fk foreign key (recipient_id) references account (id)
 );
 
 
@@ -422,31 +412,17 @@ create table unblock
     constraint unblock_admin_id_fk foreign key (admin_id) references admin (id)
 );
 
+select *
+from account where id = 'e8f9d44f-9313-4569-b294-608c71924fe3';
+
+select *
+from account_question
+where account_id = 'e8f9d44f-9313-4569-b294-608c71924fe3';
 
 
 select *
 from account_question
-where account_id = '824b8cae-6f45-4c7e-b165-d1111a5b904b'
-order by selected, sequence;
+where account_id = 'e8f9d44f-9313-4569-b294-608c71924fe3'
+and ((question_id = 1 and answer = true) or (question_id = 2 and answer = true) or (question_id = 3 and answer = true));
 
 
-select swiped_id, count(*)
-from swipe
-group by swiped_id
-order by count(*) desc;
-
-select *
-from account
-where id = 'f0629e5d-47ca-4fb9-83bf-96d5232598b7';
-
-
-
-select *
-from match
-where matched_id = '824b8cae-6f45-4c7e-b165-d1111a5b904b';
-
-
-select matched_id, count(*)
-from match
-group by matched_id
-order by count(*) desc;

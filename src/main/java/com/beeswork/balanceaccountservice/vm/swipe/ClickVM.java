@@ -22,6 +22,6 @@ public class ClickVM extends AccountIdentityVM {
     @ValidUUID(message = "{uuid.invalid}")
     private String swipedId;
 
-    @Size(min = 1, max = 3, message = "{swipe.click.answers.size}")
+    @Size(min = 3, max = 6, message = "{swipe.click.answers.size}")
     private Map<Integer, Boolean> answers = new HashMap<>();
 }

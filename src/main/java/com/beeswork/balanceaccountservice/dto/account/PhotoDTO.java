@@ -9,4 +9,5 @@ import lombok.Setter;
 public class PhotoDTO {
     private String key;
     private Long sequence;
+
 }
