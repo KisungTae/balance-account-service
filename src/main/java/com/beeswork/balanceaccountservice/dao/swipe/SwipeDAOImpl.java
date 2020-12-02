@@ -81,7 +81,11 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
                                                           .then(qSwipe.updatedAt)
                                                           .otherwise(qAccount.updatedAt);
 
-        return jpaQueryFactory.select(new QClickedProjection(qSwipe.swiperId, qAccount.repPhotoKey, updatedAtCase))
+        return jpaQueryFactory.select(new QClickedProjection(qSwipe.swiperId,
+                                                             qAccount.repPhotoKey,
+                                                             qAccount.blocked,
+                                                             qAccount.deleted,
+                                                             updatedAtCase))
                               .from(qSwipe)
                               .leftJoin(qMatch)
                               .on(qSwipe.swiperId.eq(qMatch.matcherId)

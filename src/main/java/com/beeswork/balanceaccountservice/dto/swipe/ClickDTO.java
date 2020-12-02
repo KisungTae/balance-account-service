@@ -44,7 +44,7 @@ public class ClickDTO {
         this.clickResult = ClickResult.MATCHED;
         this.swiperName = swiperName;
         this.swiperPhotoKey = swiperPhotoKey;
-        this.match = new MatchProjection(chatId, swipedId, swipedName, swipedPhotoKey, false, matchUpdated);
+        this.match = new MatchProjection(chatId, swipedId, swipedName, swipedPhotoKey, matchUpdated);
         this.swipedFCMToken = swipedFCMToken;
     }
 }

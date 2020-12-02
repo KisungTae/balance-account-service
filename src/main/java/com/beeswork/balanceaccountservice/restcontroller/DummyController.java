@@ -224,6 +224,8 @@ public class DummyController {
                 account.setScore(0);
                 account.setPoint(50000);
                 account.setFcmToken("");
+                account.setFreeSwipe(2000);
+                account.setFreeSwipeUpdatedAt(new Date());
                 account.setCreatedAt(new Date());
                 account.setUpdatedAt(new Date());
 

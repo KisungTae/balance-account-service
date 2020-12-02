@@ -101,6 +101,7 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
                 "        and birth_year >= :maxAge " +
                 "        and enabled = true" +
                 "        and blocked = false " +
+                "        and deleted = false " +
                 "       limit :limit " +
                 "       offset :offset) as b " +
                 "left join photo as p " +

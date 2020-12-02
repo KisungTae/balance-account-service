@@ -24,12 +24,22 @@ public class MatchProjection {
     private Date updatedAt;
 
     @QueryProjection
-    public MatchProjection(Long chatId, UUID matchedId, String name, String photoKey, boolean unmatched, Date updatedAt) {
+    public MatchProjection(Long chatId, UUID matchedId, String name, String photoKey, boolean unmatched, boolean blocked, boolean deleted, Date updatedAt) {
         this.chatId = chatId;
         this.matchedId = matchedId;
         this.name = name;
         this.photoKey = photoKey;
         this.unmatched = unmatched;
+        this.blocked = blocked;
+        this.deleted = deleted;
+        this.updatedAt = updatedAt;
+    }
+
+    public MatchProjection(Long chatId, UUID matchedId, String name, String photoKey, Date updatedAt) {
+        this.chatId = chatId;
+        this.matchedId = matchedId;
+        this.name = name;
+        this.photoKey = photoKey;
         this.updatedAt = updatedAt;
     }
 

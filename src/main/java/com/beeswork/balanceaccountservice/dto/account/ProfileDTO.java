@@ -15,6 +15,4 @@ public class ProfileDTO {
     private Date birth;
     private String about;
     private boolean gender;
-    private int point;
-    private String email;
 }

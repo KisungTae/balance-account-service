@@ -56,6 +56,8 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                                                            qAccount.name,
                                                            qAccount.repPhotoKey,
                                                            qMatch.unmatched,
+                                                           qAccount.blocked,
+                                                           qAccount.deleted,
                                                            updatedAtCase))
                               .from(qMatch)
                               .leftJoin(qAccount)

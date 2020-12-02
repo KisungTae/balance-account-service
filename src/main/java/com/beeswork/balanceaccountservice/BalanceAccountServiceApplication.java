@@ -177,9 +177,12 @@ public class BalanceAccountServiceApplication {
 //					-->	fetchedAt = DateUtils.addMilliseconds(fetchedAt, -1); implemented
 
 // TODO			45. delete, block, update photo should update the updatedAt column so that listClicked and listMatches can query on them
+//					--> implemented
 
 // TODO			47. modify logic to check answers in clickservice
+//					--> long findAllByAnswer(UUID accountId, Map<Integer, Boolean> answers) in accountQuestionDAO
 
 // TODO			48. add deleted and blocked field to matchProject and clickedProject
+//					--> implemented
 
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one

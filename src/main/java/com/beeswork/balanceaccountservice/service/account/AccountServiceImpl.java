@@ -74,8 +74,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
                    readOnly = true)
     public ProfileDTO getProfile(String accountId, String identityToken) {
 
-        Account account = accountDAO.findWithPhotos(UUID.fromString(accountId), UUID.fromString(identityToken));
-        checkIfAccountValid(account);
+        Account account = findValidAccount(accountId, identityToken);
         return modelMapper.map(account, ProfileDTO.class);
     }
 

@@ -136,8 +136,6 @@ call populate_user();
 
 
 drop table unblock;
-drop table reward;
-drop table reward_type;
 drop table report_resolution;
 drop table deleted_photo;
 drop table report;
@@ -166,30 +164,32 @@ create extension if not exists "uuid-ossp";
 -- liked count will be reset on every night
 create table account
 (
-    version             int          not null,
-    id                  uuid primary key default uuid_generate_v4(),
-    social_login_id     varchar(100),
-    identity_token      uuid,
-    enabled             boolean      not null,
-    blocked             boolean      not null,
-    deleted             boolean      not null,
-    name                varchar(50)  not null,
-    email               varchar(256) not null,
-    height              int,
-    birth_year          int          not null,
-    birth               Date         not null,
-    about               varchar(500),
-    gender              boolean      not null,
-    score               int          not null,
-    index               int          not null,
-    point               int          not null,
-    rep_photo_key       varchar(30),
-    location_updated_at timestamptz,
-    location            geography(point, 4326),
-    fcm_token           varchar(200),
-    account_type        int          not null,
-    created_at          timestamptz  not null,
-    updated_at          timestamptz  not null
+    version               int          not null,
+    id                    uuid primary key default uuid_generate_v4(),
+    social_login_id       varchar(100),
+    identity_token        uuid,
+    enabled               boolean      not null,
+    blocked               boolean      not null,
+    deleted               boolean      not null,
+    name                  varchar(50)  not null,
+    email                 varchar(256) not null,
+    height                int,
+    birth_year            int          not null,
+    birth                 Date         not null,
+    about                 varchar(500),
+    gender                boolean      not null,
+    score                 int          not null,
+    index                 int          not null,
+    point                 int          not null,
+    rep_photo_key         varchar(30),
+    location_updated_at   timestamptz,
+    location              geography(point, 4326),
+    fcm_token             varchar(200),
+    account_type          int          not null,
+    free_swipe            int          not null,
+    free_swipe_updated_at timestamptz  not null,
+    created_at            timestamptz  not null,
+    updated_at            timestamptz  not null
 
 );
 
@@ -308,28 +308,6 @@ create table chat_message
 );
 
 
--- watch ad, liked, etc...
-create table reward_type
-(
-    id          serial primary key,
-    description varchar(50) not null,
-    point       int         not null
-);
-
--- this table does not include the purchase
-create table reward
-(
-    id             bigserial primary key,
-    rewarded_point int         not null,
-    account_id     uuid        not null,
-    reward_type_id int         not null,
-    created_at     timestamptz not null,
-
-    constraint reward_account_id_fk foreign key (account_id) references account (id),
-    constraint reward_reward_type_id_fk foreign key (reward_type_id) references reward_type (id)
-);
-
-
 -- ================================ ADMIN =========================================
 
 
@@ -413,7 +391,8 @@ create table unblock
 );
 
 select *
-from account where id = 'e8f9d44f-9313-4569-b294-608c71924fe3';
+from account
+where id = 'e8f9d44f-9313-4569-b294-608c71924fe3';
 
 select *
 from account_question
@@ -423,6 +402,22 @@ where account_id = 'e8f9d44f-9313-4569-b294-608c71924fe3';
 select *
 from account_question
 where account_id = 'e8f9d44f-9313-4569-b294-608c71924fe3'
-and ((question_id = 1 and answer = true) or (question_id = 2 and answer = true) or (question_id = 3 and answer = true));
+  and ((question_id = 1 and answer = true) or (question_id = 2 and answer = true) or
+       (question_id = 3 and answer = true));
 
+
+select *
+from account
+where id = 'b50382d1-2013-430a-b0bd-f07687d810e7';
+
+update account set point = 200
+where id = 'b50382d1-2013-430a-b0bd-f07687d810e7';
+
+update account set free_swipe_updated_at = free_swipe_updated_at - Interval '1 DAY';
+
+select *
+from swipe;
+
+select *
+from swipe;
 

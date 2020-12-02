@@ -5,6 +5,7 @@ import com.beeswork.balanceaccountservice.exception.account.AccountBlockedExcept
 import com.beeswork.balanceaccountservice.exception.account.AccountDeletedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipedDeletedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import org.modelmapper.ModelMapper;
 
@@ -26,11 +27,11 @@ public abstract class BaseServiceImpl {
     protected void checkIfAccountValid(Account account) {
         if (account == null) throw new AccountNotFoundException();
         if (account.isBlocked()) throw new AccountBlockedException();
-        if (account.isDeleted()) throw new AccountDeletedException();
     }
 
     protected void checkIfSwipedValid(Account account) {
         if (account == null) throw new SwipedNotFoundException();
         if (account.isBlocked()) throw new SwipedBlockedException();
+        if (account.isDeleted()) throw new SwipedDeletedException();
     }
 }
