@@ -249,13 +249,14 @@ create table account_question
 
 create table swipe
 (
-    id         bigserial primary key,
     swiper_id  uuid        not null,
     swiped_id  uuid        not null,
     clicked    boolean     not null,
+    count      int         not null,
     created_at timestamptz not null,
     updated_at timestamptz not null,
 
+    primary key (swiper_id, swiped_id),
     constraint swipe_swiper_id_fk foreign key (swiper_id) references account (id),
     constraint swipe_swiped_id_fk foreign key (swiped_id) references account (id)
 );
@@ -306,6 +307,11 @@ create table chat_message
     constraint chat_message_account_id_fk foreign key (account_id) references account (id),
     constraint chat_message_recipient_id_fk foreign key (recipient_id) references account (id)
 );
+
+
+
+select *
+from swipe;
 
 
 -- ================================ ADMIN =========================================
@@ -390,34 +396,5 @@ create table unblock
     constraint unblock_admin_id_fk foreign key (admin_id) references admin (id)
 );
 
-select *
-from account
-where id = 'e8f9d44f-9313-4569-b294-608c71924fe3';
 
-select *
-from account_question
-where account_id = 'e8f9d44f-9313-4569-b294-608c71924fe3';
-
-
-select *
-from account_question
-where account_id = 'e8f9d44f-9313-4569-b294-608c71924fe3'
-  and ((question_id = 1 and answer = true) or (question_id = 2 and answer = true) or
-       (question_id = 3 and answer = true));
-
-
-select *
-from account
-where id = 'b50382d1-2013-430a-b0bd-f07687d810e7';
-
-update account set point = 200
-where id = 'b50382d1-2013-430a-b0bd-f07687d810e7';
-
-update account set free_swipe_updated_at = free_swipe_updated_at - Interval '1 DAY';
-
-select *
-from swipe;
-
-select *
-from swipe;
 

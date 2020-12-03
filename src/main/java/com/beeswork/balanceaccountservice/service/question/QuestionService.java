@@ -7,5 +7,5 @@ public interface QuestionService {
 
     List<QuestionDTO> listQuestions(String accountId, String identityToken);
     QuestionDTO randomQuestion(List<Integer> questionIds);
-    List<QuestionDTO> listRandomQuestions(String accountId, String identityToken);
+    List<QuestionDTO> listRandomQuestions();
 }

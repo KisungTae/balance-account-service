@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.entity.swipe;
 
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.querydsl.core.annotations.QueryProjection;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,10 +19,8 @@ import java.util.UUID;
 @Table(name = "swipe")
 public class Swipe {
 
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @EmbeddedId
+    private SwipeId swipeId;
 
     @Column(name = "swiper_id", updatable = false, insertable = false)
     private UUID swiperId;
@@ -30,15 +29,18 @@ public class Swipe {
     private UUID swipedId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "swiper_id")
+    @MapsId("swiperId")
     private Account swiper;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "swiped_id")
+    @MapsId("swipedId")
     private Account swiped;
 
     @Column(name = "clicked")
     private boolean clicked;
+
+    @Column(name = "count")
+    private int count;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -48,10 +50,12 @@ public class Swipe {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public Swipe(Account swiper, Account swiped, boolean clicked, Date createdAt, Date updatedAt) {
+    public Swipe(Account swiper, Account swiped, boolean clicked, int count, Date createdAt, Date updatedAt) {
+        this.swipeId = new SwipeId(swiper.getId(), swiped.getId());
         this.swiper = swiper;
         this.swiped = swiped;
         this.clicked = clicked;
+        this.count = count;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }

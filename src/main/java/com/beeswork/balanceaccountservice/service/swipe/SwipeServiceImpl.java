@@ -54,7 +54,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public BalanceGameDTO swipe(String accountId, String identityToken, Long swipeId, String swipedId) {
+    public List<QuestionDTO> swipe(String accountId, String identityToken, String swipedId) {
 
         Account swiper = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(swiper);
@@ -65,38 +65,38 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         if (swiped.getAccountQuestions().size() == 0)
             throw new AccountQuestionNotFoundException();
 
-        if (swipeDAO.existsByClicked(swiper.getId(), swiped.getId(), true))
-            throw new SwipeClickedExistsException();
-
         rechargeFreeSwipe(swiper);
         if (swiper.getFreeSwipe() < SWIPE_POINT && swiper.getPoint() < SWIPE_POINT)
             throw new AccountShortOfPointException();
 
-        BalanceGameDTO balanceGameDTO = new BalanceGameDTO();
-        balanceGameDTO.setSwipeId(swipeId);
+        Swipe swipe = swipeDAO.findBy(UUID.fromString(accountId), UUID.fromString(swipedId));
 
-        if (swipeId == null) {
-            Swipe swipe = new Swipe(swiper, swiped, false, new Date(), new Date());
-            swipeDAO.persist(swipe);
-            balanceGameDTO.setSwipeId(swipe.getId());
+        if (swipe != null && swipe.isClicked())
+            throw new SwipeClickedExistsException();
+
+        if (swipe == null) {
+            Date today = new Date();
+            swipe = new Swipe(swiper, swiped, false, 0, today, today);
         }
+
+        swipe.setCount((swipe.getCount() + 1));
+        swipeDAO.persist(swipe);
+
+        List<QuestionDTO> questionDTOs = new ArrayList<>();
 
         for (AccountQuestion accountQuestion : swiped.getAccountQuestions()) {
             Question question = accountQuestion.getQuestion();
-            balanceGameDTO.getQuestions().add(new QuestionDTO(question.getId(),
-                                                              question.getDescription(),
-                                                              question.getTopOption(),
-                                                              question.getBottomOption()));
+            questionDTOs.add(new QuestionDTO(question.getId(),
+                                             question.getDescription(),
+                                             question.getTopOption(),
+                                             question.getBottomOption()));
         }
-
-        return balanceGameDTO;
+        return questionDTOs;
     }
 
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED,
-                   isolation = Isolation.READ_COMMITTED,
-                   readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<ClickProjection> listClick(String accountId, String identityToken, Date fetchedAt) {
 
         UUID accountUUId = UUID.fromString(accountId);
@@ -106,9 +106,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED,
-                   isolation = Isolation.READ_COMMITTED,
-                   readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<ClickedProjection> listClicked(String accountId, String identityToken, Date fetchedAt) {
 
         UUID accountUUId = UUID.fromString(accountId);
@@ -120,12 +118,12 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public ClickDTO click(Long swipeId, String accountId, String identityToken, String swipedId, Map<Integer, Boolean> answers) {
+    public ClickDTO click(String accountId, String identityToken, String swipedId, Map<Integer, Boolean> answers) {
 
         UUID swiperUUId = UUID.fromString(accountId);
         UUID swipedUUId = UUID.fromString(swipedId);
 
-        Swipe swipe = swipeDAO.findWithAccounts(swipeId, swiperUUId, swipedUUId);
+        Swipe swipe = swipeDAO.findWithAccounts(swiperUUId, swipedUUId);
 
         Account swiper = swipe.getSwiper();
         Account swiped = swipe.getSwiped();

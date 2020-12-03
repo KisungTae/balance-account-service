@@ -6,8 +6,6 @@ import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
-import com.beeswork.balanceaccountservice.exception.BadRequestException;
-import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
@@ -21,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Repository
 public class QuestionServiceImpl extends BaseServiceImpl implements QuestionService {
@@ -37,19 +36,15 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED,
-                   isolation = Isolation.READ_COMMITTED,
-                   readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<QuestionDTO> listQuestions(String accountId, String identityToken) {
 
         Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId),
                                                               UUID.fromString(identityToken));
         checkIfAccountValid(account);
 
-        if (account.getAccountQuestions().size() == 0)
-            return listRandomQuestions();
-
         List<QuestionDTO> questionDTOs = new ArrayList<>();
+
         for (AccountQuestion accountQuestion : account.getAccountQuestions()) {
             Question question = accountQuestion.getQuestion();
             questionDTOs.add(new QuestionDTO(question.getId(),
@@ -58,7 +53,12 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
                                              question.getBottomOption(),
                                              accountQuestion.isAnswer()));
         }
-//        throw new BadRequestException();
+
+        for (int i = account.getAccountQuestions().size(); i < MAX_NUM_OF_QUESTIONS; i++) {
+            List<Integer> questionIds = questionDTOs.stream().map(QuestionDTO::getId).collect(Collectors.toList());
+            questionDTOs.add(randomQuestion(questionIds));
+        }
+
         return questionDTOs;
     }
 
@@ -73,20 +73,14 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
         return modelMapper.map(question, QuestionDTO.class);
     }
 
-    private List<QuestionDTO> listRandomQuestions() {
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public List<QuestionDTO> listRandomQuestions() {
 
         long count = questionDAO.count();
         int startIndex = new Random().nextInt((int) (count - MAX_NUM_OF_QUESTIONS));
         return modelMapper.map(questionDAO.findAllWithLimitAndOffset(MAX_NUM_OF_QUESTIONS, startIndex),
                                new TypeToken<List<QuestionDTO>>() {}.getType());
-    }
-
-    @Override
-    public List<QuestionDTO> listRandomQuestions(String accountId, String identityToken) {
-
-        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
-        checkIfAccountValid(account);
-        return listRandomQuestions();
     }
 
 

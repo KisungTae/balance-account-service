@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.match.Match;
+import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
@@ -47,17 +48,18 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     public void unmatch(String accountId, String identityToken, String unmatchedId) {
 
         UUID unmatcherUUID = UUID.fromString(accountId);
-//        if (!accountDAO.existsBy(unmatcherUUID, unmatcherEmail, false))
-//            throw new AccountInvalidException();
 
-        List<Match> matches = matchDAO.findPairById(UUID.fromString(accountId), UUID.fromString(unmatchedId));
-
+        List<Match> matches = matchDAO.findPairById(unmatcherUUID, UUID.fromString(unmatchedId));
         Date date = new Date();
+
         for (Match match : matches) {
+            if (match.getMatcherId().equals(unmatcherUUID)) {
+                if (!match.getMatcher().getIdentityToken().equals(UUID.fromString(identityToken)))
+                    throw new AccountNotFoundException();
+                match.setUnmatcher(true);
+            }
             match.setUnmatched(true);
             match.setUpdatedAt(date);
-            if (match.getMatcherId().equals(unmatcherUUID))
-                match.setUnmatcher(true);
         }
     }
 

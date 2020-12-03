@@ -39,14 +39,12 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
 
 
     @Override
-    public Swipe findWithAccounts(Long swipeId, UUID swiperId, UUID swipedId) throws SwipeNotFoundException {
+    public Swipe findWithAccounts(UUID swiperId, UUID swipedId) throws SwipeNotFoundException {
 
         return jpaQueryFactory.selectFrom(qSwipe)
                               .innerJoin(qSwipe.swiper, qAccount).fetchJoin()
                               .innerJoin(qSwipe.swiped, qAccount).fetchJoin()
-                              .where(qSwipe.id.eq(swipeId)
-                                              .and(qSwipe.swiperId.eq(swiperId))
-                                              .and(qSwipe.swipedId.eq(swipedId)))
+                              .where(qSwipe.swiperId.eq(swiperId).and(qSwipe.swipedId.eq(swipedId)))
                               .fetchOne();
     }
 
@@ -61,9 +59,17 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
     @Override
+    public Swipe findBy(UUID swiperId, UUID swipedId) {
+
+        return jpaQueryFactory.selectFrom(qSwipe)
+                              .where(qSwipe.swiperId.eq(swiperId).and(qSwipe.swipedId.eq(swipedId)))
+                              .fetchOne();
+    }
+
+    @Override
     public List<ClickProjection> findAllClickAfter(UUID swiperId, Date fetchedAt) {
 
-        fetchedAt = DateUtils.addMilliseconds(fetchedAt, -1);
+        fetchedAt = DateUtils.addDays(fetchedAt, -1);
 
         return jpaQueryFactory.select(new QClickProjection(qSwipe.swipedId, qSwipe.updatedAt))
                               .from(qSwipe)
@@ -75,7 +81,7 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
 
     public List<ClickedProjection> findAllClickedAfter(UUID swipedId, Date fetchedAt) {
 
-        fetchedAt = DateUtils.addMilliseconds(fetchedAt, -1);
+        fetchedAt = DateUtils.addDays(fetchedAt, -1);
 
         Expression<Date> updatedAtCase = new CaseBuilder().when(qSwipe.updatedAt.after(qAccount.updatedAt))
                                                           .then(qSwipe.updatedAt)

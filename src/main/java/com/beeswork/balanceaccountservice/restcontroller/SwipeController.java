@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.BalanceGameDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
@@ -45,12 +46,11 @@ public class SwipeController extends BaseController {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        BalanceGameDTO balanceGameDTO = swipeService.swipe(swipeVM.getAccountId(),
-                                                           swipeVM.getIdentityToken(),
-                                                           swipeVM.getSwipeId(),
-                                                           swipeVM.getSwipedId());
+        List<QuestionDTO> questionDTOs = swipeService.swipe(swipeVM.getAccountId(),
+                                                              swipeVM.getIdentityToken(),
+                                                              swipeVM.getSwipedId());
 
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(balanceGameDTO));
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
     }
 
     @GetMapping("/click/list")
@@ -89,8 +89,7 @@ public class SwipeController extends BaseController {
 
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
-        ClickDTO clickDTO = swipeService.click(clickVM.getSwipeId(),
-                                               clickVM.getAccountId(),
+        ClickDTO clickDTO = swipeService.click(clickVM.getAccountId(),
                                                clickVM.getIdentityToken(),
                                                clickVM.getSwipedId(),
                                                clickVM.getAnswers());

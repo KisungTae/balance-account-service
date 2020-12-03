@@ -49,6 +49,7 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     public Account findWithPhotos(UUID accountId, UUID identityToken) {
         return jpaQueryFactory.selectFrom(qAccount)
                               .leftJoin(qAccount.photos, qPhoto)
+                              .fetchJoin()
                               .where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken)))
                               .fetchOne();
     }

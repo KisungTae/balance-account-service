@@ -15,9 +15,6 @@ import java.util.Map;
 @Setter
 public class ClickVM extends AccountIdentityVM {
 
-    @NotNull
-    private Long swipeId;
-
     @NotEmpty(message = "{uuid.empty}")
     @ValidUUID(message = "{uuid.invalid}")
     private String swipedId;

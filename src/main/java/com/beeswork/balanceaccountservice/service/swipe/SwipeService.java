@@ -17,8 +17,8 @@ public interface SwipeService {
 
     List<ClickedProjection> listClicked(String accountId, String identityToken, Date fetchedAt);
     List<ClickProjection> listClick(String accountId, String identityToken, Date fetchedAt);
-    BalanceGameDTO swipe(String accountId, String identityToken, Long swipeId, String swipedId);
+    List<QuestionDTO> swipe(String accountId, String identityToken, String swipedId);
 
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-    ClickDTO click(Long swipeId, String accountId, String identityToken, String swipedId, Map<Integer, Boolean> answers);
+    ClickDTO click(String accountId, String identityToken, String swipedId, Map<Integer, Boolean> answers);
 }

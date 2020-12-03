@@ -69,9 +69,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED,
-                   isolation = Isolation.READ_COMMITTED,
-                   readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public ProfileDTO getProfile(String accountId, String identityToken) {
 
         Account account = findValidAccount(accountId, identityToken);
@@ -92,7 +90,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
         Account account = findValidAccount(accountId, identityToken);
 
-        if (account.isEnabled()) {
+        if (!account.isEnabled()) {
             account.setName(name);
 
             Calendar calendar = Calendar.getInstance();
@@ -115,19 +113,18 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         Account account = findValidAccount(accountId, identityToken);
         account.setHeight(height);
         account.setAbout(about);
-        account.setUpdatedAt(new Date());
     }
 
     @Override
     @Transactional
-    public void saveLocation(String accountId, String identityToken, double latitude, double longitude,
-                             Date updatedAt) {
+    public void saveLocation(String accountId, String identityToken, double latitude, double longitude, Date updatedAt) {
 
         Account account = findValidAccount(accountId, identityToken);
         saveLocation(account, latitude, longitude, updatedAt);
     }
 
     private void saveLocation(Account account, double latitude, double longitude, Date updatedAt) {
+
         account.setLocation(geometryFactory.createPoint(new Coordinate(longitude, latitude)));
         account.setLocationUpdatedAt(updatedAt);
     }
@@ -218,8 +215,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
-    public PreRecommendDTO preRecommend(String accountId, String identityToken, Double latitude, Double longitude,
-                                        Date locationUpdatedAt, boolean reset) {
+    public PreRecommendDTO preRecommend(String accountId, String identityToken, Double latitude,
+                                        Double longitude, Date locationUpdatedAt, boolean reset) {
 
         Account account = findValidAccount(accountId, identityToken);
 
@@ -243,9 +240,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     // TEST 1. matches are mapped by matcher_id not matched_id
     @Override
-    @Transactional(propagation = Propagation.REQUIRED,
-                   isolation = Isolation.READ_COMMITTED,
-                   readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<CardDTO> recommend(int distance, int minAge, int maxAge, boolean gender, Point location, int index) {
 
         if (distance < minDistance || distance > maxDistance)
@@ -289,7 +284,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
         Account account = findValidAccount(accountId, identityToken);
 
-
         // delete photos in s3
         ArrayList<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<>();
 
@@ -302,14 +296,13 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
         amazonS3.deleteObjects(deleteObjectsRequest);
 
-
         // delete photos in database
         account.getPhotos().clear();
 
         // delete account_questions
         account.getAccountQuestions().clear();
 
-        // delete profiles
+        // delete profile
         Date today = new Date();
 
         account.setDeleted(true);

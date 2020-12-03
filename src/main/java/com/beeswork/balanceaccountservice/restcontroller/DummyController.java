@@ -82,17 +82,24 @@ public class DummyController {
 
             for (int j = startIndex; j < endIndex; j++) {
                 if (i != j) {
-                    int count = random.nextInt(4);
+                    swiper.getSwipes()
+                          .add(new Swipe(swiper,
+                                         accounts.get(j),
+                                         random.nextBoolean(),
+                                         random.nextInt(10),
+                                         new Date(),
+                                         new Date()));
 
-                    for (int k = 0; k < count; k++) {
-                        Swipe swipe = new Swipe(swiper, accounts.get(j), false, new Date(), new Date());
-                        Thread.sleep(5);
-                        swiper.getSwipes().add(swipe);
-                    }
 
-                    Swipe swipe = new Swipe(swiper, accounts.get(j), random.nextBoolean(), new Date(), new Date());
-                    Thread.sleep(5);
-                    swiper.getSwipes().add(swipe);
+//                    for (int k = 0; k < count; k++) {
+//                        Swipe swipe = new Swipe(swiper, accounts.get(j), false, new Date(), new Date());
+//                        Thread.sleep(5);
+//                        swiper.getSwipes().add(swipe);
+//                    }
+//
+//                    Swipe swipe = new Swipe(swiper, accounts.get(j), random.nextBoolean(), new Date(), new Date());
+//                    Thread.sleep(5);
+//                    swiper.getSwipes().add(swipe);
                 }
             }
             entityManager.persist(swiper);

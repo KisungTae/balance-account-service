@@ -16,13 +16,13 @@ import javax.persistence.Id;
 @AllArgsConstructor
 public class QuestionDTO {
 
-    private long id;
+    private int id;
     private String description;
     private String topOption;
     private String bottomOption;
     private Boolean answer;
 
-    public QuestionDTO(long id, String description, String topOption, String bottomOption) {
+    public QuestionDTO(int id, String description, String topOption, String bottomOption) {
         this.id = id;
         this.description = description;
         this.topOption = topOption;

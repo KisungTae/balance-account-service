@@ -35,8 +35,8 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     public Match findWithAccounts(UUID matcherId, UUID matchedId, Long chatId) {
 
         return jpaQueryFactory.selectFrom(qMatch)
-                              .innerJoin(qMatch.matcher, qAccount)
-                              .innerJoin(qMatch.matched, qAccount)
+                              .innerJoin(qMatch.matcher, qAccount).fetchJoin()
+                              .innerJoin(qMatch.matched, qAccount).fetchJoin()
                               .where(qMatch.matcherId.eq(matcherId)
                                                      .and(qMatch.matchedId.eq(matchedId))
                                                      .and(qMatch.chatId.eq(chatId))).fetchOne();
@@ -45,7 +45,8 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     @Override
     public List<MatchProjection> findAllAfter(UUID matcherId, Date fetchedAt) {
 
-        fetchedAt = DateUtils.addMilliseconds(fetchedAt, -1);
+
+        fetchedAt = DateUtils.addDays(fetchedAt, -1);
 
         Expression<Date> updatedAtCase = new CaseBuilder().when(qMatch.updatedAt.after(qAccount.updatedAt))
                                                           .then(qMatch.updatedAt)
@@ -76,6 +77,8 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                                                      .and(qMatch.matchedId.eq(matchedId))
                                                      .or(qMatch.matcherId.eq(matchedId)
                                                                          .and(qMatch.matchedId.eq(matcherId))))
+                              .innerJoin(qMatch.matcher, qAccount)
+                              .fetchJoin()
                               .fetch();
     }
 

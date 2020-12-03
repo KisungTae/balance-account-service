@@ -14,8 +14,6 @@ import java.util.Locale;
 @Setter
 public class SwipeVM extends AccountIdentityVM {
 
-    private Long swipeId;
-
     @NotEmpty(message = "{uuid.empty}")
     @ValidUUID(message = "{uuid.invalid}")
     private String swipedId;
