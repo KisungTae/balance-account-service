@@ -13,18 +13,19 @@ public class WebSocketMessageBrokerConfig  implements WebSocketMessageBrokerConf
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
+//        config.enableSimpleBroker("/topic");
+//        config.setApplicationDestinationPrefixes("/app");
+
+        config.enableSimpleBroker("/user/queue/specific-user");
         config.setApplicationDestinationPrefixes("/app");
+        config.setUserDestinationPrefix("/user");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/broadcast");
+//        registry.addEndpoint("/broadcast");
+        registry.addEndpoint("/room");
     }
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new TopicSubscriptionInterceptor());
-    }
 
 }

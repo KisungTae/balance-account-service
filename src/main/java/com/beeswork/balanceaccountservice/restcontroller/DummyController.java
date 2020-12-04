@@ -86,7 +86,7 @@ public class DummyController {
                           .add(new Swipe(swiper,
                                          accounts.get(j),
                                          random.nextBoolean(),
-                                         random.nextInt(10),
+                                         (random.nextInt(10) + 1),
                                          new Date(),
                                          new Date()));
 

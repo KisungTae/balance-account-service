@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.vm.ChatMessage;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -15,27 +16,29 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.security.Principal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @RestController
 public class ChatController {
 
-    private final SimpMessagingTemplate template;
-    private final Validator validator;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
-    public ChatController(SimpMessagingTemplate template, Validator validator) {
-        this.template = template;
-        this.validator = validator;
+    public ChatController(SimpMessagingTemplate simpMessagingTemplate) {
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
 
+    @MessageMapping("/secured/room")
+    public void sendSpecific(
+            @Payload ChatMessage msg,
+            Principal user,
+            @Header("simpSessionId") String sessionId) throws Exception {
 
-    public void sendChatMessage(@Valid @ModelAttribute ChatMessageVM chatMessageVM) {
-
-    }
-
-    public void subscribe() {
-
+            simpMessagingTemplate.convertAndSendToUser(
+                msg.getTo(), "/secured/user/queue/specific-user", msg);
     }
 
 
@@ -46,8 +49,8 @@ public class ChatController {
 
 
 
-        if (chatMessage.getChatId() == 1)
-            template.convertAndSend("/topic/messages/" + chatMessage.getChatId(), chatMessage);
+//        if (chatMessage.getChatId() == 1)
+//            template.convertAndSend("/topic/messages/" + chatMessage.getChatId(), chatMessage);
 //        return new ChatMessage(chatMessage.getFrom(), chatMessage.getText(), "ALL");
     }
 }

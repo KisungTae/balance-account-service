@@ -13,20 +13,16 @@ import java.util.Date;
 @NoArgsConstructor
 public class ChatMessage {
 
-    private Long chatId;
-
-    @ValidUUID
     private String from;
-
     private String text;
-    private String recipient;
+    private String to;
     private String time;
 
 
-    public ChatMessage(String from, String text, String recipient) {
+    public ChatMessage(String from, String text, String to) {
         this.from = from;
         this.text = text;
-        this.recipient = recipient;
+        this.to = to;
         this.time = new Date().toString();
     }
 }

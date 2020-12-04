@@ -311,7 +311,22 @@ create table chat_message
 
 
 select *
-from swipe;
+from account
+where id = 'c5fe3250-fca0-4c5d-9093-cf59a8ff4b21';
+
+
+select *
+from swipe
+where swiper_id = 'c5fe3250-fca0-4c5d-9093-cf59a8ff4b21'
+  and swiped_id = '830eba62-9b5b-4491-af0d-00de3a6e2417';
+
+
+select *
+from account
+where id not in (select swiped_id from swipe where swiper_id = 'c5fe3250-fca0-4c5d-9093-cf59a8ff4b21');
+
+
+
 
 
 -- ================================ ADMIN =========================================

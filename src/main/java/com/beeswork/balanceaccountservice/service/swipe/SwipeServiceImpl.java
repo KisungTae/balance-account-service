@@ -79,6 +79,9 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             swipe = new Swipe(swiper, swiped, false, 0, today, today);
         }
 
+        if (swipe.getCount() != 0)
+            swipe.setUpdatedAt(new Date());
+
         swipe.setCount((swipe.getCount() + 1));
         swipeDAO.persist(swipe);
 

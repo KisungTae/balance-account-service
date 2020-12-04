@@ -28,24 +28,26 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public void checkIfValidMatch(String accountId, String identityToken, String matchedId, Long chatId) {
 
-        Match match = matchDAO.findWithAccounts(UUID.fromString(accountId), UUID.fromString(matchedId), chatId);
+        System.out.println("checkIfValidMatch");
 
-        if (match == null)
-            throw new MatchNotFoundException();
-        if (match.isUnmatched())
-            throw new MatchUnmatchedException();
-
-        Account matcher = match.getMatcher();
-        Account matched = match.getMatched();
-
-        if (matcher == null || !matcher.getIdentityToken().equals(UUID.fromString(identityToken)))
-            throw new AccountNotFoundException();
-        if (matcher.isBlocked())
-            throw new AccountBlockedException();
-
-        if (matched == null)
-            throw new SwipedNotFoundException();
-        if (matched.isBlocked())
-            throw new SwipedBlockedException();
+//        Match match = matchDAO.findWithAccounts(UUID.fromString(accountId), UUID.fromString(matchedId), chatId);
+//
+//        if (match == null)
+//            throw new MatchNotFoundException();
+//        if (match.isUnmatched())
+//            throw new MatchUnmatchedException();
+//
+//        Account matcher = match.getMatcher();
+//        Account matched = match.getMatched();
+//
+//        if (matcher == null || !matcher.getIdentityToken().equals(UUID.fromString(identityToken)))
+//            throw new AccountNotFoundException();
+//        if (matcher.isBlocked())
+//            throw new AccountBlockedException();
+//
+//        if (matched == null)
+//            throw new SwipedNotFoundException();
+//        if (matched.isBlocked())
+//            throw new SwipedBlockedException();
     }
 }
