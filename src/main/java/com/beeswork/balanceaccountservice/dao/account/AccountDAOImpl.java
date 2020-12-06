@@ -100,13 +100,13 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
                 "        and gender = :gender " +
                 "        and birth_year <= :minAge " +
                 "        and birth_year >= :maxAge " +
-                "        and enabled = true" +
+                "        and enabled = true " +
                 "        and blocked = false " +
                 "        and deleted = false " +
                 "       limit :limit " +
                 "       offset :offset) as b " +
                 "left join photo as p " +
-                "on p.account_id = b.id", Object[].class)
+                "on p.account_id = b.id")
                             .setParameter("pivot", point)
                             .setParameter("distance", distance)
                             .setParameter("gender", gender)

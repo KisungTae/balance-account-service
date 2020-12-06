@@ -28,8 +28,7 @@ public class Account {
     @Id
     @Column(name = "id")
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID",
-                      strategy = "org.hibernate.id.UUIDGenerator")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Type(type="pg-uuid")
     private UUID id;
 
@@ -45,6 +44,9 @@ public class Account {
 
     @Column(name = "blocked")
     private boolean blocked;
+
+    @Column(name = "deleted")
+    private boolean deleted;
 
     @Column(name = "name")
     private String name;
@@ -75,9 +77,6 @@ public class Account {
 
     @Column(name = "point")
     private int point;
-
-    @Column(name = "deleted")
-    private boolean deleted;
 
     @Column(name = "fcm_token")
     private String fcmToken;

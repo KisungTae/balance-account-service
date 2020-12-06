@@ -310,23 +310,18 @@ create table chat_message
 
 
 
-select *
-from account
-where id = 'c5fe3250-fca0-4c5d-9093-cf59a8ff4b21';
-
-
-select *
+select swiped_id, count(*)
 from swipe
-where swiper_id = 'c5fe3250-fca0-4c5d-9093-cf59a8ff4b21'
-  and swiped_id = '830eba62-9b5b-4491-af0d-00de3a6e2417';
-
+group by swiped_id
+order by count(*) desc;
 
 select *
 from account
-where id not in (select swiped_id from swipe where swiper_id = 'c5fe3250-fca0-4c5d-9093-cf59a8ff4b21');
+where id = '1865971c-0080-4a03-89ad-32de139c4dc8';
 
 
-
+select *
+from account;
 
 
 -- ================================ ADMIN =========================================
@@ -412,4 +407,4 @@ create table unblock
 );
 
 
-
+select * from account;
