@@ -10,19 +10,21 @@ import java.util.Date;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class ChatMessage {
 
     private String from;
     private String text;
-    private String to;
+    private String recipient;
     private String time;
 
+    public ChatMessage() {
 
-    public ChatMessage(String from, String text, String to) {
+    }
+
+    public ChatMessage(String from, String text, String recipient) {
         this.from = from;
         this.text = text;
-        this.to = to;
+        this.recipient = recipient;
         this.time = new Date().toString();
     }
 }

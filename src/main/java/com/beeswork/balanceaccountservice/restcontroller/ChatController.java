@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
@@ -30,27 +31,18 @@ public class ChatController {
         this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
-
-    @MessageMapping("/secured/room")
-    public void sendSpecific(
-            @Payload ChatMessage msg,
-            Principal user,
-            @Header("simpSessionId") String sessionId) throws Exception {
-
-            simpMessagingTemplate.convertAndSendToUser(
-                msg.getTo(), "/secured/user/queue/specific-user", msg);
+    @MessageMapping("/broadcast")
+    @SendTo("/topic/broadcast")
+    public ChatMessage send(ChatMessage chatMessage) throws Exception {
+        return new ChatMessage(chatMessage.getFrom(), chatMessage.getText(), "ALL");
     }
 
+    @MessageMapping("/secured/room")
+    public void sendSpecific(@Payload ChatMessage msg,
+                             Principal user,
+                             @Header("simpSessionId") String sessionId) throws Exception {
 
-    @MessageMapping("/broadcast")
-//    @SendTo("/topic/messages")
-    public void send(@Validated @Payload ChatMessage chatMessage) {
-
-
-
-
-//        if (chatMessage.getChatId() == 1)
-//            template.convertAndSend("/topic/messages/" + chatMessage.getChatId(), chatMessage);
-//        return new ChatMessage(chatMessage.getFrom(), chatMessage.getText(), "ALL");
+        simpMessagingTemplate.convertAndSendToUser(
+                msg.getRecipient(), "/secured/user/queue/specific-user", msg);
     }
 }

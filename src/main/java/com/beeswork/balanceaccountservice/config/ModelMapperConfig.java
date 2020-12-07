@@ -1,11 +1,9 @@
 package com.beeswork.balanceaccountservice.config;
 
-import com.beeswork.balanceaccountservice.dto.account.ProfileDTO;
-import com.beeswork.balanceaccountservice.entity.account.Account;
+
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;

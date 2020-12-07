@@ -13,6 +13,7 @@ public class WebSocketBroadcastController {
 
     @GetMapping("/stomp-broadcast")
     public String getWebSocketBroadcast() {
+//        return "ddd";
         return "stomp-broadcast";
     }
 

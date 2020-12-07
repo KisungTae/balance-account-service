@@ -14,7 +14,6 @@ import java.io.IOException;
 @Configuration
 public class AWSConfig {
 
-
     @Bean
     public AmazonS3 amazonS3() {
         return AmazonS3ClientBuilder.standard()

@@ -8,14 +8,15 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.ChannelInterceptorAdapter;
+import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
-public class TopicSubscriptionInterceptor implements ChannelInterceptor {
-
+public class ChatSubscriptionInterceptor implements ChannelInterceptor {
 
     @Autowired
     private ChatService chatService;
