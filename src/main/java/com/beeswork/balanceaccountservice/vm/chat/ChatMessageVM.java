@@ -7,26 +7,17 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.UUID;
 
 @Getter
 @Setter
-public class ChatMessageVM extends AccountIdentityVM {
+public class ChatMessageVM {
 
-    @NotEmpty
-    private Long id;
-
-    @NotEmpty(message = "{account.uuid.empty}")
-    @ValidUUID(message = "{account.uuid.invalid}")
-    private String recipientId;
-
-    @NotEmpty(message = "{chat.message.empty}")
     private String message;
 
-    public ChatMessageVM(String accountId, String message, String recipientId) {
-        this.accountId = accountId;
-        this.message = message;
-        this.recipientId = recipientId;
-    }
+//  TODO: remove me or modify me
+    private Date createdAt = new Date();
+
 }

@@ -3,7 +3,8 @@
 <head>
     <title>WebSocket With STOMP Broadcast Example</title>
     <!--    <th:block th:include="fragments/common.html :: headerfiles"></th:block>-->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
 <body>
 <div class="container">
@@ -17,8 +18,9 @@
         <div class="col-md-6">
             <div class="mb-3">
                 <div class="input-group">
-                    <input type="text" id="from" class="form-control" placeholder="Choose a nickname"/>
-                    <input type="text" id="topic" class="form-control" placeholder="Choose a topic"/>
+                    <input type="text" id="accountId" class="form-control" placeholder="Enter accountId"/>
+                    <input type="text" id="identityToken" class="form-control" placeholder="Enter identityToken"/>
+                    <input type="text" id="chatId" class="form-control" placeholder="Enter chat Id"/>
                     <div class="btn-group">
                         <button type="button" id="connect" class="btn btn-sm btn-outline-secondary" onclick="connect()">
                             Connect
@@ -43,7 +45,8 @@
             <div id="content"></div>
             <div>
                 <span class="float-right">
-                    <button id="clear" class="btn btn-primary" onclick="clearBroadcast()" style="display: none;">Clear</button>
+                    <button id="clear" class="btn btn-primary" onclick="clearBroadcast()"
+                            style="display: none;">Clear</button>
                 </span>
             </div>
         </div>
@@ -55,107 +58,124 @@
 
 <script th:src="@{/webjars/stomp-websocket/2.3.3-1/stomp.js}" type="text/javascript"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script th:src="@{/webjars/stomp-websocket/2.3.3-1/stomp.js}" type="text/javascript"></script>
 <script type="text/javascript">
 
-    var stompClient = null;
-    var userName = $("#from").val();
-    var sockJs = null;
-
+    var stompClient = null
+    var sockJs = null
 
 
     function setConnected(connected) {
-        $("#from").prop("disabled", connected);
-        $("#connect").prop("disabled", connected);
-        $("#disconnect").prop("disabled", !connected);
+        $('#from').prop('disabled', connected)
+        $('#connect').prop('disabled', connected)
+        $('#disconnect').prop('disabled', !connected)
         if (connected) {
-            $("#sendmessage").show();
+            $('#sendmessage').show()
         } else {
-            $("#sendmessage").hide();
+            $('#sendmessage').hide()
         }
     }
+
 
     function connect() {
-        userName = $("#from").val();
-        if (userName == null || userName === "") {
-            alert('Please input a nickname!');
-            return;
-        }
-        /*<![CDATA[*/
-        var url = /*[['ws://'+${#httpServletRequest.serverName}+':'+${#httpServletRequest.serverPort}+@{/broadcast}]]*/ 'ws://localhost:8080/broadcast';
-        /*]]>*/
-
-
 
         // stompClient = Stomp.client(url);
-        sockJs = SockJS('/broadcast')
+        sockJs = SockJS('/chat')
         stompClient = Stomp.over(sockJs)
         stompClient.connect({}, function () {
-            stompClient.subscribe('/topic/broadcast', function (output) {
-                showBroadcastMessage(createTextNode(JSON.parse(output.body)));
-            },  { chatId: '123123'});
 
-            sendConnection(' connected to server');
-            setConnected(true);
+            stompClient.subscribe('/queue/' + $('#chatId').val(),
+                function (output) {
+                    console.log('I have received output:' + output)
+                    if (output.body) {
+                        showBroadcastMessage(createTextNode(JSON.parse(output.body)))
+                    } else {
+                        console.log('Output body is empty')
+                    }
+                }, getHeaders())
+
+            sendConnection(' connected to server')
+            setConnected(true)
         }, function (err) {
-            alert('error' + err);
-        });
+            alert('error' + err)
+        })
     }
 
-    function disconnect() {
-        if (stompClient != null) {
-            sendConnection(' disconnected from server');
-
-            stompClient.disconnect(function() {
-                console.log('disconnected...');
-                setConnected(false);
-            });
+    function getHeaders() {
+        return {
+            accountId: $('#accountId').val(),
+            identityToken: $('#identityToken').val(),
+            chatId: $('#chatId').val(),
         }
     }
 
     function sendConnection(message) {
-        var text = userName + message;
-        sendBroadcast({'from': 'server', 'text': text});
+        sendBroadcast({ message: message })
     }
 
-    function sendBroadcast(json) {
-        stompClient.send("/app/broadcast", {}, JSON.stringify(json));
+    function getMessage() {
+        return {
+            message: $('#message').val()
+        }
     }
 
     function send() {
-        var text = $("#message").val();
-        sendBroadcast({'from': userName, 'text': text});
-        $("#message").val("");
+        sendBroadcast(getMessage())
+        $('#message').val('')
     }
+
+    function sendBroadcast(json) {
+        stompClient.send('/app/chat/send', getHeaders(), JSON.stringify(json))
+    }
+
 
     function createTextNode(messageObj) {
         return '<div class="row alert alert-info"><div class="col-md-8">' +
-            messageObj.text +
+            messageObj.message +
             '</div><div class="col-md-4 text-right"><small>[<b>' +
-            messageObj.from +
+            messageObj.accountId +
             '</b> ' +
-            messageObj.time +
+            messageObj.createdAt +
             ']</small>' +
-            '</div></div>';
+            '</div></div>'
     }
 
+
+
     function showBroadcastMessage(message) {
-        $("#content").html($("#content").html() + message);
-        $("#clear").show();
+        $('#content').html($('#content').html() + message)
+        $('#clear').show()
     }
 
     function clearBroadcast() {
-        $("#content").html("");
-        $("#clear").hide();
+        $('#content').html('')
+        $('#clear').hide()
+    }
+
+    function disconnect() {
+        if (stompClient != null) {
+
+            sendConnection(' disconnected from server')
+
+            stompClient.disconnect(function () {
+                console.log('disconnected...')
+                setConnected(false)
+            })
+        }
     }
 </script>
 </body>
 </html>
-
 
 
 <!--

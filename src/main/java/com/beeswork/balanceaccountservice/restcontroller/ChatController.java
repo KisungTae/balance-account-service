@@ -3,46 +3,48 @@ package com.beeswork.balanceaccountservice.restcontroller;
 import com.beeswork.balanceaccountservice.vm.ChatMessage;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.messaging.simp.user.SimpSession;
+import org.springframework.messaging.simp.user.SimpSubscription;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Set;
 
 @RestController
 public class ChatController {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final SimpUserRegistry simpUserRegistry;
+
 
     @Autowired
-    public ChatController(SimpMessagingTemplate simpMessagingTemplate) {
+    public ChatController(SimpMessagingTemplate simpMessagingTemplate, SimpUserRegistry simpUserRegistry) {
         this.simpMessagingTemplate = simpMessagingTemplate;
+        this.simpUserRegistry = simpUserRegistry;
     }
 
-    @MessageMapping("/broadcast")
-    @SendTo("/topic/broadcast")
-    public ChatMessage send(ChatMessage chatMessage) throws Exception {
-        return new ChatMessage(chatMessage.getFrom(), chatMessage.getText(), "ALL");
-    }
+    @MessageMapping("/chat/send")
+//    @SendTo("/topic/broadcast")
+    public void send(@Payload ChatMessageVM chatMessageVM, SimpMessageHeaderAccessor simpMessageHeaderAccessor)
+    throws Exception {
 
-    @MessageMapping("/secured/room")
-    public void sendSpecific(@Payload ChatMessage msg,
-                             Principal user,
-                             @Header("simpSessionId") String sessionId) throws Exception {
-
-        simpMessagingTemplate.convertAndSendToUser(
-                msg.getRecipient(), "/secured/user/queue/specific-user", msg);
+        simpMessagingTemplate.convertAndSend("/queue/" + 1, chatMessageVM);
     }
 }
+
+
+// maximum topic
+
+// no subscriber channel, have to be handled manually,
+
+// how @subscribe works
+
+// how to check if there is subscriber discconected
