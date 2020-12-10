@@ -52,6 +52,10 @@ public class ChatSubscriptionInterceptor implements ChannelInterceptor {
             }
         }
 
+        if (StompCommand.ACK.equals(headerAccessor.getCommand())) {
+            System.out.println("presend: StompCommand.ACK.equals(headerAccessor.getCommand())");
+        }
+
 
         if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
             System.out.println("presend: subscribing chat: " + channel);

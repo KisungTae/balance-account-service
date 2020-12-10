@@ -56,7 +56,7 @@
 
 <!--<footer th:insert="fragments/common.html :: footer"></footer>-->
 
-<script th:src="@{/webjars/stomp-websocket/2.3.3-1/stomp.js}" type="text/javascript"></script>
+<!--<script th:src="@{/webjars/stomp-websocket/2.3.3-1/stomp.js}" type="text/javascript"></script>-->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
         integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
@@ -68,12 +68,11 @@
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<script th:src="@{/webjars/stomp-websocket/2.3.3-1/stomp.js}" type="text/javascript"></script>
-<script type="text/javascript">
+<!--<script th:src="@{/webjars/stomp-websocket/2.3.3-1/stomp.js}" type="text/javascript"></script>-->
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.min.js"></script>
+<script type="application/javascript">
 
-    var stompClient = null
-    var sockJs = null
-
+    let stompClient
 
     function setConnected(connected) {
         $('#from').prop('disabled', connected)
@@ -89,14 +88,27 @@
 
     function connect() {
 
-        // stompClient = Stomp.client(url);
-        sockJs = SockJS('/chat')
-        stompClient = Stomp.over(sockJs)
-        stompClient.connect({}, function () {
+        stompClient = new StompJs.Client({
+            brokerURL: 'ws://localhost:8080/chat',
+            connectHeaders: {
+                login: 'user',
+                passcode: 'password',
+            },
+            debug: function (str) {
+                console.log(str)
+            },
+            reconnectDelay: 500000,
+            heartbeatIncoming: 4000,
+            heartbeatOutgoing: 4000,
+        })
 
+        stompClient.onConnect = function (frame) {
+            console.log('connecting to server......')
             stompClient.subscribe('/queue/' + $('#chatId').val(),
                 function (output) {
                     console.log('I have received output:' + output)
+                    console.log('I acknowledge this output')
+                    output.ack()
                     if (output.body) {
                         showBroadcastMessage(createTextNode(JSON.parse(output.body)))
                     } else {
@@ -104,39 +116,63 @@
                     }
                 }, getHeaders())
 
-            sendConnection(' connected to server')
+            sendBroadcast({ message: 'connected to server' })
             setConnected(true)
-        }, function (err) {
-            alert('error' + err)
-        })
+        }
+
+        stompClient.onStompError = function (frame) {
+            console.log('Broker reported error: ' + frame.headers['message'])
+            console.log('Additional details: ' + frame.body)
+        }
+
+        stompClient.onUnhandledReceipt = function (frame) {
+            console.log('onUnhandledReceipt')
+        }
+
+        stompClient.activate()
+
+
     }
+
 
     function getHeaders() {
         return {
             accountId: $('#accountId').val(),
             identityToken: $('#identityToken').val(),
             chatId: $('#chatId').val(),
-        }
-    }
-
-    function sendConnection(message) {
-        sendBroadcast({ message: message })
-    }
-
-    function getMessage() {
-        return {
-            message: $('#message').val()
+            receipt: 'receipt-123'
         }
     }
 
     function send() {
-        sendBroadcast(getMessage())
+        sendBroadcast({message: $('#message').val()})
         $('#message').val('')
     }
 
-    function sendBroadcast(json) {
-        stompClient.send('/app/chat/send', getHeaders(), JSON.stringify(json))
+
+    function sendBroadcast(message) {
+        stompClient.publish({
+            destination: '/app/chat/send',
+            headers: getHeaders(),
+            body: JSON.stringify(message)
+        })
     }
+
+
+
+    //
+    // function disconnect() {
+    //     if (stompClient != null) {
+    //
+    //         sendConnection(' disconnected from server')
+    //
+    //         stompClient.disconnect(function () {
+    //             console.log('disconnected...')
+    //             setConnected(false)
+    //         })
+    //     }
+    // }
+
 
 
     function createTextNode(messageObj) {
@@ -151,28 +187,17 @@
     }
 
 
-
     function showBroadcastMessage(message) {
         $('#content').html($('#content').html() + message)
         $('#clear').show()
     }
+
 
     function clearBroadcast() {
         $('#content').html('')
         $('#clear').hide()
     }
 
-    function disconnect() {
-        if (stompClient != null) {
-
-            sendConnection(' disconnected from server')
-
-            stompClient.disconnect(function () {
-                console.log('disconnected...')
-                setConnected(false)
-            })
-        }
-    }
 </script>
 </body>
 </html>
