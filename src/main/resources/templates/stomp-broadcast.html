@@ -127,6 +127,7 @@
 
         stompClient.onUnhandledReceipt = function (frame) {
             console.log('onUnhandledReceipt')
+            console.log(frame)
         }
 
         stompClient.activate()
