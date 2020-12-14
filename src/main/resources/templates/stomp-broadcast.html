@@ -21,6 +21,7 @@
                     <input type="text" id="accountId" class="form-control" placeholder="Enter accountId"/>
                     <input type="text" id="identityToken" class="form-control" placeholder="Enter identityToken"/>
                     <input type="text" id="chatId" class="form-control" placeholder="Enter chat Id"/>
+                    <input type="text" id="messageId" class="form-control" placeholder="Enter message Id"/>
                     <div class="btn-group">
                         <button type="button" id="connect" class="btn btn-sm btn-outline-secondary" onclick="connect()">
                             Connect
@@ -107,8 +108,8 @@
             stompClient.subscribe('/queue/' + $('#chatId').val(),
                 function (output) {
                     console.log('I have received output:' + output)
-                    console.log('I acknowledge this output')
-                    output.ack()
+                    // console.log('I acknowledge this output')
+                    // output.ack()
                     if (output.body) {
                         showBroadcastMessage(createTextNode(JSON.parse(output.body)))
                     } else {
@@ -123,6 +124,8 @@
         stompClient.onStompError = function (frame) {
             console.log('Broker reported error: ' + frame.headers['message'])
             console.log('Additional details: ' + frame.body)
+            console.log('frame:')
+            console.log(frame)
         }
 
         stompClient.onUnhandledReceipt = function (frame) {
@@ -141,7 +144,8 @@
             accountId: $('#accountId').val(),
             identityToken: $('#identityToken').val(),
             chatId: $('#chatId').val(),
-            receipt: 'receipt-123'
+            'receipt': 'receipt-123',
+            'message-id': $('#messageId').val()
         }
     }
 

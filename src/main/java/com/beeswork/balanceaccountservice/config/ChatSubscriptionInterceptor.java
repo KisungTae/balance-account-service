@@ -27,6 +27,7 @@ public class ChatSubscriptionInterceptor implements ChannelInterceptor {
     @Autowired
     private CompositeMessageConverter compositeMessageConverter;
 
+
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
 
