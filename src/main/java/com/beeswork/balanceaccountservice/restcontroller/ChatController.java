@@ -35,7 +35,7 @@ public class ChatController {
 //    @SendTo("/topic/broadcast")
     public void send(@Payload ChatMessageVM chatMessageVM, SimpMessageHeaderAccessor simpMessageHeaderAccessor)
     throws Exception {
-
+        
         simpMessagingTemplate.convertAndSend("/queue/" + 1, chatMessageVM);
     }
 }

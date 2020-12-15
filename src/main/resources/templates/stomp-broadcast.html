@@ -96,7 +96,7 @@
                 passcode: 'password',
             },
             debug: function (str) {
-                console.log(str)
+                // console.log(str)
             },
             reconnectDelay: 500000,
             heartbeatIncoming: 4000,
@@ -104,7 +104,7 @@
         })
 
         stompClient.onConnect = function (frame) {
-            console.log('connecting to server......')
+
             stompClient.subscribe('/queue/' + $('#chatId').val(),
                 function (output) {
                     console.log('I have received output:' + output)
