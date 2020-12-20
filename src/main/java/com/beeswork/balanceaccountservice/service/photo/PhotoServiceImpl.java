@@ -52,14 +52,14 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
         Account account = accountDAO.findWithPhotos(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);
 
-        if (account.getPhotos().size() <= 1)
-            throw new PhotoInvalidDeleteException();
-
         Photo photo = account.getPhotos()
                              .stream()
                              .filter(p -> p.getKey().equals(photoKey))
                              .findAny()
                              .orElseThrow(PhotoNotFoundException::new);
+
+        if (account.getPhotos().size() <= 1)
+            throw new PhotoInvalidDeleteException();
 
         String key = account.getId().toString() + "/" + photo.getKey();
         amazonS3.deleteObject(new DeleteObjectRequest(BUCKET, key));

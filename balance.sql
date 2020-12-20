@@ -156,7 +156,7 @@ drop table account;
 
 -- TODO: 2020-09-14 execute these
 
-
+CREATE EXTENSION if not exists postgis;
 -- create UUID extension
 create extension if not exists "uuid-ossp";
 
@@ -317,7 +317,23 @@ order by count(*) desc;
 
 select *
 from account
-where id = '1865971c-0080-4a03-89ad-32de139c4dc8';
+where id = 'ea11c916-515e-475d-97ad-e82d82c84fed';
+
+
+
+select *
+from photo
+where account_id = 'ea11c916-515e-475d-97ad-e82d82c84fed';
+
+
+
+insert into photo values ('2020-12-20T02:50:32.425Z', default, 'ea11c916-515e-475d-97ad-e82d82c84fed');
+insert into photo values ('2020-12-20T02:50:32.225Z', default, 'ea11c916-515e-475d-97ad-e82d82c84fed');
+insert into photo values ('2020-12-20T02:50:32.825Z', default, 'ea11c916-515e-475d-97ad-e82d82c84fed');
+insert into photo values ('2020-12-20T02:50:32.832Z', default, 'ea11c916-515e-475d-97ad-e82d82c84fed');
+insert into photo values ('2020-12-20T02:50:32.842Z', default, 'ea11c916-515e-475d-97ad-e82d82c84fed');
+insert into photo values ('2020-12-20T02:50:32.852Z', default, 'ea11c916-515e-475d-97ad-e82d82c84fed');
+
 
 
 select *

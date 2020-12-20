@@ -6,6 +6,7 @@ import com.amazonaws.SdkClientException;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 import com.beeswork.balanceaccountservice.exception.account.*;
+import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
@@ -57,7 +58,7 @@ public class ExceptionControllerAdvice {
                        SwipeClickedExistsException.class, BadRequestException.class,
                        SwipedBlockedException.class, SwipedNotFoundException.class,
                        QuestionSetChangedException.class, AccountEmailNotMutableException.class,
-                       AccountEmailDuplicateException.class})
+                       AccountEmailDuplicateException.class, PhotoInvalidDeleteException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
