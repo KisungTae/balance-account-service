@@ -10,5 +10,5 @@ public interface PhotoService {
 
     List<PhotoDTO> listPhotos(String accountId, String identityToken);
     void deletePhoto(String accountId, String identityToken, String photoKey);
-    void reorderPhotos(String accountId, String identityToken, Map<String, Long> photoOrders);
+    void reorderPhotos(String accountId, String identityToken, Map<String, Integer> photoOrders);
 }

@@ -61,8 +61,6 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
         if (account.getPhotos().size() <= 1)
             throw new PhotoInvalidDeleteException();
 
-        String key = account.getId().toString() + "/" + photo.getKey();
-        amazonS3.deleteObject(new DeleteObjectRequest(BUCKET, key));
         account.getPhotos().remove(photo);
         resetRepPhoto(account);
     }
@@ -80,7 +78,7 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
 
     @Override
     @Transactional
-    public void reorderPhotos(String accountId, String identityToken, Map<String, Long> photoOrders) {
+    public void reorderPhotos(String accountId, String identityToken, Map<String, Integer> photoOrders) {
 
         Account account = accountDAO.findWithPhotos(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(account);

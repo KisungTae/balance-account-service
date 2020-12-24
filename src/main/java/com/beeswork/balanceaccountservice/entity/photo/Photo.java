@@ -29,7 +29,7 @@ public class Photo implements Comparable<Photo> {
     private UUID accountId;
 
     @Column(name = "sequence")
-    private Long sequence;
+    private Integer sequence;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("accountId")

@@ -1,16 +1,16 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.account.PhotoDTO;
-import com.beeswork.balanceaccountservice.dto.photo.GenerateS3PreSignedURLDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.photo.PhotoService;
+import com.beeswork.balanceaccountservice.service.s3.S3Service;
 import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
+import com.beeswork.balanceaccountservice.vm.photo.AddPhotoVM;
 import com.beeswork.balanceaccountservice.vm.photo.DeletePhotoVM;
 import com.beeswork.balanceaccountservice.vm.photo.ReorderPhotosVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,17 +26,29 @@ import java.util.List;
 public class PhotoController extends BaseController {
 
     private final PhotoService photoService;
+    private final S3Service    s3Service;
 
     @Autowired
-    public PhotoController(ObjectMapper objectMapper, ModelMapper modelMapper, PhotoService photoService) {
+    public PhotoController(ObjectMapper objectMapper, ModelMapper modelMapper, PhotoService photoService,
+                           S3Service s3Service) {
         super(objectMapper, modelMapper);
         this.photoService = photoService;
+        this.s3Service = s3Service;
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<String> addPhoto(@Valid @RequestBody AddPhotoVM addPhotoVM,
+                                           BindingResult bindingResult)
+    throws JsonProcessingException {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(objectMapper.writeValueAsString(s3Service.preSignedUrl(addPhotoVM.getPhotoKey())));
     }
 
     @GetMapping("/list")
     public ResponseEntity<String> listPhotos(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
-                                             BindingResult bindingResult) throws JsonProcessingException {
-
+                                             BindingResult bindingResult)
+    throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         List<PhotoDTO> photoDTOs = photoService.listPhotos(accountIdentityVM.getAccountId(),
                                                            accountIdentityVM.getIdentityToken());
@@ -60,13 +72,13 @@ public class PhotoController extends BaseController {
     @PostMapping("/delete")
     public ResponseEntity<String> deletePhoto(@Valid @RequestBody DeletePhotoVM deletePhotoVM,
                                               BindingResult bindingResult) throws JsonProcessingException {
-
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
         photoService.deletePhoto(deletePhotoVM.getAccountId(),
                                  deletePhotoVM.getIdentityToken(),
                                  deletePhotoVM.getPhotoKey());
 
+        s3Service.deletePhoto(deletePhotoVM.getAccountId(), deletePhotoVM.getPhotoKey());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 }

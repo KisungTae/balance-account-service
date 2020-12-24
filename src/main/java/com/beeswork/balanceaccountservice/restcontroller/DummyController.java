@@ -248,7 +248,7 @@ public class DummyController {
                     if (p == 0) {
                         account.setRepPhotoKey(photoKey);
                     }
-                    photo.setSequence((long) count);
+                    photo.setSequence(count);
                     photo.setAccount(account);
                     account.getPhotos().add(photo);
                 }
