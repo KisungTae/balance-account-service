@@ -35,6 +35,12 @@ public class Photo implements Comparable<Photo> {
     @MapsId("accountId")
     private Account account;
 
+    public Photo(Account account, String key, int sequence) {
+        this.photoId = new PhotoId(account.getId(), key);
+        this.sequence = sequence;
+        this.account = account;
+    }
+
     @Override
     public int compareTo(@NonNull Photo o) {
         if (sequence == null || o.sequence == null) return 0;

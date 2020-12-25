@@ -20,6 +20,7 @@ public class PreSignedUrl {
     private static final Duration     EXPIRATION_DURATION  = Duration.of(3L, ChronoUnit.MINUTES);
     private static final String       ACL                  = "public-read";
     private static final List<Object> CONTENT_LENGTH_RANGE = Arrays.asList("content-length-range", 1, 1048576);
+//    private static final List<Object> CONTENT_LENGTH_RANGE = Arrays.asList("content-length-range", 1, 10);
 
     public PreSignedUrl(String url, String accessKeyId, String region, String bucket, String key, Instant date) {
         this.url = url;
@@ -51,7 +52,7 @@ public class PreSignedUrl {
     public UploadPolicy getUploadPolicy(Instant date) {
         UploadPolicy uploadPolicy = new UploadPolicy();
         uploadPolicy.expiration = date.plus(EXPIRATION_DURATION);
-        uploadPolicy.conditions.add(new ArrayList<Object>(this.fields.entrySet()));
+        uploadPolicy.conditions.addAll(this.fields.entrySet());
         uploadPolicy.conditions.add(CONTENT_LENGTH_RANGE);
         return uploadPolicy;
     }

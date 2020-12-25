@@ -1,7 +1,9 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.account.PhotoDTO;
+import com.beeswork.balanceaccountservice.dto.s3.PreSignedUrl;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
+import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.photo.PhotoService;
 import com.beeswork.balanceaccountservice.service.s3.S3Service;
@@ -38,11 +40,17 @@ public class PhotoController extends BaseController {
 
     @PostMapping("/add")
     public ResponseEntity<String> addPhoto(@Valid @RequestBody AddPhotoVM addPhotoVM,
-                                           BindingResult bindingResult)
-    throws JsonProcessingException {
+                                           BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
+        photoService.addPhoto(addPhotoVM.getAccountId(),
+                              addPhotoVM.getIdentityToken(),
+                              addPhotoVM.getPhotoKey(),
+                              addPhotoVM.getSequence());
+
+        PreSignedUrl preSignedUrl = s3Service.preSignedUrl(addPhotoVM.getAccountId(), addPhotoVM.getPhotoKey());
+
         return ResponseEntity.status(HttpStatus.OK)
-                             .body(objectMapper.writeValueAsString(s3Service.preSignedUrl(addPhotoVM.getPhotoKey())));
+                             .body(objectMapper.writeValueAsString(preSignedUrl));
     }
 
     @GetMapping("/list")

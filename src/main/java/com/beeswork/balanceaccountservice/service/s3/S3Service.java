@@ -5,5 +5,5 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 public interface S3Service {
     void deletePhoto(String accountId, String photoKey);
-    PreSignedUrl preSignedUrl(String photoKey) throws JsonProcessingException;
+    PreSignedUrl preSignedUrl(String accountId, String photoKey) throws JsonProcessingException;
 }

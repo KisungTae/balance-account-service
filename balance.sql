@@ -326,13 +326,7 @@ from photo
 where account_id = 'ea11c916-515e-475d-97ad-e82d82c84fed';
 
 
-
-insert into photo values ('2020-12-20T02:50:32.425Z', 1, 'ea11c916-515e-475d-97ad-e82d82c84fed');
-insert into photo values ('2020-12-20T02:50:32.225Z', 2, 'ea11c916-515e-475d-97ad-e82d82c84fed');
-insert into photo values ('2020-12-20T02:50:32.825Z', 3, 'ea11c916-515e-475d-97ad-e82d82c84fed');
-insert into photo values ('2020-12-20T02:50:32.832Z', 4, 'ea11c916-515e-475d-97ad-e82d82c84fed');
-insert into photo values ('2020-12-20T02:50:32.842Z', 5, 'ea11c916-515e-475d-97ad-e82d82c84fed');
-insert into photo values ('2020-12-20T02:50:32.852Z', 6, 'ea11c916-515e-475d-97ad-e82d82c84fed');
+delete from photo;
 
 
 

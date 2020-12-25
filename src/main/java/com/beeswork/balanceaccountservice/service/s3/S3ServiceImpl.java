@@ -42,20 +42,20 @@ public class S3ServiceImpl implements S3Service {
     @Override
     @Async("processExecutor")
     public void deletePhoto(String accountId, String photoKey) {
-        String key = accountId + "/" + photoKey;
+        String key = generateKey(accountId, photoKey);
         amazonS3.deleteObject(new DeleteObjectRequest(BALANCE_PHOTO_BUCKET, key));
     }
 
     @Override
-    public PreSignedUrl preSignedUrl(String photoKey) throws JsonProcessingException {
+    public PreSignedUrl preSignedUrl(String accountId, String photoKey) throws JsonProcessingException {
+        String key = generateKey(accountId, photoKey);
         String region = defaultAwsRegionProviderChain.getRegion();
         String accessKeyId = defaultAWSCredentialsProviderChain.getCredentials().getAWSAccessKeyId();
         String secretKey = defaultAWSCredentialsProviderChain.getCredentials().getAWSSecretKey();
         String endpoint = String.format(S3_URL, region, BALANCE_PHOTO_BUCKET);
 
         Instant now = Instant.now();
-        PreSignedUrl preSignedUrl = new PreSignedUrl(endpoint, accessKeyId, region, BALANCE_PHOTO_BUCKET, photoKey,
-                                                     now);
+        PreSignedUrl preSignedUrl = new PreSignedUrl(endpoint, accessKeyId, region, BALANCE_PHOTO_BUCKET, key, now);
         String encodePolicy = encodePolicy(preSignedUrl.getUploadPolicy(now));
         String signature = computeSignature(encodePolicy, secretKey, region, now);
         preSignedUrl.sign(encodePolicy, signature);
@@ -74,5 +74,9 @@ public class S3ServiceImpl implements S3Service {
     private String encodePolicy(PreSignedUrl.UploadPolicy uploadPolicy) throws JsonProcessingException {
         String policyJson = objectMapper.writeValueAsString(uploadPolicy);
         return Base64.getEncoder().encodeToString(policyJson.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static String generateKey(String accountId, String photoKey) {
+        return accountId + "/" + photoKey;
     }
 }
