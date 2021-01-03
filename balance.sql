@@ -323,7 +323,7 @@ where id = 'ea11c916-515e-475d-97ad-e82d82c84fed';
 
 select *
 from photo
-where account_id = 'ea11c916-515e-475d-97ad-e82d82c84fed';
+where account_id = 'ea11c916-515e-475d-97ad-e82d82c84fed' order by sequence;
 
 
 delete from photo;
@@ -418,3 +418,6 @@ create table unblock
 
 
 select * from account;
+
+
+

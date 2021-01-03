@@ -67,7 +67,6 @@ public class PhotoController extends BaseController {
     @PostMapping("/reorder")
     public ResponseEntity<String> reorderPhotos(@Valid @RequestBody ReorderPhotosVM reorderPhotosVM,
                                                 BindingResult bindingResult) throws JsonProcessingException {
-
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
         photoService.reorderPhotos(reorderPhotosVM.getAccountId(),

@@ -21,7 +21,7 @@
                     <input type="text" id="accountId" class="form-control" placeholder="Enter accountId"/>
                     <input type="text" id="identityToken" class="form-control" placeholder="Enter identityToken"/>
                     <input type="text" id="chatId" class="form-control" placeholder="Enter chat Id"/>
-                    <input type="text" id="messageId" class="form-control" placeholder="Enter message Id"/>
+                    <input type="text" id="recipientId" class="form-control" placeholder="Enter recipient Id"/>
                     <div class="btn-group">
                         <button type="button" id="connect" class="btn btn-sm btn-outline-secondary" onclick="connect()">
                             Connect
@@ -90,7 +90,7 @@
     function connect() {
 
         stompClient = new StompJs.Client({
-            brokerURL: 'ws://localhost:8080/chat',
+            brokerURL: 'ws://localhost:8080/chat/websocket',
             connectHeaders: {
                 login: 'user',
                 passcode: 'password',
@@ -104,20 +104,14 @@
         })
 
         stompClient.onConnect = function (frame) {
-
-            stompClient.subscribe('/queue/' + $('#chatId').val(),
+            stompClient.subscribe('/queue/' + $('#accountId').val() + '-' +  $('#chatId').val(),
                 function (output) {
-                    console.log('I have received output:' + output)
-                    // console.log('I acknowledge this output')
-                    // output.ack()
                     if (output.body) {
                         showBroadcastMessage(createTextNode(JSON.parse(output.body)))
                     } else {
                         console.log('Output body is empty')
                     }
-                }, getHeaders())
-
-            sendBroadcast({ message: 'connected to server' })
+                }, {exclusive: false, durable: true, 'auto-delete': true})
             setConnected(true)
         }
 
@@ -138,22 +132,24 @@
 
     }
 
-
     function getHeaders() {
         return {
-            accountId: $('#accountId').val(),
-            identityToken: $('#identityToken').val(),
-            chatId: $('#chatId').val(),
-            'receipt': 'receipt-123',
-            'message-id': $('#messageId').val()
+            'account-id': $('#accountId').val(),
+            'identity-token': $('#identityToken').val(),
+            'chat-id': $('#chatId').val(),
+            'receipt': $('#accountId').val(),
+            'message-id': Math.floor(Math.random() * 100),
+            'recipient-id': $('#recipientId').val()
         }
     }
 
     function send() {
-        sendBroadcast({message: $('#message').val()})
+        sendBroadcast({
+            message: $('#message').val(),
+            createdAt: new Date().toISOString()
+        })
         $('#message').val('')
     }
-
 
     function sendBroadcast(message) {
         stompClient.publish({
@@ -163,20 +159,22 @@
         })
     }
 
+    function disconnect() {
+        if (stompClient != null) {
+            // sendBroadcast({message: ' disconnected from server'});
+            stompClient.deactivate()
+
+            // stompClient.disconnect()
+            // stompClient.disconnect(function (frame) {
+            //     console.log("frame")
+            //     console.log(frame)
+            // }, getHeaders())
+            setConnected(false);
+        }
+    }
 
 
-    //
-    // function disconnect() {
-    //     if (stompClient != null) {
-    //
-    //         sendConnection(' disconnected from server')
-    //
-    //         stompClient.disconnect(function () {
-    //             console.log('disconnected...')
-    //             setConnected(false)
-    //         })
-    //     }
-    // }
+
 
 
 

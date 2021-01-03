@@ -84,6 +84,8 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     }
 
     private void resetRepPhoto(Account account) {
+        if (account.getPhotos().size() <= 0) return;
+
         Collections.sort(account.getPhotos());
         Photo repPhoto = account.getPhotos().get(0);
 

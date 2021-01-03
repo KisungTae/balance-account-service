@@ -185,4 +185,5 @@ public class BalanceAccountServiceApplication {
 // TODO			48. add deleted and blocked field to matchProject and clickedProject
 //					--> implemented
 
+
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one
