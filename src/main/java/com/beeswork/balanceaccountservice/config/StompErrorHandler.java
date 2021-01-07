@@ -33,10 +33,13 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
 
         if (cause != null && cause.getCause() != null && cause.getCause() instanceof BaseException) {
             BaseException exception = (BaseException) cause.getCause();
-            errorHeaderAccessor.setMessage(exception.getExceptionCode());
-//            String exceptionMessage = messageSource.getMessage(exception.getExceptionCode(), null, locale);
+            String exceptionMessage = messageSource.getMessage(exception.getExceptionCode(), null, locale);
+            errorHeaderAccessor.setMessage(exceptionMessage);
+            errorHeaderAccessor.addNativeHeader("exceptionCode", exception.getExceptionCode());
+
 //            return MessageBuilder.createMessage(exceptionMessage.getBytes(StandardCharsets.UTF_8),
 //                                                errorHeaderAccessor.getMessageHeaders());
+//            return super.handleInternal(errorHeaderAccessor, errorPayload, cause, clientHeaderAccessor);
         } else {
 
         }
