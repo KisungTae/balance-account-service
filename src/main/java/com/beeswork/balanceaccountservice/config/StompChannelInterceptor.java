@@ -51,13 +51,26 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
         StompCommand stompCommand = stompHeaderAccessor.getCommand();
 
+
+
         if (StompCommand.SUBSCRIBE.equals(stompCommand)) {
-            validateChat(stompHeaderAccessor, stompCommand, messageHeaders.get(SIMP_DESTINATION));
-            stompHeaderAccessor.addNativeHeader(AUTO_DELETE, Boolean.toString(true));
-            stompHeaderAccessor.addNativeHeader(EXCLUSIVE, Boolean.toString(false));
-            stompHeaderAccessor.addNativeHeader(DURABLE, Boolean.toString(true));
+//            validateChat(stompHeaderAccessor, stompCommand, messageHeaders.get(SIMP_DESTINATION));
+
+
+//            TODO: check these three headers
+//            String autoDelete = stompHeaderAccessor.getFirstNativeHeader(AUTO_DELETE);
+//            String exclusive = stompHeaderAccessor.getFirstNativeHeader(EXCLUSIVE);
+//            String durable = stompHeaderAccessor.getFirstNativeHeader(DURABLE);
+//
+//            if (autoDelete == null || autoDelete == Boolean.to || exclusive == null || exclusive || durable == null || !durable)
+//                throw new BadRequestException();
+
+
+//            stompHeaderAccessor.addNativeHeader(AUTO_DELETE, Boolean.toString(true));
+//            stompHeaderAccessor.addNativeHeader(EXCLUSIVE, Boolean.toString(false));
+//            stompHeaderAccessor.addNativeHeader(DURABLE, Boolean.toString(true));
         } else if (StompCommand.SEND.equals(stompCommand)) {
-            validateChat(stompHeaderAccessor, stompCommand, messageHeaders.get(SIMP_DESTINATION));
+//            validateChat(stompHeaderAccessor, stompCommand, messageHeaders.get(SIMP_DESTINATION));
         }
 
 //        for (Map.Entry<String, List<String>> entry : nativeHeaders.entrySet()) {
