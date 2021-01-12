@@ -31,7 +31,6 @@ public class BalanceAccountServiceApplication {
 
 	@Bean(name="processExecutor")
 	public TaskExecutor taskExecutor() {
-
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 		taskExecutor.setMaxPoolSize(taskExecutorProperties.getMaxPoolSize());
 		taskExecutor.setQueueCapacity(taskExecutorProperties.getQueueCapacity());

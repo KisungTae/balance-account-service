@@ -32,11 +32,12 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public Match findWithAccounts(UUID matcherId, Long chatId) {
+    public Match findWithAccounts(UUID matcherId, UUID matchedId, Long chatId) {
         return jpaQueryFactory.selectFrom(qMatch)
                               .innerJoin(qMatch.matcher, qAccount).fetchJoin()
                               .innerJoin(qMatch.matched, qAccount).fetchJoin()
                               .where(qMatch.matcherId.eq(matcherId)
+                                                     .and(qMatch.matchedId.eq(matchedId))
                                                      .and(qMatch.chatId.eq(chatId))).fetchOne();
     }
 

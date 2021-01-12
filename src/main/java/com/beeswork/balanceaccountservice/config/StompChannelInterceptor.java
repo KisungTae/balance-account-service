@@ -41,8 +41,12 @@ public class StompChannelInterceptor implements ChannelInterceptor {
     private static final String EXCLUSIVE        = "exclusive";
     private static final String DURABLE          = "durable";
     private static final String SIMP_DESTINATION = "simpDestination";
+    private static final String MATCHED_ID = "matched-id";
     private static final String QUEUE_PREFIX     = "/queue/";
     private static final String QUEUE_SEPARATOR  = "-";
+    private static final Pattern VALID_UUID_PATTERN  = Pattern.compile(RegexExpression.VALID_UUID);
+    private static final String FALSE = Boolean.toString(false);
+    private static final String TRUE = Boolean.toString(true);
 
 
     @Override
@@ -51,26 +55,18 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
         StompCommand stompCommand = stompHeaderAccessor.getCommand();
 
-
-
         if (StompCommand.SUBSCRIBE.equals(stompCommand)) {
-//            validateChat(stompHeaderAccessor, stompCommand, messageHeaders.get(SIMP_DESTINATION));
+            String queue = validateChat(stompHeaderAccessor);
+            Object destination = messageHeaders.get(SIMP_DESTINATION);
+            if (destination == null || !queue.equals(destination.toString()))
+                throw new BadRequestException();
 
-
-//            TODO: check these three headers
-//            String autoDelete = stompHeaderAccessor.getFirstNativeHeader(AUTO_DELETE);
-//            String exclusive = stompHeaderAccessor.getFirstNativeHeader(EXCLUSIVE);
-//            String durable = stompHeaderAccessor.getFirstNativeHeader(DURABLE);
-//
-//            if (autoDelete == null || autoDelete == Boolean.to || exclusive == null || exclusive || durable == null || !durable)
-//                throw new BadRequestException();
-
-
-//            stompHeaderAccessor.addNativeHeader(AUTO_DELETE, Boolean.toString(true));
-//            stompHeaderAccessor.addNativeHeader(EXCLUSIVE, Boolean.toString(false));
-//            stompHeaderAccessor.addNativeHeader(DURABLE, Boolean.toString(true));
+            if (!TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(AUTO_DELETE)) ||
+                !FALSE.equals(stompHeaderAccessor.getFirstNativeHeader(EXCLUSIVE)) ||
+                !TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(DURABLE)))
+                throw new BadRequestException();
         } else if (StompCommand.SEND.equals(stompCommand)) {
-//            validateChat(stompHeaderAccessor, stompCommand, messageHeaders.get(SIMP_DESTINATION));
+            validateChat(stompHeaderAccessor);
         }
 
 //        for (Map.Entry<String, List<String>> entry : nativeHeaders.entrySet()) {
@@ -108,32 +104,31 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         return message;
     }
 
-    private void validateChat(StompHeaderAccessor stompHeaderAccessor, StompCommand stompCommand, Object destination) {
-        Pattern uuidPattern = Pattern.compile(RegexExpression.VALID_UUID);
-
+    private String validateChat(StompHeaderAccessor stompHeaderAccessor) {
         String accountId = stompHeaderAccessor.getFirstNativeHeader(ACCOUNT_ID);
-        if (accountId == null || !uuidPattern.matcher(accountId).find())
-            throw new BadRequestException();
+        checkValidUUID(accountId);
 
         String identityToken = stompHeaderAccessor.getFirstNativeHeader(IDENTITY_TOKEN);
-        if (identityToken == null || !uuidPattern.matcher(identityToken).find())
-            throw new BadRequestException();
+        checkValidUUID(identityToken);
+
+        String matchedId = stompHeaderAccessor.getFirstNativeHeader(MATCHED_ID);
+        checkValidUUID(matchedId);
 
         String chatId = stompHeaderAccessor.getFirstNativeHeader(CHAT_ID);
         if (!isNumber(chatId))
             throw new BadRequestException();
 
-        if (destination == null)
-            throw new BadRequestException();
+        chatService.checkIfValidChat(accountId, identityToken, matchedId, chatId);
+        return queueName(accountId, chatId);
+    }
 
-        String matchedId = chatService.checkIfValidChat(accountId, identityToken, chatId);
-        if (StompCommand.SEND.equals(stompCommand))
-            accountId = matchedId;
-
-        String queue = QUEUE_PREFIX + accountId + QUEUE_SEPARATOR + chatId;
-        // TODO: change to !queue.equals
-        if (queue.equals(destination.toString()))
+    private void checkValidUUID(String uuid) {
+        if (uuid == null || !VALID_UUID_PATTERN.matcher(uuid).find())
             throw new BadRequestException();
+    }
+
+    private String queueName(String accountId, String chatId) {
+        return QUEUE_PREFIX + accountId + QUEUE_SEPARATOR + chatId;
     }
 
     public static boolean isNumber(String str) {
@@ -159,9 +154,5 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         }
         return true;
     }
-
-
-
-
 
 }

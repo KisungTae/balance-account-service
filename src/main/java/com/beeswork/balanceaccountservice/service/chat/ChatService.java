@@ -2,5 +2,5 @@ package com.beeswork.balanceaccountservice.service.chat;
 
 public interface ChatService {
 
-    String checkIfValidChat(String accountId, String identityToken, String chatId);
+    void checkIfValidChat(String accountId, String identityToken, String matchedId, String chatId);
 }

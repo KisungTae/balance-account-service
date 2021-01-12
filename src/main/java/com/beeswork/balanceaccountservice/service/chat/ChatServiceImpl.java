@@ -27,8 +27,10 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public String checkIfValidChat(String accountId, String identityToken, String chatId) {
-        Match match = matchDAO.findWithAccounts(UUID.fromString(accountId), Long.valueOf(chatId));
+    public void checkIfValidChat(String accountId, String identityToken, String matchedId, String chatId) {
+        Match match = matchDAO.findWithAccounts(UUID.fromString(accountId),
+                                                UUID.fromString(matchedId),
+                                                Long.valueOf(chatId));
 
         if (match == null)
             throw new MatchNotFoundException();
@@ -52,6 +54,5 @@ public class ChatServiceImpl implements ChatService {
         if (matched.isDeleted())
             throw new SwipedDeletedException();
 
-        return matched.getId().toString();
     }
 }
