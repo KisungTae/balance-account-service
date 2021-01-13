@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.config.StompChannelInterceptor;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
+import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.QueueInformation;
@@ -36,29 +37,32 @@ public class ChatController {
     @MessageMapping("/chat/send")
     public void send(@Payload ChatMessageVM chatMessageVM, MessageHeaders messageHeaders) {
 
-        MultiValueMap<String, String> headers = messageHeaders.get(StompHeaderAccessor.NATIVE_HEADERS,
-                                                                   MultiValueMap.class);
+//        MultiValueMap<String, String> nativeHeaders = messageHeaders.get(StompHeaderAccessor.NATIVE_HEADERS,
+//                                                                   MultiValueMap.class);
+//
+//        if (nativeHeaders != null) {
+//            Map<String, Object> messageHeadersToSend = new HashMap<>();
+//            messageHeaders.put(StompHeader.CHAT_ID, nativeHeaders.getFirst(StompHeader.CHAT_ID));
+//
+//            chatMessageVM.setChatId(nativeHeaders.getFirst(StompHeader.CHAT_ID));
+//            chatMessageVM.setRecipientId(nativeHeaders.getFirst(StompHeader.MATCHED_ID));
+//            chatMessageVM.setSenderId(nativeHeaders.getFirst(StompHeader.ACCOUNT_ID));
+//            String queue = StompChannelInterceptor.queueName(chatMessageVM.getRecipientId(), chatMessageVM.getChatId());
+//            QueueInformation queueInformation = amqpAdmin.getQueueInfo(queue);
+//
+//            if (queueInformation == null)
+//                System.out.println("queueInformation is null");
+//            else {
+//                System.out.println("consumer count: " + queueInformation.getConsumerCount());
+//
+//                simpMessagingTemplate.convertAndSend(queue, chatMessageVM, messageHeadersToSend);
+//            }
+//
+//
+//        }
 
-        if (headers != null) {
-            chatMessageVM.setChatId(headers.getFirst(StompHeader.CHAT_ID));
-            chatMessageVM.setRecipientId(headers.getFirst(StompHeader.MATCHED_ID));
-            chatMessageVM.setSenderId(headers.getFirst(StompHeader.ACCOUNT_ID));
-            String queue = StompChannelInterceptor.queueName(chatMessageVM.getRecipientId(), chatMessageVM.getChatId());
-            QueueInformation queueInformation = amqpAdmin.getQueueInfo(queue);
-            if (queueInformation == null)
-                System.out.println("queueInformation is null");
-            else {
-                System.out.println("consumer count: " + queueInformation.getConsumerCount());
-//                Map<String, Object> messageHeaders = new HashMap<>();
-//                headers.put("auto-delete", true);
-                simpMessagingTemplate.convertAndSend(queue, chatMessageVM, messageHeaders);
-            }
 
-
-        }
-
-
-
+        throw new BadRequestException();
 
 
     }

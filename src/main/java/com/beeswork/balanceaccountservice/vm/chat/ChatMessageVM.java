@@ -14,11 +14,9 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ChatMessageVM {
-
     private String message;
-    private String senderId;
-    private String chatId;
+    private String accountId;
     private String recipientId;
+    private String chatId;
     private Date createdAt;
-
 }

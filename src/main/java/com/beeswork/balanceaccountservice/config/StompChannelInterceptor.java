@@ -3,12 +3,9 @@ package com.beeswork.balanceaccountservice.config;
 import com.beeswork.balanceaccountservice.constant.RegexExpression;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
-import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
-import com.google.api.gax.rpc.InvalidArgumentException;
 import io.micrometer.core.lang.NonNull;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -17,14 +14,7 @@ import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.ChannelInterceptorAdapter;
-import org.springframework.stereotype.Component;
-import org.springframework.util.MultiValueMap;
 
-import java.security.Principal;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class StompChannelInterceptor implements ChannelInterceptor {
@@ -36,9 +26,9 @@ public class StompChannelInterceptor implements ChannelInterceptor {
     private CompositeMessageConverter compositeMessageConverter;
 
 
-    private static final Pattern VALID_UUID_PATTERN  = Pattern.compile(RegexExpression.VALID_UUID);
-    private static final String FALSE = Boolean.toString(false);
-    private static final String TRUE = Boolean.toString(true);
+    private static final Pattern VALID_UUID_PATTERN = Pattern.compile(RegexExpression.VALID_UUID);
+    private static final String  FALSE              = Boolean.toString(false);
+    private static final String  TRUE               = Boolean.toString(true);
 
 
     @Override
@@ -48,16 +38,25 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         StompCommand stompCommand = stompHeaderAccessor.getCommand();
 
         if (StompCommand.SUBSCRIBE.equals(stompCommand)) {
-//            String queue = validateChat(stompHeaderAccessor);
-//            Object destination = messageHeaders.get(SIMP_DESTINATION);
-//            if (destination == null || !queue.equals(destination.toString()))
-//                throw new BadRequestException();
+            String accountId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.ACCOUNT_ID);
+            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
+            String recipientId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECIPIENT_ID);
+            String chatId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.CHAT_ID);
+            validateFields(accountId, identityToken, recipientId, chatId);
+            chatService.validateChat(accountId, identityToken, recipientId, chatId);
+
+            Object destination = messageHeaders.get(StompHeader.SIMP_DESTINATION);
+            if (destination == null || !queueName(accountId, chatId).equals(destination.toString()))
+                throw new BadRequestException();
 
             if (!TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.AUTO_DELETE)) ||
                 !FALSE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.EXCLUSIVE)) ||
                 !TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.DURABLE)))
                 throw new BadRequestException();
         } else if (StompCommand.SEND.equals(stompCommand)) {
+            ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
+            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
+            validateFields(chatMessageVM, identityToken);
 //            validateChat(stompHeaderAccessor);
         }
 
@@ -96,22 +95,19 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         return message;
     }
 
-    private String validateChat(StompHeaderAccessor stompHeaderAccessor) {
-        String accountId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.ACCOUNT_ID);
+    private void validateFields(ChatMessageVM chatMessageVM, String identityToken) {
+        if (chatMessageVM == null) throw new BadRequestException();
+        validateFields(chatMessageVM.getAccountId(),
+                       identityToken,
+                       chatMessageVM.getRecipientId(),
+                       chatMessageVM.getChatId());
+    }
+
+    private void validateFields(String accountId, String identityToken, String recipientId, String chatId) {
         checkValidUUID(accountId);
-
-        String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
         checkValidUUID(identityToken);
-
-        String matchedId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.MATCHED_ID);
-        checkValidUUID(matchedId);
-
-        String chatId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.CHAT_ID);
-        if (!isNumber(chatId))
-            throw new BadRequestException();
-
-        chatService.checkIfValidChat(accountId, identityToken, matchedId, chatId);
-        return queueName(accountId, chatId);
+        checkValidUUID(recipientId);
+        if (!isNumber(chatId)) throw new BadRequestException();
     }
 
     private void checkValidUUID(String uuid) {

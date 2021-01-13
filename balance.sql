@@ -415,3 +415,4 @@ from match
 group by matched_id
 order by count(*) desc;
 
+select * from match where matcher_id = '562b9e01-611c-4e2a-b5ee-a15a0224e211' and chat_id = 14;

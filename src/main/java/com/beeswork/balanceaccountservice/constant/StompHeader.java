@@ -9,7 +9,7 @@ public class StompHeader {
     public static final String EXCLUSIVE        = "exclusive";
     public static final String DURABLE          = "durable";
     public static final String SIMP_DESTINATION = "simpDestination";
-    public static final String MATCHED_ID = "matched-id";
+    public static final String RECIPIENT_ID = "recipient-id";
     public static final String QUEUE_PREFIX     = "/queue/";
     public static final String QUEUE_SEPARATOR  = "-";
 }

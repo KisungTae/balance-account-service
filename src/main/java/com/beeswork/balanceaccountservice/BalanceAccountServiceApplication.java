@@ -186,5 +186,7 @@ public class BalanceAccountServiceApplication {
 
 // TODO 		49. when user load cards and not go through all the cards and close the app and open again, then the index starts with 2 not 1 which has card left
 
+// TODO			50. limit the size of message in stomp
+
 
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one

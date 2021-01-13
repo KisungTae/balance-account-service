@@ -1,6 +1,9 @@
 package com.beeswork.balanceaccountservice.service.chat;
 
+import java.util.Date;
+
 public interface ChatService {
 
-    void checkIfValidChat(String accountId, String identityToken, String matchedId, String chatId);
+    void validateChat(String accountId, String identityToken, String matchedId, String chatId);
+    void validateAndSaveMessage(String accountId, String identityToken, String matchedId, String chatId, String message, Date createdAt);
 }

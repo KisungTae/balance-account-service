@@ -14,6 +14,7 @@ import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundExceptio
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -27,11 +28,14 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public void checkIfValidChat(String accountId, String identityToken, String matchedId, String chatId) {
-        Match match = matchDAO.findWithAccounts(UUID.fromString(accountId),
-                                                UUID.fromString(matchedId),
-                                                Long.valueOf(chatId));
+    public void validateChat(String accountId, String identityToken, String matchedId, String chatId) {
+        validateChat(matchDAO.findWithAccounts(UUID.fromString(accountId),
+                                               UUID.fromString(matchedId),
+                                               Long.valueOf(chatId)),
+                     identityToken);
+    }
 
+    private void validateChat(Match match, String identityToken) {
         if (match == null)
             throw new MatchNotFoundException();
         if (match.isUnmatched())
@@ -53,6 +57,20 @@ public class ChatServiceImpl implements ChatService {
             throw new SwipedBlockedException();
         if (matched.isDeleted())
             throw new SwipedDeletedException();
+    }
+
+    @Override
+    public void validateAndSaveMessage(String accountId,
+                                       String identityToken,
+                                       String matchedId,
+                                       String chatId,
+                                       String message,
+                                       Date createdAt) {
+        Match match = matchDAO.findWithAccounts(UUID.fromString(accountId),
+                                                UUID.fromString(matchedId),
+                                                Long.valueOf(chatId));
+        validateChat(match, identityToken);
+        
 
     }
 }
