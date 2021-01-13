@@ -1,5 +1,7 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.config.StompChannelInterceptor;
+import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.QueueInformation;
@@ -21,7 +23,7 @@ import java.util.Map;
 public class ChatController {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final AmqpAdmin             amqpAdmin;
+    private final AmqpAdmin amqpAdmin;
 
 
     @Autowired
@@ -34,25 +36,31 @@ public class ChatController {
     @MessageMapping("/chat/send")
     public void send(@Payload ChatMessageVM chatMessageVM, MessageHeaders messageHeaders) {
 
-        MultiValueMap<String, String>
-                multiValueMap = messageHeaders.get(StompHeaderAccessor.NATIVE_HEADERS, MultiValueMap.class);
+        MultiValueMap<String, String> headers = messageHeaders.get(StompHeaderAccessor.NATIVE_HEADERS,
+                                                                   MultiValueMap.class);
 
-        String accountId = multiValueMap.getFirst("account-id");
-        String chatId = multiValueMap.getFirst("chat-id");
-        String recipientId = multiValueMap.getFirst("recipient-id");
-        String messageId = multiValueMap.getFirst("message-id");
+        if (headers != null) {
+            chatMessageVM.setChatId(headers.getFirst(StompHeader.CHAT_ID));
+            chatMessageVM.setRecipientId(headers.getFirst(StompHeader.MATCHED_ID));
+            chatMessageVM.setSenderId(headers.getFirst(StompHeader.ACCOUNT_ID));
+            String queue = StompChannelInterceptor.queueName(chatMessageVM.getRecipientId(), chatMessageVM.getChatId());
+            QueueInformation queueInformation = amqpAdmin.getQueueInfo(queue);
+            if (queueInformation == null)
+                System.out.println("queueInformation is null");
+            else {
+                System.out.println("consumer count: " + queueInformation.getConsumerCount());
+//                Map<String, Object> messageHeaders = new HashMap<>();
+//                headers.put("auto-delete", true);
+                simpMessagingTemplate.convertAndSend(queue, chatMessageVM, messageHeaders);
+            }
 
 
-        QueueInformation queueInformation = amqpAdmin.getQueueInfo(recipientId + "-" + chatId);
-        if (queueInformation == null)
-            System.out.println("queueInformation is null");
-        else {
-            System.out.println("consumer count: " + queueInformation.getConsumerCount());
         }
 
-        Map<String, Object> headers = new HashMap<>();
-        headers.put("auto-delete", true);
-        simpMessagingTemplate.convertAndSend("/queue/" + recipientId + "-" + chatId, chatMessageVM, headers);
+
+
+
+
     }
 }
 

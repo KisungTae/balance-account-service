@@ -16,8 +16,9 @@ import java.util.UUID;
 public class ChatMessageVM {
 
     private String message;
-
-//  TODO: remove me or modify me
-    private Date createdAt = new Date();
+    private String senderId;
+    private String chatId;
+    private String recipientId;
+    private Date createdAt;
 
 }

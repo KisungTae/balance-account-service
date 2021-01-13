@@ -317,21 +317,11 @@ order by count(*) desc;
 
 select *
 from account
-where id = 'ea11c916-515e-475d-97ad-e82d82c84fed';
-
-
+where id = '9f881819-638a-4098-954c-ce34b133d32a';
 
 select *
-from photo
-where account_id = 'ea11c916-515e-475d-97ad-e82d82c84fed' order by sequence;
-
-
-delete from photo;
-
-
-
-select *
-from account;
+from match
+where matcher_id = '9f881819-638a-4098-954c-ce34b133d32a' and chat_id = 29;
 
 
 -- ================================ ADMIN =========================================
