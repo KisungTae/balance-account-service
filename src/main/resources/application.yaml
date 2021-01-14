@@ -19,11 +19,21 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: none
+#      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.spatial.dialect.postgis.PostgisPG82Dialect
         format_sql: true
-#    database-platform: org.hibernate.dialect.PostgreSQLDialect auto-detected by spring boot
+        cache:
+          use_second_level_cache=true: true
+          region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+      javax:
+        persistence:
+          sharedCache:
+            mode: ENABLE_SELECTIVE
+
+  #    database-platform: org.hibernate.dialect.PostgreSQLDialect auto-detected by spring boot
   datasource:
       url: jdbc:postgresql://localhost:5432/balance
       driverClassName: org.postgresql.Driver

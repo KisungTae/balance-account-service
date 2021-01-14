@@ -75,6 +75,13 @@
 
     let stompClient
 
+    $(document).ready(function () {
+        $('#accountId').val('9f881819-638a-4098-954c-ce34b133d32a')
+        $('#identityToken').val('96c80a98-8807-4aee-999c-ceca92e009c3')
+        $('#recipientId').val('894b4960-43df-42f9-b987-5d73a5cc4ef5')
+        $('#chatId').val(29)
+    })
+
     function setConnected(connected) {
         $('#from').prop('disabled', connected)
         $('#connect').prop('disabled', connected)
@@ -88,6 +95,12 @@
 
 
     function connect() {
+
+        console.log({exclusive: false, durable: true, 'auto-delete': true,
+            'account-id': $('#accountId').val(),
+            'identity-token': $('#identityToken').val(),
+            'chat-id': $('#chatId').val(),
+            'recipient-id': $('#recipientId').val()})
 
         stompClient = new StompJs.Client({
             brokerURL: 'ws://localhost:8080/chat/websocket',
@@ -111,7 +124,11 @@
                     } else {
                         console.log('Output body is empty')
                     }
-                }, {exclusive: false, durable: true, 'auto-delete': true})
+                }, {exclusive: false, durable: true, 'auto-delete': true,
+                    'account-id': $('#accountId').val(),
+                    'identity-token': $('#identityToken').val(),
+                    'chat-id': $('#chatId').val(),
+                    'recipient-id': $('#recipientId').val()})
             setConnected(true)
         }
 

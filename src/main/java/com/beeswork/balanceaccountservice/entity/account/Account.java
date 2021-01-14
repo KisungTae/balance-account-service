@@ -7,9 +7,11 @@ import com.beeswork.balanceaccountservice.entity.match.Match;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.locationtech.jts.geom.Point;
+import org.springframework.cache.annotation.Cacheable;
 
 import javax.persistence.*;
 import java.util.*;
@@ -20,6 +22,8 @@ import java.util.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "account")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Account {
 
     @Version

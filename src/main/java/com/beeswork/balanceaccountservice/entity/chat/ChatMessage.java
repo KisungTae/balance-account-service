@@ -5,6 +5,7 @@ import com.beeswork.balanceaccountservice.entity.account.Account;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -15,6 +16,8 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Table(name = "chat_message")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ChatMessage {
 
     @Id

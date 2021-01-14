@@ -6,6 +6,7 @@ import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -16,6 +17,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "match")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Match {
 
     @EmbeddedId

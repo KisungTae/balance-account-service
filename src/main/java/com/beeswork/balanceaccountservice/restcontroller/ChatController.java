@@ -1,37 +1,35 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.config.StompChannelInterceptor;
-import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
+import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.core.QueueInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
-import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 public class ChatController {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final AmqpAdmin amqpAdmin;
-
+    private final ChatService chatService;
 
     @Autowired
     public ChatController(SimpMessagingTemplate simpMessagingTemplate,
-                          AmqpAdmin amqpAdmin) {
+                          AmqpAdmin amqpAdmin, ChatService chatService) {
         this.simpMessagingTemplate = simpMessagingTemplate;
         this.amqpAdmin = amqpAdmin;
+        this.chatService = chatService;
+    }
+
+    @GetMapping("/chat/test")
+    public void test() {
+        chatService.test();
     }
 
     @MessageMapping("/chat/send")

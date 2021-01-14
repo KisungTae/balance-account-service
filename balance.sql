@@ -321,8 +321,22 @@ where id = '9f881819-638a-4098-954c-ce34b133d32a';
 
 select *
 from match
-where matcher_id = '9f881819-638a-4098-954c-ce34b133d32a' and chat_id = 29;
+where matcher_id = '9f881819-638a-4098-954c-ce34b133d32a' and
+  matched_id = '894b4960-43df-42f9-b987-5d73a5cc4ef5' and chat_id = 29;
 
+
+update match set unmatched = false
+where matcher_id = '9f881819-638a-4098-954c-ce34b133d32a' and
+        matched_id = '894b4960-43df-42f9-b987-5d73a5cc4ef5' and chat_id = 29;
+
+
+select *
+from chat_message;
+
+select *
+from chat;
+
+insert into chat_message values (default, 29, '9f881819-638a-4098-954c-ce34b133d32a', '894b4960-43df-42f9-b987-5d73a5cc4ef5', 'test message', current_timestamp);
 
 -- ================================ ADMIN =========================================
 

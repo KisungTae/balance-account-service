@@ -2,6 +2,8 @@ package com.beeswork.balanceaccountservice.dao.match;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
+import com.beeswork.balanceaccountservice.entity.chat.Chat;
+import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
@@ -11,6 +13,7 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.commons.lang3.time.DateUtils;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -27,26 +30,44 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
 
     @Autowired
     public MatchDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
-
         super(entityManager, jpaQueryFactory);
     }
 
     @Override
+    public void test() {
+        Session session = entityManager.unwrap(Session.class);
+        Match match = session.get(Match.class, new MatchId(UUID.fromString("9f881819-638a-4098-954c-ce34b133d32a"),
+                                                           UUID.fromString("894b4960-43df-42f9-b987-5d73a5cc4ef5")));
+//        return session.createQuery("select c from ChatMessage c where c.id = 1", ChatMessage.class)
+//                      .setHint("org.hibernate.cacheable", Boolean.TRUE).getSingleResult();
+        System.out.println("unmatched: " + match.isUnmatched());
+        System.out.println(match.getMatcher().getAbout());
+    }
+
+    @Override
     public Match findWithAccounts(UUID matcherId, UUID matchedId, Long chatId) {
-        return jpaQueryFactory.selectFrom(qMatch)
-                              .innerJoin(qMatch.matcher, qAccount).fetchJoin()
-                              .innerJoin(qMatch.matched, qAccount).fetchJoin()
-                              .where(qMatch.matcherId.eq(matcherId)
-                                                     .and(qMatch.matchedId.eq(matchedId))
-                                                     .and(qMatch.chatId.eq(chatId))).fetchOne();
+        Session session = entityManager.unwrap(Session.class);
+        return session.createQuery(
+                "select m from Match m where m.matcherId = :matcherId and m.matchedId = :matchedId and m.chatId = :chatId",
+                Match.class)
+                      .setParameter("matcherId", matcherId)
+                      .setParameter("matchedId", matchedId)
+                      .setParameter("chatId", chatId)
+                      .setHint("org.hibernate.cacheable", true)
+                      .getSingleResult();
+
+
+//        return jpaQueryFactory.selectFrom(qMatch)
+//                              .innerJoin(qMatch.matcher, qAccount).fetchJoin()
+//                              .innerJoin(qMatch.matched, qAccount).fetchJoin()
+//                              .where(qMatch.matcherId.eq(matcherId)
+//                                                     .and(qMatch.matchedId.eq(matchedId))
+//                                                     .and(qMatch.chatId.eq(chatId))).fetchOne();
     }
 
     @Override
     public List<MatchProjection> findAllAfter(UUID matcherId, Date fetchedAt) {
-
-
         fetchedAt = DateUtils.addDays(fetchedAt, -1);
-
         Expression<Date> updatedAtCase = new CaseBuilder().when(qMatch.updatedAt.after(qAccount.updatedAt))
                                                           .then(qMatch.updatedAt)
                                                           .otherwise(qAccount.updatedAt);
@@ -70,7 +91,6 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
 
     @Override
     public List<Match> findPairById(UUID matcherId, UUID matchedId) {
-
         return jpaQueryFactory.selectFrom(qMatch)
                               .where(qMatch.matcherId.eq(matcherId)
                                                      .and(qMatch.matchedId.eq(matchedId))
