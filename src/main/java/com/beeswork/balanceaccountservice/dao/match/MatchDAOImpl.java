@@ -34,14 +34,8 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public void test() {
-        Session session = entityManager.unwrap(Session.class);
-        Match match = session.get(Match.class, new MatchId(UUID.fromString("9f881819-638a-4098-954c-ce34b133d32a"),
-                                                           UUID.fromString("894b4960-43df-42f9-b987-5d73a5cc4ef5")));
-//        return session.createQuery("select c from ChatMessage c where c.id = 1", ChatMessage.class)
-//                      .setHint("org.hibernate.cacheable", Boolean.TRUE).getSingleResult();
-        System.out.println("unmatched: " + match.isUnmatched());
-        System.out.println(match.getMatcher().getAbout());
+    public Match findById(UUID accountId, UUID identityToken) {
+        return entityManager.find(Match.class, new MatchId(accountId, identityToken));
     }
 
     @Override

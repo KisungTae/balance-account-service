@@ -37,9 +37,7 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
         StompCommand stompCommand = stompHeaderAccessor.getCommand();
 
-        chatService.test();
-
-        if (StompCommand.SUBSCRIBE.equals(stompCommand)) {
+//        if (StompCommand.SUBSCRIBE.equals(stompCommand)) {
 //            String accountId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.ACCOUNT_ID);
 //            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
 //            String recipientId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECIPIENT_ID);
@@ -55,12 +53,18 @@ public class StompChannelInterceptor implements ChannelInterceptor {
 //                !FALSE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.EXCLUSIVE)) ||
 //                !TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.DURABLE)))
 //                throw new BadRequestException();
-        } else if (StompCommand.SEND.equals(stompCommand)) {
-//            ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
+//        } else if (StompCommand.SEND.equals(stompCommand)) {
+//            ChatMessageVM chatMessageVM =
+//                    (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
 //            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
 //            validateFields(chatMessageVM, identityToken);
-//            validateChat(stompHeaderAccessor);
-        }
+//            chatService.validateAndSaveMessage(chatMessageVM.getAccountId(),
+//                                               identityToken,
+//                                               chatMessageVM.getRecipientId(),
+//                                               chatMessageVM.getChatId(),
+//                                               chatMessageVM.getMessage(),
+//                                               chatMessageVM.getCreatedAt());
+//        }
 
 //        for (Map.Entry<String, List<String>> entry : nativeHeaders.entrySet()) {
 //            System.out.println(entry.getKey() + ": " + entry.getValue());

@@ -23,10 +23,27 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
     private MessageSource messageSource;
 
     @Override
+    public Message<byte[]> handleClientMessageProcessingError(Message<byte[]> clientMessage, Throwable ex) {
+        System.out.println("handleClientMessageProcessingError");
+        return super.handleClientMessageProcessingError(clientMessage, ex);
+    }
+
+
+
+    @Override
+    public Message<byte[]> handleErrorMessageToClient(Message<byte[]> errorMessage) {
+        System.out.println("handleErrorMessageToClient");
+        return super.handleErrorMessageToClient(errorMessage);
+    }
+
+    @Override
     protected Message<byte[]> handleInternal(@NonNull StompHeaderAccessor errorHeaderAccessor,
                                              @NonNull byte[] errorPayload,
                                              Throwable cause,
                                              StompHeaderAccessor clientHeaderAccessor) {
+
+        System.out.println("stomp handleInternal!!!!!!!!!!!!");
+
 
         String acceptLanguage = clientHeaderAccessor == null ? null : clientHeaderAccessor.getFirstNativeHeader(ACCEPT_LANGUAGE);
         Locale locale = acceptLanguage == null ? LocaleContextHolder.getLocale() : Locale.forLanguageTag(acceptLanguage);

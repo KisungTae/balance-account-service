@@ -27,11 +27,6 @@ public class ChatController {
         this.chatService = chatService;
     }
 
-    @GetMapping("/chat/test")
-    public void test() {
-        chatService.test();
-    }
-
     @MessageMapping("/chat/send")
     public void send(@Payload ChatMessageVM chatMessageVM, MessageHeaders messageHeaders) {
 
@@ -59,7 +54,7 @@ public class ChatController {
 //
 //        }
 
-
+        System.out.println("send before throwing exception");
         throw new BadRequestException();
 
 

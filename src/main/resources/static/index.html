@@ -120,6 +120,8 @@
             stompClient.subscribe('/queue/' + $('#accountId').val() + '-' +  $('#chatId').val(),
                 function (output) {
                     if (output.body) {
+                        console.log('received')
+                        console.log(output)
                         showBroadcastMessage(createTextNode(JSON.parse(output.body)))
                     } else {
                         console.log('Output body is empty')

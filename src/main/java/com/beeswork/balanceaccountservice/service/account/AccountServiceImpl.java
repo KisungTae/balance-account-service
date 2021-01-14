@@ -291,10 +291,11 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
             keys.add(new DeleteObjectsRequest.KeyVersion(account.getId().toString() + "/" + photo.getKey()));
         }
 
-        DeleteObjectsRequest deleteObjectsRequest =
-                new DeleteObjectsRequest(awsProperties.getBalancePhotoBucket()).withKeys(keys).withQuiet(true);
-
-        amazonS3.deleteObjects(deleteObjectsRequest);
+        if (!keys.isEmpty()) {
+            DeleteObjectsRequest deleteObjectsRequest =
+                    new DeleteObjectsRequest(awsProperties.getBalancePhotoBucket()).withKeys(keys).withQuiet(true);
+            amazonS3.deleteObjects(deleteObjectsRequest);
+        }
 
         // delete photos in database
         account.getPhotos().clear();

@@ -66,6 +66,11 @@ public class ExceptionControllerAdvice {
                              .body(exceptionResponse(exception.getExceptionCode(), locale));
     }
 
+    public ResponseEntity<String> handleMessageException() {
+        System.out.println("handleMessageException");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("");
+    }
+
     @ExceptionHandler({AmazonServiceException.class, SdkClientException.class})
     public ResponseEntity<String> handleAWSException(Exception exception, Locale locale) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

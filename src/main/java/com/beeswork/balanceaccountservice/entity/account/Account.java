@@ -11,7 +11,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.locationtech.jts.geom.Point;
-import org.springframework.cache.annotation.Cacheable;
 
 import javax.persistence.*;
 import java.util.*;

@@ -16,5 +16,5 @@ public interface MatchDAO extends BaseDAO<Match> {
     List<MatchProjection> findAllAfter(UUID matcherId, Date fetchedAt);
     List<Match> findPairById(UUID matcherId, UUID matchedId);
     Match findWithAccounts(UUID matcherId, UUID matchedId, Long chatId);
-    void test();
+    Match findById(UUID accountId, UUID identityToken);
 }

@@ -20,6 +20,14 @@ import java.util.UUID;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ChatMessage {
 
+    public ChatMessage(Chat chat, Account account, Account recipient, String message, Date createdAt) {
+        this.chat = chat;
+        this.account = account;
+        this.recipient = recipient;
+        this.message = message;
+        this.createdAt = createdAt;
+    }
+
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
