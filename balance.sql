@@ -310,44 +310,20 @@ create table chat_message
 
 
 
-select swiped_id, count(*)
-from swipe
-group by swiped_id
-order by count(*) desc;
-
-
 select *
 from account
-where id = 'ea11c916-515e-475d-97ad-e82d82c84fed';
+where id = '9f881819-638a-4098-954c-ce34b133d32a';
 
-
-select *
-from photo;
-
-select *
-from account
-where id = '562b9e01-611c-4e2a-b5ee-a15a0224e211';
-
-update account set deleted = false
-where id = '562b9e01-611c-4e2a-b5ee-a15a0224e211';
 
 select *
 from match
-where matcher_id = '562b9e01-611c-4e2a-b5ee-a15a0224e211';
+where matcher_id = '9f881819-638a-4098-954c-ce34b133d32a';
 
 
 update match set unmatched = false
-where matcher_id = '9f881819-638a-4098-954c-ce34b133d32a' and
-        matched_id = '894b4960-43df-42f9-b987-5d73a5cc4ef5' and chat_id = 29;
+where matcher_id = '9f881819-638a-4098-954c-ce34b133d32a';
 
 
-select *
-from chat_message;
-
-select *
-from chat;
-
-insert into chat_message values (default, 29, '9f881819-638a-4098-954c-ce34b133d32a', '894b4960-43df-42f9-b987-5d73a5cc4ef5', 'test message', current_timestamp);
 
 -- ================================ ADMIN =========================================
 

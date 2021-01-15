@@ -23,6 +23,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -66,9 +67,11 @@ public class ExceptionControllerAdvice {
                              .body(exceptionResponse(exception.getExceptionCode(), locale));
     }
 
+    @MessageExceptionHandler(Exception.class)
     public ResponseEntity<String> handleMessageException() {
+//        TODO: log exception for later review
         System.out.println("handleMessageException");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("abc error ");
     }
 
     @ExceptionHandler({AmazonServiceException.class, SdkClientException.class})

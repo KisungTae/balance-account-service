@@ -44,7 +44,6 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     @Autowired
     public SwipeServiceImpl(ModelMapper modelMapper, AccountDAO accountDAO, SwipeDAO swipeDAO,
                             ChatDAO chatDAO, AccountQuestionDAO accountQuestionDAO) {
-
         super(modelMapper);
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
@@ -55,7 +54,6 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     @Override
     @Transactional
     public List<QuestionDTO> swipe(String accountId, String identityToken, String swipedId) {
-
         Account swiper = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
         checkIfAccountValid(swiper);
 
@@ -101,7 +99,6 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<ClickProjection> listClick(String accountId, String identityToken, Date fetchedAt) {
-
         UUID accountUUId = UUID.fromString(accountId);
         Account account = accountDAO.findBy(accountUUId, UUID.fromString(identityToken));
         checkIfAccountValid(account);
@@ -111,7 +108,6 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<ClickedProjection> listClicked(String accountId, String identityToken, Date fetchedAt) {
-
         UUID accountUUId = UUID.fromString(accountId);
         Account account = accountDAO.findBy(accountUUId, UUID.fromString(identityToken));
         checkIfAccountValid(account);
@@ -122,7 +118,6 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     @Override
     @Transactional
     public ClickDTO click(String accountId, String identityToken, String swipedId, Map<Integer, Boolean> answers) {
-
         UUID swiperUUId = UUID.fromString(accountId);
         UUID swipedUUId = UUID.fromString(swipedId);
 
@@ -148,13 +143,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             return clickDTO;
 
         swipe.setClicked(true);
-
         Date updatedAt = new Date();
         swipe.setUpdatedAt(updatedAt);
 
         // match
         if (swipeDAO.existsByClicked(swipedUUId, swiperUUId, true)) {
-
             Chat chat = new Chat();
             chatDAO.persist(chat);
 
@@ -172,7 +165,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         } else {
             clickDTO.setupAsClick(swiper.getName(),
                                   swiper.getRepPhotoKey(),
-                                  swiped.getId(),
+                                  swiper.getId(),
                                   swiped.getFcmToken(),
                                   updatedAt);
         }
@@ -181,7 +174,6 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     }
 
     private void rechargeFreeSwipe(Account swiper) {
-
         Date today = new Date();
         long elapsedTime = today.getTime() - swiper.getFreeSwipeUpdatedAt().getTime();
         long rechargePeriod = 24 * 60 * 60 * 1000;

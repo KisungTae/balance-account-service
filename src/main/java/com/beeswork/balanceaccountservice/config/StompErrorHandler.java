@@ -41,10 +41,6 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
                                              @NonNull byte[] errorPayload,
                                              Throwable cause,
                                              StompHeaderAccessor clientHeaderAccessor) {
-
-        System.out.println("stomp handleInternal!!!!!!!!!!!!");
-
-
         String acceptLanguage = clientHeaderAccessor == null ? null : clientHeaderAccessor.getFirstNativeHeader(ACCEPT_LANGUAGE);
         Locale locale = acceptLanguage == null ? LocaleContextHolder.getLocale() : Locale.forLanguageTag(acceptLanguage);
 
@@ -52,7 +48,10 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
             BaseException exception = (BaseException) cause.getCause();
             String exceptionMessage = messageSource.getMessage(exception.getExceptionCode(), null, locale);
             errorHeaderAccessor.setMessage(exceptionMessage);
-            errorHeaderAccessor.addNativeHeader("exceptionCode", exception.getExceptionCode());
+            errorHeaderAccessor.addNativeHeader("error", exception.getExceptionCode());
+
+            if (clientHeaderAccessor != null)
+                errorHeaderAccessor.setMessageId(clientHeaderAccessor.getMessageId());
 
 //            return MessageBuilder.createMessage(exceptionMessage.getBytes(StandardCharsets.UTF_8),
 //                                                errorHeaderAccessor.getMessageHeaders());

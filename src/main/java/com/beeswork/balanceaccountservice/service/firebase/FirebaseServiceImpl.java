@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.service.firebase;
 
+import com.beeswork.balanceaccountservice.dto.firebase.FirebaseNotification;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -32,11 +33,21 @@ public class FirebaseServiceImpl implements FirebaseService {
         this.messageSource = messageSource;
     }
 
+
+    @Override
+    @Async("processExecutor")
+    public void sendNotification(FirebaseNotification firebaseNotification, Locale locale) {
+        try {
+            firebaseMessaging.send(firebaseNotification.buildMessage(messageSource, locale));
+        } catch (FirebaseMessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     @Async("processExecutor")
     public void sendNotification(ClickDTO clickDTO, Locale locale) {
-
-        switch (clickDTO.getClickResult()) {
+        switch (clickDTO.getResult()) {
             case CLICKED: sendNotification(clickedMessageBuilder(clickDTO, locale));
             case MATCHED: sendNotification(matchedMessageBuilder(clickDTO, locale));
             default: break;
@@ -44,24 +55,21 @@ public class FirebaseServiceImpl implements FirebaseService {
     }
 
     private Message.Builder clickedMessageBuilder(ClickDTO clickDTO, Locale locale) {
-
         Message.Builder messageBuilder = clickMessageBuilder(clickDTO);
         messageBuilder.setNotification(notification(CLICKED_NOTIFICATION_TITLE, locale));
         return messageBuilder;
     }
 
     private Message.Builder matchedMessageBuilder(ClickDTO clickDTO, Locale locale) {
-
         Message.Builder messageBuilder = clickMessageBuilder(clickDTO);
         messageBuilder.setNotification(notification(MATCHED_NOTIFICATION_TITLE, locale));
         return messageBuilder;
     }
 
     private Message.Builder clickMessageBuilder(ClickDTO clickDTO) {
-
         Message.Builder messageBuilder = Message.builder();
         messageBuilder.setToken(clickDTO.getSwipedFCMToken());
-        messageBuilder.putData(CLICK_RESULT, clickDTO.getClickResult().toString());
+        messageBuilder.putData(CLICK_RESULT, clickDTO.getResult().toString());
         messageBuilder.putData(SWIPER_NAME, clickDTO.getSwiperName());
         messageBuilder.putData(SWIPER_PHOTO_KEY, clickDTO.getSwiperPhotoKey());
         return messageBuilder;

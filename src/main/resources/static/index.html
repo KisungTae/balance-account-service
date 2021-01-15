@@ -130,6 +130,7 @@
                     'account-id': $('#accountId').val(),
                     'identity-token': $('#identityToken').val(),
                     'chat-id': $('#chatId').val(),
+                    'receipt': $('#accountId').val(),
                     'recipient-id': $('#recipientId').val()})
             setConnected(true)
         }
@@ -158,7 +159,8 @@
             'chat-id': $('#chatId').val(),
             'receipt': $('#accountId').val(),
             'message-id': Math.floor(Math.random() * 100),
-            'recipient-id': $('#recipientId').val()
+            'recipient-id': $('#recipientId').val(),
+            'accept-language': 'kr'
         }
     }
 

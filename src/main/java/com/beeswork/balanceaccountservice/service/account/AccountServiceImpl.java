@@ -68,10 +68,11 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     }
 
 
+
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public ProfileDTO getProfile(String accountId, String identityToken) {
-
         Account account = findValidAccount(accountId, identityToken);
         return modelMapper.map(account, ProfileDTO.class);
     }

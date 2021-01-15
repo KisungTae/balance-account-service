@@ -1,6 +1,9 @@
 package com.beeswork.balanceaccountservice.service.chat;
 
+import com.beeswork.balanceaccountservice.config.StompChannelInterceptor;
+import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
+import com.beeswork.balanceaccountservice.dto.account.MessageReceivedNotificationDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
@@ -12,7 +15,11 @@ import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedExceptio
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedDeletedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
+import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.QueueInformation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,12 +32,21 @@ import java.util.UUID;
 public class ChatServiceImpl implements ChatService {
 
     private final MatchDAO matchDAO;
+    private final AccountDAO accountDAO;
 
     @Autowired
-    public ChatServiceImpl(MatchDAO matchDAO) {
+    public ChatServiceImpl(MatchDAO matchDAO, AccountDAO accountDAO) {
         this.matchDAO = matchDAO;
+        this.accountDAO = accountDAO;
     }
 
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public MessageReceivedNotificationDTO getMessageReceivedNotification(String accountId) {
+        Account account = accountDAO.findById(UUID.fromString(accountId));
+        if (account == null || account.isDeleted() || account.isBlocked() || account.getFcmToken() == null) return null;
+        return new MessageReceivedNotificationDTO(account.getName(), account.getFcmToken());
+    }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)

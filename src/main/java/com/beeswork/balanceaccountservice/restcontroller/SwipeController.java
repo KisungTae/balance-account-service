@@ -43,26 +43,20 @@ public class SwipeController extends BaseController {
     @PostMapping
     public ResponseEntity<String> swipe(@Valid @RequestBody SwipeVM swipeVM, BindingResult bindingResult)
     throws JsonProcessingException {
-
         if (bindingResult.hasErrors()) throw new BadRequestException();
-
         List<QuestionDTO> questionDTOs = swipeService.swipe(swipeVM.getAccountId(),
                                                               swipeVM.getIdentityToken(),
                                                               swipeVM.getSwipedId());
-
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
     }
 
     @GetMapping("/click/list")
     public ResponseEntity<String> listClick(@Valid @ModelAttribute ListClickVM listClickVM,
                                             BindingResult bindingResult) throws JsonProcessingException {
-
         if (bindingResult.hasErrors()) throw new BadRequestException();
-
         List<ClickProjection> clickProjections = swipeService.listClick(listClickVM.getAccountId(),
                                                                         listClickVM.getIdentityToken(),
                                                                         listClickVM.getFetchedAt());
-
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickProjections));
     }
 
@@ -70,13 +64,10 @@ public class SwipeController extends BaseController {
     public ResponseEntity<String> listClicked(@Valid @ModelAttribute ListClickedVM listClickedVM,
                                               BindingResult bindingResult)
     throws JsonProcessingException {
-
         if (bindingResult.hasErrors()) throw new BadRequestException();
-
         List<ClickedProjection> clickedProjections = swipeService.listClicked(listClickedVM.getAccountId(),
                                                                               listClickedVM.getIdentityToken(),
                                                                               listClickedVM.getFetchedAt());
-
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickedProjections));
     }
 
@@ -86,14 +77,11 @@ public class SwipeController extends BaseController {
                                         BindingResult bindingResult,
                                         Locale locale)
     throws JsonProcessingException {
-
         if (bindingResult.hasErrors()) throw new BadRequestException();
-
         ClickDTO clickDTO = swipeService.click(clickVM.getAccountId(),
                                                clickVM.getIdentityToken(),
                                                clickVM.getSwipedId(),
                                                clickVM.getAnswers());
-
         firebaseService.sendNotification(clickDTO, locale);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO));
     }

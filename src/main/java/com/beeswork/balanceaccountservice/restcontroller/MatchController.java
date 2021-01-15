@@ -35,20 +35,16 @@ public class MatchController extends BaseController {
     public ResponseEntity<String> listMatches(@Valid @ModelAttribute ListMatchesVM listMatchesVM,
                                               BindingResult bindingResult)
     throws JsonProcessingException {
-
         if (bindingResult.hasErrors()) throw new BadRequestException();
-
         List<MatchProjection> matchProjections = matchService.listMatches(listMatchesVM.getAccountId(),
                                                                           listMatchesVM.getIdentityToken(),
                                                                           listMatchesVM.getFetchedAt());
-
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(matchProjections));
     }
 
     @PostMapping("/unmatch")
     public ResponseEntity<String> unmatch(@Valid @RequestBody UnmatchVM unmatchVM, BindingResult bindingResult)
     throws JsonProcessingException {
-
         if (bindingResult.hasErrors()) throw new BadRequestException();
         matchService.unmatch(unmatchVM.getAccountId(), unmatchVM.getIdentityToken(), unmatchVM.getUnmatchedId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));

@@ -11,13 +11,14 @@ import java.util.UUID;
 @Setter
 public class ClickDTO {
 
-    public enum ClickResult {
+    public enum Result {
         NOT_CLICKED,
         CLICKED,
-        MATCHED
+        MATCHED,
+        MESSAGE
     }
 
-    private ClickResult clickResult = ClickResult.NOT_CLICKED;
+    private Result result = Result.NOT_CLICKED;
 
     private String swiperName;
     private String swiperPhotoKey;
@@ -30,7 +31,7 @@ public class ClickDTO {
 
     public void setupAsClick(String swiperName, String swiperPhotoKey, UUID swipedId, String swipedFCMToken, Date swipeUpdatedAt) {
 
-        this.clickResult = ClickResult.CLICKED;
+        this.result = Result.CLICKED;
         this.swiperName = swiperName;
         this.swiperPhotoKey = swiperPhotoKey;
         this.match = new MatchProjection(swipedId, swipeUpdatedAt);
@@ -41,7 +42,7 @@ public class ClickDTO {
     public void setupAsMatch(String swiperName, String swiperPhotoKey, Long chatId, UUID swipedId, String swipedName,
                              String swipedPhotoKey, String swipedFCMToken, Date matchUpdated) {
 
-        this.clickResult = ClickResult.MATCHED;
+        this.result = Result.MATCHED;
         this.swiperName = swiperName;
         this.swiperPhotoKey = swiperPhotoKey;
         this.match = new MatchProjection(chatId, swipedId, swipedName, swipedPhotoKey, matchUpdated);

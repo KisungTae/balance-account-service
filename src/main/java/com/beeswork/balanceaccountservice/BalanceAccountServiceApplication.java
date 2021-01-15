@@ -188,5 +188,9 @@ public class BalanceAccountServiceApplication {
 
 // TODO			50. limit the size of message in stomp
 
+// TODO			51. check anything calling account because you can use cache so, change to findById(accountId) then check identitytoken separately not query together otherwise you can't use cache benefits
+
+// TODO			52. consider how to retrieve message when enter to a chat, and consider changing createdAt in message generated on the server
+
 
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one

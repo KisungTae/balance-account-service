@@ -34,6 +34,11 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     }
 
     @Override
+    public Account findById(UUID accountId) {
+        return entityManager.find(Account.class, accountId);
+    }
+
+    @Override
     public Account findBy(UUID accountId, UUID identityToken) {
         return jpaQueryFactory.selectFrom(qAccount)
                               .where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken)))
