@@ -1,7 +1,8 @@
 package com.beeswork.balanceaccountservice.service.swipe;
 
+import com.beeswork.balanceaccountservice.dto.firebase.AbstractFirebaseNotification;
+import com.beeswork.balanceaccountservice.dto.firebase.FirebaseNotification;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.BalanceGameDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.projection.ClickProjection;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
@@ -11,6 +12,7 @@ import org.springframework.retry.annotation.Retryable;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public interface SwipeService {
@@ -20,5 +22,5 @@ public interface SwipeService {
     List<QuestionDTO> swipe(String accountId, String identityToken, String swipedId);
 
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-    ClickDTO click(String accountId, String identityToken, String swipedId, Map<Integer, Boolean> answers);
+    ClickDTO click(String accountId, String identityToken, String swipedId, Map<Integer, Boolean> answers, Locale locale);
 }

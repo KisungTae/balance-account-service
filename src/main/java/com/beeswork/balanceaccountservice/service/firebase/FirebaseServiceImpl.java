@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.service.firebase;
 
+import com.beeswork.balanceaccountservice.dto.firebase.AbstractFirebaseNotification;
 import com.beeswork.balanceaccountservice.dto.firebase.FirebaseNotification;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -18,19 +19,23 @@ import java.util.Locale;
 public class FirebaseServiceImpl implements FirebaseService {
 
     private final FirebaseMessaging firebaseMessaging;
-    private final MessageSource messageSource;
+    private final MessageSource     messageSource;
+    private final Message.Builder   messageBuilder;
 
     private static final String CLICKED_NOTIFICATION_TITLE = "clicked.notification.title";
     private static final String MATCHED_NOTIFICATION_TITLE = "matched.notification.title";
 
-    private static final String SWIPER_NAME = "swiperName";
+    private static final String SWIPER_NAME      = "swiperName";
     private static final String SWIPER_PHOTO_KEY = "swiperPhotoKey";
-    private static final String CLICK_RESULT = "clickResult";
+    private static final String CLICK_RESULT     = "clickResult";
 
     @Autowired
-    public FirebaseServiceImpl(FirebaseMessaging firebaseMessaging, MessageSource messageSource) {
+    public FirebaseServiceImpl(FirebaseMessaging firebaseMessaging,
+                               MessageSource messageSource,
+                               Message.Builder messageBuilder) {
         this.firebaseMessaging = firebaseMessaging;
         this.messageSource = messageSource;
+        this.messageBuilder = messageBuilder;
     }
 
 
@@ -38,7 +43,8 @@ public class FirebaseServiceImpl implements FirebaseService {
     @Async("processExecutor")
     public void sendNotification(FirebaseNotification firebaseNotification, Locale locale) {
         try {
-            firebaseMessaging.send(firebaseNotification.buildMessage(messageSource, locale));
+            if (firebaseNotification.validateFCMToken())
+                firebaseMessaging.send(firebaseNotification.buildMessage(messageBuilder, messageSource, locale));
         } catch (FirebaseMessagingException e) {
             e.printStackTrace();
         }
@@ -48,9 +54,12 @@ public class FirebaseServiceImpl implements FirebaseService {
     @Async("processExecutor")
     public void sendNotification(ClickDTO clickDTO, Locale locale) {
         switch (clickDTO.getResult()) {
-            case CLICKED: sendNotification(clickedMessageBuilder(clickDTO, locale));
-            case MATCHED: sendNotification(matchedMessageBuilder(clickDTO, locale));
-            default: break;
+            case CLICK:
+                sendNotification(clickedMessageBuilder(clickDTO, locale));
+            case MATCH:
+                sendNotification(matchedMessageBuilder(clickDTO, locale));
+            default:
+                break;
         }
     }
 
@@ -68,10 +77,10 @@ public class FirebaseServiceImpl implements FirebaseService {
 
     private Message.Builder clickMessageBuilder(ClickDTO clickDTO) {
         Message.Builder messageBuilder = Message.builder();
-        messageBuilder.setToken(clickDTO.getSwipedFCMToken());
-        messageBuilder.putData(CLICK_RESULT, clickDTO.getResult().toString());
-        messageBuilder.putData(SWIPER_NAME, clickDTO.getSwiperName());
-        messageBuilder.putData(SWIPER_PHOTO_KEY, clickDTO.getSwiperPhotoKey());
+//        messageBuilder.setToken(clickDTO.getSwipedFCMToken());
+//        messageBuilder.putData(CLICK_RESULT, clickDTO.getResult().toString());
+//        messageBuilder.putData(SWIPER_NAME, clickDTO.getSwiperName());
+//        messageBuilder.putData(SWIPER_PHOTO_KEY, clickDTO.getSwiperPhotoKey());
         return messageBuilder;
     }
 

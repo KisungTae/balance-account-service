@@ -14,6 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class MatchProjection {
 
+
     private Long chatId;
     private UUID matchedId;
     private String name;

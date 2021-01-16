@@ -311,17 +311,12 @@ create table chat_message
 
 
 select *
-from account
-where id = '9f881819-638a-4098-954c-ce34b133d32a';
-
+from match
+where matcher_id = '562b9e01-611c-4e2a-b5ee-a15a0224e211';
 
 select *
-from match
-where matcher_id = '9f881819-638a-4098-954c-ce34b133d32a';
-
-
-update match set unmatched = false
-where matcher_id = '9f881819-638a-4098-954c-ce34b133d32a';
+from account
+where id = '70011134-0e6e-4ae1-a479-cfbf1fe44384';
 
 
 

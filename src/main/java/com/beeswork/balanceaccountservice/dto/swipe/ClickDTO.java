@@ -12,40 +12,21 @@ import java.util.UUID;
 public class ClickDTO {
 
     public enum Result {
-        NOT_CLICKED,
-        CLICKED,
-        MATCHED,
-        MESSAGE
+        MISS,
+        CLICK,
+        MATCH
     }
 
-    private Result result = Result.NOT_CLICKED;
-
-    private String swiperName;
-    private String swiperPhotoKey;
-
-    private UUID swipedId;
-    private String swipedFCMToken;
-    private Date swipeUpdatedAt;
-
+    private Result          result = Result.MISS;
     private MatchProjection match;
 
-    public void setupAsClick(String swiperName, String swiperPhotoKey, UUID swipedId, String swipedFCMToken, Date swipeUpdatedAt) {
-
-        this.result = Result.CLICKED;
-        this.swiperName = swiperName;
-        this.swiperPhotoKey = swiperPhotoKey;
+    public void setupAsClick(UUID swipedId, Date swipeUpdatedAt) {
+        this.result = Result.CLICK;
         this.match = new MatchProjection(swipedId, swipeUpdatedAt);
-        this.swipedFCMToken = swipedFCMToken;
-
     }
 
-    public void setupAsMatch(String swiperName, String swiperPhotoKey, Long chatId, UUID swipedId, String swipedName,
-                             String swipedPhotoKey, String swipedFCMToken, Date matchUpdated) {
-
-        this.result = Result.MATCHED;
-        this.swiperName = swiperName;
-        this.swiperPhotoKey = swiperPhotoKey;
-        this.match = new MatchProjection(chatId, swipedId, swipedName, swipedPhotoKey, matchUpdated);
-        this.swipedFCMToken = swipedFCMToken;
+    public void setupAsMatch(Long chatId, UUID swipedId, String swipedName, String matchedPhotoKey, Date matchUpdated) {
+        this.result = Result.MATCH;
+        this.match = new MatchProjection(chatId, swipedId, swipedName, matchedPhotoKey, matchUpdated);
     }
 }

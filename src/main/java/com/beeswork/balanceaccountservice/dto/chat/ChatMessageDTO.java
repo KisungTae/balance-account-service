@@ -1,13 +1,14 @@
 package com.beeswork.balanceaccountservice.dto.chat;
 
-
-import com.beeswork.balanceaccountservice.entity.account.Account;
-import lombok.AllArgsConstructor;
+import com.beeswork.balanceaccountservice.validator.ValidUUID;
+import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.UUID;
 
@@ -15,11 +16,11 @@ import java.util.UUID;
 @Setter
 public class ChatMessageDTO {
 
-    private Long id;
-    private Long chatId;
-    private UUID accountId;
-    private UUID recipientId;
+    @Size(min = 1, max = 2)
     private String message;
-    private Date createdAt;
 
+    private String accountId;
+    private String recipientId;
+    private String chatId;
+    private Date createdAt;
 }

@@ -4,14 +4,13 @@ import com.beeswork.balanceaccountservice.constant.RegexExpression;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
-import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
+import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import io.micrometer.core.lang.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.converter.CompositeMessageConverter;
-import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
@@ -38,76 +37,43 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
         StompCommand stompCommand = stompHeaderAccessor.getCommand();
 
-//        if (StompCommand.SUBSCRIBE.equals(stompCommand)) {
-//            String accountId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.ACCOUNT_ID);
-//            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
-//            String recipientId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECIPIENT_ID);
-//            String chatId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.CHAT_ID);
-//            validateFields(accountId, identityToken, recipientId, chatId);
-//            chatService.validateChat(accountId, identityToken, recipientId, chatId);
-//
-//            Object destination = messageHeaders.get(StompHeader.SIMP_DESTINATION);
-//            if (destination == null || !queueName(accountId, chatId).equals(destination.toString()))
-//                throw new BadRequestException();
-//
-//            if (!TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.AUTO_DELETE)) ||
-//                !FALSE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.EXCLUSIVE)) ||
-//                !TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.DURABLE)))
-//                throw new BadRequestException();
-//        } else if (StompCommand.SEND.equals(stompCommand)) {
-//            ChatMessageVM chatMessageVM =
-//                    (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
-//            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
-//            validateFields(chatMessageVM, identityToken);
-//            chatService.validateAndSaveMessage(chatMessageVM.getAccountId(),
-//                                               identityToken,
-//                                               chatMessageVM.getRecipientId(),
-//                                               chatMessageVM.getChatId(),
-//                                               chatMessageVM.getMessage(),
-//                                               chatMessageVM.getCreatedAt());
-//        }
+        if (StompCommand.SUBSCRIBE.equals(stompCommand)) {
+            String accountId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.ACCOUNT_ID);
+            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
+            String recipientId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECIPIENT_ID);
+            String chatId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.CHAT_ID);
+            validateFields(accountId, identityToken, recipientId, chatId);
+            chatService.validateChat(accountId, identityToken, recipientId, chatId);
 
-//        for (Map.Entry<String, List<String>> entry : nativeHeaders.entrySet()) {
-//            System.out.println(entry.getKey() + ": " + entry.getValue());
-//        }
+            Object destination = messageHeaders.get(StompHeader.SIMP_DESTINATION);
+            if (destination == null || !queueName(accountId, chatId).equals(destination.toString()))
+                throw new BadRequestException();
 
-//        if (StompCommand.SEND.equals(stompHeaderAccessor.getCommand())) {
-//            ChatMessageVM chatMessageVM =
-//                    (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
-//            if (chatMessageVM == null) System.out.println("chatMessageVM == null");
-//            else {
-//                System.out.println("payload message: " + chatMessageVM.getMessage());
-//                if (chatMessageVM.getMessage().equals("abc"))
-//                    throw new BadRequestException();
-//            }
-//        }
-
-//        if (StompCommand.ACK.equals(stompHeaderAccessor.getCommand())) {
-//
-//        }
-
-
-//        if (StompCommand.SUBSCRIBE.equals(stompHeaderAccessor.getCommand())) {
-//            Principal userPrincipal = stompHeaderAccessor.getUser();
-
-
-//            for (Map.Entry<String, List<String>> entry : nativeHeaders.entrySet()) {
-//                System.out.println(entry.getKey() + ": " + entry.getValue());
-//            }
-
-//            if (!validateSubscription(userPrincipal, stompHeaderAccessor.getDestination())) {
-//                throw new IllegalArgumentException("No permission for this topic");
-//            }
-//        }
+            if (!TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.AUTO_DELETE)) ||
+                !FALSE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.EXCLUSIVE)) ||
+                !TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.DURABLE)))
+                throw new BadRequestException();
+        } else if (StompCommand.SEND.equals(stompCommand)) {
+            ChatMessageDTO chatMessageDTO =
+                    (ChatMessageDTO) compositeMessageConverter.fromMessage(message, ChatMessageDTO.class);
+            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
+            validateFields(chatMessageDTO, identityToken);
+            chatService.validateAndSaveMessage(chatMessageDTO.getAccountId(),
+                                               identityToken,
+                                               chatMessageDTO.getRecipientId(),
+                                               chatMessageDTO.getChatId(),
+                                               chatMessageDTO.getMessage(),
+                                               chatMessageDTO.getCreatedAt());
+        }
         return message;
     }
 
-    private void validateFields(ChatMessageVM chatMessageVM, String identityToken) {
-        if (chatMessageVM == null) throw new BadRequestException();
-        validateFields(chatMessageVM.getAccountId(),
+    private void validateFields(ChatMessageDTO chatMessageDTO, String identityToken) {
+        if (chatMessageDTO == null) throw new BadRequestException();
+        validateFields(chatMessageDTO.getAccountId(),
                        identityToken,
-                       chatMessageVM.getRecipientId(),
-                       chatMessageVM.getChatId());
+                       chatMessageDTO.getRecipientId(),
+                       chatMessageDTO.getChatId());
     }
 
     private void validateFields(String accountId, String identityToken, String recipientId, String chatId) {

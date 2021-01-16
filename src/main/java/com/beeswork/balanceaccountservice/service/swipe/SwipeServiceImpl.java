@@ -4,8 +4,10 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.accountquestion.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
+import com.beeswork.balanceaccountservice.dto.firebase.ClickedNotificationDTO;
+import com.beeswork.balanceaccountservice.dto.firebase.FirebaseNotification;
+import com.beeswork.balanceaccountservice.dto.firebase.MatchedNotificationDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.BalanceGameDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
@@ -15,12 +17,11 @@ import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
-import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
 import com.beeswork.balanceaccountservice.projection.ClickProjection;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
-import io.micrometer.core.instrument.util.TimeUtils;
+import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,21 +34,27 @@ import java.util.*;
 @Service
 public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
-    private static final int SWIPE_POINT = 200;
+    private static final int SWIPE_POINT      = 200;
     private static final int FREE_SWIPE_A_DAY = 2000;
 
-    private final AccountDAO accountDAO;
-    private final SwipeDAO swipeDAO;
-    private final ChatDAO chatDAO;
+    private final AccountDAO         accountDAO;
+    private final SwipeDAO           swipeDAO;
+    private final ChatDAO            chatDAO;
+    private final FirebaseService    firebaseService;
     private final AccountQuestionDAO accountQuestionDAO;
 
     @Autowired
-    public SwipeServiceImpl(ModelMapper modelMapper, AccountDAO accountDAO, SwipeDAO swipeDAO,
-                            ChatDAO chatDAO, AccountQuestionDAO accountQuestionDAO) {
+    public SwipeServiceImpl(ModelMapper modelMapper,
+                            AccountDAO accountDAO,
+                            SwipeDAO swipeDAO,
+                            ChatDAO chatDAO,
+                            FirebaseService firebaseService,
+                            AccountQuestionDAO accountQuestionDAO) {
         super(modelMapper);
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
         this.chatDAO = chatDAO;
+        this.firebaseService = firebaseService;
         this.accountQuestionDAO = accountQuestionDAO;
     }
 
@@ -117,7 +124,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public ClickDTO click(String accountId, String identityToken, String swipedId, Map<Integer, Boolean> answers) {
+    public ClickDTO click(String accountId,
+                          String identityToken,
+                          String swipedId,
+                          Map<Integer, Boolean> answers,
+                          Locale locale) {
         UUID swiperUUId = UUID.fromString(accountId);
         UUID swipedUUId = UUID.fromString(swipedId);
 
@@ -154,22 +165,18 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             swiper.getMatches().add(new Match(swiper, swiped, chat, false, updatedAt, updatedAt));
             swiped.getMatches().add(new Match(swiped, swiper, chat, false, updatedAt, updatedAt));
 
-            clickDTO.setupAsMatch(swiper.getName(),
-                                  swiper.getRepPhotoKey(),
-                                  chat.getId(),
-                                  swiped.getId(),
-                                  swiped.getName(),
-                                  swiped.getRepPhotoKey(),
-                                  swiped.getFcmToken(),
-                                  updatedAt);
+            clickDTO.setupAsMatch(chat.getId(), swiped.getId(), swiped.getName(), swiped.getRepPhotoKey(), updatedAt);
+            firebaseService.sendNotification(new MatchedNotificationDTO(swiped.getFcmToken(),
+                                                                        swiped.getName(),
+                                                                        swiped.getRepPhotoKey()),
+                                             locale);
         } else {
-            clickDTO.setupAsClick(swiper.getName(),
-                                  swiper.getRepPhotoKey(),
-                                  swiper.getId(),
-                                  swiped.getFcmToken(),
-                                  updatedAt);
+            clickDTO.setupAsClick(swiped.getId(), updatedAt);
+            firebaseService.sendNotification(new ClickedNotificationDTO(swiped.getFcmToken(),
+                                                                        swiped.getName(),
+                                                                        swiped.getRepPhotoKey()),
+                                             locale);
         }
-
         return clickDTO;
     }
 

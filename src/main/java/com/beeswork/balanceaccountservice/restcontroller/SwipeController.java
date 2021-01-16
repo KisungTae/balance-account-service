@@ -29,11 +29,14 @@ import java.util.Locale;
 @RequestMapping("/swipe")
 public class SwipeController extends BaseController {
 
-    private final SwipeService swipeService;
+    private final SwipeService    swipeService;
     private final FirebaseService firebaseService;
 
     @Autowired
-    public SwipeController(ObjectMapper objectMapper, ModelMapper modelMapper, SwipeService swipeService, FirebaseService firebaseService) {
+    public SwipeController(ObjectMapper objectMapper,
+                           ModelMapper modelMapper,
+                           SwipeService swipeService,
+                           FirebaseService firebaseService) {
 
         super(objectMapper, modelMapper);
         this.swipeService = swipeService;
@@ -45,8 +48,8 @@ public class SwipeController extends BaseController {
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         List<QuestionDTO> questionDTOs = swipeService.swipe(swipeVM.getAccountId(),
-                                                              swipeVM.getIdentityToken(),
-                                                              swipeVM.getSwipedId());
+                                                            swipeVM.getIdentityToken(),
+                                                            swipeVM.getSwipedId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
     }
 
@@ -81,8 +84,8 @@ public class SwipeController extends BaseController {
         ClickDTO clickDTO = swipeService.click(clickVM.getAccountId(),
                                                clickVM.getIdentityToken(),
                                                clickVM.getSwipedId(),
-                                               clickVM.getAnswers());
-        firebaseService.sendNotification(clickDTO, locale);
+                                               clickVM.getAnswers(),
+                                               locale);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO));
     }
 }
