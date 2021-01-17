@@ -116,11 +116,18 @@ public class DummyController {
                                                                              "where s1.clicked = true and s2.clicked = true " +
                                                                              "and s1.swiperId = s2.swipedId order by s1.swiperId",
                                                                              Swipe.class).getResultList();
+        HashMap<String, Match> matchMap = new HashMap<>();
 
         for (Swipe swipe : swipes) {
 
-            Thread.sleep(12);
+            Thread.sleep(10);
             Chat chat = new Chat();
+
+            MatchId theOtherPartyMatchId  = new MatchId(swipe.getSwipedId(), swipe.getSwiperId());
+            if (matchMap.containsKey(swipe.getSwipedId().toString() + swipe.getSwiperId().toString())) {
+                chat = matchMap.get(swipe.getSwipedId().toString() + swipe.getSwiperId().toString()).getChat();
+            }
+
 
             Match newMatch = new Match();
             newMatch.setChat(chat);
@@ -129,9 +136,14 @@ public class DummyController {
             newMatch.setUnmatcher(false);
             newMatch.setCreatedAt(new Date());
             newMatch.setUpdatedAt(new Date());
-            newMatch.setMatchId(new MatchId(swipe.getSwiperId(), swipe.getSwipedId()));
+
+            MatchId matchId = new MatchId(swipe.getSwiperId(), swipe.getSwipedId());
+            newMatch.setMatchId(matchId);
+
             chatDAO.persist(chat);
             matchDAO.persist(newMatch);
+
+            matchMap.put(swipe.getSwiperId().toString() + swipe.getSwipedId().toString(), newMatch);
         }
     }
 

@@ -19,9 +19,9 @@ import java.util.UUID;
 public class StompServiceImpl implements StompService {
 
     private final FirebaseService       firebaseService;
-    private final     SimpMessagingTemplate simpMessagingTemplate;
-    private final     AmqpAdmin             amqpAdmin;
-    private final AccountDAO accountDAO;
+    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final AmqpAdmin             amqpAdmin;
+    private final AccountDAO            accountDAO;
 
     @Autowired
     public StompServiceImpl(FirebaseService firebaseService,
@@ -35,7 +35,8 @@ public class StompServiceImpl implements StompService {
 
     @Override
     public void send(ChatMessageDTO chatMessageDTO, Locale locale) {
-        String queue = StompChannelInterceptor.queueName(chatMessageDTO.getRecipientId(), chatMessageDTO.getChatId());
+        String queue = chatMessageDTO.getRecipientId() + "-" + chatMessageDTO.getChatId();
+
         QueueInformation queueInformation = amqpAdmin.getQueueInfo(queue);
 
         if (queueInformation == null || queueInformation.getConsumerCount() <= 0) {
@@ -43,6 +44,6 @@ public class StompServiceImpl implements StompService {
             firebaseService.sendNotification(new MessageReceivedNotificationDTO(account.getName(),
                                                                                 account.getFcmToken()),
                                              locale);
-        } else simpMessagingTemplate.convertAndSend(queue, chatMessageDTO);
+        } else simpMessagingTemplate.convertAndSend("/queue/" + queue, chatMessageDTO);
     }
 }

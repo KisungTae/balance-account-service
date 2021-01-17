@@ -54,17 +54,20 @@ public class StompChannelInterceptor implements ChannelInterceptor {
                 !TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.DURABLE)))
                 throw new BadRequestException();
         } else if (StompCommand.SEND.equals(stompCommand)) {
-            ChatMessageDTO chatMessageDTO =
-                    (ChatMessageDTO) compositeMessageConverter.fromMessage(message, ChatMessageDTO.class);
-            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
-            validateFields(chatMessageDTO, identityToken);
-            chatService.validateAndSaveMessage(chatMessageDTO.getAccountId(),
-                                               identityToken,
-                                               chatMessageDTO.getRecipientId(),
-                                               chatMessageDTO.getChatId(),
-                                               chatMessageDTO.getMessage(),
-                                               chatMessageDTO.getCreatedAt());
+//            ChatMessageDTO chatMessageDTO =
+//                    (ChatMessageDTO) compositeMessageConverter.fromMessage(message, ChatMessageDTO.class);
+//            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
+//            validateFields(chatMessageDTO, identityToken);
+//            chatService.validateAndSaveMessage(chatMessageDTO.getAccountId(),
+//                                               identityToken,
+//                                               chatMessageDTO.getRecipientId(),
+//                                               chatMessageDTO.getChatId(),
+//                                               chatMessageDTO.getMessage(),
+//                                               chatMessageDTO.getCreatedAt());
+            return message;
         }
+
+
         return message;
     }
 

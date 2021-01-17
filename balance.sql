@@ -310,13 +310,19 @@ create table chat_message
 
 
 
+
+select m1.matcher_id, m1.matched_id, m1.chat_id, m2.matcher_id, m2.matched_id, m2.chat_id
+from match m1
+left join match m2 on m1.matcher_id = m2.matched_id and m1.matched_id = m2.matcher_id;
+
+
 select *
-from match
-where matcher_id = '562b9e01-611c-4e2a-b5ee-a15a0224e211';
+from chat_message;
+
 
 select *
 from account
-where id = '70011134-0e6e-4ae1-a479-cfbf1fe44384';
+where id = 'd5303184-f9d8-4aec-9225-632ba607fdf5';
 
 
 

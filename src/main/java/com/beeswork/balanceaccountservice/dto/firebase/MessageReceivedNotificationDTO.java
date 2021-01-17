@@ -20,7 +20,7 @@ public class MessageReceivedNotificationDTO extends AbstractFirebaseNotification
 
     @Override
     public Message buildMessage(Message.Builder messageBuilder, MessageSource messageSource, Locale locale) {
-        messageBuilder.setToken(this.recipientFCMToken);
+        messageBuilder.setToken(recipientFCMToken);
         setNotification(messageBuilder,
                         messageSource,
                         locale,

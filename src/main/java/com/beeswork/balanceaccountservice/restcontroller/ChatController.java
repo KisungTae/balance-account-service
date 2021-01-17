@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
@@ -12,6 +13,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.Locale;
 
 @RestController
@@ -27,6 +29,7 @@ public class ChatController {
 
     @MessageMapping("/chat/send")
     public void send(@Payload ChatMessageDTO chatMessageDTO, MessageHeaders messageHeaders) {
+        System.out.println("send");
         stompService.send(chatMessageDTO, getLocaleFromMessageHeaders(messageHeaders));
     }
 
@@ -34,6 +37,16 @@ public class ChatController {
     private Locale getLocaleFromMessageHeaders(MessageHeaders messageHeaders) {
         MultiValueMap<String, String> nativeHeaders = messageHeaders.get(StompHeaderAccessor.NATIVE_HEADERS,
                                                                          MultiValueMap.class);
+        
+        String localeCode = nativeHeaders.getFirst(ACCEPT_LANGUAGE);
+        try {
+            Locale locale = LocaleUtils.toLocale("localeCode");
+        } catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+        }
+
+
+
         return LocaleUtils.toLocale(nativeHeaders == null ? "" : nativeHeaders.getFirst(ACCEPT_LANGUAGE));
     }
 }

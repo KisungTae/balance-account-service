@@ -29,7 +29,9 @@ public abstract class AbstractFirebaseNotification implements FirebaseNotificati
     public abstract Message buildMessage(Message.Builder messageBuilder, MessageSource messageSource, Locale locale);
 
     public boolean validateFCMToken() {
-        return recipientFCMToken != null;
+//        TODO: comment in
+//        return recipientFCMToken != null && !recipientFCMToken.isEmpty();
+        return true;
     }
 
     protected void setNotification(Message.Builder messageBuilder,
@@ -38,6 +40,7 @@ public abstract class AbstractFirebaseNotification implements FirebaseNotificati
                                    String notificationBodyCode,
                                    String[] notificationBodyArguments,
                                    Type notificationType) {
+
         String body = messageSource.getMessage(notificationBodyCode, notificationBodyArguments, locale);
         String title = messageSource.getMessage(NOTIFICATION_TITLE_CODE, null, locale);
         messageBuilder.setNotification(Notification.builder().setTitle(title).setBody(body).build());

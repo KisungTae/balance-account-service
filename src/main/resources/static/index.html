@@ -81,10 +81,10 @@
         // $('#recipientId').val('894b4960-43df-42f9-b987-5d73a5cc4ef5')
         // $('#chatId').val(29)
 
-        $('#accountId').val('70011134-0e6e-4ae1-a479-cfbf1fe44384')
-        $('#identityToken').val('74ce17cb-8a3a-43b9-a303-557df3aa19f2')
-        $('#recipientId').val('562b9e01-611c-4e2a-b5ee-a15a0224e211')
-        $('#chatId').val(14)
+        $('#accountId').val('d5303184-f9d8-4aec-9225-632ba607fdf5')
+        $('#identityToken').val('78c8cf09-ec17-4f78-ad9d-3611654e4bb6')
+        $('#recipientId').val('0a164463-f27f-4a68-840b-4e04c0becb3c')
+        $('#chatId').val(200)
     })
 
     function setConnected(connected) {
@@ -159,20 +159,26 @@
 
     function getHeaders() {
         return {
-            'account-id': $('#accountId').val(),
-            'identity-token': $('#identityToken').val(),
-            'chat-id': $('#chatId').val(),
+            // 'account-id': $('#accountId').val(),
+            // 'identity-token': $('#identityToken').val(),
+            // 'chat-id': $('#chatId').val(),
             'receipt': $('#accountId').val(),
             'message-id': Math.floor(Math.random() * 100),
-            'recipient-id': $('#recipientId').val(),
-            'accept-language': 'kr'
+            // 'recipient-id': $('#recipientId').val(),
+            // 'accept-language': 'ko'
         }
     }
 
     function send() {
         sendBroadcast({
             message: $('#message').val(),
-            createdAt: new Date().toISOString()
+            'accountId': $('#accountId').val(),
+            'identityToken': $('#identityToken').val(),
+            'chatId': $('#chatId').val(),
+            'receipt': $('#accountId').val(),
+            'messageId': Math.floor(Math.random() * 100),
+            'recipientId': $('#recipientId').val()
+            // createdAt: new Date().toISOString()
         })
         $('#message').val('')
     }

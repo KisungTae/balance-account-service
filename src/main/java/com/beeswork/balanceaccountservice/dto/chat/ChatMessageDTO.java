@@ -15,12 +15,9 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ChatMessageDTO {
-
-    @Size(min = 1, max = 2)
     private String message;
-
     private String accountId;
     private String recipientId;
     private String chatId;
-    private Date createdAt;
+    private Date createdAt = new Date();
 }
