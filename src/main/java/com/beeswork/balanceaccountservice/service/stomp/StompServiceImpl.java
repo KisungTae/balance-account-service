@@ -23,11 +23,11 @@ import java.util.UUID;
 @Service
 public class StompServiceImpl implements StompService {
 
-    private final FirebaseService firebaseService;
-    private final SimpMessagingTemplate simpMessagingTemplate;
-    private final AmqpAdmin amqpAdmin;
-    private final AccountDAO accountDAO;
-    private static final String ACCEPT_LANGUAGE = "accept-language";
+    private final        FirebaseService       firebaseService;
+    private final        SimpMessagingTemplate simpMessagingTemplate;
+    private final        AmqpAdmin             amqpAdmin;
+    private final        AccountDAO            accountDAO;
+    private static final String                ACCEPT_LANGUAGE = "accept-language";
 
     @Autowired
     public StompServiceImpl(FirebaseService firebaseService,
@@ -42,19 +42,20 @@ public class StompServiceImpl implements StompService {
 
     @Override
     public void send(ChatMessageDTO chatMessageDTO, MessageHeaders messageHeaders) {
-        String queue = chatMessageDTO.getRecipientId() + StompHeader.QUEUE_SEPARATOR + chatMessageDTO.getChatId();
-        QueueInformation queueInformation = amqpAdmin.getQueueInfo(queue);
-        if (queueInformation == null || queueInformation.getConsumerCount() <= 0) {
-            Account account = accountDAO.findById(UUID.fromString(chatMessageDTO.getAccountId()));
+//        String queue = chatMessageDTO.getRecipientId() + StompHeader.QUEUE_SEPARATOR + chatMessageDTO.getChatId();
+//        QueueInformation queueInformation = amqpAdmin.getQueueInfo(queue);
+//        if (queueInformation == null || queueInformation.getConsumerCount() <= 0) {
+//            Account account = accountDAO.findById(UUID.fromString(chatMessageDTO.getAccountId()));
 //            firebaseService.sendNotification(new MessageNotificationDTO(account.getName(),
 //                                                                        account.getFcmToken()),
 //                                             getLocaleFromMessageHeaders(messageHeaders));
-        } else simpMessagingTemplate.convertAndSend(StompHeader.QUEUE_PREFIX + queue, chatMessageDTO);
+//        } else simpMessagingTemplate.convertAndSend(StompHeader.QUEUE_PREFIX + queue, chatMessageDTO);
     }
 
     @SuppressWarnings("unchecked")
     private Locale getLocaleFromMessageHeaders(MessageHeaders messageHeaders) {
-        MultiValueMap<String, String> nativeHeaders = messageHeaders.get(StompHeaderAccessor.NATIVE_HEADERS, MultiValueMap.class);
+        MultiValueMap<String, String> nativeHeaders =
+                messageHeaders.get(StompHeaderAccessor.NATIVE_HEADERS, MultiValueMap.class);
         if (nativeHeaders == null) return WebConfig.defaultLocale();
         String localeCode = nativeHeaders.getFirst(ACCEPT_LANGUAGE);
         if (localeCode == null) return WebConfig.defaultLocale();

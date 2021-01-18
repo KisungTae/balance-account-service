@@ -324,6 +324,12 @@ select *
 from account
 where id = '9f881819-638a-4098-954c-ce34b133d32a';
 
+select * from match
+where matcher_id = '0a164463-f27f-4a68-840b-4e04c0becb3c';
+
+select *
+from chat_message
+where chat_id = 200;
 
 
 -- ================================ ADMIN =========================================

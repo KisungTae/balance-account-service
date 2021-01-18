@@ -28,7 +28,6 @@ public class ChatController {
 
     @MessageMapping("/chat/send")
     public void send(@Payload ChatMessageDTO chatMessageDTO, MessageHeaders messageHeaders) {
-        System.out.println("send!!!!!!!!!!!!!!!!!!!!!!!!!");
         stompService.send(chatMessageDTO, messageHeaders);
     }
 

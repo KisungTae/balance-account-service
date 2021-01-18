@@ -15,6 +15,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ChatMessageDTO {
+    private Long id;
     private String message;
     private String accountId;
     private String recipientId;

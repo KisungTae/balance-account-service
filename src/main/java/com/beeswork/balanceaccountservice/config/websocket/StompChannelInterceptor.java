@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.config;
+package com.beeswork.balanceaccountservice.config.websocket;
 
 import com.beeswork.balanceaccountservice.constant.RegexExpression;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
@@ -28,13 +28,17 @@ public class StompChannelInterceptor implements ChannelInterceptor {
     @Autowired
     private CompositeMessageConverter compositeMessageConverter;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     private static final Pattern VALID_UUID_PATTERN = Pattern.compile(RegexExpression.VALID_UUID);
-    private static final String FALSE = Boolean.toString(false);
-    private static final String TRUE = Boolean.toString(true);
+    private static final String  FALSE              = Boolean.toString(false);
+    private static final String  TRUE               = Boolean.toString(true);
 
 
-    @SneakyThrows @Override
+    @SneakyThrows
+    @Override
     public Message<?> preSend(Message<?> message, @NonNull MessageChannel channel) {
         MessageHeaders messageHeaders = message.getHeaders();
         StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
@@ -56,25 +60,16 @@ public class StompChannelInterceptor implements ChannelInterceptor {
                 !FALSE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.EXCLUSIVE)) ||
                 !TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.DURABLE)))
                 throw new BadRequestException();
+
         } else if (StompCommand.SEND.equals(stompCommand)) {
             ChatMessageDTO chatMessageDTO =
                     (ChatMessageDTO) compositeMessageConverter.fromMessage(message, ChatMessageDTO.class);
             String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
             validateFields(chatMessageDTO, identityToken);
-            Long chatMessageId = chatService.validateAndSaveMessage(chatMessageDTO.getAccountId(),
-                                                                    identityToken,
-                                                                    chatMessageDTO.getRecipientId(),
-                                                                    chatMessageDTO.getChatId(),
-                                                                    chatMessageDTO.getMessage(),
-                                                                    chatMessageDTO.getCreatedAt());
-            ChatMessageDTO chatMessageDTO1 = new ChatMessageDTO();
-            chatMessageDTO1.setChatId("1234566789");
-            ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(chatMessageDTO1);
-            return MessageBuilder.createMessage(json, stompHeaderAccessor.getMessageHeaders());
+            chatMessageDTO.setId(chatService.validateAndSaveMessage(chatMessageDTO, identityToken));
+            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageDTO),
+                                                stompHeaderAccessor.getMessageHeaders());
         }
-
-
         return message;
     }
 

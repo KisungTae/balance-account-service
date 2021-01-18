@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.service.chat;
 
 import com.beeswork.balanceaccountservice.dao.chatmessage.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
+import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
@@ -71,20 +72,15 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     @Transactional
-    public Long validateAndSaveMessage(String accountId,
-                                       String identityToken,
-                                       String matchedId,
-                                       String chatId,
-                                       String message,
-                                       Date createdAt) {
+    public Long validateAndSaveMessage(ChatMessageDTO chatMessageDTO, String identityToken) {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
-        Match match = matchDAO.findById(UUID.fromString(accountId), UUID.fromString(identityToken));
-        validateChat(match, UUID.fromString(identityToken), Long.valueOf(chatId));
+        Match match = matchDAO.findById(UUID.fromString(chatMessageDTO.getAccountId()), UUID.fromString(chatMessageDTO.getRecipientId()));
+        validateChat(match, UUID.fromString(identityToken), Long.valueOf(chatMessageDTO.getChatId()));
         ChatMessage chatMessage = new ChatMessage(match.getChat(),
                                                   match.getMatcher(),
                                                   match.getMatched(),
-                                                  message,
-                                                  createdAt);
+                                                  chatMessageDTO.getMessage(),
+                                                  chatMessageDTO.getCreatedAt());
         chatMessageDAO.persist(chatMessage);
         return chatMessage.getId();
     }

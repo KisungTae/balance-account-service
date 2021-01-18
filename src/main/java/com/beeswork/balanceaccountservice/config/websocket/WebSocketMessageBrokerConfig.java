@@ -1,10 +1,13 @@
-package com.beeswork.balanceaccountservice.config;
+package com.beeswork.balanceaccountservice.config.websocket;
 
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.util.StringUtils;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
@@ -21,7 +24,6 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 
 @Configuration
 @EnableWebSocket
@@ -33,6 +35,9 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Autowired
     private CompositeMessageConverter compositeMessageConverter;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -58,51 +63,41 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     }
 
     @Bean
-    public StompErrorHandler stompErrorHandler() { return new StompErrorHandler(); }
+    public StompErrorHandler stompErrorHandler() {
+        return new StompErrorHandler();
+    }
 
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(chatChannelInterceptor());
-
         registration.interceptors(new ExecutorChannelInterceptor() {
-
+            @SneakyThrows
             @Override
-            public Message<?> beforeHandle(Message<?> message, MessageChannel channel, MessageHandler handler) {
-//                System.out.println("beforeHandle!!!!!!!!!!!!!!!!!!!");
-                return message;
-            }
-
-            @Override
-            public void afterMessageHandled(Message<?> inMessage, MessageChannel inChannel, MessageHandler handler, Exception ex) {
+            public void afterMessageHandled(@NonNull Message<?> inMessage,
+                                            @NonNull MessageChannel inChannel,
+                                            @NonNull MessageHandler handler,
+                                            Exception ex) {
                 StompHeaderAccessor inAccessor = StompHeaderAccessor.wrap(inMessage);
+                if (StompCommand.SEND.equals(inAccessor.getCommand()) &&
+                    handler instanceof StompBrokerRelayMessageHandler) {
 
-                if (StompCommand.SEND.equals(inAccessor.getCommand()) && handler instanceof StompBrokerRelayMessageHandler) {
-
-                    System.out.println("afterMessageHandled!!!!!!!!!!!!!!!!!!!!!");
-
-
+                    String receipt = inAccessor.getReceipt();
                     ChatMessageDTO chatMessageDTO =
                             (ChatMessageDTO) compositeMessageConverter.fromMessage(inMessage, ChatMessageDTO.class);
 
+                    if (StringUtils.isEmpty(receipt) || outChannel == null || chatMessageDTO == null) return;
 
-                    String receipt = inAccessor.getReceipt();
-                    if (StringUtils.isEmpty(receipt)) {
-                        return;
-                    }
+                    chatMessageDTO.setAccountId(null);
+                    chatMessageDTO.setMessage(null);
+                    chatMessageDTO.setRecipientId(null);
 
-                    if (outChannel != null) {
-                        StompHeaderAccessor outAccessor = StompHeaderAccessor.create(StompCommand.RECEIPT);
-                        outAccessor.setSessionId(inAccessor.getSessionId());
-                        outAccessor.setReceiptId(receipt);
-                        outAccessor.setLeaveMutable(true);
-                        outAccessor.setMessageId(inAccessor.getMessageId());
-
-                        Message<byte[]> outMessage =
-                                MessageBuilder.createMessage(new byte[0], outAccessor.getMessageHeaders());
-
-                        outChannel.send(outMessage);
-                    }
+                    StompHeaderAccessor outAccessor = StompHeaderAccessor.create(StompCommand.RECEIPT);
+                    outAccessor.setSessionId(inAccessor.getSessionId());
+                    outAccessor.setReceiptId(receipt);
+                    outAccessor.setMessageId(inAccessor.getMessageId());
+                    outChannel.send(MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageDTO).getBytes(),
+                                                                 outAccessor.getMessageHeaders()));
                 }
             }
         });
@@ -110,17 +105,11 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void configureClientOutboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new OutboundMessageInterceptor());
+        registration.interceptors(new ChannelInterceptor() {
+            @Override
+            public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
+                outChannel = channel;
+            }
+        });
     }
-
-    class OutboundMessageInterceptor implements ChannelInterceptor {
-        public void postSend(Message message,
-                             MessageChannel channel,
-                             boolean sent) {
-
-            outChannel = channel;
-        }
-    }
-
-
 }

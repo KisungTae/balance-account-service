@@ -1,6 +1,5 @@
-package com.beeswork.balanceaccountservice.config;
+package com.beeswork.balanceaccountservice.config.websocket;
 
-import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +8,8 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 public class StompErrorHandler extends StompSubProtocolErrorHandler {
