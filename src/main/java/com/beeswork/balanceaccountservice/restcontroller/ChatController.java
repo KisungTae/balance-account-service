@@ -20,7 +20,6 @@ import java.util.Locale;
 public class ChatController {
 
     private final StompService stompService;
-    private static final String      ACCEPT_LANGUAGE = "accept-language";
 
     @Autowired
     public ChatController(StompService stompService) {
@@ -29,26 +28,10 @@ public class ChatController {
 
     @MessageMapping("/chat/send")
     public void send(@Payload ChatMessageDTO chatMessageDTO, MessageHeaders messageHeaders) {
-        System.out.println("send");
-        stompService.send(chatMessageDTO, getLocaleFromMessageHeaders(messageHeaders));
+        System.out.println("send!!!!!!!!!!!!!!!!!!!!!!!!!");
+        stompService.send(chatMessageDTO, messageHeaders);
     }
 
-    @SuppressWarnings("unchecked")
-    private Locale getLocaleFromMessageHeaders(MessageHeaders messageHeaders) {
-        MultiValueMap<String, String> nativeHeaders = messageHeaders.get(StompHeaderAccessor.NATIVE_HEADERS,
-                                                                         MultiValueMap.class);
-        
-        String localeCode = nativeHeaders.getFirst(ACCEPT_LANGUAGE);
-        try {
-            Locale locale = LocaleUtils.toLocale("localeCode");
-        } catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
-        }
-
-
-
-        return LocaleUtils.toLocale(nativeHeaders == null ? "" : nativeHeaders.getFirst(ACCEPT_LANGUAGE));
-    }
 }
 
 

@@ -193,5 +193,10 @@ public class BalanceAccountServiceApplication {
 // TODO			52. consider how to retrieve message when enter to a chat, and consider changing createdAt in message generated on the server
 
 // TODO 		53. chagne match to have id increment so that no need to createdAt when fetching list of matches, fetch by id
+//					--> can't because unmatch does not update id then no way to retrieve newly updated match so go for dates
+
+// TODO			54. encrypt chat message
+
+// TODO			55. check daos for match, chat, account because they are all cached
 
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one

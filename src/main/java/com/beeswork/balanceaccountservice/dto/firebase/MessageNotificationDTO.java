@@ -7,13 +7,13 @@ import org.springframework.context.MessageSource;
 
 import java.util.Locale;
 
-public class MessageReceivedNotificationDTO extends AbstractFirebaseNotification {
+public class MessageNotificationDTO extends AbstractFirebaseNotification {
 
     private static final String NOTIFICATION_BODY_CODE = "message.received.notification.body";
 
     private final String senderName;
 
-    public MessageReceivedNotificationDTO(String senderName, String recipientFCMToken) {
+    public MessageNotificationDTO(String senderName, String recipientFCMToken) {
         super(recipientFCMToken);
         this.senderName = senderName;
     }

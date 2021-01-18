@@ -1,10 +1,7 @@
 package com.beeswork.balanceaccountservice.service.chat;
 
-import com.beeswork.balanceaccountservice.config.StompChannelInterceptor;
-import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
+import com.beeswork.balanceaccountservice.dao.chatmessage.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
-import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
-import com.beeswork.balanceaccountservice.dto.firebase.MessageReceivedNotificationDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
@@ -16,32 +13,26 @@ import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedExceptio
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedDeletedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
-import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
-import org.apache.commons.lang3.LocaleUtils;
-import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.core.QueueInformation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.MultiValueMap;
 
 import java.util.Date;
-import java.util.Locale;
 import java.util.UUID;
 
 @Service
 public class ChatServiceImpl implements ChatService {
 
-    private final MatchDAO              matchDAO;
+    private final MatchDAO matchDAO;
+    private final ChatMessageDAO chatMessageDAO;
 
     @Autowired
-    public ChatServiceImpl(MatchDAO matchDAO) {
+    public ChatServiceImpl(MatchDAO matchDAO,
+                           ChatMessageDAO chatMessageDAO) {
         this.matchDAO = matchDAO;
+        this.chatMessageDAO = chatMessageDAO;
     }
 
     @Override
@@ -80,7 +71,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     @Transactional
-    public void validateAndSaveMessage(String accountId,
+    public Long validateAndSaveMessage(String accountId,
                                        String identityToken,
                                        String matchedId,
                                        String chatId,
@@ -89,12 +80,14 @@ public class ChatServiceImpl implements ChatService {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
         Match match = matchDAO.findById(UUID.fromString(accountId), UUID.fromString(identityToken));
         validateChat(match, UUID.fromString(identityToken), Long.valueOf(chatId));
-        match.getChat()
-             .getChatMessages()
-             .add(new ChatMessage(match.getChat(), match.getMatcher(), match.getMatched(), message, createdAt));
+        ChatMessage chatMessage = new ChatMessage(match.getChat(),
+                                                  match.getMatcher(),
+                                                  match.getMatched(),
+                                                  message,
+                                                  createdAt);
+        chatMessageDAO.persist(chatMessage);
+        return chatMessage.getId();
     }
-
-
 
 
 }

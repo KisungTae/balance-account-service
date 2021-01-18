@@ -40,7 +40,6 @@ public abstract class AbstractFirebaseNotification implements FirebaseNotificati
                                    String notificationBodyCode,
                                    String[] notificationBodyArguments,
                                    Type notificationType) {
-
         String body = messageSource.getMessage(notificationBodyCode, notificationBodyArguments, locale);
         String title = messageSource.getMessage(NOTIFICATION_TITLE_CODE, null, locale);
         messageBuilder.setNotification(Notification.builder().setTitle(title).setBody(body).build());

@@ -110,7 +110,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void saveAbout(String accountId, String identityToken, String about, Integer height) {
-
         Account account = findValidAccount(accountId, identityToken);
         account.setHeight(height);
         account.setAbout(about);
@@ -119,13 +118,11 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void saveLocation(String accountId, String identityToken, double latitude, double longitude, Date updatedAt) {
-
         Account account = findValidAccount(accountId, identityToken);
         saveLocation(account, latitude, longitude, updatedAt);
     }
 
     private void saveLocation(Account account, double latitude, double longitude, Date updatedAt) {
-
         account.setLocation(geometryFactory.createPoint(new Coordinate(longitude, latitude)));
         account.setLocationUpdatedAt(updatedAt);
     }
@@ -133,7 +130,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void saveFCMToken(String accountId, String identityToken, String token) {
-
         Account account = findValidAccount(accountId, identityToken);
         account.setFcmToken(token);
     }
@@ -145,7 +141,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void saveAnswers(String accountId, String identityToken, Map<Integer, Boolean> answers) {
-
         Account account = accountDAO.findWithAccountQuestionsIn(UUID.fromString(accountId),
                                                                 UUID.fromString(identityToken),
                                                                 answers.keySet());
@@ -218,7 +213,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Transactional
     public PreRecommendDTO preRecommend(String accountId, String identityToken, Double latitude,
                                         Double longitude, Date locationUpdatedAt, boolean reset) {
-
         Account account = findValidAccount(accountId, identityToken);
 
         PreRecommendDTO preRecommendDTO = new PreRecommendDTO();
@@ -282,7 +276,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void deleteAccount(String accountId, String identityToken) {
-
         Account account = findValidAccount(accountId, identityToken);
 
         // delete photos in s3

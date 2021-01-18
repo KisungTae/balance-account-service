@@ -5,7 +5,9 @@ import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.lang.NonNull;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -14,6 +16,7 @@ import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageBuilder;
 
 import java.util.regex.Pattern;
 
@@ -27,11 +30,11 @@ public class StompChannelInterceptor implements ChannelInterceptor {
 
 
     private static final Pattern VALID_UUID_PATTERN = Pattern.compile(RegexExpression.VALID_UUID);
-    private static final String  FALSE              = Boolean.toString(false);
-    private static final String  TRUE               = Boolean.toString(true);
+    private static final String FALSE = Boolean.toString(false);
+    private static final String TRUE = Boolean.toString(true);
 
 
-    @Override
+    @SneakyThrows @Override
     public Message<?> preSend(Message<?> message, @NonNull MessageChannel channel) {
         MessageHeaders messageHeaders = message.getHeaders();
         StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
@@ -54,17 +57,21 @@ public class StompChannelInterceptor implements ChannelInterceptor {
                 !TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.DURABLE)))
                 throw new BadRequestException();
         } else if (StompCommand.SEND.equals(stompCommand)) {
-//            ChatMessageDTO chatMessageDTO =
-//                    (ChatMessageDTO) compositeMessageConverter.fromMessage(message, ChatMessageDTO.class);
-//            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
-//            validateFields(chatMessageDTO, identityToken);
-//            chatService.validateAndSaveMessage(chatMessageDTO.getAccountId(),
-//                                               identityToken,
-//                                               chatMessageDTO.getRecipientId(),
-//                                               chatMessageDTO.getChatId(),
-//                                               chatMessageDTO.getMessage(),
-//                                               chatMessageDTO.getCreatedAt());
-            return message;
+            ChatMessageDTO chatMessageDTO =
+                    (ChatMessageDTO) compositeMessageConverter.fromMessage(message, ChatMessageDTO.class);
+            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
+            validateFields(chatMessageDTO, identityToken);
+            Long chatMessageId = chatService.validateAndSaveMessage(chatMessageDTO.getAccountId(),
+                                                                    identityToken,
+                                                                    chatMessageDTO.getRecipientId(),
+                                                                    chatMessageDTO.getChatId(),
+                                                                    chatMessageDTO.getMessage(),
+                                                                    chatMessageDTO.getCreatedAt());
+            ChatMessageDTO chatMessageDTO1 = new ChatMessageDTO();
+            chatMessageDTO1.setChatId("1234566789");
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(chatMessageDTO1);
+            return MessageBuilder.createMessage(json, stompHeaderAccessor.getMessageHeaders());
         }
 
 
@@ -91,7 +98,7 @@ public class StompChannelInterceptor implements ChannelInterceptor {
             throw new BadRequestException();
     }
 
-    public static String queueName(String accountId, String chatId) {
+    private String queueName(String accountId, String chatId) {
         return StompHeader.QUEUE_PREFIX + accountId + StompHeader.QUEUE_SEPARATOR + chatId;
     }
 

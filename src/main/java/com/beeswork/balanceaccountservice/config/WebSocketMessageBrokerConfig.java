@@ -11,6 +11,7 @@ import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.simp.stomp.StompBrokerRelayMessageHandler;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
@@ -48,15 +49,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chat").withSockJS();
-//        registry.addEndpoint("/chat").withSockJS();
-//        registry.addEndpoint("/chat");
-//
-
         registry.setErrorHandler(stompErrorHandler());
-
-
-
-        //        registry.addEndpoint("/chat").withSockJS();
     }
 
     @Bean
@@ -76,21 +69,17 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
             @Override
             public Message<?> beforeHandle(Message<?> message, MessageChannel channel, MessageHandler handler) {
+//                System.out.println("beforeHandle!!!!!!!!!!!!!!!!!!!");
                 return message;
             }
 
             @Override
-            public void afterMessageHandled(Message<?> inMessage,
-                                            MessageChannel inChannel, MessageHandler handler, Exception ex) {
-
-
+            public void afterMessageHandled(Message<?> inMessage, MessageChannel inChannel, MessageHandler handler, Exception ex) {
                 StompHeaderAccessor inAccessor = StompHeaderAccessor.wrap(inMessage);
 
+                if (StompCommand.SEND.equals(inAccessor.getCommand()) && handler instanceof StompBrokerRelayMessageHandler) {
 
-
-                if (StompCommand.SEND.equals(inAccessor.getCommand())) {
-
-                    System.out.println("afterMessageHandled");
+                    System.out.println("afterMessageHandled!!!!!!!!!!!!!!!!!!!!!");
 
 
                     ChatMessageDTO chatMessageDTO =

@@ -1,5 +1,7 @@
 package com.beeswork.balanceaccountservice.config;
 
+import org.apache.commons.lang3.LocaleUtils;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -27,10 +29,14 @@ public class WebConfig implements WebMvcConfigurer {
 
     }
 
+    public static Locale defaultLocale() {
+        return Locale.US;
+    }
+
     @Bean
     public LocaleResolver localeResolver() {
         AcceptHeaderLocaleResolver localeResolver = new AcceptHeaderLocaleResolver();
-        localeResolver.setDefaultLocale(Locale.US);
+        localeResolver.setDefaultLocale(defaultLocale());
         return localeResolver;
     }
 
@@ -39,7 +45,7 @@ public class WebConfig implements WebMvcConfigurer {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:messages");
         messageSource.setDefaultEncoding("UTF-8");
-        messageSource.setDefaultLocale(Locale.US);
+        messageSource.setDefaultLocale(defaultLocale());
         return messageSource;
     }
 
