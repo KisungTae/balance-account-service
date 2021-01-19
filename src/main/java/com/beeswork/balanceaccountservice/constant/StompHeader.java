@@ -1,5 +1,14 @@
 package com.beeswork.balanceaccountservice.constant;
 
+import com.beeswork.balanceaccountservice.config.WebConfig;
+import org.apache.commons.lang3.LocaleUtils;
+import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.util.MultiValueMap;
+
+import java.util.Locale;
+
 public class StompHeader {
 
     public static final String ACCOUNT_ID       = "account-id";
@@ -12,4 +21,30 @@ public class StompHeader {
     public static final String RECIPIENT_ID = "recipient-id";
     public static final String QUEUE_PREFIX     = "/queue/";
     public static final String QUEUE_SEPARATOR  = "-";
+    public static final String ACCEPT_LANGUAGE = "accept-language";
+    public static final String ERROR = "error";
+
+
+    public static Locale getLocaleFromAcceptLanguageHeader(StompHeaderAccessor stompHeaderAccessor) {
+        if (stompHeaderAccessor == null) return WebConfig.defaultLocale();
+        return getLocaleFromAcceptLanguageHeader(stompHeaderAccessor.getFirstNativeHeader(ACCEPT_LANGUAGE));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Locale getLocaleFromAcceptLanguageHeader(MessageHeaders messageHeaders) {
+        if (messageHeaders == null) return WebConfig.defaultLocale();
+        MultiValueMap<String, String> nativeHeaders =
+                messageHeaders.get(StompHeaderAccessor.NATIVE_HEADERS, MultiValueMap.class);
+        if (nativeHeaders == null) return WebConfig.defaultLocale();
+        return getLocaleFromAcceptLanguageHeader(nativeHeaders.getFirst(ACCEPT_LANGUAGE));
+    }
+
+    public static Locale getLocaleFromAcceptLanguageHeader(String localeCode) {
+        if (localeCode == null) return WebConfig.defaultLocale();
+        try {
+            return LocaleUtils.toLocale(localeCode);
+        } catch (Exception e) {
+            return WebConfig.defaultLocale();
+        }
+    }
 }

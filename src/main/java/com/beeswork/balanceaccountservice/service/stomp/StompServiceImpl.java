@@ -51,18 +51,4 @@ public class StompServiceImpl implements StompService {
 //                                             getLocaleFromMessageHeaders(messageHeaders));
 //        } else simpMessagingTemplate.convertAndSend(StompHeader.QUEUE_PREFIX + queue, chatMessageDTO);
     }
-
-    @SuppressWarnings("unchecked")
-    private Locale getLocaleFromMessageHeaders(MessageHeaders messageHeaders) {
-        MultiValueMap<String, String> nativeHeaders =
-                messageHeaders.get(StompHeaderAccessor.NATIVE_HEADERS, MultiValueMap.class);
-        if (nativeHeaders == null) return WebConfig.defaultLocale();
-        String localeCode = nativeHeaders.getFirst(ACCEPT_LANGUAGE);
-        if (localeCode == null) return WebConfig.defaultLocale();
-        try {
-            return LocaleUtils.toLocale(localeCode);
-        } catch (Exception e) {
-            return WebConfig.defaultLocale();
-        }
-    }
 }

@@ -20,10 +20,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.ExecutorChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
 @EnableWebSocket
@@ -31,7 +28,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     private MessageChannel outChannel;
-
 
     @Autowired
     private CompositeMessageConverter compositeMessageConverter;
@@ -48,8 +44,14 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
               .setRelayPort(61613)
               .setClientLogin("guest")
               .setClientPasscode("guest");
+
     }
 
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
+//        registry.setMessageSizeLimit(1);
+//        registry.setSendBufferSizeLimit(1);
+    }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
