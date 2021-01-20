@@ -4,6 +4,8 @@ import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.util.StringUtils;
 import lombok.SneakyThrows;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.QueueInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -98,7 +100,8 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                     outAccessor.setSessionId(inAccessor.getSessionId());
                     outAccessor.setReceiptId(receipt);
                     outAccessor.setMessageId(inAccessor.getMessageId());
-                    outChannel.send(MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageDTO).getBytes(),
+                    outChannel.send(MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageDTO)
+                                                                             .getBytes(),
                                                                  outAccessor.getMessageHeaders()));
                 }
             }

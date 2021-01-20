@@ -8,12 +8,13 @@ import org.springframework.retry.annotation.Retryable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public interface PhotoService {
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-    void addPhoto(String accountId, String identityToken, String photoKey, int sequence);
+    void addPhoto(UUID accountId, UUID identityToken, String photoKey, int sequence);
 
-    List<PhotoDTO> listPhotos(String accountId, String identityToken);
-    void deletePhoto(String accountId, String identityToken, String photoKey);
-    void reorderPhotos(String accountId, String identityToken, Map<String, Integer> photoOrders);
+    List<PhotoDTO> listPhotos(UUID accountId, UUID identityToken);
+    void deletePhoto(UUID accountId, UUID identityToken, String photoKey);
+    void reorderPhotos(UUID accountId, UUID identityToken, Map<String, Integer> photoOrders);
 }

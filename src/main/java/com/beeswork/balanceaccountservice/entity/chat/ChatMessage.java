@@ -20,10 +20,11 @@ import java.util.UUID;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ChatMessage {
 
-    public ChatMessage(Chat chat, Account account, Account recipient, String message, Date createdAt) {
+    public ChatMessage(Chat chat, Account account, Account recipient, Long messageId, String message, Date createdAt) {
         this.chat = chat;
         this.account = account;
         this.recipient = recipient;
+        this.messageId = messageId;
         this.message = message;
         this.createdAt = createdAt;
     }
@@ -32,6 +33,9 @@ public class ChatMessage {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "message_id")
+    private Long messageId;
 
     @Column(name = "chat_id", insertable = false, updatable = false)
     private Long chatId;

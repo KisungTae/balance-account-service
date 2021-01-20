@@ -72,13 +72,14 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     @Transactional
-    public Long validateAndSaveMessage(ChatMessageDTO chatMessageDTO, String identityToken) {
+    public Long validateAndSaveMessage(ChatMessageDTO chatMessageDTO, String identityToken, String messageId) {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
         Match match = matchDAO.findById(UUID.fromString(chatMessageDTO.getAccountId()), UUID.fromString(chatMessageDTO.getRecipientId()));
         validateChat(match, UUID.fromString(identityToken), Long.valueOf(chatMessageDTO.getChatId()));
         ChatMessage chatMessage = new ChatMessage(match.getChat(),
                                                   match.getMatcher(),
                                                   match.getMatched(),
+                                                  Long.valueOf(messageId),
                                                   chatMessageDTO.getMessage(),
                                                   chatMessageDTO.getCreatedAt());
         chatMessageDAO.persist(chatMessage);

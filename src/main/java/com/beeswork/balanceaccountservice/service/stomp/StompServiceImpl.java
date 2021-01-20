@@ -40,6 +40,7 @@ public class StompServiceImpl implements StompService {
         this.accountDAO = accountDAO;
     }
 
+//  NOTE 1. convertAndSend to not existing queue, it creates a new queue under the queue desitination
     @Override
     public void send(ChatMessageDTO chatMessageDTO, MessageHeaders messageHeaders) {
 //        String queue = chatMessageDTO.getRecipientId() + StompHeader.QUEUE_SEPARATOR + chatMessageDTO.getChatId();

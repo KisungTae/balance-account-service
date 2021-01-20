@@ -4,10 +4,11 @@ import com.beeswork.balanceaccountservice.projection.MatchProjection;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public interface MatchService {
 
 
-    List<MatchProjection> listMatches(String accountId, String identityToken, Date fetchedAt);
-    void unmatch(String accountId, String identityToken, String unmatchedId);
+    List<MatchProjection> listMatches(UUID accountId, UUID identityToken, Date fetchedAt);
+    void unmatch(UUID accountId, UUID identityToken, UUID unmatchedId);
 }

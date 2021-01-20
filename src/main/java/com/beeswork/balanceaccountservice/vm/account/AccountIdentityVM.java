@@ -4,18 +4,16 @@ import com.beeswork.balanceaccountservice.validator.ValidUUID;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import java.util.UUID;
 
 @Getter
 @Setter
 public class AccountIdentityVM {
 
-    @NotEmpty(message = "{account.uuid.empty}")
-    @ValidUUID(message = "{account.uuid.invalid}")
-    protected String accountId;
+    @ValidUUID
+    protected UUID accountId;
 
-    @NotEmpty(message = "{identity.token.uuid.empty}")
-    @ValidUUID(message = "{identity.token.uuid.invalid}")
-    protected String identityToken;
+    @ValidUUID
+    protected UUID identityToken;
 }

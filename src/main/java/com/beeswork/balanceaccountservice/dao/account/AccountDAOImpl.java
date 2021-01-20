@@ -50,6 +50,16 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
         return jpaQueryFactory.selectFrom(qAccount).where(qAccount.email.eq(email)).fetchCount() > 0;
     }
 
+    public Account findWithPhotosAndAccountQuestions(UUID accountId, UUID identityToken) {
+        return jpaQueryFactory.selectFrom(qAccount)
+                              .leftJoin(qAccount.photos, qPhoto)
+                              .fetchJoin()
+                              .leftJoin(qAccount.accountQuestions, qAccountQuestion)
+                              .fetchJoin()
+                              .where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken)))
+                              .fetchOne();
+    }
+
     @Override
     public Account findWithPhotos(UUID accountId, UUID identityToken) {
         return jpaQueryFactory.selectFrom(qAccount)
@@ -66,7 +76,8 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
                               .where(qAccount.id.eq(accountId)
                                                 .and(qAccount.identityToken.eq(identityToken))
                                                 .and(qAccountQuestion.selected.eq(true)
-                                                                              .or(qAccountQuestion.questionId.in(questionIds))))
+                                                                              .or(qAccountQuestion.questionId.in(
+                                                                                      questionIds))))
                               .fetchOne();
     }
 
@@ -96,7 +107,13 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Object[]> findAllWithin(int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point point) {
+    public List<Object[]> findAllWithin(int distance,
+                                        int minAge,
+                                        int maxAge,
+                                        boolean gender,
+                                        int limit,
+                                        int offset,
+                                        Point point) {
         return entityManager.createNativeQuery(
                 "select cast(b.id as varchar), b.name, b.about, b.birth_year, st_distance(b.location, :pivot), p.key, b.height " +
                 "from (select * " +

@@ -6,18 +6,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Getter
 @Setter
 public class ClickVM extends AccountIdentityVM {
 
-    @NotEmpty(message = "{uuid.empty}")
-    @ValidUUID(message = "{uuid.invalid}")
-    private String swipedId;
+    @ValidUUID
+    private UUID swipedId;
 
     @Size(min = 3, max = 6, message = "{swipe.click.answers.size}")
     private Map<Integer, Boolean> answers = new HashMap<>();

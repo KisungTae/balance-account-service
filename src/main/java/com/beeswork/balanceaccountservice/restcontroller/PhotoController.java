@@ -47,7 +47,7 @@ public class PhotoController extends BaseController {
                               addPhotoVM.getPhotoKey(),
                               addPhotoVM.getSequence());
 
-        PreSignedUrl preSignedUrl = s3Service.preSignedUrl(addPhotoVM.getAccountId(), addPhotoVM.getPhotoKey());
+        PreSignedUrl preSignedUrl = s3Service.preSignedUrl(addPhotoVM.getAccountId().toString(), addPhotoVM.getPhotoKey());
 
         return ResponseEntity.status(HttpStatus.OK)
                              .body(objectMapper.writeValueAsString(preSignedUrl));
@@ -85,7 +85,7 @@ public class PhotoController extends BaseController {
                                  deletePhotoVM.getIdentityToken(),
                                  deletePhotoVM.getPhotoKey());
 
-        s3Service.deletePhoto(deletePhotoVM.getAccountId(), deletePhotoVM.getPhotoKey());
+        s3Service.deletePhoto(deletePhotoVM.getAccountId().toString(), deletePhotoVM.getPhotoKey());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 }

@@ -1,11 +1,8 @@
 package com.beeswork.balanceaccountservice.vm.account;
 
-import com.beeswork.balanceaccountservice.validator.ValidUUID;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.constraints.*;
 import java.util.Date;

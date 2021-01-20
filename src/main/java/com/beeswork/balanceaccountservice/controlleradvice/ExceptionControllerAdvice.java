@@ -15,7 +15,7 @@ import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
-import com.beeswork.balanceaccountservice.vm.account.AccountEmailDuplicateException;
+import com.beeswork.balanceaccountservice.exception.account.AccountEmailDuplicateException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;

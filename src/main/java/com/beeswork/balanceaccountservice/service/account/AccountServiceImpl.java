@@ -1,12 +1,8 @@
 package com.beeswork.balanceaccountservice.service.account;
 
 
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
-import com.amazonaws.services.s3.model.DeleteObjectsResult;
 import com.beeswork.balanceaccountservice.config.properties.AWSProperties;
 import com.beeswork.balanceaccountservice.constant.AccountType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
@@ -19,7 +15,7 @@ import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.exception.account.AccountEmailNotMutableException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
-import com.beeswork.balanceaccountservice.vm.account.AccountEmailDuplicateException;
+import com.beeswork.balanceaccountservice.exception.account.AccountEmailDuplicateException;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -67,12 +63,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         this.geometryFactory = geometryFactory;
     }
 
-
-
-
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public ProfileDTO getProfile(String accountId, String identityToken) {
+    public ProfileDTO getProfile(UUID accountId, UUID identityToken) {
         Account account = findValidAccount(accountId, identityToken);
         return modelMapper.map(account, ProfileDTO.class);
     }
@@ -86,7 +79,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          then Hibernate won't delete accountQuestions even if their size = 0
     @Override
     @Transactional
-    public void saveProfile(String accountId, String identityToken, String name, Date birth, String about,
+    public void saveProfile(UUID accountId, UUID identityToken, String name, Date birth, String about,
                             Integer height, boolean gender) {
 
         Account account = findValidAccount(accountId, identityToken);
@@ -109,7 +102,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
-    public void saveAbout(String accountId, String identityToken, String about, Integer height) {
+    public void saveAbout(UUID accountId, UUID identityToken, String about, Integer height) {
         Account account = findValidAccount(accountId, identityToken);
         account.setHeight(height);
         account.setAbout(about);
@@ -117,7 +110,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
-    public void saveLocation(String accountId, String identityToken, double latitude, double longitude, Date updatedAt) {
+    public void saveLocation(UUID accountId, UUID identityToken, double latitude, double longitude, Date updatedAt) {
         Account account = findValidAccount(accountId, identityToken);
         saveLocation(account, latitude, longitude, updatedAt);
     }
@@ -129,7 +122,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
-    public void saveFCMToken(String accountId, String identityToken, String token) {
+    public void saveFCMToken(UUID accountId, UUID identityToken, String token) {
         Account account = findValidAccount(accountId, identityToken);
         account.setFcmToken(token);
     }
@@ -140,10 +133,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          accountQuestions to check if it needs to remove or insert or update entities
     @Override
     @Transactional
-    public void saveAnswers(String accountId, String identityToken, Map<Integer, Boolean> answers) {
-        Account account = accountDAO.findWithAccountQuestionsIn(UUID.fromString(accountId),
-                                                                UUID.fromString(identityToken),
-                                                                answers.keySet());
+    public void saveAnswers(UUID accountId, UUID identityToken, Map<Integer, Boolean> answers) {
+        Account account = accountDAO.findWithAccountQuestionsIn(accountId, identityToken, answers.keySet());
         checkIfAccountValid(account);
 
         Map<Integer, Integer> sequences = new LinkedHashMap<>();
@@ -196,8 +187,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
-    public void saveEmail(String accountId, String identityToken, String email) {
-
+    public void saveEmail(UUID accountId, UUID identityToken, String email) {
         Account account = findValidAccount(accountId, identityToken);
 
         if (account.getAccountType() == AccountType.NAVER || account.getAccountType() == AccountType.GOOGLE)
@@ -211,7 +201,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
-    public PreRecommendDTO preRecommend(String accountId, String identityToken, Double latitude,
+    public PreRecommendDTO preRecommend(UUID accountId, UUID identityToken, Double latitude,
                                         Double longitude, Date locationUpdatedAt, boolean reset) {
         Account account = findValidAccount(accountId, identityToken);
 
@@ -237,7 +227,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<CardDTO> recommend(int distance, int minAge, int maxAge, boolean gender, Point location, int index) {
-
         if (distance < minDistance || distance > maxDistance)
             distance = maxDistance;
 
@@ -275,8 +264,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
-    public void deleteAccount(String accountId, String identityToken) {
-        Account account = findValidAccount(accountId, identityToken);
+    public void deleteAccount(UUID accountId, UUID identityToken) {
+        Account account = accountDAO.findWithPhotosAndAccountQuestions(accountId, identityToken);
 
         // delete photos in s3
         ArrayList<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<>();
@@ -319,9 +308,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         account.setUpdatedAt(today);
     }
 
-    private Account findValidAccount(String accountId, String identityToken) {
-        Account account = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
-        checkIfAccountValid(account);
+    private Account findValidAccount(UUID accountId, UUID identityToken) {
+        Account account = accountDAO.findById(accountId);
+        checkIfAccountValid(account, identityToken);
         return account;
     }
 }

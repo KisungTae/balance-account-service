@@ -1,13 +1,10 @@
 package com.beeswork.balanceaccountservice.vm.account;
 
-import com.beeswork.balanceaccountservice.validator.ValidUUID;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.annotation.RegEx;
 import javax.validation.constraints.*;
 import java.util.Date;
-import java.util.UUID;
 
 @Getter
 @Setter

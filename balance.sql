@@ -297,6 +297,7 @@ create index match_matcher_id_matched_id_chat_id on match (matcher_id, matched_i
 create table chat_message
 (
     id           bigserial primary key,
+    message_id   bigint    not null,
     chat_id      bigint    not null,
     account_id   uuid      not null,
     recipient_id uuid      not null,
@@ -310,10 +311,9 @@ create table chat_message
 
 
 
-
 select m1.matcher_id, m1.matched_id, m1.chat_id, m2.matcher_id, m2.matched_id, m2.chat_id
 from match m1
-left join match m2 on m1.matcher_id = m2.matched_id and m1.matched_id = m2.matcher_id;
+         left join match m2 on m1.matcher_id = m2.matched_id and m1.matched_id = m2.matcher_id;
 
 
 select *
@@ -324,8 +324,9 @@ select *
 from account
 where id = '9f881819-638a-4098-954c-ce34b133d32a';
 
-select * from match
-where matcher_id = '0a164463-f27f-4a68-840b-4e04c0becb3c';
+select *
+from match
+where matcher_id = '9f881819-638a-4098-954c-ce34b133d32a';
 
 select *
 from chat_message
@@ -415,7 +416,8 @@ create table unblock
 );
 
 
-select * from account
+select *
+from account
 where id = '562b9e01-611c-4e2a-b5ee-a15a0224e211';
 
 select matched_id, count(*)
@@ -423,200 +425,12 @@ from match
 group by matched_id
 order by count(*) desc;
 
-select * from match where matcher_id = '562b9e01-611c-4e2a-b5ee-a15a0224e211' and chat_id = 14;
+select *
+from match
+where matcher_id = '562b9e01-611c-4e2a-b5ee-a15a0224e211'
+  and chat_id = 14;
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-123
-34
-97
-99
-99
-111
-117
-110
-116
-73
-100
-34
-58
-34
-57
-102
-56
-56
-49
-56
-49
-57
-45
-54
-51
-56
-97
-45
-52
-48
-57
-56
-45
-57
-53
-52
-99
-45
-99
-101
-51
-52
-98
-49
-51
-51
-100
-51
-50
-97
-34
-44
-34
-99
-104
-97
-116
-73
-100
-34
-58
-34
-50
-57
-34
-44
-34
-99
-114
-101
-97
-116
-101
-100
-65
-116
-34
-58
-34
-50
-48
-50
-49
-45
-48
-49
-45
-49
-56
-84
-48
-48
-58
-51
-51
-58
-48
-48
-46
-51
-
-53
-50
-90
-34
-44
-34
-109
-101
-115
-115
-97
-103
-101
-34
-58
-34
-97
-97
-97
-97
-34
-44
-34
-114
-101
-99
-105
-112
-105
-101
-110
-116
-73
-100
-34
-58
-34
-56
-57
-52
-98
-52
-57
-54
-48
-45
-52
-51
-100
-102
-45
-52
-50
-102
-57
-45
-98
-57
-56
-55
-45
-53
-100
-55
-51
-97
-53
-99
-99
-52
-101
-102
-53
-34
-125
-10
-10

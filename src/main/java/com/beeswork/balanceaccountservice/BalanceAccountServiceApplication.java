@@ -199,4 +199,10 @@ public class BalanceAccountServiceApplication {
 
 // TODO			55. check daos for match, chat, account because they are all cached
 
+// TODO			56. check unmatch() in matchService in regards to cache findMatchById
+
+// TODO			57. change to throw badrequestexception if field errors inclde accountId and IdentityToekn in base controller
+
+// TODO			58. check delete photo in account service and the findWithPhotosAndAccountQuestions()
+
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one

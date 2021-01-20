@@ -33,8 +33,8 @@ public class StompChannelInterceptor implements ChannelInterceptor {
 
 
     private static final Pattern VALID_UUID_PATTERN = Pattern.compile(RegexExpression.VALID_UUID);
-    private static final String  FALSE              = Boolean.toString(false);
-    private static final String  TRUE               = Boolean.toString(true);
+    private static final String FALSE = Boolean.toString(false);
+    private static final String TRUE = Boolean.toString(true);
 
 
     @SneakyThrows
@@ -62,23 +62,27 @@ public class StompChannelInterceptor implements ChannelInterceptor {
                 throw new BadRequestException();
 
         } else if (StompCommand.SEND.equals(stompCommand)) {
-            ChatMessageDTO chatMessageDTO =
-                    (ChatMessageDTO) compositeMessageConverter.fromMessage(message, ChatMessageDTO.class);
-            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
-            validateFields(chatMessageDTO, identityToken);
-            chatMessageDTO.setId(chatService.validateAndSaveMessage(chatMessageDTO, identityToken));
-            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageDTO),
-                                                stompHeaderAccessor.getMessageHeaders());
+//            ChatMessageDTO chatMessageDTO =
+//                    (ChatMessageDTO) compositeMessageConverter.fromMessage(message, ChatMessageDTO.class);
+//            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
+//            String messageId = stompHeaderAccessor.getMessageId();
+//            validateFields(chatMessageDTO, identityToken, messageId);
+//            chatMessageDTO.setId(chatService.validateAndSaveMessage(chatMessageDTO,
+//                                                                    identityToken,
+//                                                                    messageId));
+//            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageDTO),
+//                                                stompHeaderAccessor.getMessageHeaders());
         }
         return message;
     }
 
-    private void validateFields(ChatMessageDTO chatMessageDTO, String identityToken) {
+    private void validateFields(ChatMessageDTO chatMessageDTO, String identityToken, String messageId) {
         if (chatMessageDTO == null) throw new BadRequestException();
         validateFields(chatMessageDTO.getAccountId(),
                        identityToken,
                        chatMessageDTO.getRecipientId(),
                        chatMessageDTO.getChatId());
+        if (!isNumber(messageId)) throw new BadRequestException();
     }
 
     private void validateFields(String accountId, String identityToken, String recipientId, String chatId) {

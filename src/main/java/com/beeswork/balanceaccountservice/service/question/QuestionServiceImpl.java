@@ -37,10 +37,8 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<QuestionDTO> listQuestions(String accountId, String identityToken) {
-
-        Account account = accountDAO.findWithAccountQuestions(UUID.fromString(accountId),
-                                                              UUID.fromString(identityToken));
+    public List<QuestionDTO> listQuestions(UUID accountId, UUID identityToken) {
+        Account account = accountDAO.findWithAccountQuestions(accountId, identityToken);
         checkIfAccountValid(account);
 
         List<QuestionDTO> questionDTOs = new ArrayList<>();

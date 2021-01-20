@@ -60,11 +60,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public List<QuestionDTO> swipe(String accountId, String identityToken, String swipedId) {
-        Account swiper = accountDAO.findBy(UUID.fromString(accountId), UUID.fromString(identityToken));
-        checkIfAccountValid(swiper);
+    public List<QuestionDTO> swipe(UUID accountId, UUID identityToken, UUID swipedId) {
+        Account swiper = accountDAO.findById(accountId);
+        checkIfAccountValid(swiper, identityToken);
 
-        Account swiped = accountDAO.findWithAccountQuestions(UUID.fromString(swipedId));
+        Account swiped = accountDAO.findWithAccountQuestions(swipedId);
         checkIfSwipedValid(swiped);
 
         if (swiped.getAccountQuestions().size() == 0)
@@ -74,7 +74,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         if (swiper.getFreeSwipe() < SWIPE_POINT && swiper.getPoint() < SWIPE_POINT)
             throw new AccountShortOfPointException();
 
-        Swipe swipe = swipeDAO.findBy(UUID.fromString(accountId), UUID.fromString(swipedId));
+        Swipe swipe = swipeDAO.findBy(accountId, swipedId);
 
         if (swipe != null && swipe.isClicked())
             throw new SwipeClickedExistsException();
@@ -105,39 +105,33 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<ClickProjection> listClick(String accountId, String identityToken, Date fetchedAt) {
-        UUID accountUUId = UUID.fromString(accountId);
-        Account account = accountDAO.findBy(accountUUId, UUID.fromString(identityToken));
-        checkIfAccountValid(account);
-        return swipeDAO.findAllClickAfter(accountUUId, fetchedAt);
+    public List<ClickProjection> listClick(UUID accountId, UUID identityToken, Date fetchedAt) {
+        Account account = accountDAO.findById(accountId);
+        checkIfAccountValid(account, identityToken);
+        return swipeDAO.findAllClickAfter(accountId, fetchedAt);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<ClickedProjection> listClicked(String accountId, String identityToken, Date fetchedAt) {
-        UUID accountUUId = UUID.fromString(accountId);
-        Account account = accountDAO.findBy(accountUUId, UUID.fromString(identityToken));
-        checkIfAccountValid(account);
-        return swipeDAO.findAllClickedAfter(accountUUId, fetchedAt);
+    public List<ClickedProjection> listClicked(UUID accountId, UUID identityToken, Date fetchedAt) {
+        Account account = accountDAO.findById(accountId);
+        checkIfAccountValid(account, identityToken);
+        return swipeDAO.findAllClickedAfter(accountId, fetchedAt);
     }
-
 
     @Override
     @Transactional
-    public ClickDTO click(String accountId,
-                          String identityToken,
-                          String swipedId,
+    public ClickDTO click(UUID accountId,
+                          UUID identityToken,
+                          UUID swipedId,
                           Map<Integer, Boolean> answers,
                           Locale locale) {
-        UUID swiperUUId = UUID.fromString(accountId);
-        UUID swipedUUId = UUID.fromString(swipedId);
-
-        Swipe swipe = swipeDAO.findWithAccounts(swiperUUId, swipedUUId);
+        Swipe swipe = swipeDAO.findWithAccounts(accountId, swipedId);
 
         Account swiper = swipe.getSwiper();
         Account swiped = swipe.getSwiped();
 
-        checkIfAccountValid(swiper, UUID.fromString(identityToken));
+        checkIfAccountValid(swiper, identityToken);
         checkIfSwipedValid(swiped);
 
         rechargeFreeSwipe(swiper);
@@ -150,7 +144,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         ClickDTO clickDTO = new ClickDTO();
 
-        if (accountQuestionDAO.findAllByAnswer(swipedUUId, answers) != answers.size())
+        if (accountQuestionDAO.findAllByAnswer(swipedId, answers) != answers.size())
             return clickDTO;
 
         swipe.setClicked(true);
@@ -158,7 +152,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         swipe.setUpdatedAt(updatedAt);
 
         // match
-        if (swipeDAO.existsByClicked(swipedUUId, swiperUUId, true)) {
+        if (swipeDAO.existsByClicked(swipedId, accountId, true)) {
             Chat chat = new Chat();
             chatDAO.persist(chat);
 

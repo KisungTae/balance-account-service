@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.vm.account;
+package com.beeswork.balanceaccountservice.exception.account;
 
 import com.beeswork.balanceaccountservice.exception.BaseException;
 
