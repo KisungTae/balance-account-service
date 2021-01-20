@@ -45,21 +45,21 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         StompCommand stompCommand = stompHeaderAccessor.getCommand();
 
         if (StompCommand.SUBSCRIBE.equals(stompCommand)) {
-            String accountId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.ACCOUNT_ID);
-            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
-            String recipientId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECIPIENT_ID);
-            String chatId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.CHAT_ID);
-            validateFields(accountId, identityToken, recipientId, chatId);
-            chatService.validateChat(accountId, identityToken, recipientId, chatId);
-
-            Object destination = messageHeaders.get(StompHeader.SIMP_DESTINATION);
-            if (destination == null || !queueName(accountId, chatId).equals(destination.toString()))
-                throw new BadRequestException();
-
-            if (!TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.AUTO_DELETE)) ||
-                !FALSE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.EXCLUSIVE)) ||
-                !TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.DURABLE)))
-                throw new BadRequestException();
+//            String accountId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.ACCOUNT_ID);
+//            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
+//            String recipientId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECIPIENT_ID);
+//            String chatId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.CHAT_ID);
+//            validateFields(accountId, identityToken, recipientId, chatId);
+//            chatService.validateChat(accountId, identityToken, recipientId, chatId);
+//
+//            Object destination = messageHeaders.get(StompHeader.SIMP_DESTINATION);
+//            if (destination == null || !queueName(accountId, chatId).equals(destination.toString()))
+//                throw new BadRequestException();
+//
+//            if (!TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.AUTO_DELETE)) ||
+//                !FALSE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.EXCLUSIVE)) ||
+//                !TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.DURABLE)))
+//                throw new BadRequestException();
 
         } else if (StompCommand.SEND.equals(stompCommand)) {
 //            ChatMessageDTO chatMessageDTO =
@@ -78,10 +78,10 @@ public class StompChannelInterceptor implements ChannelInterceptor {
 
     private void validateFields(ChatMessageDTO chatMessageDTO, String identityToken, String messageId) {
         if (chatMessageDTO == null) throw new BadRequestException();
-        validateFields(chatMessageDTO.getAccountId(),
-                       identityToken,
-                       chatMessageDTO.getRecipientId(),
-                       chatMessageDTO.getChatId());
+//        validateFields(chatMessageDTO.getAccountId(),
+//                       identityToken,
+//                       chatMessageDTO.getRecipientId(),
+//                       chatMessageDTO.getChatId());
         if (!isNumber(messageId)) throw new BadRequestException();
     }
 

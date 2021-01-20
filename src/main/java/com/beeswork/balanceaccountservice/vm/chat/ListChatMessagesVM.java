@@ -5,15 +5,20 @@ import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Getter
 @Setter
-public class ListMessagesVM extends AccountIdentityVM {
+public class ListChatMessagesVM extends AccountIdentityVM {
 
 
+    @NotNull
     private Long chatId;
 
     @ValidUUID
     private UUID recipientId;
+
+    @NotNull
+    private Long lastChatMessageId;
 }

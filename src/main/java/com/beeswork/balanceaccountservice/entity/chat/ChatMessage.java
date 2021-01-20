@@ -20,12 +20,12 @@ import java.util.UUID;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ChatMessage {
 
-    public ChatMessage(Chat chat, Account account, Account recipient, Long messageId, String message, Date createdAt) {
+    public ChatMessage(Chat chat, Account account, Account recipient, Long messageId, String body, Date createdAt) {
         this.chat = chat;
         this.account = account;
         this.recipient = recipient;
         this.messageId = messageId;
-        this.message = message;
+        this.body = body;
         this.createdAt = createdAt;
     }
 
@@ -58,8 +58,8 @@ public class ChatMessage {
     @JoinColumn(name = "recipient_id")
     private Account recipient;
 
-    @Column(name = "message")
-    private String message;
+    @Column(name = "body")
+    private String body;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

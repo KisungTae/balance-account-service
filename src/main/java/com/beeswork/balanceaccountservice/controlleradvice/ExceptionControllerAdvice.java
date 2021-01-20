@@ -71,7 +71,7 @@ public class ExceptionControllerAdvice {
     public ResponseEntity<String> handleMessageException(Exception e) {
 //        TODO: log exception for later review
         System.out.println("handleMessageException");
-        System.out.println(e.getLocalizedMessage());
+//        System.out.println(e.getLocalizedMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("abc error ");
     }
 

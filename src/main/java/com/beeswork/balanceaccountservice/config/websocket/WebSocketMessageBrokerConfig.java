@@ -86,23 +86,23 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                 if (StompCommand.SEND.equals(inAccessor.getCommand()) &&
                     handler instanceof StompBrokerRelayMessageHandler) {
 
-                    String receipt = inAccessor.getReceipt();
-                    ChatMessageDTO chatMessageDTO =
-                            (ChatMessageDTO) compositeMessageConverter.fromMessage(inMessage, ChatMessageDTO.class);
-
-                    if (StringUtils.isEmpty(receipt) || outChannel == null || chatMessageDTO == null) return;
-
-                    chatMessageDTO.setAccountId(null);
-                    chatMessageDTO.setMessage(null);
-                    chatMessageDTO.setRecipientId(null);
-
-                    StompHeaderAccessor outAccessor = StompHeaderAccessor.create(StompCommand.RECEIPT);
-                    outAccessor.setSessionId(inAccessor.getSessionId());
-                    outAccessor.setReceiptId(receipt);
-                    outAccessor.setMessageId(inAccessor.getMessageId());
-                    outChannel.send(MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageDTO)
-                                                                             .getBytes(),
-                                                                 outAccessor.getMessageHeaders()));
+//                    String receipt = inAccessor.getReceipt();
+//                    ChatMessageDTO chatMessageDTO =
+//                            (ChatMessageDTO) compositeMessageConverter.fromMessage(inMessage, ChatMessageDTO.class);
+//
+//                    if (StringUtils.isEmpty(receipt) || outChannel == null || chatMessageDTO == null) return;
+//
+//                    chatMessageDTO.setAccountId(null);
+//                    chatMessageDTO.setMessage(null);
+//                    chatMessageDTO.setRecipientId(null);
+//
+//                    StompHeaderAccessor outAccessor = StompHeaderAccessor.create(StompCommand.RECEIPT);
+//                    outAccessor.setSessionId(inAccessor.getSessionId());
+//                    outAccessor.setReceiptId(receipt);
+//                    outAccessor.setMessageId(inAccessor.getMessageId());
+//                    outChannel.send(MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageDTO)
+//                                                                             .getBytes(),
+//                                                                 outAccessor.getMessageHeaders()));
                 }
             }
         });

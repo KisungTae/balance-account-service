@@ -14,13 +14,15 @@ import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedExceptio
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedDeletedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -28,12 +30,14 @@ public class ChatServiceImpl implements ChatService {
 
     private final MatchDAO matchDAO;
     private final ChatMessageDAO chatMessageDAO;
+    private final ModelMapper modelMapper;
 
     @Autowired
     public ChatServiceImpl(MatchDAO matchDAO,
-                           ChatMessageDAO chatMessageDAO) {
+                           ChatMessageDAO chatMessageDAO, ModelMapper modelMapper) {
         this.matchDAO = matchDAO;
         this.chatMessageDAO = chatMessageDAO;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -74,16 +78,35 @@ public class ChatServiceImpl implements ChatService {
     @Transactional
     public Long validateAndSaveMessage(ChatMessageDTO chatMessageDTO, String identityToken, String messageId) {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
-        Match match = matchDAO.findById(UUID.fromString(chatMessageDTO.getAccountId()), UUID.fromString(chatMessageDTO.getRecipientId()));
-        validateChat(match, UUID.fromString(identityToken), Long.valueOf(chatMessageDTO.getChatId()));
+        Match match = matchDAO.findById(chatMessageDTO.getAccountId(), chatMessageDTO.getRecipientId());
+        validateChat(match, UUID.fromString(identityToken), chatMessageDTO.getChatId());
         ChatMessage chatMessage = new ChatMessage(match.getChat(),
                                                   match.getMatcher(),
                                                   match.getMatched(),
                                                   Long.valueOf(messageId),
-                                                  chatMessageDTO.getMessage(),
+                                                  chatMessageDTO.getBody(),
                                                   chatMessageDTO.getCreatedAt());
         chatMessageDAO.persist(chatMessage);
         return chatMessage.getId();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public List<ChatMessageDTO> listChatMessages(UUID accountId,
+                                                 UUID identityToken,
+                                                 UUID recipientId,
+                                                 Long chatId,
+                                                 Long lastChatMessageId) {
+        validateChat(matchDAO.findById(accountId, recipientId), identityToken, chatId);
+
+        List<ChatMessageDTO> chatMessageDTOs = new ArrayList<>();
+        for (ChatMessage chatMessage : chatMessageDAO.findAllByChatIdAfter(chatId, lastChatMessageId)) {
+            ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessage, ChatMessageDTO.class);
+            if (chatMessage.getRecipientId().equals(recipientId))
+                chatMessageDTO.setMessageId(null);
+            chatMessageDTOs.add(chatMessageDTO);
+        }
+        return chatMessageDTOs;
     }
 
 

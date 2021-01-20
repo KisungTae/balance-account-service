@@ -301,13 +301,14 @@ create table chat_message
     chat_id      bigint    not null,
     account_id   uuid      not null,
     recipient_id uuid      not null,
-    message      varchar(200),
+    body         varchar(200),
     created_at   timestamp not null,
 
     constraint chat_message_chat_id_fk foreign key (chat_id) references chat (id),
     constraint chat_message_account_id_fk foreign key (account_id) references account (id),
     constraint chat_message_recipient_id_fk foreign key (recipient_id) references account (id)
 );
+
 
 
 
