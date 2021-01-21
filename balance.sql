@@ -309,21 +309,7 @@ create table chat_message
     constraint chat_message_recipient_id_fk foreign key (recipient_id) references account (id)
 );
 
-
-
-
-select m1.matcher_id, m1.matched_id, m1.chat_id, m2.matcher_id, m2.matched_id, m2.chat_id
-from match m1
-         left join match m2 on m1.matcher_id = m2.matched_id and m1.matched_id = m2.matcher_id;
-
-
-select *
-from chat_message;
-
-
-select *
-from account
-where id = '9f881819-638a-4098-954c-ce34b133d32a';
+drop table chat_message;
 
 select *
 from match
@@ -331,7 +317,11 @@ where matcher_id = '9f881819-638a-4098-954c-ce34b133d32a';
 
 select *
 from chat_message
-where chat_id = 200;
+where account_id = '9f881819-638a-4098-954c-ce34b133d32a';
+
+
+
+
 
 
 -- ================================ ADMIN =========================================

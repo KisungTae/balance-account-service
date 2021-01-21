@@ -45,7 +45,6 @@ public class ChatController {
     public ResponseEntity<String> listChatMessages(@Valid @ModelAttribute ListChatMessagesVM listChatMessagesVM,
                                                    BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-
         List<ChatMessageDTO> chatMessageDTOs = chatService.listChatMessages(listChatMessagesVM.getAccountId(),
                                                                             listChatMessagesVM.getIdentityToken(),
                                                                             listChatMessagesVM.getRecipientId(),

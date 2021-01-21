@@ -102,7 +102,7 @@ public class ChatServiceImpl implements ChatService {
         List<ChatMessageDTO> chatMessageDTOs = new ArrayList<>();
         for (ChatMessage chatMessage : chatMessageDAO.findAllByChatIdAfter(chatId, lastChatMessageId)) {
             ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessage, ChatMessageDTO.class);
-            if (chatMessage.getRecipientId().equals(recipientId))
+            if (chatMessage.getAccountId().equals(recipientId))
                 chatMessageDTO.setMessageId(null);
             chatMessageDTOs.add(chatMessageDTO);
         }
