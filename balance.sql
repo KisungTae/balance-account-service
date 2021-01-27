@@ -320,6 +320,58 @@ from chat_message
 where account_id = '9f881819-638a-4098-954c-ce34b133d32a';
 
 
+drop table test;
+
+
+create table test
+(
+    message_id  bigserial primary key,
+    id bigint
+);
+
+do $$
+    begin
+        for counter in 1..100 loop
+                insert into test values (default, counter);
+            end loop;
+    end; $$;
+
+
+insert into test values (default, null);
+insert into test values (default, null);
+insert into test values (default, null);
+insert into test values (default, null);
+insert into test values (default, null);
+insert into test values (default, null);
+insert into test values (default, null);
+insert into test values (default, null);
+
+insert into test values (default, 101);
+insert into test values (default, 102);
+insert into test values (default, 103);
+insert into test values (default, 104);
+insert into test values (default, 105);
+insert into test values (default, 106);
+insert into test values (default, 107);
+insert into test values (default, 108);
+insert into test values (default, 109);
+
+select *
+from test
+order by case when id is null then 0 else 1 end, id desc, message_id desc;
+
+explain select *
+from test
+order by case when id is null then 0 else 1 end, id desc, message_id desc
+offset (
+    select row_num
+    from (select message_id, row_number() over (order by case when id is null then 0 else 1 end, id desc, message_id desc) as row_num
+          from test
+          order by case when id is null then 0 else 1 end, id desc, message_id desc) it
+    where it.message_id = 103
+    ) limit 5;
+
+
 
 
 
