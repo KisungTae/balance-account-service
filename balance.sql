@@ -326,52 +326,85 @@ drop table test;
 create table test
 (
     message_id  bigserial primary key,
-    id bigint
+    id bigint,
+    chat_id bigint not null
 );
 
 do $$
     begin
         for counter in 1..100 loop
-                insert into test values (default, counter);
+                insert into test values (default, counter, 1);
+
+                insert into test values (default, counter, 2);
+                insert into test values (default, counter, 3);
             end loop;
     end; $$;
 
 
-insert into test values (default, null);
-insert into test values (default, null);
-insert into test values (default, null);
-insert into test values (default, null);
-insert into test values (default, null);
-insert into test values (default, null);
-insert into test values (default, null);
-insert into test values (default, null);
+insert into test values (default, null, 1);
+insert into test values (default, null, 1);
+insert into test values (default, null, 1);
+insert into test values (default, null, 1);
+insert into test values (default, null, 1);
+insert into test values (default, null, 1);
+insert into test values (default, null, 1);
+insert into test values (default, null, 1);
 
-insert into test values (default, 101);
-insert into test values (default, 102);
-insert into test values (default, 103);
-insert into test values (default, 104);
-insert into test values (default, 105);
-insert into test values (default, 106);
-insert into test values (default, 107);
-insert into test values (default, 108);
-insert into test values (default, 109);
+insert into test values (default, 101, 1);
+insert into test values (default, 102, 1);
+insert into test values (default, 103, 1);
+insert into test values (default, 104, 1);
+insert into test values (default, 105, 1);
+insert into test values (default, 106, 1);
+insert into test values (default, 107, 1);
+insert into test values (default, 108, 1);
+insert into test values (default, 109, 1);
+
+
+
+
+
+
+
+
+
+
+
+
 
 select *
 from test
+where chat_id = 1
 order by case when id is null then 0 else 1 end, id desc, message_id desc;
 
-explain select *
+
+
+select *
 from test
+where chat_id = 1
 order by case when id is null then 0 else 1 end, id desc, message_id desc
 offset (
     select row_num
-    from (select message_id, row_number() over (order by case when id is null then 0 else 1 end, id desc, message_id desc) as row_num
+    from (select message_id,
+                 row_number()
+                 over (order by case when id is null then 0 else 1 end, id desc, message_id desc) as row_num
           from test
-          order by case when id is null then 0 else 1 end, id desc, message_id desc) it
+          where chat_id = 1) it
     where it.message_id = 103
+) limit 5;
+
+
+
+
+    select *
+    from test
+    order by case when id is null then 0 else 1 end, id desc, message_id desc
+    offset (
+        select row_num - 6
+        from (select message_id, row_number() over (order by case when id is null then 0 else 1 end, id desc, message_id desc) as row_num
+              from test) it
+        where it.message_id = 103
     ) limit 5;
-
-
 
 
 
