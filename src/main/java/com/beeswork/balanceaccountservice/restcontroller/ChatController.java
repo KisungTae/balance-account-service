@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
+import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.beeswork.balanceaccountservice.vm.chat.ListChatMessagesVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,8 +38,8 @@ public class ChatController {
     }
 
     @MessageMapping("/chat/send")
-    public void send(@Payload ChatMessageDTO chatMessageDTO, MessageHeaders messageHeaders) {
-        stompService.send(chatMessageDTO, messageHeaders);
+    public void send(@Payload ChatMessageVM chatMessageVM, MessageHeaders messageHeaders) {
+        stompService.send(chatMessageVM, messageHeaders);
     }
 
     @GetMapping("/chat/message/list")

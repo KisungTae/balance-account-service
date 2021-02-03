@@ -15,8 +15,6 @@ public class ChatMessageDTO {
     private Long   id;
     private String body;
     private Long   messageId;
-    private UUID   accountId;
-    private UUID   recipientId;
     private Long   chatId;
-    private Date   createdAt = new Date();
+    private Date   createdAt;
 }

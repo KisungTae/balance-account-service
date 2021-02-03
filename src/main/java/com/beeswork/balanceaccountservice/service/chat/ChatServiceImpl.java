@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,16 +77,16 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     @Transactional
-    public Long validateAndSaveMessage(ChatMessageDTO chatMessageDTO, String identityToken, String messageId) {
+    public Long validateAndSaveMessage(UUID accountId, UUID identityToken, UUID recipientId, Long chatId, Long messageId, String body, Date createdAt) {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
-        Match match = matchDAO.findById(chatMessageDTO.getAccountId(), chatMessageDTO.getRecipientId());
-        validateChat(match, UUID.fromString(identityToken), chatMessageDTO.getChatId());
+        Match match = matchDAO.findById(accountId, recipientId);
+        validateChat(match, identityToken, chatId);
         ChatMessage chatMessage = new ChatMessage(match.getChat(),
                                                   match.getMatcher(),
                                                   match.getMatched(),
-                                                  Long.valueOf(messageId),
-                                                  chatMessageDTO.getBody(),
-                                                  chatMessageDTO.getCreatedAt());
+                                                  messageId,
+                                                  body,
+                                                  createdAt);
         chatMessageDAO.persist(chatMessage);
         return chatMessage.getId();
     }

@@ -7,6 +7,7 @@ import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.firebase.MessageNotificationDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
+import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import org.apache.commons.lang3.LocaleUtils;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.QueueInformation;
@@ -42,7 +43,7 @@ public class StompServiceImpl implements StompService {
 
 //  NOTE 1. convertAndSend to not existing queue, it creates a new queue under the queue desitination
     @Override
-    public void send(ChatMessageDTO chatMessageDTO, MessageHeaders messageHeaders) {
+    public void send(ChatMessageVM chatMessageVM, MessageHeaders messageHeaders) {
 //        String queue = chatMessageDTO.getRecipientId() + StompHeader.QUEUE_SEPARATOR + chatMessageDTO.getChatId();
 //        QueueInformation queueInformation = amqpAdmin.getQueueInfo(queue);
 //        if (queueInformation == null || queueInformation.getConsumerCount() <= 0) {

@@ -5,6 +5,7 @@ import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.lang.NonNull;
 import lombok.SneakyThrows;
@@ -18,6 +19,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class StompChannelInterceptor implements ChannelInterceptor {
@@ -37,6 +39,7 @@ public class StompChannelInterceptor implements ChannelInterceptor {
     private static final String TRUE = Boolean.toString(true);
 
 
+    //  NOTE 1. if exception is thrown from compositeMessageConverter.fromMessage for invalid UUId or Long then ignore the request
     @SneakyThrows
     @Override
     public Message<?> preSend(Message<?> message, @NonNull MessageChannel channel) {
@@ -62,67 +65,97 @@ public class StompChannelInterceptor implements ChannelInterceptor {
 //                throw new BadRequestException();
 
         } else if (StompCommand.SEND.equals(stompCommand)) {
-            ChatMessageDTO chatMessageDTO =
-                    (ChatMessageDTO) compositeMessageConverter.fromMessage(message, ChatMessageDTO.class);
+            ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message,
+                                                                                                ChatMessageVM.class);
             String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
             String messageId = stompHeaderAccessor.getMessageId();
-            validateFields(chatMessageDTO, identityToken, messageId);
-            chatMessageDTO.setId(chatService.validateAndSaveMessage(chatMessageDTO,
-                                                                    identityToken,
-                                                                    messageId));
-            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageDTO),
+//            validateFields(chatMessageVM, identityToken, messageId);
+            checkValidUUID(identityToken);
+            checkValidNumber(messageId);
+            chatMessageVM.setId(chatService.validateAndSaveMessage(chatMessageVM.getAccountId(),
+                                                                   UUID.fromString(identityToken),
+                                                                   chatMessageVM.getRecipientId(),
+                                                                   chatMessageVM.getChatId(),
+                                                                   Long.valueOf(messageId),
+                                                                   chatMessageVM.getBody(),
+                                                                   chatMessageVM.getCreatedAt()));
+            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM),
                                                 stompHeaderAccessor.getMessageHeaders());
         }
         return message;
     }
 
-    private void validateFields(ChatMessageDTO chatMessageDTO, String identityToken, String messageId) {
-        if (chatMessageDTO == null) throw new BadRequestException();
-//        validateFields(chatMessageDTO.getAccountId(),
+//    private void validateFields(ChatMessageVM chatMessageVM, String identityToken, String messageId) {
+//        if (chatMessageVM == null) throw new BadRequestException();
+//        checkValidUUID(identityToken);
+//        validateFields(chatMessageVM.getAccountId(),
 //                       identityToken,
-//                       chatMessageDTO.getRecipientId(),
-//                       chatMessageDTO.getChatId());
-        if (!isNumber(messageId)) throw new BadRequestException();
-    }
+//                       chatMessageVM.getRecipientId(),
+//                       chatMessageVM.getChatId());
+//        if (!isNumber(messageId)) throw new BadRequestException();
+//    }
 
-    private void validateFields(String accountId, String identityToken, String recipientId, String chatId) {
-        checkValidUUID(accountId);
-        checkValidUUID(identityToken);
-        checkValidUUID(recipientId);
-        if (!isNumber(chatId)) throw new BadRequestException();
-    }
+//    private void validateFields(String accountId, String identityToken, String recipientId, String chatId) {
+//        checkValidUUID(accountId);
+//        checkValidUUID(identityToken);
+//        checkValidUUID(recipientId);
+//        if (!isNumber(chatId)) throw new BadRequestException();
+//    }
 
     private void checkValidUUID(String uuid) {
         if (uuid == null || !VALID_UUID_PATTERN.matcher(uuid).find())
             throw new BadRequestException();
     }
 
-    private String queueName(String accountId, String chatId) {
-        return StompHeader.QUEUE_PREFIX + accountId + StompHeader.QUEUE_SEPARATOR + chatId;
-    }
-
-    public static boolean isNumber(String str) {
-        if (str == null) {
-            return false;
+    private void checkValidNumber(String number) {
+        if (number == null) {
+            throw new BadRequestException();
         }
-        int length = str.length();
+        int length = number.length();
         if (length == 0) {
-            return false;
+            throw new BadRequestException();
         }
         int i = 0;
-        if (str.charAt(0) == '-') {
+        if (number.charAt(0) == '-') {
             if (length == 1) {
-                return false;
+                throw new BadRequestException();
             }
             i = 1;
         }
         for (; i < length; i++) {
-            char c = str.charAt(i);
+            char c = number.charAt(i);
             if (c < '0' || c > '9') {
-                return false;
+                throw new BadRequestException();
             }
         }
-        return true;
     }
+
+    private String queueName(String accountId, String chatId) {
+        return StompHeader.QUEUE_PREFIX + accountId + StompHeader.QUEUE_SEPARATOR + chatId;
+    }
+
+//    public static boolean isNumber(String str) {
+//        if (str == null) {
+//            return false;
+//        }
+//        int length = str.length();
+//        if (length == 0) {
+//            return false;
+//        }
+//        int i = 0;
+//        if (str.charAt(0) == '-') {
+//            if (length == 1) {
+//                return false;
+//            }
+//            i = 1;
+//        }
+//        for (; i < length; i++) {
+//            char c = str.charAt(i);
+//            if (c < '0' || c > '9') {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
 }
