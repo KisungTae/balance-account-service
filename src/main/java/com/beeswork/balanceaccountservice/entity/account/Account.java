@@ -129,6 +129,10 @@ public class Account {
                orphanRemoval = true)
     private List<Swipe> swipes = new ArrayList<>();
 
+    @Column(name = "rep_photo_updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date repPhotoUpdatedAt;
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.Session;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -45,11 +46,11 @@ public class DummyController {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private final MatchDAO matchDAO;
-    private final ObjectMapper objectMapper;
+    private final MatchDAO        matchDAO;
+    private final ObjectMapper    objectMapper;
     private final FirebaseService firebaseService;
-    private final AccountDAO accountDAO;
-    private final ChatDAO chatDAO;
+    private final AccountDAO      accountDAO;
+    private final ChatDAO         chatDAO;
 
     @Autowired
     public DummyController(MatchDAO matchDAO,
@@ -113,6 +114,33 @@ public class DummyController {
         }
     }
 
+    @PostMapping("/update/account-and-match")
+    public void updateRepPhotoUpdateAtAnd() throws InterruptedException {
+        List<Account> accounts = new JPAQueryFactory(entityManager).selectFrom(QAccount.account).fetch();
+        Random random = new Random();
+        for (Account account : accounts) {
+            if (random.nextBoolean()) {
+                account.setRepPhotoUpdatedAt(new Date());
+                Thread.sleep(10);
+            } else if (account.getMatches().size() > 0) {
+                Match match = account.getMatches().get(0);
+                List<Match> matches = new JPAQueryFactory(entityManager).selectFrom(QMatch.match)
+                                                                        .where(QMatch.match.chatId.eq(match.getChatId()))
+                                                                        .fetch();
+                Date date = new Date();
+                for (Match match1 : matches) {
+                    match1.setUpdatedAt(date);
+                }
+            }
+        }
+    }
+
+    @PostMapping("/update/rep-photo-updated-at")
+    public void updateMatchUpdatedAt() {
+
+    }
+
+
     @Transactional
     @PostMapping("/create/match")
     public void createDummyMatch() throws InterruptedException {
@@ -128,21 +156,23 @@ public class DummyController {
         for (Swipe swipe : swipes) {
 
             Thread.sleep(10);
+            Date date = new Date();
             Chat chat = new Chat();
+            chat.setUpdatedAt(date);
 
             MatchId theOtherPartyMatchId = new MatchId(swipe.getSwipedId(), swipe.getSwiperId());
             if (matchMap.containsKey(swipe.getSwipedId().toString() + swipe.getSwiperId().toString())) {
                 chat = matchMap.get(swipe.getSwipedId().toString() + swipe.getSwiperId().toString()).getChat();
             }
 
-
             Match newMatch = new Match();
             newMatch.setChat(chat);
             newMatch.setMatcher(swipe.getSwiper());
             newMatch.setMatched(swipe.getSwiped());
             newMatch.setUnmatcher(false);
-            newMatch.setCreatedAt(new Date());
-            newMatch.setUpdatedAt(new Date());
+
+            newMatch.setCreatedAt(date);
+            newMatch.setUpdatedAt(date);
 
             MatchId matchId = new MatchId(swipe.getSwiperId(), swipe.getSwipedId());
             newMatch.setMatchId(matchId);
@@ -199,40 +229,68 @@ public class DummyController {
 
     @Transactional
     @PostMapping("/create/chat-messages")
-    public void createDummyChatMessages() throws InterruptedException {
+    public void createDummyChatMessages() {
         List<Match> matches = new JPAQueryFactory(entityManager).selectFrom(QMatch.match).fetch();
+        Date date = new Date();
         Random random = new Random();
-        for (Match match : matches) {
-            int messageCount = random.nextInt(20);
-            Chat chat = match.getChat();
-            List<ChatMessage> chatMessages = match.getChat().getChatMessages();
-            for (int i = 0; i < messageCount; i++) {
-                int matcherCount = random.nextInt(5);
-                int matchedCount = random.nextInt(5);
+        for (int i = 0; i < 500; i++) {
+            date = DateUtils.addSeconds(date, 30);
 
-                for (int j = 0; j < matcherCount; j++) {
-                    Long messageId = (long) (i + j);
-                    chatMessages.add(new ChatMessage(chat,
-                                                     match.getMatcher(),
-                                                     match.getMatched(),
-                                                     messageId,
-                                                     "message body" + i + j,
-                                                     new Date()));
-                    Thread.sleep(1000);
+            for (Match match : matches) {
+                if (random.nextBoolean()) {
+                    boolean who = random.nextBoolean();
+                    Account sender = who ? match.getMatcher() : match.getMatched();
+                    Account receiver = who ? match.getMatched() : match.getMatcher();
+                    match.getChat().setUpdatedAt(date);
+                    match.getChat()
+                         .getChatMessages()
+                         .add(new ChatMessage(match.getChat(),
+                                              sender,
+                                              receiver,
+                                              1L,
+                                              "message-" + random.nextFloat(),
+                                              date));
                 }
-                for (int k = 0; k < matchedCount; k++) {
-                    Long messageId = (long) (i + k);
-                    chatMessages.add(new ChatMessage(chat,
-                                                     match.getMatched(),
-                                                     match.getMatcher(),
-                                                     messageId,
-                                                     "message body" + i + k,
-                                                     new Date()));
-                    Thread.sleep(1000);
-                }
-
             }
         }
+
+
+//        Random random = new Random();
+//        for (Match match : matches) {
+//            int messageCount = random.nextInt(20);
+//            Chat chat = match.getChat();
+//            List<ChatMessage> chatMessages = match.getChat().getChatMessages();
+//            for (int i = 0; i < messageCount; i++) {
+//                int matcherCount = random.nextInt(5);
+//                int matchedCount = random.nextInt(5);
+//
+//                for (int j = 0; j < matcherCount; j++) {
+//                    Long messageId = (long) (i + j);
+//                    chatMessages.add(new ChatMessage(chat,
+//                                                     match.getMatcher(),
+//                                                     match.getMatched(),
+//                                                     messageId,
+//                                                     "message body" + i + j,
+//                                                     new Date()));
+//                    Thread.sleep(10);
+//                }
+//                for (int k = 0; k < matchedCount; k++) {
+//                    Long messageId = (long) (i + k);
+//                    Date newDate = new Date();
+//                    chatMessages.add(new ChatMessage(chat,
+//                                                     match.getMatched(),
+//                                                     match.getMatcher(),
+//                                                     messageId,
+//                                                     "message body" + i + k,
+//                                                     newDate));
+//                    Thread.sleep(10);
+//                    if (i == messageCount - 1 && k == matchedCount - 1) {
+//                        chat.setUpdatedAt(newDate);
+//                    }
+//                }
+//
+//            }
+//        }
     }
 
     @Transactional
@@ -304,10 +362,12 @@ public class DummyController {
 
                     if (p == 0) {
                         account.setRepPhotoKey(photoKey);
+                        account.setRepPhotoUpdatedAt(new Date());
                     }
                     photo.setSequence(count);
                     photo.setAccount(account);
                     account.getPhotos().add(photo);
+
                 }
                 entityManager.persist(account);
                 count++;

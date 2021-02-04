@@ -188,6 +188,7 @@ create table account
     account_type          int          not null,
     free_swipe            int          not null,
     free_swipe_updated_at timestamptz  not null,
+    rep_photo_updated_at  timestamptz  not null,
     created_at            timestamptz  not null,
     updated_at            timestamptz  not null
 
@@ -208,6 +209,13 @@ create table photo
 );
 
 create index photo_account_id_idx on photo (account_id);
+
+
+select created_at, count(*)
+from chat_message
+group by created_at;
+
+
 
 
 -- create table photo_info
@@ -266,9 +274,9 @@ create index swipe_swiped_id_idx on swipe (swiped_id);
 
 create table chat
 (
-    id bigserial primary key
+    id         bigserial primary key,
+    updated_at timestamptz not null
 );
-
 
 -- if match between 1 and 2 then
 -- 1 - 2 saved
@@ -297,12 +305,12 @@ create index match_matcher_id_matched_id_chat_id on match (matcher_id, matched_i
 create table chat_message
 (
     id           bigserial primary key,
-    message_id   bigint    not null,
-    chat_id      bigint    not null,
-    account_id   uuid      not null,
-    recipient_id uuid      not null,
+    message_id   bigint      not null,
+    chat_id      bigint      not null,
+    account_id   uuid        not null,
+    recipient_id uuid        not null,
     body         varchar(200),
-    created_at   timestamp not null,
+    created_at   timestamptz not null,
 
     constraint chat_message_chat_id_fk foreign key (chat_id) references chat (id),
     constraint chat_message_account_id_fk foreign key (account_id) references account (id),
@@ -312,15 +320,24 @@ create table chat_message
 create index chat_message_chat_id_created_at on chat_message (chat_id, created_at);
 
 
-select *
-from match;
+drop table match;
+drop table chat_message;
+drop table chat;
+
 
 select *
-from chat_message;
+from match
+where updated_at > '2021-02-04 10:36:40.271000';
 
-delete
-from chat_message
-where id is not null;
+select *
+from account;
+
+
+select m.chat_id, cm.created_at
+from match m
+inner join chat_message cm on m.chat_id = cm.chat_id
+where matcher_id = '3426d89b-73f9-4b6e-99fa-b97e67a1262d'
+  and cm.created_at > '2021-02-04 10:46:40.271000';
 
 
 -- ================================ ADMIN =========================================
