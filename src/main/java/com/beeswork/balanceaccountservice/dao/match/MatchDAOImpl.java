@@ -61,7 +61,6 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
 
     @Override
     public List<MatchProjection> findAllAfter(UUID matcherId, Date fetchedAt) {
-        fetchedAt = DateUtils.addDays(fetchedAt, -1);
         Expression<Date> updatedAtCase = new CaseBuilder().when(qMatch.updatedAt.after(qAccount.updatedAt))
                                                           .then(qMatch.updatedAt)
                                                           .otherwise(qAccount.updatedAt);

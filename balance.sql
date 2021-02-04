@@ -309,108 +309,18 @@ create table chat_message
     constraint chat_message_recipient_id_fk foreign key (recipient_id) references account (id)
 );
 
-
-select *
-from account
-where id = '9f881819-638a-4098-954c-ce34b133d32a';
+create index chat_message_chat_id_created_at on chat_message (chat_id, created_at);
 
 
 select *
-from match
-where matcher_id = '9f881819-638a-4098-954c-ce34b133d32a';
+from match;
 
 select *
+from chat_message;
+
+delete
 from chat_message
-where account_id = '9f881819-638a-4098-954c-ce34b133d32a';
-
-
-drop table test;
-
-
-create table test
-(
-    message_id  bigserial primary key,
-    id bigint,
-    chat_id bigint not null
-);
-
-do $$
-    begin
-        for counter in 1..100 loop
-                insert into test values (default, counter, 1);
-
-                insert into test values (default, counter, 2);
-                insert into test values (default, counter, 3);
-            end loop;
-    end; $$;
-
-
-insert into test values (default, null, 1);
-insert into test values (default, null, 1);
-insert into test values (default, null, 1);
-insert into test values (default, null, 1);
-insert into test values (default, null, 1);
-insert into test values (default, null, 1);
-insert into test values (default, null, 1);
-insert into test values (default, null, 1);
-
-insert into test values (default, 101, 1);
-insert into test values (default, 102, 1);
-insert into test values (default, 103, 1);
-insert into test values (default, 104, 1);
-insert into test values (default, 105, 1);
-insert into test values (default, 106, 1);
-insert into test values (default, 107, 1);
-insert into test values (default, 108, 1);
-insert into test values (default, 109, 1);
-
-
-
-
-
-
-
-
-
-
-
-
-
-select *
-from test
-where chat_id = 1
-order by case when id is null then 0 else 1 end, id desc, message_id desc;
-
-
-
-select *
-from test
-where chat_id = 1
-order by case when id is null then 0 else 1 end, id desc, message_id desc
-offset (
-    select row_num
-    from (select message_id,
-                 row_number()
-                 over (order by case when id is null then 0 else 1 end, id desc, message_id desc) as row_num
-          from test
-          where chat_id = 1) it
-    where it.message_id = 103
-) limit 5;
-
-
-
-
-    select *
-    from test
-    order by case when id is null then 0 else 1 end, id desc, message_id desc
-    offset (
-        select row_num - 6
-        from (select message_id, row_number() over (order by case when id is null then 0 else 1 end, id desc, message_id desc) as row_num
-              from test) it
-        where it.message_id = 103
-    ) limit 5;
-
-
+where id is not null;
 
 
 -- ================================ ADMIN =========================================

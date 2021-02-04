@@ -22,6 +22,7 @@ import com.beeswork.balanceaccountservice.projection.ClickProjection;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
+import org.apache.commons.lang3.time.DateUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -108,7 +109,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     public List<ClickProjection> listClick(UUID accountId, UUID identityToken, Date fetchedAt) {
         Account account = accountDAO.findById(accountId);
         checkIfAccountValid(account, identityToken);
-        return swipeDAO.findAllClickAfter(accountId, fetchedAt);
+        return swipeDAO.findAllClickAfter(accountId, DateUtils.addDays(fetchedAt, -1));
     }
 
     @Override
@@ -116,7 +117,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     public List<ClickedProjection> listClicked(UUID accountId, UUID identityToken, Date fetchedAt) {
         Account account = accountDAO.findById(accountId);
         checkIfAccountValid(account, identityToken);
-        return swipeDAO.findAllClickedAfter(accountId, fetchedAt);
+        return swipeDAO.findAllClickedAfter(accountId, DateUtils.addDays(fetchedAt, -1));
     }
 
     @Override

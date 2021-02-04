@@ -14,6 +14,7 @@ import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedExceptio
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedDeletedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
+import org.apache.commons.lang3.time.DateUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -97,11 +98,10 @@ public class ChatServiceImpl implements ChatService {
                                                  UUID identityToken,
                                                  UUID recipientId,
                                                  Long chatId,
-                                                 Long lastChatMessageId) {
+                                                 Date lastChatMessageCreatedAt) {
         validateChat(matchDAO.findById(accountId, recipientId), identityToken, chatId);
-
         List<ChatMessageDTO> chatMessageDTOs = new ArrayList<>();
-        for (ChatMessage chatMessage : chatMessageDAO.findAllByChatIdAfter(chatId, lastChatMessageId)) {
+        for (ChatMessage chatMessage : chatMessageDAO.findAllByChatIdAfter(chatId, DateUtils.addHours(lastChatMessageCreatedAt, -1))) {
             ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessage, ChatMessageDTO.class);
             if (chatMessage.getAccountId().equals(recipientId))
                 chatMessageDTO.setMessageId(null);

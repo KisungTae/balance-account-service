@@ -50,7 +50,7 @@ public class ChatController {
                                                                             listChatMessagesVM.getIdentityToken(),
                                                                             listChatMessagesVM.getRecipientId(),
                                                                             listChatMessagesVM.getChatId(),
-                                                                            listChatMessagesVM.getLastChatMessageId());
+                                                                            listChatMessagesVM.getLastChatMessageCreatedAt());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(chatMessageDTOs));
     }
 

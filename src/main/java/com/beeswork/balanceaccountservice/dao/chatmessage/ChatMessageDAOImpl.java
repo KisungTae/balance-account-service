@@ -7,6 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -20,9 +21,10 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
     }
 
     @Override
-    public List<ChatMessage> findAllByChatIdAfter(Long chatId, Long lastChatMessageId) {
+    public List<ChatMessage> findAllByChatIdAfter(Long chatId, Date lastChatMessageCreatedAt) {
         return jpaQueryFactory.selectFrom(qChatMessage)
-                       .where(qChatMessage.chatId.eq(chatId).and(qChatMessage.id.gt((lastChatMessageId - 1))))
-                       .fetch();
+                              .where(qChatMessage.chatId.eq(chatId)
+                                                        .and(qChatMessage.createdAt.gt(lastChatMessageCreatedAt)))
+                              .fetch();
     }
 }

@@ -2,10 +2,12 @@ package com.beeswork.balanceaccountservice.vm.chat;
 
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
 import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -20,5 +22,5 @@ public class ListChatMessagesVM extends AccountIdentityVM {
     private UUID recipientId;
 
     @NotNull
-    private Long lastChatMessageId;
+    private Date lastChatMessageCreatedAt;
 }

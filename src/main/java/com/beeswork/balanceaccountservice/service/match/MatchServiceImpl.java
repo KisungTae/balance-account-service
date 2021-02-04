@@ -8,6 +8,7 @@ import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundExcep
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
+import org.apache.commons.lang3.time.DateUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<MatchProjection> listMatches(UUID accountId, UUID identityToken, Date fetchedAt) {
         checkIfAccountValid(accountDAO.findById(accountId), identityToken);
-        return matchDAO.findAllAfter(accountId, fetchedAt);
+        return matchDAO.findAllAfter(accountId, DateUtils.addDays(fetchedAt, -1));
     }
 
     @Override

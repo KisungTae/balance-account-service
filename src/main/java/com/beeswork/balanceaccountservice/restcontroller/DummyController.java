@@ -5,8 +5,11 @@ import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
+import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
+import com.beeswork.balanceaccountservice.entity.chat.QChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
+import com.beeswork.balanceaccountservice.entity.match.QMatch;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.photo.PhotoId;
 import com.beeswork.balanceaccountservice.entity.question.QQuestion;
@@ -49,7 +52,11 @@ public class DummyController {
     private final ChatDAO chatDAO;
 
     @Autowired
-    public DummyController(MatchDAO matchDAO, ObjectMapper objectMapper, FirebaseService firebaseService, AccountDAO accountDAO, ChatDAO chatDAO) {
+    public DummyController(MatchDAO matchDAO,
+                           ObjectMapper objectMapper,
+                           FirebaseService firebaseService,
+                           AccountDAO accountDAO,
+                           ChatDAO chatDAO) {
         this.matchDAO = matchDAO;
         this.objectMapper = objectMapper;
         this.firebaseService = firebaseService;
@@ -123,7 +130,7 @@ public class DummyController {
             Thread.sleep(10);
             Chat chat = new Chat();
 
-            MatchId theOtherPartyMatchId  = new MatchId(swipe.getSwipedId(), swipe.getSwiperId());
+            MatchId theOtherPartyMatchId = new MatchId(swipe.getSwipedId(), swipe.getSwiperId());
             if (matchMap.containsKey(swipe.getSwipedId().toString() + swipe.getSwiperId().toString())) {
                 chat = matchMap.get(swipe.getSwipedId().toString() + swipe.getSwiperId().toString()).getChat();
             }
@@ -188,6 +195,44 @@ public class DummyController {
             entityManager.persist(question);
         }
         entityManager.flush();
+    }
+
+    @Transactional
+    @PostMapping("/create/chat-messages")
+    public void createDummyChatMessages() throws InterruptedException {
+        List<Match> matches = new JPAQueryFactory(entityManager).selectFrom(QMatch.match).fetch();
+        Random random = new Random();
+        for (Match match : matches) {
+            int messageCount = random.nextInt(20);
+            Chat chat = match.getChat();
+            List<ChatMessage> chatMessages = match.getChat().getChatMessages();
+            for (int i = 0; i < messageCount; i++) {
+                int matcherCount = random.nextInt(5);
+                int matchedCount = random.nextInt(5);
+
+                for (int j = 0; j < matcherCount; j++) {
+                    Long messageId = (long) (i + j);
+                    chatMessages.add(new ChatMessage(chat,
+                                                     match.getMatcher(),
+                                                     match.getMatched(),
+                                                     messageId,
+                                                     "message body" + i + j,
+                                                     new Date()));
+                    Thread.sleep(1000);
+                }
+                for (int k = 0; k < matchedCount; k++) {
+                    Long messageId = (long) (i + k);
+                    chatMessages.add(new ChatMessage(chat,
+                                                     match.getMatched(),
+                                                     match.getMatcher(),
+                                                     messageId,
+                                                     "message body" + i + k,
+                                                     new Date()));
+                    Thread.sleep(1000);
+                }
+
+            }
+        }
     }
 
     @Transactional
