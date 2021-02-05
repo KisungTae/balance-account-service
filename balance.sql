@@ -188,7 +188,6 @@ create table account
     account_type          int          not null,
     free_swipe            int          not null,
     free_swipe_updated_at timestamptz  not null,
-    rep_photo_updated_at  timestamptz  not null,
     created_at            timestamptz  not null,
     updated_at            timestamptz  not null
 
@@ -196,6 +195,7 @@ create table account
 
 
 CREATE INDEX account_location_idx ON account USING GIST (location);
+
 
 
 create table photo
@@ -210,10 +210,6 @@ create table photo
 
 create index photo_account_id_idx on photo (account_id);
 
-
-select created_at, count(*)
-from chat_message
-group by created_at;
 
 
 
@@ -320,24 +316,11 @@ create table chat_message
 create index chat_message_chat_id_created_at on chat_message (chat_id, created_at);
 
 
-drop table match;
-drop table chat_message;
-drop table chat;
-
-
-select *
-from match
-where updated_at > '2021-02-04 10:36:40.271000';
-
-select *
-from account;
-
-
-select m.chat_id, cm.created_at
+select greatest(m.updated_at, a.updated_at, c.updated_at)
 from match m
-inner join chat_message cm on m.chat_id = cm.chat_id
-where matcher_id = '3426d89b-73f9-4b6e-99fa-b97e67a1262d'
-  and cm.created_at > '2021-02-04 10:46:40.271000';
+inner join account a on a.id = m.matcher_id
+inner join chat c on m.chat_id = c.id
+where chat_id = 1;
 
 
 -- ================================ ADMIN =========================================

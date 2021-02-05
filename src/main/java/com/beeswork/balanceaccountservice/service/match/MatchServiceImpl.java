@@ -39,6 +39,8 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<MatchProjection> listMatches(UUID accountId, UUID identityToken, Date fetchedAt) {
         checkIfAccountValid(accountDAO.findById(accountId), identityToken);
+        List<MatchProjection> matchProjections = matchDAO.findAllAfter(accountId, DateUtils.addDays(fetchedAt, -1));
+
         return matchDAO.findAllAfter(accountId, DateUtils.addDays(fetchedAt, -1));
     }
 

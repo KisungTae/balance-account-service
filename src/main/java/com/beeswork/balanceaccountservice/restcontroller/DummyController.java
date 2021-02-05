@@ -29,11 +29,12 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -65,6 +66,88 @@ public class DummyController {
         this.chatDAO = chatDAO;
     }
 
+    @Transactional
+    @PostMapping("/create/accounts")
+    public void createDummyAccounts(@RequestParam int size) throws InterruptedException {
+        double startLat = 37.463557;
+        double endLat = 37.650017;
+        double startLon = 126.807883;
+        double endLon = 127.176639;
+
+        Random random = new Random();
+        GeometryFactory gf = new GeometryFactory();
+
+        int count = 1;
+
+        for (double lon = startLon; lon <= endLon; lon += 0.000300) {
+            for (double lat = startLat; lat <= endLat; lat += 0.000300) {
+                saveAccount(lat, lon, count, random, gf);
+                count++;
+                if (count > size) break;
+            }
+            if (count > size) break;
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void saveAccount(double lat, double lon, int count, Random random, GeometryFactory geometryFactory)
+    throws InterruptedException {
+        Account account = new Account();
+        Date birth = randomBirth();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(birth);
+        Date now = new Date();
+
+        account.setIdentityToken(UUID.randomUUID());
+        account.setName("user-" + count);
+        account.setEmail(count + "@gmail.com");
+        account.setAbout(count + ": this is my profile");
+        account.setBirthYear(calendar.get(Calendar.YEAR));
+        account.setBirth(birth);
+        account.setGender(random.nextBoolean());
+        account.setLocation(geometryFactory.createPoint(new Coordinate(lon, lat)));
+        account.setAccountType(com.beeswork.balanceaccountservice.constant.AccountType.values()[random.nextInt(4)]);
+        account.setScore(0);
+        account.setPoint(50000);
+        account.setFcmToken("");
+        account.setFreeSwipe(2000);
+        account.setFreeSwipeUpdatedAt(now);
+        account.setCreatedAt(now);
+        account.setUpdatedAt(now);
+        if (random.nextBoolean()) account.setHeight(random.nextInt(50) + 150);
+
+        Date photoKeyDate = now;
+        for (int p = 0; p < 5; p++) {
+            Photo photo = new Photo();
+            photoKeyDate = DateUtils.addMinutes(photoKeyDate, 1);
+            photo.setPhotoId(new PhotoId(account.getId(), photoKeyDate.toString()));
+
+            if (p == 0) {
+                account.setRepPhotoKey(photoKeyDate.toString());
+                account.setUpdatedAt(photoKeyDate);
+            }
+            photo.setSequence(count);
+            photo.setAccount(account);
+            account.getPhotos().add(photo);
+        }
+
+        entityManager.persist(account);
+    }
+
+    private Date randomBirth() {
+        Random random = new Random();
+        int year = random.nextInt((2003 - 1970)) + 1970;
+        int month = random.nextInt((12 - 1));
+        int day = random.nextInt((25 - 1)) + 1;
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day, 0, 0);
+        return calendar.getTime();
+    }
+
+
+
+
+
 
     @Transactional
     @GetMapping("question-by-account-id")
@@ -74,53 +157,49 @@ public class DummyController {
 
     @Transactional
     @PostMapping("/create/swipe")
-    public void createDummySwipe() throws InterruptedException {
+    public void createDummySwipe() {
         List<Account> accounts = new JPAQueryFactory(entityManager).selectFrom(QAccount.account).fetch();
-
         Random random = new Random();
-
+        int maxOffset = 20;
         for (int i = 0; i < accounts.size(); i++) {
-            Account swiper = accounts.get(i);
-
             int index1 = random.nextInt(accounts.size() - 1);
             int index2 = random.nextInt(accounts.size() - 1);
 
             int startIndex = Math.min(index1, index2);
             int endIndex = Math.max(index1, index2);
 
-            for (int j = startIndex; j < endIndex; j++) {
-                if (i != j) {
-                    swiper.getSwipes()
-                          .add(new Swipe(swiper,
-                                         accounts.get(j),
-                                         random.nextBoolean(),
-                                         (random.nextInt(10) + 1),
-                                         new Date(),
-                                         new Date()));
+            int distance = endIndex - startIndex;
+            if (distance > maxOffset) endIndex = startIndex + maxOffset;
 
-
-//                    for (int k = 0; k < count; k++) {
-//                        Swipe swipe = new Swipe(swiper, accounts.get(j), false, new Date(), new Date());
-//                        Thread.sleep(5);
-//                        swiper.getSwipes().add(swipe);
-//                    }
-//
-//                    Swipe swipe = new Swipe(swiper, accounts.get(j), random.nextBoolean(), new Date(), new Date());
-//                    Thread.sleep(5);
-//                    swiper.getSwipes().add(swipe);
-                }
-            }
-            entityManager.persist(swiper);
+            saveSwipe(accounts, i, startIndex, endIndex, random);
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void saveSwipe(List<Account> accounts, int i, int startIndex, int endIndex, Random random) {
+        Account swiper = accounts.get(i);
+        for (int j = startIndex; j < endIndex; j++) {
+            if (i == j) continue;
+            Date now = new Date();
+            Swipe swipe = new Swipe(swiper,
+                                    accounts.get(j),
+                                    random.nextBoolean(),
+                                    (random.nextInt(10) + 1),
+                                    now,
+                                    now);
+
+            swiper.getSwipes().add(swipe);
+        }
+        entityManager.persist(swiper);
+    }
+
     @PostMapping("/update/account-and-match")
-    public void updateRepPhotoUpdateAtAnd() throws InterruptedException {
+    public void updateAccountAndMatch() throws InterruptedException {
         List<Account> accounts = new JPAQueryFactory(entityManager).selectFrom(QAccount.account).fetch();
         Random random = new Random();
         for (Account account : accounts) {
             if (random.nextBoolean()) {
-                account.setRepPhotoUpdatedAt(new Date());
+                account.setUpdatedAt(new Date());
                 Thread.sleep(10);
             } else if (account.getMatches().size() > 0) {
                 Match match = account.getMatches().get(0);
@@ -293,90 +372,7 @@ public class DummyController {
 //        }
     }
 
-    @Transactional
-    @PostMapping("/create/accounts")
-    public void createDummyAccounts(@RequestParam int size) throws ParseException, InterruptedException {
 
-        double startLat = 37.463557;
-        double endLat = 37.650017;
-        double startLon = 126.807883;
-        double endLon = 127.176639;
-
-        Random random = new Random();
-        SimpleDateFormat originalFormat = new SimpleDateFormat("yyyyMMdd");
-        GeometryFactory gf = new GeometryFactory();
-//        AccountType accountType = new JPAQueryFactory(entityManager).selectFrom(QAccountType.accountType).fetchFirst();
-
-        int count = 1;
-
-        Calendar calendar = Calendar.getInstance();
-
-        for (double lon = startLon; lon <= endLon; lon += 0.000300) {
-
-            for (double lat = startLat; lat <= endLat; lat += 0.000300) {
-
-                boolean gender = random.nextInt(2) == 0;
-
-                int year = random.nextInt((2003 - 1970)) + 1970;
-                int month = random.nextInt((12 - 1)) + 1;
-                int day = random.nextInt((25 - 1)) + 1;
-
-                String birthString = String.valueOf(year) +
-                                     (month < 10 ? "0" + month : month) +
-                                     (day < 10 ? "0" + day : day);
-                Date birth = originalFormat.parse(birthString);
-                calendar.setTime(birth);
-
-                Point location = gf.createPoint(new Coordinate(lon, lat));
-
-                Account account = new Account();
-
-//              Blocked and Enabled for integration test
-                account.setBlocked(size == count);
-                account.setIdentityToken(UUID.randomUUID());
-                account.setEnabled(random.nextBoolean());
-                account.setName(String.valueOf(count));
-                account.setEmail(count + "@gmail.com");
-                account.setAbout(count + ": this is my profile");
-                account.setBirthYear(calendar.get(Calendar.YEAR));
-                account.setBirth(birth);
-                account.setGender(gender);
-                account.setLocation(location);
-                account.setAccountType(com.beeswork.balanceaccountservice.constant.AccountType.values()[random.nextInt(4)]);
-                account.setScore(0);
-                account.setPoint(50000);
-                account.setFcmToken("");
-                account.setFreeSwipe(2000);
-                account.setFreeSwipeUpdatedAt(new Date());
-                account.setCreatedAt(new Date());
-                account.setUpdatedAt(new Date());
-
-                if (random.nextBoolean())
-                    account.setHeight(random.nextInt(50) + 150);
-
-                for (int p = 0; p < 5; p++) {
-                    Photo photo = new Photo();
-                    Thread.sleep(12);
-                    String photoKey = new Date().toInstant().toString();
-                    photo.setPhotoId(new PhotoId(account.getId(), photoKey));
-
-                    if (p == 0) {
-                        account.setRepPhotoKey(photoKey);
-                        account.setRepPhotoUpdatedAt(new Date());
-                    }
-                    photo.setSequence(count);
-                    photo.setAccount(account);
-                    account.getPhotos().add(photo);
-
-                }
-                entityManager.persist(account);
-                count++;
-                if (count > size) break;
-            }
-            if (count > size) break;
-        }
-        entityManager.flush();
-    }
 
     @GetMapping("/send/notification/clicked")
     public void sendDummyClickedNotification(@RequestParam("clickedId") String clickedId)
