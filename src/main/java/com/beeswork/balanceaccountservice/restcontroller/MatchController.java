@@ -16,8 +16,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Validated
 @RestController
@@ -33,12 +37,28 @@ public class MatchController extends BaseController {
 
     @GetMapping("/match/list")
     public ResponseEntity<String> listMatches(@Valid @ModelAttribute ListMatchesVM listMatchesVM,
-                                              BindingResult bindingResult)
+                                              BindingResult bindingResult,
+                                              HttpServletResponse httpServletResponse)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<MatchProjection> matchProjections = matchService.listMatches(listMatchesVM.getAccountId(),
-                                                                          listMatchesVM.getIdentityToken(),
-                                                                          listMatchesVM.getFetchedAt());
+//        List<MatchProjection> matchProjections = matchService.listMatches(listMatchesVM.getAccountId(),
+//                                                                          listMatchesVM.getIdentityToken(),
+//                                                                          listMatchesVM.getLastAccountUpdatedAt(),
+//                                                                          listMatchesVM.getLastMatchUpdatedAt(),
+//                                                                          listMatchesVM.getLastChatMessageCreatedAt());
+        List<MatchProjection> matchProjections = new ArrayList<>();
+        for (int i = 0; i < 100000; i++) {
+            matchProjections.add(new MatchProjection(1L,
+                                                     UUID.randomUUID(),
+                                                     new Date(),
+                                                     false,
+                                                     "Michael Tae",
+                                                     new Date().toString(),
+                                                     false,
+                                                     false,
+                                                     new Date()));
+        }
+
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(matchProjections));
     }
 

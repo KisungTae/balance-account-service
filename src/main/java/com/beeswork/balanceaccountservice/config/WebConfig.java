@@ -40,6 +40,7 @@ public class WebConfig implements WebMvcConfigurer {
         return localeResolver;
     }
 
+
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();

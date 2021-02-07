@@ -212,8 +212,6 @@ create index photo_account_id_idx on photo (account_id);
 
 
 
-
-
 -- create table photo_info
 -- (
 --     account_id    uuid primary key not null,
@@ -316,11 +314,45 @@ create table chat_message
 create index chat_message_chat_id_created_at on chat_message (chat_id, created_at);
 
 
-select greatest(m.updated_at, a.updated_at, c.updated_at)
+select matcher_id, count(matcher_id)
+from match
+group by matcher_id
+order by count(matcher_id) desc;
+
+
+select *
+from account
+where id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
+
+select *
+from chat_message;
+
+select m.updated_at, a.updated_at, c.updated_at
 from match m
-inner join account a on a.id = m.matcher_id
-inner join chat c on m.chat_id = c.id
-where chat_id = 1;
+left join account a on a.id = m.matcher_id
+left join chat c on m.chat_id = c.id
+where matcher_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
+
+
+
+select m.updated_at, a.updated_at, cm.created_at
+from match m
+left join account a on m.matcher_id = a.id
+left join chat_message cm on m.matcher_id = cm.recipient_id
+where matcher_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0'
+  and (m.updated_at > '2021-02-05 13:37:32.196000' or
+       a.updated_at > '2021-02-05 13:37:32.196000' or
+       cm.created_at > '2021-02-05 13:37:32.196000');
+
+select *
+from chat_message;
+
+
+
+select *
+from chat_message
+where recipient_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
+
 
 
 -- ================================ ADMIN =========================================

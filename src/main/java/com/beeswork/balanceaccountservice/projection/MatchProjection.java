@@ -13,50 +13,48 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class MatchProjection {
-
-
-    private Long chatId;
-    private UUID matchedId;
-    private String name;
-    private String photoKey;
+    private Long    chatId;
+    private UUID    matchedId;
+    private Date    matchUpdatedAt;
     private boolean unmatched;
+    private String  name;
+    private String  repPhotoKey;
     private boolean blocked;
     private boolean deleted;
-    private Date updatedAt;
+    private Date    accountUpdatedAt;
 
     @QueryProjection
-    public MatchProjection(Long chatId, UUID matchedId, String name, String photoKey, boolean unmatched, boolean blocked, boolean deleted, Date updatedAt) {
+    public MatchProjection(Long chatId,
+                           UUID matchedId,
+                           Date matchUpdatedAt,
+                           boolean unmatched,
+                           String name,
+                           String repPhotoKey,
+                           boolean blocked,
+                           boolean deleted,
+                           Date accountUpdatedAt) {
         this.chatId = chatId;
         this.matchedId = matchedId;
-        this.name = name;
-        this.photoKey = photoKey;
+        this.matchUpdatedAt = matchUpdatedAt;
         this.unmatched = unmatched;
+        this.name = name;
+        this.repPhotoKey = repPhotoKey;
         this.blocked = blocked;
         this.deleted = deleted;
-        this.updatedAt = updatedAt;
+        this.accountUpdatedAt = accountUpdatedAt;
     }
 
-    public MatchProjection(Long chatId, UUID matchedId, String name, String photoKey, Date updatedAt) {
+    public MatchProjection(Long chatId, UUID matchedId, String name, String repPhotoKey, Date matchUpdatedAt) {
         this.chatId = chatId;
         this.matchedId = matchedId;
         this.name = name;
-        this.photoKey = photoKey;
-        this.updatedAt = updatedAt;
+        this.repPhotoKey = repPhotoKey;
+        this.matchUpdatedAt = matchUpdatedAt;
     }
 
-    public MatchProjection(UUID matchedId, Date updatedAt) {
+    public MatchProjection(UUID matchedId, Date matchUpdatedAt) {
         this.matchedId = matchedId;
-        this.updatedAt = updatedAt;
+        this.matchUpdatedAt = matchUpdatedAt;
     }
 
-    @Override
-    public String toString() {
-        return "MatchProjection{" +
-               "matchedId=" + matchedId +
-               ", name='" + name + '\'' +
-               ", photoKey='" + photoKey + '\'' +
-               ", unmatched=" + unmatched +
-               ", updatedAt=" + updatedAt +
-               '}';
-    }
 }

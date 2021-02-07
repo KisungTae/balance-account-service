@@ -9,6 +9,11 @@ import java.util.UUID;
 public interface MatchService {
 
 
-    List<MatchProjection> listMatches(UUID accountId, UUID identityToken, Date fetchedAt);
+    List<MatchProjection> listMatches(UUID accountId,
+                                      UUID identityToken,
+                                      Date lastAccountUpdatedAt,
+                                      Date lastMatchUpdatedAt,
+                                      Date lastChatMessageCreatedAt);
+
     void unmatch(UUID accountId, UUID identityToken, UUID unmatchedId);
 }

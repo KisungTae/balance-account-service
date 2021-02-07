@@ -205,4 +205,7 @@ public class BalanceAccountServiceApplication {
 
 // TODO			58. check delete photo in account service and the findWithPhotosAndAccountQuestions()
 
+// TODO			59. retrieve chatMessages make sent body = null
+
+
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one

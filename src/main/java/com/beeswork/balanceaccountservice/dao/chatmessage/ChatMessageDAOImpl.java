@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements ChatMessageDAO {
@@ -27,4 +28,14 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
                                                         .and(qChatMessage.createdAt.gt(lastChatMessageCreatedAt)))
                               .fetch();
     }
+
+    @Override
+    public List<ChatMessage> findAllReceivedAfter(UUID accountId, Date lastChatMessageCreatedAt) {
+        return jpaQueryFactory.selectFrom(qChatMessage)
+                              .where(qChatMessage.recipientId.eq(accountId)
+                                                             .and(qChatMessage.createdAt.after(lastChatMessageCreatedAt)))
+                              .fetch();
+    }
+
+
 }
