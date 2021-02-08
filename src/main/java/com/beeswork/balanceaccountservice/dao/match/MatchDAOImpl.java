@@ -1,6 +1,8 @@
 package com.beeswork.balanceaccountservice.dao.match;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
+import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
+import com.beeswork.balanceaccountservice.dto.match.QMatchDTO;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
@@ -66,16 +68,16 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public List<MatchProjection> findAllAfter(UUID matcherId, Date lastAccountUpdatedAt, Date lastMatchUpdatedAt) {
-        return jpaQueryFactory.select(new QMatchProjection(qMatch.chatId,
-                                                           qMatch.matchedId,
-                                                           qMatch.updatedAt,
-                                                           qMatch.unmatched,
-                                                           qAccount.name,
-                                                           qAccount.repPhotoKey,
-                                                           qAccount.blocked,
-                                                           qAccount.deleted,
-                                                           qAccount.updatedAt))
+    public List<MatchDTO> findAllAfter(UUID matcherId, Date lastAccountUpdatedAt, Date lastMatchUpdatedAt) {
+        return jpaQueryFactory.select(new QMatchDTO(qMatch.chatId,
+                                                    qMatch.matchedId,
+                                                    qMatch.updatedAt,
+                                                    qMatch.unmatched,
+                                                    qAccount.name,
+                                                    qAccount.repPhotoKey,
+                                                    qAccount.blocked,
+                                                    qAccount.deleted,
+                                                    qAccount.updatedAt))
                               .from(qMatch)
                               .leftJoin(qAccount).on(qMatch.matchedId.eq(qAccount.id))
                               .where(qMatch.matcherId.eq(matcherId)

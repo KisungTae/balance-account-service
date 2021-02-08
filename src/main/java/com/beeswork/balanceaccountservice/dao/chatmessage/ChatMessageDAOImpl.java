@@ -1,8 +1,11 @@
 package com.beeswork.balanceaccountservice.dao.chatmessage;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
+import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.beeswork.balanceaccountservice.dto.chat.QChatMessageDTO;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.chat.QChatMessage;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
@@ -30,8 +33,8 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
     }
 
     @Override
-    public List<ChatMessage> findAllReceivedAfter(UUID accountId, Date lastChatMessageCreatedAt) {
-        return jpaQueryFactory.selectFrom(qChatMessage)
+    public List<ChatMessageDTO> findAllReceivedAfter(UUID accountId, Date lastChatMessageCreatedAt) {
+        return jpaQueryFactory.select(new QChatMessageDTO(qChatMessage.id, qChatMessage.chatId))
                               .where(qChatMessage.recipientId.eq(accountId)
                                                              .and(qChatMessage.createdAt.after(lastChatMessageCreatedAt)))
                               .fetch();

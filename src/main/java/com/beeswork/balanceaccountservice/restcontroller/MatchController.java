@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.dto.match.ListMatchDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
@@ -26,7 +27,6 @@ import java.util.UUID;
 @Validated
 @RestController
 public class MatchController extends BaseController {
-
     private final MatchService matchService;
 
     @Autowired
@@ -37,29 +37,15 @@ public class MatchController extends BaseController {
 
     @GetMapping("/match/list")
     public ResponseEntity<String> listMatches(@Valid @ModelAttribute ListMatchesVM listMatchesVM,
-                                              BindingResult bindingResult,
-                                              HttpServletResponse httpServletResponse)
+                                              BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-//        List<MatchProjection> matchProjections = matchService.listMatches(listMatchesVM.getAccountId(),
-//                                                                          listMatchesVM.getIdentityToken(),
-//                                                                          listMatchesVM.getLastAccountUpdatedAt(),
-//                                                                          listMatchesVM.getLastMatchUpdatedAt(),
-//                                                                          listMatchesVM.getLastChatMessageCreatedAt());
-        List<MatchProjection> matchProjections = new ArrayList<>();
-        for (int i = 0; i < 100000; i++) {
-            matchProjections.add(new MatchProjection(1L,
-                                                     UUID.randomUUID(),
-                                                     new Date(),
-                                                     false,
-                                                     "Michael Tae",
-                                                     new Date().toString(),
-                                                     false,
-                                                     false,
-                                                     new Date()));
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(matchProjections));
+        ListMatchDTO listMatchDTO = matchService.listMatches(listMatchesVM.getAccountId(),
+                                                             listMatchesVM.getIdentityToken(),
+                                                             listMatchesVM.getLastAccountUpdatedAt(),
+                                                             listMatchesVM.getLastMatchUpdatedAt(),
+                                                             listMatchesVM.getLastChatMessageCreatedAt());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listMatchDTO));
     }
 
     @PostMapping("/unmatch")

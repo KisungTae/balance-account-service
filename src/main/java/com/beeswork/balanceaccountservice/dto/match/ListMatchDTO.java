@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 public class ListMatchDTO {
-    private List<MatchProjection> matches = new ArrayList<>();
+    private List<MatchDTO> matchDTOs = new ArrayList<>();
     private List<ChatMessageDTO> chatMessageDTOs = new ArrayList<>();
     private Date lastAccountUpdatedAt;
 }

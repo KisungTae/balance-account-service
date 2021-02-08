@@ -1,7 +1,9 @@
 package com.beeswork.balanceaccountservice.dto.chat;
 
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
@@ -11,10 +13,26 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ChatMessageDTO {
     private Long   id;
     private String body;
     private Long   messageId;
     private Long   chatId;
     private Date   createdAt;
+
+    @QueryProjection
+    public ChatMessageDTO(Long id, Long chatId) {
+        this.id = id;
+        this.chatId = chatId;
+    }
+
+    @QueryProjection
+    public ChatMessageDTO(Long id, String body, Long messageId, Long chatId, Date createdAt) {
+        this.id = id;
+        this.body = body;
+        this.messageId = messageId;
+        this.chatId = chatId;
+        this.createdAt = createdAt;
+    }
 }
