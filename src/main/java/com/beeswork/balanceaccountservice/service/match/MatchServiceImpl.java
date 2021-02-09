@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.service.match;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chatmessage.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
+import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.entity.match.Match;
@@ -25,8 +26,8 @@ import java.util.UUID;
 
 @Service
 public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
-    private final AccountDAO     accountDAO;
-    private final MatchDAO       matchDAO;
+    private final AccountDAO accountDAO;
+    private final MatchDAO matchDAO;
     private final ChatMessageDAO chatMessageDAO;
 
     @Autowired
@@ -45,27 +46,19 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public ListMatchDTO listMatches(UUID accountId,
                                     UUID identityToken,
-                                    Date lastAccountUpdatedAt,
-                                    Date lastMatchUpdatedAt,
-                                    Date lastChatMessageCreatedAt) {
+                                    Date lastFetchedAccountUpdatedAt,
+                                    Date lastFetchedMatchUpdatedAt,
+                                    Date lastFetchedChatMessageCreatedAt) {
         checkIfAccountValid(accountDAO.findById(accountId), identityToken);
         ListMatchDTO listMatchDTO = new ListMatchDTO();
         listMatchDTO.setMatchDTOs(matchDAO.findAllAfter(accountId,
-                                                        DateUtils.addHours(lastAccountUpdatedAt, -1),
-                                                        DateUtils.addHours(lastMatchUpdatedAt, -1)));
-
-        if (listMatchDTO.getMatchDTOs().size() > 0)
-            listMatchDTO.setLastAccountUpdatedAt(listMatchDTO.getMatchDTOs().get(0).getAccountUpdatedAt());
-
-        for (MatchDTO matchDTO : listMatchDTO.getMatchDTOs()) {
-            if (matchDTO.getAccountUpdatedAt().after(listMatchDTO.getLastAccountUpdatedAt()))
-                listMatchDTO.setLastAccountUpdatedAt(matchDTO.getAccountUpdatedAt());
-            matchDTO.setAccountUpdatedAt(null);
-        }
+                                                        DateUtils.addHours(lastFetchedAccountUpdatedAt, -1),
+                                                        DateUtils.addHours(lastFetchedMatchUpdatedAt, -1)));
 
         listMatchDTO.setChatMessageDTOs(chatMessageDAO.findAllReceivedAfter(accountId,
-                                                                            DateUtils.addHours(lastChatMessageCreatedAt,
-                                                                                               -1)));
+                                                                            DateUtils.addHours(
+                                                                                    lastFetchedChatMessageCreatedAt,
+                                                                                    -1)));
         return listMatchDTO;
     }
 

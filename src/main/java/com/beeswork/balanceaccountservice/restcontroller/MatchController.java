@@ -2,7 +2,6 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.match.ListMatchDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
-import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.match.MatchService;
 import com.beeswork.balanceaccountservice.vm.match.ListMatchesVM;
@@ -17,12 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 
 @Validated
 @RestController
@@ -42,9 +36,9 @@ public class MatchController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         ListMatchDTO listMatchDTO = matchService.listMatches(listMatchesVM.getAccountId(),
                                                              listMatchesVM.getIdentityToken(),
-                                                             listMatchesVM.getLastAccountUpdatedAt(),
-                                                             listMatchesVM.getLastMatchUpdatedAt(),
-                                                             listMatchesVM.getLastChatMessageCreatedAt());
+                                                             listMatchesVM.getLastFetchedAccountUpdatedAt(),
+                                                             listMatchesVM.getLastFetchedMatchUpdatedAt(),
+                                                             listMatchesVM.getLastFetchedChatMessageCreatedAt());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listMatchDTO));
     }
 

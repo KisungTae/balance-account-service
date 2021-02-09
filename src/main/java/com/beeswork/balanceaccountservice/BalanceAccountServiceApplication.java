@@ -207,5 +207,8 @@ public class BalanceAccountServiceApplication {
 
 // TODO			59. retrieve chatMessages make sent body = null
 
+// TODO			60. only chatMessages within 2 weeks are retrieved, so check lastChatMesageCreated > (today-2weeks)
+
+// TODO			61. save configuration of android, and fetchedAt datetimes,
 
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one
