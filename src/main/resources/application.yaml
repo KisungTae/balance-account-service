@@ -5,13 +5,11 @@ server:
 #  compression:
 #    enabled: on
 #    min-response-size: 2KB
-
   servlet:
     encoding:
       force: true
       charset: UTF-8
       enabled: true
-
 #  port: 8081
 #  address: 192.168.1.100
 

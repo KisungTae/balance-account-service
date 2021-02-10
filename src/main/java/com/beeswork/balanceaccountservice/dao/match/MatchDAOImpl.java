@@ -32,9 +32,9 @@ import java.util.UUID;
 @Repository
 public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
 
-    private final QMatch   qMatch   = QMatch.match;
+    private final QMatch qMatch = QMatch.match;
     private final QAccount qAccount = QAccount.account;
-    private final QChat    qChat    = QChat.chat;
+    private final QChat qChat = QChat.chat;
 
     @Autowired
     public MatchDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
@@ -68,7 +68,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public List<MatchDTO> findAllAfter(UUID matcherId, Date lastAccountUpdatedAt, Date lastMatchUpdatedAt) {
+    public List<MatchDTO> findAllAfter(UUID matcherId, Date matchFetchedAt, Date accountFetchedAt) {
         return jpaQueryFactory.select(new QMatchDTO(qMatch.chatId,
                                                     qMatch.matchedId,
                                                     qMatch.updatedAt,
@@ -81,9 +81,8 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                               .from(qMatch)
                               .leftJoin(qAccount).on(qMatch.matchedId.eq(qAccount.id))
                               .where(qMatch.matcherId.eq(matcherId)
-                                                     .and(qMatch.updatedAt.after(lastMatchUpdatedAt)
-                                                                          .or(qAccount.updatedAt.after(
-                                                                                  lastAccountUpdatedAt))))
+                                                     .and(qMatch.updatedAt.after(matchFetchedAt)
+                                                                          .or(qAccount.updatedAt.after(accountFetchedAt))))
                               .fetch();
     }
 

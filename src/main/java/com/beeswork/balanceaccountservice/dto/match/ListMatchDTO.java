@@ -14,6 +14,6 @@ import java.util.List;
 @Setter
 public class ListMatchDTO {
     private List<MatchDTO> matchDTOs = new ArrayList<>();
-    private List<ChatMessageDTO> chatMessageDTOs = new ArrayList<>();
-    private Date lastAccountUpdatedAt;
+    private List<ChatMessageDTO> sentChatMessageDTOs = new ArrayList<>();
+    private List<ChatMessageDTO> receivedChatMessageDTOs = new ArrayList<>();
 }

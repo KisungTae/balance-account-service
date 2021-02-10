@@ -46,19 +46,19 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public ListMatchDTO listMatches(UUID accountId,
                                     UUID identityToken,
-                                    Date lastFetchedAccountUpdatedAt,
-                                    Date lastFetchedMatchUpdatedAt,
-                                    Date lastFetchedChatMessageCreatedAt) {
+                                    Date matchFetchedAt,
+                                    Date accountFetchedAt,
+                                    Date chatMessageFetchedAt) {
         checkIfAccountValid(accountDAO.findById(accountId), identityToken);
         ListMatchDTO listMatchDTO = new ListMatchDTO();
-        listMatchDTO.setMatchDTOs(matchDAO.findAllAfter(accountId,
-                                                        DateUtils.addHours(lastFetchedAccountUpdatedAt, -1),
-                                                        DateUtils.addHours(lastFetchedMatchUpdatedAt, -1)));
 
-        listMatchDTO.setChatMessageDTOs(chatMessageDAO.findAllReceivedAfter(accountId,
-                                                                            DateUtils.addHours(
-                                                                                    lastFetchedChatMessageCreatedAt,
-                                                                                    -1)));
+        listMatchDTO.setMatchDTOs(matchDAO.findAllAfter(accountId,
+                                                        offsetFetchedDate(matchFetchedAt),
+                                                        offsetFetchedDate(accountFetchedAt)));
+
+        listMatchDTO.setReceivedChatMessageDTOs(chatMessageDAO.findAllUnreceived(accountId));
+        listMatchDTO.setSentChatMessageDTOs(chatMessageDAO.findAllSentAfter(accountId,
+                                                                            offsetFetchedDate(chatMessageFetchedAt)));
         return listMatchDTO;
     }
 

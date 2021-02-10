@@ -211,4 +211,15 @@ public class BalanceAccountServiceApplication {
 
 // TODO			61. save configuration of android, and fetchedAt datetimes,
 
+// TODO			62. chatmessage has chatmessages synced and received tables
+
+// TODO			63. when app delted, send out the last read message date for each chat and save them in case of when app reinstalled
+
+// TODO 		64. chat workflow, send --> receipt || receive --> ack --> update chat_message received column
+//					list matches --> android query to get the last synced message's createdat,
+//					server query chat_message where sender = accountid and created > last synced message's createdat
+//					query chat_message where recipient = accountId and received = false
+
+// TODO			65. decide how many minutes subtract from lastChatMessagecreated, lastAccountudpatedAt .. etc
+
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one

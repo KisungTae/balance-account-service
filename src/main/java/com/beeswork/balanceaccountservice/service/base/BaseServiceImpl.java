@@ -7,13 +7,17 @@ import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundExcep
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedDeletedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
+import org.apache.commons.lang3.time.DateUtils;
 import org.modelmapper.ModelMapper;
 
+import java.util.Date;
 import java.util.UUID;
 
 public abstract class BaseServiceImpl {
 
     protected final ModelMapper modelMapper;
+    private static final int FETCH_OFFSET_IN_MINUTES = -5;
+
 
     public BaseServiceImpl(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
@@ -33,5 +37,9 @@ public abstract class BaseServiceImpl {
         if (account == null) throw new SwipedNotFoundException();
         if (account.isBlocked()) throw new SwipedBlockedException();
         if (account.isDeleted()) throw new SwipedDeletedException();
+    }
+
+    protected Date offsetFetchedDate(Date date) {
+        return DateUtils.addMinutes(date, FETCH_OFFSET_IN_MINUTES);
     }
 }

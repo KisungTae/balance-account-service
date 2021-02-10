@@ -12,9 +12,9 @@ public interface MatchService {
 
     ListMatchDTO listMatches(UUID accountId,
                              UUID identityToken,
-                             Date lastFetchedAccountUpdatedAt,
-                             Date lastFetchedMatchUpdatedAt,
-                             Date lastFetchedChatMessageCreatedAt);
+                             Date matchFetchedAt,
+                             Date accountFetchedAt,
+                             Date chatMessageFetchedAt);
 
     void unmatch(UUID accountId, UUID identityToken, UUID unmatchedId);
 }

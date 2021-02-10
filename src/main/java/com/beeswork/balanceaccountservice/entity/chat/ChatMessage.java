@@ -61,6 +61,9 @@ public class ChatMessage {
     @Column(name = "body")
     private String body;
 
+    @Column(name = "received")
+    private boolean received;
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

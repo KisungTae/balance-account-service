@@ -12,8 +12,8 @@ import java.util.UUID;
 public class MatchDTO {
     private Long    chatId;
     private UUID    matchedId;
-    private Date    updatedAt;
     private boolean unmatched;
+    private Date    updatedAt;
     private String  name;
     private String  repPhotoKey;
     private boolean blocked;
@@ -23,8 +23,8 @@ public class MatchDTO {
     @QueryProjection
     public MatchDTO(Long chatId,
                     UUID matchedId,
-                    Date updatedAt,
                     boolean unmatched,
+                    Date updatedAt,
                     String name,
                     String repPhotoKey,
                     boolean blocked,
@@ -32,8 +32,8 @@ public class MatchDTO {
                     Date accountUpdatedAt) {
         this.chatId = chatId;
         this.matchedId = matchedId;
-        this.updatedAt = updatedAt;
         this.unmatched = unmatched;
+        this.updatedAt = updatedAt;
         this.name = name;
         this.repPhotoKey = repPhotoKey;
         this.blocked = blocked;

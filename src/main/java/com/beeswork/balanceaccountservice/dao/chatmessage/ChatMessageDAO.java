@@ -11,5 +11,6 @@ import java.util.UUID;
 public interface ChatMessageDAO extends BaseDAO<ChatMessage> {
 
     List<ChatMessage> findAllByChatIdAfter(Long chatId, Date lastChatMessageCreatedAt);
-    List<ChatMessageDTO> findAllReceivedAfter(UUID accountId, Date lastChatMessageCreatedAt);
+    List<ChatMessageDTO> findAllUnreceived(UUID accountId);
+    List<ChatMessageDTO> findAllSentAfter(UUID accountId, Date chatMessageFetchedAt);
 }

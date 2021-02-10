@@ -19,7 +19,6 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
 
     private final QChatMessage qChatMessage = QChatMessage.chatMessage;
 
-
     public ChatMessageDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
         super(entityManager, jpaQueryFactory);
     }
@@ -33,10 +32,24 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
     }
 
     @Override
-    public List<ChatMessageDTO> findAllReceivedAfter(UUID accountId, Date lastChatMessageCreatedAt) {
-        return jpaQueryFactory.select(new QChatMessageDTO(qChatMessage.id, qChatMessage.chatId))
-                              .where(qChatMessage.recipientId.eq(accountId)
-                                                             .and(qChatMessage.createdAt.after(lastChatMessageCreatedAt)))
+    public List<ChatMessageDTO> findAllUnreceived(UUID accountId) {
+        return jpaQueryFactory.select(new QChatMessageDTO(qChatMessage.id,
+                                                          qChatMessage.body,
+                                                          qChatMessage.chatId,
+                                                          qChatMessage.createdAt))
+                              .from(qChatMessage)
+                              .where(qChatMessage.recipientId.eq(accountId).and(qChatMessage.received.eq(false)))
+                              .fetch();
+    }
+
+    @Override
+    public List<ChatMessageDTO> findAllSentAfter(UUID accountId, Date chatMessageFetchedAt) {
+        return jpaQueryFactory.select(new QChatMessageDTO(qChatMessage.id,
+                                                          qChatMessage.messageId,
+                                                          qChatMessage.createdAt))
+                              .from(qChatMessage)
+                              .where(qChatMessage.accountId.eq(accountId)
+                                                           .and(qChatMessage.createdAt.after(chatMessageFetchedAt)))
                               .fetch();
     }
 
