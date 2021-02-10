@@ -71,8 +71,8 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     public List<MatchDTO> findAllAfter(UUID matcherId, Date matchFetchedAt, Date accountFetchedAt) {
         return jpaQueryFactory.select(new QMatchDTO(qMatch.chatId,
                                                     qMatch.matchedId,
-                                                    qMatch.updatedAt,
                                                     qMatch.unmatched,
+                                                    qMatch.updatedAt,
                                                     qAccount.name,
                                                     qAccount.repPhotoKey,
                                                     qAccount.blocked,

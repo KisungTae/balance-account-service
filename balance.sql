@@ -318,58 +318,25 @@ create index chat_message_chat_id_created_at on chat_message (chat_id, created_a
 
 
 
-select matcher_id, count(matcher_id)
-from match
-group by matcher_id
-order by count(matcher_id) desc;
-
-
-select *
-from account
-where id = '6be75d61-b60a-44f9-916b-9703a9063cf5';
-
-select *
-from chat_message;
-
-select m.updated_at, a.updated_at, c.updated_at
-from match m
-         left join account a on a.id = m.matcher_id
-         left join chat c on m.chat_id = c.id
-where matcher_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
+-------------------------------------- Query ------------------------------------------------
 
 
 
-select m.updated_at, a.updated_at, cm.created_at
-from match m
-         left join account a on m.matcher_id = a.id
-         left join chat_message cm on m.matcher_id = cm.recipient_id
-where matcher_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0'
-  and (m.updated_at > '2021-02-05 13:37:32.196000' or
-       a.updated_at > '2021-02-05 13:37:32.196000' or
-       cm.created_at > '2021-02-05 13:37:32.196000');
 
 
 
-select chat_id
-from chat_message
-group by chat_id;
-
-select recipient_id, count(*)
-from chat_message
-group by recipient_id;
 
 
-select chat_id, max(id)
-from chat_message
-where recipient_id = '6be75d61-b60a-44f9-916b-9703a9063cf5'
-  and created_at > '2021-02-05 10:15:36.251000'
-group by chat_id;
 
-select chat_id, id
-from chat_message
-where recipient_id = '6be75d61-b60a-44f9-916b-9703a9063cf5'
-  and created_at > '2021-02-05 10:15:36.251000'
-order by chat_id, id;
+
+
+
+
+-------------------------------------- Query ------------------------------------------------
+
+
+
+
 
 
 -- ================================ ADMIN =========================================
