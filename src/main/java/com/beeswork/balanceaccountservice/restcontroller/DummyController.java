@@ -312,7 +312,7 @@ public class DummyController {
         List<Match> matches = new JPAQueryFactory(entityManager).selectFrom(QMatch.match).fetch();
         Date date = new Date();
         Random random = new Random();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             date = DateUtils.addSeconds(date, 30);
 
             for (Match match : matches) {

@@ -222,4 +222,6 @@ public class BalanceAccountServiceApplication {
 
 // TODO			65. decide how many minutes subtract from lastChatMessagecreated, lastAccountudpatedAt .. etc
 
+// TODO			66. change repPhotoKey in Account, so when create account at very first time, put empty string for repPhotoKey
+
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one

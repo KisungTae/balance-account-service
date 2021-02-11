@@ -181,7 +181,7 @@ create table account
     score                 int          not null,
     index                 int          not null,
     point                 int          not null,
-    rep_photo_key         varchar(30),
+    rep_photo_key         varchar(30)  not null,
     location_updated_at   timestamptz,
     location              geography(point, 4326),
     fcm_token             varchar(200),
@@ -318,25 +318,17 @@ create index chat_message_chat_id_created_at on chat_message (chat_id, created_a
 
 
 
--------------------------------------- Query ------------------------------------------------
 
 
-
-
-
-
-
-
-
-
-
-
+-- 12,19736,message-0.058166564
+-- 13,19751,message-0.26887512
+-- 14,19888,message-0.8742933
+-- 21,19745,message-0.18621957
 
 -------------------------------------- Query ------------------------------------------------
 
 
-
-
+-------------------------------------- Query ------------------------------------------------
 
 
 -- ================================ ADMIN =========================================
