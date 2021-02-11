@@ -11,9 +11,20 @@ import java.util.Date;
 import java.util.List;
 
 @Getter
-@Setter
 public class ListMatchDTO {
     private List<MatchDTO> matchDTOs = new ArrayList<>();
     private List<ChatMessageDTO> sentChatMessageDTOs = new ArrayList<>();
     private List<ChatMessageDTO> receivedChatMessageDTOs = new ArrayList<>();
+
+    public void setMatchDTOs(List<MatchDTO> matchDTOs) {
+        if (matchDTOs != null) this.matchDTOs = matchDTOs;
+    }
+
+    public void setSentChatMessageDTOs(List<ChatMessageDTO> sentChatMessageDTOs) {
+        if (sentChatMessageDTOs != null) this.sentChatMessageDTOs = sentChatMessageDTOs;
+    }
+
+    public void setReceivedChatMessageDTOs(List<ChatMessageDTO> receivedChatMessageDTOs) {
+        if (receivedChatMessageDTOs != null) this.receivedChatMessageDTOs = receivedChatMessageDTOs;
+    }
 }

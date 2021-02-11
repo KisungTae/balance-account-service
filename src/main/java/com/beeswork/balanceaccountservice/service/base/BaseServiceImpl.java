@@ -39,7 +39,7 @@ public abstract class BaseServiceImpl {
         if (account.isDeleted()) throw new SwipedDeletedException();
     }
 
-    protected Date offsetFetchedDate(Date date) {
+    protected Date offsetFetchedAt(Date date) {
         return DateUtils.addMinutes(date, FETCH_OFFSET_IN_MINUTES);
     }
 }

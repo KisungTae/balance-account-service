@@ -3,15 +3,11 @@ package com.beeswork.balanceaccountservice.service.match;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chatmessage.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
-import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchDTO;
-import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
-import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
-import org.apache.commons.lang3.time.DateUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +16,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 
@@ -53,12 +48,11 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
         ListMatchDTO listMatchDTO = new ListMatchDTO();
 
         listMatchDTO.setMatchDTOs(matchDAO.findAllAfter(accountId,
-                                                        offsetFetchedDate(matchFetchedAt),
-                                                        offsetFetchedDate(accountFetchedAt)));
-
+                                                        offsetFetchedAt(matchFetchedAt),
+                                                        offsetFetchedAt(accountFetchedAt)));
         listMatchDTO.setReceivedChatMessageDTOs(chatMessageDAO.findAllUnreceived(accountId));
         listMatchDTO.setSentChatMessageDTOs(chatMessageDAO.findAllSentAfter(accountId,
-                                                                            offsetFetchedDate(chatMessageFetchedAt)));
+                                                                            offsetFetchedAt(chatMessageFetchedAt)));
         return listMatchDTO;
     }
 
