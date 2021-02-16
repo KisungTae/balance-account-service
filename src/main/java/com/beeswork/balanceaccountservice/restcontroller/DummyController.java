@@ -312,11 +312,14 @@ public class DummyController {
         List<Match> matches = new JPAQueryFactory(entityManager).selectFrom(QMatch.match).fetch();
         Date date = new Date();
         Random random = new Random();
-        for (int i = 0; i < 10; i++) {
+        int innerCount = 0;
+        for (int i = 0; i < 20; i++) {
             date = DateUtils.addSeconds(date, 30);
+
 
             for (Match match : matches) {
                 if (random.nextBoolean()) {
+                    innerCount++;
                     boolean who = random.nextBoolean();
                     Account sender = who ? match.getMatcher() : match.getMatched();
                     Account receiver = who ? match.getMatched() : match.getMatcher();
@@ -326,7 +329,7 @@ public class DummyController {
                          .add(new ChatMessage(match.getChat(),
                                               sender,
                                               receiver,
-                                              1L,
+                                              (long) i + innerCount,
                                               "message-" + random.nextFloat(),
                                               date));
                 }

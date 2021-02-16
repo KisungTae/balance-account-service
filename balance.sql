@@ -319,11 +319,22 @@ create index chat_message_chat_id_created_at on chat_message (chat_id, created_a
 select * from chat_message
 where account_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
 
+select *
+from chat_message
+where account_id = '6be75d61-b60a-44f9-916b-9703a9063cf5'
+order by message_id desc;
+
+
+select message_id, count(message_id)
+from chat_message
+group by message_id
+having count(message_id) > 1;
 
 select *
 from match
 where matcher_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
 
+delete from chat_message;
 
 select *
 from match m
@@ -331,10 +342,10 @@ left join account a on a.id = m.matched_id
 where matcher_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0'
 and (m.updated_at > '2021-01-05 09:27:15.962000' or a.updated_at > '2021-01-05 09:27:15.962000');
 
--- 12,19736,message-0.058166564
--- 13,19751,message-0.26887512
--- 14,19888,message-0.8742933
--- 21,19745,message-0.18621957
+
+
+
+
 
 -------------------------------------- Query ------------------------------------------------
 

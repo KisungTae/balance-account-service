@@ -46,6 +46,7 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
     public List<ChatMessageDTO> findAllSentAfter(UUID accountId, Date chatMessageFetchedAt) {
         return jpaQueryFactory.select(new QChatMessageDTO(qChatMessage.id,
                                                           qChatMessage.messageId,
+                                                          qChatMessage.chatId,
                                                           qChatMessage.createdAt))
                               .from(qChatMessage)
                               .where(qChatMessage.accountId.eq(accountId)

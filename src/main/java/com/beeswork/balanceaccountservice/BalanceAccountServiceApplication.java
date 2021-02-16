@@ -224,4 +224,9 @@ public class BalanceAccountServiceApplication {
 
 // TODO			66. change repPhotoKey in Account, so when create account at very first time, put empty string for repPhotoKey
 
+// TODO			67. remove chatId in chatmessagedto and findAllSentAfter
+
+// TODO			68. update received of chatmessage could throw exception when version is on the entity, should be fine,
+//  				because all of them update received = true does not matter if first or second one updates the same entitiy it will result in received = true
+
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one
