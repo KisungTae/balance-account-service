@@ -4,6 +4,8 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chatmessage.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchDTO;
+import com.beeswork.balanceaccountservice.entity.account.Account;
+import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
@@ -38,7 +40,8 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+//    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    @Transactional
     public ListMatchDTO listMatches(UUID accountId,
                                     UUID identityToken,
                                     Date matchFetchedAt,

@@ -316,6 +316,19 @@ create table chat_message
 
 create index chat_message_chat_id_created_at on chat_message (chat_id, created_at);
 
+
+select * from match where matched_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
+
+select *
+from account where id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
+
+select *
+from match where matcher_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
+
+
+select *
+from account where id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
+
 select * from chat_message
 where account_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
 
