@@ -231,4 +231,19 @@ public class BalanceAccountServiceApplication {
 
 // TODO			69. make sure only updating the proflile and photo updated the updatedAt of account for flagging the account in match list when account profile or photo updated
 
+// TODO 	 	70. findAllClickedAfter should return valid accounts so delete deleted, blocked fields in ClickedProjection
+
+// TODO 		71. remove blocked field in account and blocked exception, then if admin block some users, just delete = true
+//					but create block_list table and then when user tries to login, check block_list table and then tells the user if their accoutns have bee blocked or not but
+//					other users do not need to know if this user is blocked or deleted, just combine to deleted
+
+// TODO			72. add deleted field in match and exclude deletedmatches in listmatches,
+
+// TODO			73. add synced in chatMessage for sentChatmessage then, chatmessageflow, sent, receipt and ack for sent message and send to clicent and ack for recenved message
+
+
+
+
+
+
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one
