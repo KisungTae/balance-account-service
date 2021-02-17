@@ -53,9 +53,10 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
         listMatchDTO.setMatchDTOs(matchDAO.findAllAfter(accountId,
                                                         offsetFetchedAt(matchFetchedAt),
                                                         offsetFetchedAt(accountFetchedAt)));
-        listMatchDTO.setReceivedChatMessageDTOs(chatMessageDAO.findAllUnreceived(accountId));
+        listMatchDTO.setReceivedChatMessageDTOs(chatMessageDAO.findAllUnreceived(accountId, null));
         listMatchDTO.setSentChatMessageDTOs(chatMessageDAO.findAllSentAfter(accountId,
-                                                                            offsetFetchedAt(chatMessageFetchedAt)));
+                                                                            offsetFetchedAt(chatMessageFetchedAt),
+                                                                            null));
         return listMatchDTO;
     }
 

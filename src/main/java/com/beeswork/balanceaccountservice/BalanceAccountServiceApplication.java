@@ -229,4 +229,6 @@ public class BalanceAccountServiceApplication {
 // TODO			68. update received of chatmessage could throw exception when version is on the entity, should be fine,
 //  				because all of them update received = true does not matter if first or second one updates the same entitiy it will result in received = true
 
+// TODO			69. make sure only updating the proflile and photo updated the updatedAt of account for flagging the account in match list when account profile or photo updated
+
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one

@@ -317,54 +317,29 @@ create table chat_message
 create index chat_message_chat_id_created_at on chat_message (chat_id, created_at);
 
 
-select * from match where matched_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
+
+
+
+---------------------------------------------------------------------------------------------
+-------------------------------------- Query Start ------------------------------------------
+---------------------------------------------------------------------------------------------
 
 select *
-from account where id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
+from chat_message order by id;
 
 select *
-from match where matcher_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
-
-
-select *
-from account where id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
-
-select * from chat_message
-where account_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
-
-select *
-from chat_message
-where account_id = '6be75d61-b60a-44f9-916b-9703a9063cf5'
-order by message_id desc;
-
-
-select message_id, count(message_id)
-from chat_message
-group by message_id
-having count(message_id) > 1;
-
-select *
-from match
-where matcher_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0';
-
-delete from chat_message;
-
-select *
-from match m
-left join account a on a.id = m.matched_id
-where matcher_id = '01ac40b1-cc3f-4a96-9663-df0ad79acee0'
-and (m.updated_at > '2021-01-05 09:27:15.962000' or a.updated_at > '2021-01-05 09:27:15.962000');
+from account
+where id = '6be75d61-b60a-44f9-916b-9703a9063cf5';
 
 
 
 
 
 
--------------------------------------- Query ------------------------------------------------
 
-
--------------------------------------- Query ------------------------------------------------
-
+---------------------------------------------------------------------------------------------
+-------------------------------------- Query End --------------------------------------------
+---------------------------------------------------------------------------------------------
 
 -- ================================ ADMIN =========================================
 

@@ -6,6 +6,7 @@ import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.beeswork.balanceaccountservice.vm.chat.ListChatMessagesVM;
+import com.beeswork.balanceaccountservice.vm.chat.ReceivedChatMessagesVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +16,13 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@RequestMapping("/chat")
 public class ChatController {
 
     private final StompService stompService;
@@ -37,12 +37,12 @@ public class ChatController {
         this.objectMapper = objectMapper;
     }
 
-    @MessageMapping("/chat/send")
+    @MessageMapping("/send")
     public void send(@Payload ChatMessageVM chatMessageVM, MessageHeaders messageHeaders) {
         stompService.send(chatMessageVM, messageHeaders);
     }
 
-    @GetMapping("/chat/message/list")
+    @GetMapping("/message/list")
     public ResponseEntity<String> listChatMessages(@Valid @ModelAttribute ListChatMessagesVM listChatMessagesVM,
                                                    BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
@@ -52,6 +52,15 @@ public class ChatController {
                                                                             listChatMessagesVM.getChatId(),
                                                                             listChatMessagesVM.getLastChatMessageCreatedAt());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(chatMessageDTOs));
+    }
+
+    @PostMapping("/message/received")
+    public void receivedChatMessages(@Valid @RequestBody ReceivedChatMessagesVM receivedChatMessagesVM,
+                                     BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        chatService.receivedChatMessages(receivedChatMessagesVM.getAccountId(),
+                                         receivedChatMessagesVM.getIdentityToken(),
+                                         receivedChatMessagesVM.getChatMessageIds());
     }
 
 }

@@ -74,8 +74,9 @@ public class AccountController extends BaseController {
     }
 
     @PostMapping("/about")
-    public ResponseEntity<String> saveAbout(@RequestBody SaveAboutVM saveAboutVM) throws JsonProcessingException {
-
+    public ResponseEntity<String> saveAbout(@Valid @RequestBody SaveAboutVM saveAboutVM,
+                                            BindingResult bindingResult) throws JsonProcessingException {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
         accountService.saveAbout(saveAboutVM.getAccountId(),
                                  saveAboutVM.getIdentityToken(),
                                  saveAboutVM.getAbout(),

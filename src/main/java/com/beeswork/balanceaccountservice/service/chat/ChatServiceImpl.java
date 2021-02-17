@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.service.chat;
 
+import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chatmessage.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
@@ -14,6 +15,7 @@ import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedExceptio
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedDeletedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
+import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.apache.commons.lang3.time.DateUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,18 +30,21 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class ChatServiceImpl implements ChatService {
+public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
 
     private final MatchDAO matchDAO;
     private final ChatMessageDAO chatMessageDAO;
-    private final ModelMapper modelMapper;
+    private final AccountDAO accountDAO;
 
     @Autowired
     public ChatServiceImpl(MatchDAO matchDAO,
-                           ChatMessageDAO chatMessageDAO, ModelMapper modelMapper) {
+                           ChatMessageDAO chatMessageDAO,
+                           ModelMapper modelMapper,
+                           AccountDAO accountDAO) {
+        super(modelMapper);
         this.matchDAO = matchDAO;
         this.chatMessageDAO = chatMessageDAO;
-        this.modelMapper = modelMapper;
+        this.accountDAO = accountDAO;
     }
 
     @Override
@@ -108,6 +113,15 @@ public class ChatServiceImpl implements ChatService {
             chatMessageDTOs.add(chatMessageDTO);
         }
         return chatMessageDTOs;
+    }
+
+    @Override
+    @Transactional
+    public void receivedChatMessages(UUID accountId, UUID identityToken, List<Long> chatMessageIds) {
+        checkIfAccountValid(accountDAO.findById(accountId), identityToken);
+        for (ChatMessage chatMessage : chatMessageDAO.findAllIn(chatMessageIds)) {
+            chatMessage.setReceived(true);
+        }
     }
 
 
