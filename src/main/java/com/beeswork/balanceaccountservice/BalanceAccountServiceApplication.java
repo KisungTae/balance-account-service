@@ -233,9 +233,8 @@ public class BalanceAccountServiceApplication {
 
 // TODO 	 	70. findAllClickedAfter should return valid accounts so delete deleted, blocked fields in ClickedProjection
 
-// TODO 		71. remove blocked field in account and blocked exception, then if admin block some users, just delete = true
-//					but create block_list table and then when user tries to login, check block_list table and then tells the user if their accoutns have bee blocked or not but
-//					other users do not need to know if this user is blocked or deleted, just combine to deleted
+// TODO 		71. block account make the account's deleted field = true as well so that only the deleted field can be used for other users vadiliaty
+//					only the users themselves get the blocked exception, and the other users will get deleted on fetched something
 
 // TODO			72. add deleted field in match and exclude deletedmatches in listmatches,
 
@@ -247,8 +246,21 @@ public class BalanceAccountServiceApplication {
 
 // TODO			76. before saving chatmessage to database, check if there is a duplicate especifally for sent message then if exists, then just return the creatdAt and Id
 
-// TODO			77. block account make the account's deleted field = true as well so that only the deleted field can be used for other users vadiliaty
+// TODO			78. back up chatMessages, create a table for back-up and encrypt and compress at client side and upload it to s3, then delete back-up that is not used for 15 days based on the table
 
+
+
+// TODO			Chat Business rules
+//				1. 	send, receipt and ack || receive and ack
+//				2. 	listMatches retrieve only the chatMessages that are not received or synced
+//				2. 	client checks listMatches if it's fill list, if false, then recursion function to list chatMessages,
+//					full depends on the size of chatMessages 30000?
+//				2. 	listMatches return sentChatMessages, grab the largest chatMessageId from sentChatMessages and then
+//					if chatMessages in database are in sending status and < the largest chatMessageId then make them to error status
+//				3. 	when login to the app, check if there is active back-up available, if yes, then direct the user to back-up page
+//				   	before they get into the app main page like swipe page
+//				4.  instead of listChatMessages just use listMatches even if a user comes back to the app's chat page from background
+//				5.	
 
 
 
