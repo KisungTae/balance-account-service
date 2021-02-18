@@ -241,6 +241,13 @@ public class BalanceAccountServiceApplication {
 
 // TODO			73. add synced in chatMessage for sentChatmessage then, chatmessageflow, sent, receipt and ack for sent message and send to clicent and ack for recenved message
 
+// TODO			74. delete chatmessages when they are synced and received and > 2 weeks
+
+// TODO			75. if listMatches > 10mb then drop some chatmessages and make full = false, then clicent will request again
+
+// TODO			76. before saving chatmessage to database, check if there is a duplicate especifally for sent message then if exists, then just return the creatdAt and Id
+
+// TODO			77. block account make the account's deleted field = true as well so that only the deleted field can be used for other users vadiliaty
 
 
 

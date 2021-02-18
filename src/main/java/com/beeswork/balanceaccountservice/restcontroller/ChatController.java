@@ -63,6 +63,18 @@ public class ChatController {
                                          receivedChatMessagesVM.getChatMessageIds());
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+
+        int size = 10000000;
+        StringBuilder stringB = new StringBuilder(size); //for the 2mb one
+        String paddingString = "abcdefghijklmnopqrs";
+
+        while (stringB.length() + paddingString.length() < size)
+            stringB.append(paddingString);
+        return ResponseEntity.status(HttpStatus.OK).body(stringB.toString());
+    }
+
 }
 
 
