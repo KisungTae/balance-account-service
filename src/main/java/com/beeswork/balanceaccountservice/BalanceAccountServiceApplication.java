@@ -246,7 +246,8 @@ public class BalanceAccountServiceApplication {
 
 // TODO			76. before saving chatmessage to database, check if there is a duplicate especifally for sent message then if exists, then just return the creatdAt and Id
 
-// TODO			78. back up chatMessages, create a table for back-up and encrypt and compress at client side and upload it to s3, then delete back-up that is not used for 15 days based on the table
+// TODO			78. back up chatMessages, create a table for back-up and encrypt and compress at client side and upload it to s3,
+//  				then delete back-up that is not used for 15 days based on the table
 
 
 
@@ -260,7 +261,11 @@ public class BalanceAccountServiceApplication {
 //				3. 	when login to the app, check if there is active back-up available, if yes, then direct the user to back-up page
 //				   	before they get into the app main page like swipe page
 //				4.  instead of listChatMessages just use listMatches even if a user comes back to the app's chat page from background
-//				5.	
+//				5.	add read column to chatMessage for future implementation and fetched
+//				6.	add deleted column to matches
+//				7. 	back-up includes matches and chatMessages so that we don't have to update lastChatmessageId per match on the server
+//				8. 	sent or receive message, check match's opened if false then true and set updated_at so that next listMatches include the updated Matches,
+//					on client side, when received message or receipt of sent message then make match's opened = true on client side
 
 
 

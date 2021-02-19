@@ -279,14 +279,15 @@ create table chat
 -- last_read_at will be updated when app is deleted
 create table match
 (
-    matcher_id   uuid        not null,
-    matched_id   uuid        not null,
-    chat_id      bigint      not null,
-    unmatched    boolean     not null,
-    unmatcher    boolean     not null,
-    last_read_at timestamptz,
-    created_at   timestamptz not null,
-    updated_at   timestamptz not null,
+    matcher_id uuid        not null,
+    matched_id uuid        not null,
+    chat_id    bigint      not null,
+    unmatched  boolean     not null,
+    unmatcher  boolean     not null,
+    opened     boolean     not null,
+    deleted    boolean     not null,
+    created_at timestamptz not null,
+    updated_at timestamptz not null,
 
     primary key (matcher_id, matched_id),
     constraint match_matcher_id_fk foreign key (matcher_id) references account (id),
@@ -301,13 +302,15 @@ create index match_matcher_id_matched_id_chat_id on match (matcher_id, matched_i
 create table chat_message
 (
     id           bigserial primary key,
-    message_id   bigint      not null,
-    chat_id      bigint      not null,
-    account_id   uuid        not null,
-    recipient_id uuid        not null,
-    body         varchar(200),
-    received     bool        not null,
-    created_at   timestamptz not null,
+    message_id   bigint       not null,
+    chat_id      bigint       not null,
+    account_id   uuid         not null,
+    recipient_id uuid         not null,
+    read         boolean      not null,
+    body         varchar(200) not null,
+    synced       boolean      not null,
+    received     boolean      not null,
+    created_at   timestamptz  not null,
 
     constraint chat_message_chat_id_fk foreign key (chat_id) references chat (id),
     constraint chat_message_account_id_fk foreign key (account_id) references account (id),
@@ -318,21 +321,17 @@ create index chat_message_chat_id_created_at on chat_message (chat_id, created_a
 
 
 
-
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query Start ------------------------------------------
 ---------------------------------------------------------------------------------------------
 
 select *
-from chat_message order by id;
+from chat_message
+order by id;
 
 select *
 from account
 where id = '6be75d61-b60a-44f9-916b-9703a9063cf5';
-
-
-
-
 
 
 
