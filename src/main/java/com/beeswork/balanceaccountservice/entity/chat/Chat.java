@@ -26,10 +26,6 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "updated_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;
-
     @OneToMany(mappedBy = "chat",
                fetch = FetchType.LAZY,
                cascade = CascadeType.ALL,

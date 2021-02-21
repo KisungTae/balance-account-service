@@ -12,10 +12,4 @@ import java.util.Date;
 public class ListMatchesVM extends AccountIdentityVM {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date matchFetchedAt;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private Date accountFetchedAt;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private Date chatMessageFetchedAt;
 }

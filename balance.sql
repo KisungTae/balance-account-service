@@ -171,7 +171,7 @@ create table account
     enabled               boolean      not null,
     blocked               boolean      not null,
     deleted               boolean      not null,
-    name                  varchar(50)  not null,
+    name                  varchar(15)  not null,
     email                 varchar(256) not null,
     height                int,
     birth_year            int          not null,
@@ -184,7 +184,7 @@ create table account
     rep_photo_key         varchar(30)  not null,
     location_updated_at   timestamptz,
     location              geography(point, 4326),
-    fcm_token             varchar(200),
+    fcm_token             varchar(500),
     account_type          int          not null,
     free_swipe            int          not null,
     free_swipe_updated_at timestamptz  not null,
@@ -227,7 +227,7 @@ create index photo_account_id_idx on photo (account_id);
 create table question
 (
     id            serial primary key,
-    description   varchar(100) not null,
+    description   varchar(200) not null,
     top_option    varchar(50)  not null,
     bottom_option varchar(50)  not null,
     created_at    timestamptz  not null,
@@ -251,12 +251,13 @@ create table account_question
 
 create table swipe
 (
-    swiper_id  uuid        not null,
-    swiped_id  uuid        not null,
-    clicked    boolean     not null,
-    count      int         not null,
-    created_at timestamptz not null,
-    updated_at timestamptz not null,
+    swiper_id   uuid        not null,
+    swiped_id   uuid        not null,
+    clicked     boolean     not null,
+    count       int         not null,
+    super_click boolean     not null,
+    created_at  timestamptz not null,
+    updated_at  timestamptz not null,
 
     primary key (swiper_id, swiped_id),
     constraint swipe_swiper_id_fk foreign key (swiper_id) references account (id),
@@ -268,8 +269,7 @@ create index swipe_swiped_id_idx on swipe (swiped_id);
 
 create table chat
 (
-    id         bigserial primary key,
-    updated_at timestamptz not null
+    id bigserial primary key
 );
 
 -- if match between 1 and 2 then
@@ -279,12 +279,13 @@ create table chat
 -- last_read_at will be updated when app is deleted
 create table match
 (
+    version    int         not null,
     matcher_id uuid        not null,
     matched_id uuid        not null,
     chat_id    bigint      not null,
     unmatched  boolean     not null,
     unmatcher  boolean     not null,
-    opened     boolean     not null,
+    active     boolean     not null,
     deleted    boolean     not null,
     created_at timestamptz not null,
     updated_at timestamptz not null,
@@ -306,9 +307,9 @@ create table chat_message
     chat_id      bigint       not null,
     account_id   uuid         not null,
     recipient_id uuid         not null,
-    read         boolean      not null,
     body         varchar(200) not null,
-    synced       boolean      not null,
+    read         boolean      not null,
+    fetched       boolean      not null,
     received     boolean      not null,
     created_at   timestamptz  not null,
 
@@ -319,6 +320,9 @@ create table chat_message
 
 create index chat_message_chat_id_created_at on chat_message (chat_id, created_at);
 
+
+select *
+from account;
 
 
 ---------------------------------------------------------------------------------------------
@@ -331,9 +335,23 @@ order by id;
 
 select *
 from account
-where id = '6be75d61-b60a-44f9-916b-9703a9063cf5';
+where id = 'f77865c1-e370-48f0-ad6a-c64154c938a0';
 
 
+select matcher_id, count(matcher_id)
+from match
+group by matcher_id
+order by count(matcher_id) desc;
+
+
+select *
+from match
+where matcher_id = 'f77865c1-e370-48f0-ad6a-c64154c938a0';
+
+select *
+from chat_message;
+
+delete from chat_message;
 
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query End --------------------------------------------
@@ -395,8 +413,6 @@ create table report_resolution
     constraint report_resolution_report_resolution_type_id_fk foreign key (report_resolution_type_id) references report_resolution_type (id)
 );
 
-
-
 create table deleted_photo
 (
     id         serial primary key,
@@ -419,6 +435,14 @@ create table unblock
 
     constraint unblock_unblocked_account_id_fk foreign key (unblocked_account_id) references account (id),
     constraint unblock_admin_id_fk foreign key (admin_id) references admin (id)
+);
+
+
+create table chat_message_back_up
+(
+    id         serial primary key,
+    account_id uuid        not null,
+    created_at timestamptz not null
 );
 
 

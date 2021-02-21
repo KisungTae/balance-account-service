@@ -61,6 +61,12 @@ public class ChatMessage {
     @Column(name = "body")
     private String body;
 
+    @Column(name = "read")
+    private boolean read;
+
+    @Column(name = "fetched")
+    private boolean fetched;
+
     @Column(name = "received")
     private boolean received;
 

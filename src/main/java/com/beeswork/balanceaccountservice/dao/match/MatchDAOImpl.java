@@ -12,6 +12,7 @@ import com.beeswork.balanceaccountservice.entity.match.MatchId;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
 import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import com.beeswork.balanceaccountservice.projection.QMatchProjection;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -68,23 +69,29 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public List<MatchDTO> findAllAfter(UUID matcherId, Date matchFetchedAt, Date accountFetchedAt) {
+    public List<MatchDTO> findAllAfter(UUID matcherId, Date matchFetchedAt) {
+        Expression<Date> updatedAtCase = new CaseBuilder().when(qMatch.updatedAt.after(qAccount.updatedAt))
+                                                          .then(qMatch.updatedAt)
+                                                          .otherwise(qAccount.updatedAt);
+
+        BooleanBuilder condition = new BooleanBuilder();
+        condition.and(qMatch.matcherId.eq(matcherId));
+        condition.and(qMatch.updatedAt.after(matchFetchedAt).or(qAccount.updatedAt.after(matchFetchedAt)));
+        condition.and(qMatch.deleted.eq(false));
+
         return jpaQueryFactory.select(new QMatchDTO(qMatch.chatId,
                                                     qMatch.matchedId,
                                                     qMatch.unmatched,
-                                                    qMatch.updatedAt,
                                                     qAccount.name,
                                                     qAccount.repPhotoKey,
-                                                    qAccount.blocked,
                                                     qAccount.deleted,
-                                                    qAccount.updatedAt))
+                                                    qMatch.active,
+                                                    qMatch.createdAt,
+                                                    updatedAtCase))
                               .from(qMatch)
                               .leftJoin(qAccount).on(qAccount.id.eq(qMatch.matchedId))
-                              .where(qMatch.matcherId.eq(matcherId)
-                                                     .and(qMatch.updatedAt.after(matchFetchedAt)
-                                                                          .or(qAccount.updatedAt.after(accountFetchedAt))))
+                              .where(condition)
                               .fetch();
-
     }
 
     @Override

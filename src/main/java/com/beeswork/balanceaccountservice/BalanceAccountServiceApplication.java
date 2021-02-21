@@ -206,6 +206,7 @@ public class BalanceAccountServiceApplication {
 // TODO			58. check delete photo in account service and the findWithPhotosAndAccountQuestions()
 
 // TODO			59. retrieve chatMessages make sent body = null
+//					--> implemented
 
 // TODO			60. only chatMessages within 2 weeks are retrieved, so check lastChatMesageCreated > (today-2weeks)
 
@@ -224,7 +225,8 @@ public class BalanceAccountServiceApplication {
 
 // TODO			66. change repPhotoKey in Account, so when create account at very first time, put empty string for repPhotoKey
 
-// TODO			67. remove chatId in chatmessagedto and findAllSentAfter
+// TODO			67. remove chatId in chatMessage and findAllSentAfter()
+//					--> chatId removed in findAllUnsynced
 
 // TODO			68. update received of chatmessage could throw exception when version is on the entity, should be fine,
 //  				because all of them update received = true does not matter if first or second one updates the same entitiy it will result in received = true
@@ -236,18 +238,31 @@ public class BalanceAccountServiceApplication {
 // TODO 		71. block account make the account's deleted field = true as well so that only the deleted field can be used for other users vadiliaty
 //					only the users themselves get the blocked exception, and the other users will get deleted on fetched something
 
-// TODO			72. add deleted field in match and exclude deletedmatches in listmatches,
+// TODO			72. add deleted field in match and exclude deleted matches in listMatches()
+//					--> implemented
 
-// TODO			73. add synced in chatMessage for sentChatmessage then, chatmessageflow, sent, receipt and ack for sent message and send to clicent and ack for recenved message
+// TODO			73. add synced in chatMessage and change findAllAfter to findAllUnsynced
+//					--> implemented
 
-// TODO			74. delete chatmessages when they are synced and received and > 2 weeks
+// TODO			74. delete chatMessages when they are synced and received and > 1 weeks
 
 // TODO			75. if listMatches > 10mb then drop some chatmessages and make full = false, then clicent will request again
+//					--> will implement when this happens, it will rarely happen
 
-// TODO			76. before saving chatmessage to database, check if there is a duplicate especifally for sent message then if exists, then just return the creatdAt and Id
+// TODO			76. before saving chatMessage to database, check if there is a duplicate for sent message then if exists,
+//  				then just return the created_at and Id
 
 // TODO			78. back up chatMessages, create a table for back-up and encrypt and compress at client side and upload it to s3,
 //  				then delete back-up that is not used for 15 days based on the table
+
+// TODO			79. implement super_click logic, it's just skip the balance game check in swipe()
+
+// TODO			80. limit the name of account to < 30mb 10 characters
+//					--> limited the name of account to 15 characters as an alphabet takes up a character
+
+// TODO			81. unmatch() makes match's deleted = true and unmatched = true but the other party's match's unmatched = true only
+//					--> implemented
+
 
 
 
@@ -266,6 +281,9 @@ public class BalanceAccountServiceApplication {
 //				7. 	back-up includes matches and chatMessages so that we don't have to update lastChatmessageId per match on the server
 //				8. 	sent or receive message, check match's opened if false then true and set updated_at so that next listMatches include the updated Matches,
 //					on client side, when received message or receipt of sent message then make match's opened = true on client side
+//				9. 	match does not track the active field, if users delete app and no backup, then the matches without unreceived or unsynced messages will be treated as new one
+//				10. match's created_at will be assigned at client side, so listMatch does not return updated_at field
+//				11.
 
 
 

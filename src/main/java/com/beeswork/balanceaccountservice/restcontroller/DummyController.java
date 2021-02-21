@@ -237,7 +237,6 @@ public class DummyController {
             Thread.sleep(10);
             Date date = new Date();
             Chat chat = new Chat();
-            chat.setUpdatedAt(date);
 
             MatchId theOtherPartyMatchId = new MatchId(swipe.getSwipedId(), swipe.getSwiperId());
             if (matchMap.containsKey(swipe.getSwipedId().toString() + swipe.getSwiperId().toString())) {
@@ -323,7 +322,6 @@ public class DummyController {
                     boolean who = random.nextBoolean();
                     Account sender = who ? match.getMatcher() : match.getMatched();
                     Account receiver = who ? match.getMatched() : match.getMatcher();
-                    match.getChat().setUpdatedAt(date);
                     match.getChat()
                          .getChatMessages()
                          .add(new ChatMessage(match.getChat(),

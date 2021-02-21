@@ -14,7 +14,10 @@ server:
 #  address: 192.168.1.100
 
 spring:
-# MessageSource
+  jackson:
+    default-property-inclusion: non_null
+    
+  # MessageSource
   messages:
     basename: messages
     encoding: UTF-8

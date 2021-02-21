@@ -9,6 +9,6 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ReceivedChatMessagesVM extends AccountIdentityVM {
+public class SyncChatMessagesVM extends AccountIdentityVM {
     private List<Long> chatMessageIds = new ArrayList<>();
 }

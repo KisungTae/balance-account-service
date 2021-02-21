@@ -26,48 +26,39 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
     }
 
     @Override
-    public List<ChatMessage> findAllByChatIdAfter(Long chatId, Date lastChatMessageCreatedAt) {
-        return jpaQueryFactory.selectFrom(qChatMessage)
-                              .where(qChatMessage.chatId.eq(chatId)
-                                                        .and(qChatMessage.createdAt.gt(lastChatMessageCreatedAt)))
-                              .fetch();
-    }
-
-    @Override
-    public List<ChatMessageDTO> findAllUnreceived(UUID accountId, Long chatId) {
-        BooleanBuilder booleanBuilder = new BooleanBuilder();
-        if (chatId != null) booleanBuilder.and(qChatMessage.chatId.eq(chatId));
-        booleanBuilder.and(qChatMessage.recipientId.eq(accountId));
-        booleanBuilder.and(qChatMessage.received.eq(false));
-
+    public List<ChatMessageDTO> findAllUnreceived(UUID accountId) {
         return jpaQueryFactory.select(new QChatMessageDTO(qChatMessage.id,
                                                           qChatMessage.body,
                                                           qChatMessage.chatId,
                                                           qChatMessage.createdAt))
                               .from(qChatMessage)
-                              .where(booleanBuilder)
+                              .where(qChatMessage.recipientId.eq(accountId).and(qChatMessage.received.eq(false)))
                               .fetch();
     }
 
     @Override
-    public List<ChatMessageDTO> findAllSentAfter(UUID accountId, Date chatMessageFetchedAt, Long chatId) {
-        BooleanBuilder booleanBuilder = new BooleanBuilder();
-        if (chatId != null) booleanBuilder.and(qChatMessage.chatId.eq(chatId));
-        booleanBuilder.and(qChatMessage.accountId.eq(accountId));
-        booleanBuilder.and(qChatMessage.createdAt.after(chatMessageFetchedAt));
-
+    public List<ChatMessageDTO> findAllUnfetched(UUID accountId) {
         return jpaQueryFactory.select(new QChatMessageDTO(qChatMessage.id,
                                                           qChatMessage.messageId,
-                                                          qChatMessage.chatId,
                                                           qChatMessage.createdAt))
                               .from(qChatMessage)
-                              .where(booleanBuilder)
+                              .where(qChatMessage.accountId.eq(accountId).and(qChatMessage.fetched.eq(false)))
                               .fetch();
     }
 
     @Override
     public List<ChatMessage> findAllIn(List<Long> chatMessageIds) {
         return jpaQueryFactory.selectFrom(qChatMessage).where(qChatMessage.id.in(chatMessageIds)).fetch();
+    }
+
+    @Override
+    public ChatMessage findById(Long chatMessageId) {
+        return jpaQueryFactory.selectFrom(qChatMessage).where(qChatMessage.id.eq(chatMessageId)).fetchFirst();
+    }
+
+    @Override
+    public ChatMessage findByMessageId(Long messageId) {
+        return jpaQueryFactory.selectFrom(qChatMessage).where(qChatMessage.messageId.eq(messageId)).fetchFirst();
     }
 
 

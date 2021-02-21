@@ -4,7 +4,6 @@ import com.beeswork.balanceaccountservice.constant.RegexExpression;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
-import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.lang.NonNull;
@@ -72,13 +71,13 @@ public class StompChannelInterceptor implements ChannelInterceptor {
 //            validateFields(chatMessageVM, identityToken, messageId);
             checkValidUUID(identityToken);
             checkValidNumber(messageId);
-            chatMessageVM.setId(chatService.validateAndSaveMessage(chatMessageVM.getAccountId(),
-                                                                   UUID.fromString(identityToken),
-                                                                   chatMessageVM.getRecipientId(),
-                                                                   chatMessageVM.getChatId(),
-                                                                   Long.valueOf(messageId),
-                                                                   chatMessageVM.getBody(),
-                                                                   chatMessageVM.getCreatedAt()));
+//            chatMessageVM.setId(chatService.saveChatMessage(chatMessageVM.getAccountId(),
+//                                                            UUID.fromString(identityToken),
+//                                                            chatMessageVM.getRecipientId(),
+//                                                            chatMessageVM.getChatId(),
+//                                                            Long.valueOf(messageId),
+//                                                            chatMessageVM.getBody(),
+//                                                            chatMessageVM.getCreatedAt()));
             return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM),
                                                 stompHeaderAccessor.getMessageHeaders());
         }

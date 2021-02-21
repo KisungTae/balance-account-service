@@ -42,6 +42,9 @@ public class Swipe {
     @Column(name = "count")
     private int count;
 
+    @Column(name = "super_click")
+    private boolean superClick;
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

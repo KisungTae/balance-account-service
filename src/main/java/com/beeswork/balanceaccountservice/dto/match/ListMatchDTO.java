@@ -5,26 +5,19 @@ import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Getter
+@Setter
 public class ListMatchDTO {
-    private List<MatchDTO> matchDTOs = new ArrayList<>();
-    private List<ChatMessageDTO> sentChatMessageDTOs = new ArrayList<>();
-    private List<ChatMessageDTO> receivedChatMessageDTOs = new ArrayList<>();
 
-    public void setMatchDTOs(List<MatchDTO> matchDTOs) {
-        if (matchDTOs != null) this.matchDTOs = matchDTOs;
-    }
+    private Date matchFetchedAt = new Date(Long.MIN_VALUE);
+    private List<MatchDTO> matchDTOs;
+    private List<ChatMessageDTO> sentChatMessageDTOs;
+    private List<ChatMessageDTO> receivedChatMessageDTOs;
 
-    public void setSentChatMessageDTOs(List<ChatMessageDTO> sentChatMessageDTOs) {
-        if (sentChatMessageDTOs != null) this.sentChatMessageDTOs = sentChatMessageDTOs;
-    }
-
-    public void setReceivedChatMessageDTOs(List<ChatMessageDTO> receivedChatMessageDTOs) {
-        if (receivedChatMessageDTOs != null) this.receivedChatMessageDTOs = receivedChatMessageDTOs;
-    }
 }

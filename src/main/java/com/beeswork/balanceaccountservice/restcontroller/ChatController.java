@@ -6,7 +6,7 @@ import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.beeswork.balanceaccountservice.vm.chat.ListChatMessagesVM;
-import com.beeswork.balanceaccountservice.vm.chat.ReceivedChatMessagesVM;
+import com.beeswork.balanceaccountservice.vm.chat.SyncChatMessagesVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +30,7 @@ public class ChatController {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public ChatController(StompService stompService,
-                          ChatService chatService, ObjectMapper objectMapper) {
+    public ChatController(StompService stompService, ChatService chatService, ObjectMapper objectMapper) {
         this.stompService = stompService;
         this.chatService = chatService;
         this.objectMapper = objectMapper;
@@ -42,37 +41,28 @@ public class ChatController {
         stompService.send(chatMessageVM, messageHeaders);
     }
 
-    @GetMapping("/message/list")
-    public ResponseEntity<String> listChatMessages(@Valid @ModelAttribute ListChatMessagesVM listChatMessagesVM,
-                                                   BindingResult bindingResult) throws JsonProcessingException {
+    @PostMapping("/message/sync")
+    public void syncChatMessages(@Valid @RequestBody SyncChatMessagesVM syncChatMessagesVM,
+                                 BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<ChatMessageDTO> chatMessageDTOs = chatService.listChatMessages(listChatMessagesVM.getAccountId(),
-                                                                            listChatMessagesVM.getIdentityToken(),
-                                                                            listChatMessagesVM.getRecipientId(),
-                                                                            listChatMessagesVM.getChatId(),
-                                                                            listChatMessagesVM.getLastChatMessageCreatedAt());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(chatMessageDTOs));
+        chatService.syncChatMessages(syncChatMessagesVM.getAccountId(),
+                                     syncChatMessagesVM.getIdentityToken(),
+                                     syncChatMessagesVM.getChatMessageIds());
     }
 
-    @PostMapping("/message/received")
-    public void receivedChatMessages(@Valid @RequestBody ReceivedChatMessagesVM receivedChatMessagesVM,
-                                     BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        chatService.receivedChatMessages(receivedChatMessagesVM.getAccountId(),
-                                         receivedChatMessagesVM.getIdentityToken(),
-                                         receivedChatMessagesVM.getChatMessageIds());
-    }
-
-    @GetMapping("/test")
-    public ResponseEntity<String> test() {
-
-        int size = 10000000;
-        StringBuilder stringB = new StringBuilder(size); //for the 2mb one
-        String paddingString = "abcdefghijklmnopqrs";
-
-        while (stringB.length() + paddingString.length() < size)
-            stringB.append(paddingString);
-        return ResponseEntity.status(HttpStatus.OK).body(stringB.toString());
+    //  TODO: remove me
+    @PostMapping("/message/save")
+    public void saveChatMessage(@RequestBody ChatMessageVM chatMessageVM) {
+        ChatMessageDTO chatMessageDTO = chatService.saveChatMessage(chatMessageVM.getAccountId(),
+                                                                    chatMessageVM.getAccountId(),
+                                                                    chatMessageVM.getRecipientId(),
+                                                                    chatMessageVM.getChatId(),
+                                                                    chatMessageVM.getMessageId(),
+                                                                    chatMessageVM.getBody(),
+                                                                    chatMessageVM.getCreatedAt());
+        System.out.println("chat message created");
+        System.out.println(chatMessageDTO.getId());
+        System.out.println(chatMessageDTO.getCreatedAt());
     }
 
 }

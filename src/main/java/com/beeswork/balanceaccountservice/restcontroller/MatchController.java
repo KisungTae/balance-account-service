@@ -36,9 +36,7 @@ public class MatchController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         ListMatchDTO listMatchDTO = matchService.listMatches(listMatchesVM.getAccountId(),
                                                              listMatchesVM.getIdentityToken(),
-                                                             listMatchesVM.getMatchFetchedAt(),
-                                                             listMatchesVM.getAccountFetchedAt(),
-                                                             listMatchesVM.getChatMessageFetchedAt());
+                                                             listMatchesVM.getMatchFetchedAt());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listMatchDTO));
     }
 

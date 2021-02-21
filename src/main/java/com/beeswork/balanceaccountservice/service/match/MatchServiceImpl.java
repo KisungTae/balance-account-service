@@ -4,8 +4,7 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chatmessage.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchDTO;
-import com.beeswork.balanceaccountservice.entity.account.Account;
-import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
+import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
@@ -18,14 +17,15 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 
 @Service
 public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
-    private final AccountDAO accountDAO;
-    private final MatchDAO matchDAO;
-    private final ChatMessageDAO chatMessageDAO;
+    private final  AccountDAO     accountDAO;
+    private final  MatchDAO       matchDAO;
+    private final  ChatMessageDAO chatMessageDAO;
 
     @Autowired
     public MatchServiceImpl(ModelMapper modelMapper,
@@ -40,23 +40,20 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
 
     @Override
-//    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    @Transactional
-    public ListMatchDTO listMatches(UUID accountId,
-                                    UUID identityToken,
-                                    Date matchFetchedAt,
-                                    Date accountFetchedAt,
-                                    Date chatMessageFetchedAt) {
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public ListMatchDTO listMatches(UUID accountId, UUID identityToken, Date matchFetchedAt) {
         checkIfAccountValid(accountDAO.findById(accountId), identityToken);
         ListMatchDTO listMatchDTO = new ListMatchDTO();
 
-        listMatchDTO.setMatchDTOs(matchDAO.findAllAfter(accountId,
-                                                        offsetFetchedAt(matchFetchedAt),
-                                                        offsetFetchedAt(accountFetchedAt)));
-        listMatchDTO.setReceivedChatMessageDTOs(chatMessageDAO.findAllUnreceived(accountId, null));
-        listMatchDTO.setSentChatMessageDTOs(chatMessageDAO.findAllSentAfter(accountId,
-                                                                            offsetFetchedAt(chatMessageFetchedAt),
-                                                                            null));
+        List<MatchDTO> matchDTOs = matchDAO.findAllAfter(accountId, offsetFetchedAt(matchFetchedAt));
+        for (MatchDTO matchDTO : matchDTOs) {
+            if (matchDTO.getUpdatedAt().after(listMatchDTO.getMatchFetchedAt()))
+                listMatchDTO.setMatchFetchedAt(matchDTO.getUpdatedAt());
+            matchDTO.setUpdatedAt(null);
+        }
+        listMatchDTO.setMatchDTOs(matchDTOs);
+        listMatchDTO.setReceivedChatMessageDTOs(chatMessageDAO.findAllUnreceived(accountId));
+        listMatchDTO.setSentChatMessageDTOs(chatMessageDAO.findAllUnfetched(accountId));
         return listMatchDTO;
     }
 
@@ -75,6 +72,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
         Date updatedAt = new Date();
         matcherMatch.setUnmatched(true);
         matcherMatch.setUnmatcher(true);
+        matcherMatch.setDeleted(true);
         matcherMatch.setUpdatedAt(updatedAt);
 
         matchedMatch.setUnmatched(true);
@@ -82,4 +80,53 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
         matchedMatch.setUpdatedAt(updatedAt);
     }
 
+
+//    private void setResponseLimitSize() throws JsonProcessingException {
+//        ListMatchDTO listMatchDTO = new ListMatchDTO();
+//        listMatchDTO.setMatchFetchedAt(new Date());
+//
+//        emptyListMatchDTOJsonSize = objectMapper.writeValueAsString(listMatchDTO).getBytes().length;
+//
+//        listMatchDTO.setMatchDTOs(new ArrayList<>());
+//        matchDTOListJsonSize = objectMapper.writeValueAsString(listMatchDTO)
+//                                           .getBytes().length - emptyListMatchDTOJsonSize;
+//
+//        String name = "열글자면삼십바이트다";
+//        String photoKey = "2011-10-05T14:48:00.000+00:00";
+//        Long chatId = Long.MAX_VALUE;
+//        UUID matchedId = UUID.randomUUID();
+//        listMatchDTO.getMatchDTOs()
+//                    .add(new MatchDTO(chatId, matchedId, false, name, photoKey, false, new Date(), null));
+//        matchDTOJsonSize = objectMapper.writeValueAsString(listMatchDTO).getBytes().length - matchDTOListJsonSize - emptyListMatchDTOJsonSize;
+//
+//
+//        listMatchDTO.setMatchDTOs(null);
+//        listMatchDTO.setSentChatMessageDTOs(new ArrayList<>());
+//        sentChatMessageDTOListJsonSize =
+//                objectMapper.writeValueAsString(listMatchDTO).getBytes().length - emptyListMatchDTOJsonSize;
+//
+//        ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
+//        chatMessageDTO.setId(Long.MAX_VALUE);
+//        chatMessageDTO.setMessageId(Long.MAX_VALUE);
+//        chatMessageDTO.setCreatedAt(new Date());
+//        listMatchDTO.getSentChatMessageDTOs().add(chatMessageDTO);
+//        sentChatMessageDTOJsonSize =
+//                objectMapper.writeValueAsString(listMatchDTO).getBytes().length - sentChatMessageDTOListJsonSize - emptyListMatchDTOJsonSize;
+//
+//
+//        listMatchDTO.setSentChatMessageDTOs(null);
+//        listMatchDTO.setReceivedChatMessageDTOs(new ArrayList<>());
+//        receivedChatMessageDTOListJsonSize =
+//                objectMapper.writeValueAsString(listMatchDTO).getBytes().length - emptyListMatchDTOJsonSize;
+//
+//
+//        String body = "가".repeat(200);
+//        List<ChatMessageDTO> received = new ArrayList<>();
+//        received.add(new ChatMessageDTO(Long.MAX_VALUE, body, Long.MAX_VALUE, new Date()));
+//        listMatchDTO.setReceivedChatMessageDTOs(received);
+//        receivedChatMessageDTOJsonSize =
+//                objectMapper.writeValueAsString(received).getBytes().length - receivedChatMessageDTOListJsonSize - emptyListMatchDTOJsonSize;
+//    }
+
 }
+

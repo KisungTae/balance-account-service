@@ -21,6 +21,9 @@ import java.util.UUID;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Match {
 
+    @Version
+    private int version;
+
     @EmbeddedId
     private MatchId matchId;
 
@@ -50,6 +53,12 @@ public class Match {
 
     @Column(name = "unmatcher")
     private boolean unmatcher;
+
+    @Column(name = "active")
+    private boolean active;
+
+    @Column(name = "deleted")
+    private boolean deleted;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

@@ -13,31 +13,31 @@ public class MatchDTO {
     private Long    chatId;
     private UUID    matchedId;
     private boolean unmatched;
-    private Date    updatedAt;
     private String  name;
     private String  repPhotoKey;
-    private boolean blocked;
     private boolean deleted;
-    private Date    accountUpdatedAt;
+    private boolean active;
+    private Date    createdAt;
+    private Date    updatedAt;
 
     @QueryProjection
     public MatchDTO(Long chatId,
                     UUID matchedId,
                     boolean unmatched,
-                    Date updatedAt,
                     String name,
                     String repPhotoKey,
-                    boolean blocked,
                     boolean deleted,
-                    Date accountUpdatedAt) {
+                    boolean active,
+                    Date createdAt,
+                    Date updatedAt) {
         this.chatId = chatId;
         this.matchedId = matchedId;
         this.unmatched = unmatched;
-        this.updatedAt = updatedAt;
         this.name = name;
         this.repPhotoKey = repPhotoKey;
-        this.blocked = blocked;
         this.deleted = deleted;
-        this.accountUpdatedAt = accountUpdatedAt;
+        this.active = active;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 }
