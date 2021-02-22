@@ -1,6 +1,8 @@
 package com.beeswork.balanceaccountservice.dao.swipe;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
+import com.beeswork.balanceaccountservice.dto.swipe.QSwipeDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
 import com.beeswork.balanceaccountservice.projection.ClickProjection;

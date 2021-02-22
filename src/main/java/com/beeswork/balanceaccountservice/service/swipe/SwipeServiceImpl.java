@@ -109,7 +109,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     public List<ClickProjection> listClick(UUID accountId, UUID identityToken, Date fetchedAt) {
         Account account = accountDAO.findById(accountId);
         checkIfAccountValid(account, identityToken);
-        return swipeDAO.findAllClickAfter(accountId, DateUtils.addDays(fetchedAt, -1));
+        return swipeDAO.findAllClickAfter(accountId, offsetFetchedAt(fetchedAt));
     }
 
     @Override
@@ -117,7 +117,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     public List<ClickedProjection> listClicked(UUID accountId, UUID identityToken, Date fetchedAt) {
         Account account = accountDAO.findById(accountId);
         checkIfAccountValid(account, identityToken);
-        return swipeDAO.findAllClickedAfter(accountId, DateUtils.addDays(fetchedAt, -1));
+        return swipeDAO.findAllClickedAfter(accountId, offsetFetchedAt(fetchedAt));
     }
 
     @Override
@@ -127,6 +127,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
                           UUID swipedId,
                           Map<Integer, Boolean> answers,
                           Locale locale) {
+
+//      TODO: findWithAccounts null check
+//      TODO: two thread access at the same time (if we lock swipe, then second thread will wait for swipe so no dead lock?)
+//      TODO:
+
         Swipe swipe = swipeDAO.findWithAccounts(accountId, swipedId);
 
         Account swiper = swipe.getSwiper();

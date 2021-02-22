@@ -41,14 +41,14 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public ListMatchDTO listMatches(UUID accountId, UUID identityToken, Date matchFetchedAt) {
-        checkIfAccountValid(accountDAO.findById(accountId), identityToken);
+    public ListMatchDTO listMatches(UUID accountId, UUID identityToken, Date fetchedAt) {
+//        checkIfAccountValid(accountDAO.findById(accountId), identityToken);
         ListMatchDTO listMatchDTO = new ListMatchDTO();
 
-        List<MatchDTO> matchDTOs = matchDAO.findAllAfter(accountId, offsetFetchedAt(matchFetchedAt));
+        List<MatchDTO> matchDTOs = matchDAO.findAllAfter(accountId, offsetFetchedAt(fetchedAt));
         for (MatchDTO matchDTO : matchDTOs) {
-            if (matchDTO.getUpdatedAt().after(listMatchDTO.getMatchFetchedAt()))
-                listMatchDTO.setMatchFetchedAt(matchDTO.getUpdatedAt());
+            if (matchDTO.getUpdatedAt().after(listMatchDTO.getFetchedAt()))
+                listMatchDTO.setFetchedAt(matchDTO.getUpdatedAt());
             matchDTO.setUpdatedAt(null);
         }
         listMatchDTO.setMatchDTOs(matchDTOs);

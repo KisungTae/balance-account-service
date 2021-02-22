@@ -1,7 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.BalanceGameDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.projection.ClickProjection;

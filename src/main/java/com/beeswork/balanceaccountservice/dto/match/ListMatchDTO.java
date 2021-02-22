@@ -15,8 +15,8 @@ import java.util.List;
 @Setter
 public class ListMatchDTO {
 
-    private Date matchFetchedAt = new Date(Long.MIN_VALUE);
-    private List<MatchDTO> matchDTOs;
+    private Date                 fetchedAt = new Date(Long.MIN_VALUE);
+    private List<MatchDTO>       matchDTOs;
     private List<ChatMessageDTO> sentChatMessageDTOs;
     private List<ChatMessageDTO> receivedChatMessageDTOs;
 

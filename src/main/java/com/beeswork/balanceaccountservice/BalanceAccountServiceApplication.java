@@ -191,6 +191,7 @@ public class BalanceAccountServiceApplication {
 // TODO			51. check anything calling account because you can use cache so, change to findById(accountId) then check identitytoken separately not query together otherwise you can't use cache benefits
 
 // TODO			52. consider how to retrieve message when enter to a chat, and consider changing createdAt in message generated on the server
+//					--> listMatches() will retrieve all the chatMessages unfetched or unreceived
 
 // TODO 		53. chagne match to have id increment so that no need to createdAt when fetching list of matches, fetch by id
 //					--> can't because unmatch does not update id then no way to retrieve newly updated match so go for dates
@@ -200,6 +201,7 @@ public class BalanceAccountServiceApplication {
 // TODO			55. check daos for match, chat, account because they are all cached
 
 // TODO			56. check unmatch() in matchService in regards to cache findMatchById
+//					--> changed to use matchDAO.findById() from findPair()
 
 // TODO			57. change to throw badrequestexception if field errors inclde accountId and IdentityToekn in base controller
 
@@ -209,17 +211,21 @@ public class BalanceAccountServiceApplication {
 //					--> implemented
 
 // TODO			60. only chatMessages within 2 weeks are retrieved, so check lastChatMesageCreated > (today-2weeks)
+//					--> chatMessages are deleted after 1 week
 
 // TODO			61. save configuration of android, and fetchedAt datetimes,
 
-// TODO			62. chatmessage has chatmessages synced and received tables
+// TODO			62. chatmessage has chatmessages fetched and received tables
+//					--> added fetched and received to chatMessage table
 
 // TODO			63. when app delted, send out the last read message date for each chat and save them in case of when app reinstalled
+//					--> it's not possible to send a message when app deleted
 
 // TODO 		64. chat workflow, send --> receipt || receive --> ack --> update chat_message received column
 //					list matches --> android query to get the last synced message's createdat,
 //					server query chat_message where sender = accountid and created > last synced message's createdat
 //					query chat_message where recipient = accountId and received = false
+//					--> listMatches() query chatMessages unreceived or unfetched
 
 // TODO			65. decide how many minutes subtract from lastChatMessagecreated, lastAccountudpatedAt .. etc
 
@@ -230,10 +236,19 @@ public class BalanceAccountServiceApplication {
 
 // TODO			68. update received of chatmessage could throw exception when version is on the entity, should be fine,
 //  				because all of them update received = true does not matter if first or second one updates the same entitiy it will result in received = true
+//					--> chatMessage now had fetched as well so implemented with Pessimistic Lock of Write
 
 // TODO			69. make sure only updating the proflile and photo updated the updatedAt of account for flagging the account in match list when account profile or photo updated
+//					--> updated_at is updated from delete(), resetRepPhoto()
 
 // TODO 	 	70. findAllClickedAfter should return valid accounts so delete deleted, blocked fields in ClickedProjection
+//					--> it should return invalid accounts so that client can remove invalid clicked in the list
+
+// TODO			70. click() if two users click at the same time, then one can't see another swipe clicked which results in not create matches
+
+// TODO			70. clickedProjection and clickProjection change to SwipeDTO and deleted the block field in the query
+
+// TODO			70. findAllClickedAfter is convoluted, considering matched field to swipe so that retrieve swipes where matched = false, clicked = true
 
 // TODO 		71. block account make the account's deleted field = true as well so that only the deleted field can be used for other users vadiliaty
 //					only the users themselves get the blocked exception, and the other users will get deleted on fetched something
@@ -244,7 +259,8 @@ public class BalanceAccountServiceApplication {
 // TODO			73. add synced in chatMessage and change findAllAfter to findAllUnsynced
 //					--> implemented
 
-// TODO			74. delete chatMessages when they are synced and received and > 1 weeks
+// TODO			74. delete chatMessages when they are synced and received and > 1 weeks, and
+//					chatMessages unsycned or unfetched for 1 month
 
 // TODO			75. if listMatches > 10mb then drop some chatmessages and make full = false, then clicent will request again
 //					--> will implement when this happens, it will rarely happen

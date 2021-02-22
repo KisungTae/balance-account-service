@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
@@ -43,7 +44,7 @@ public class ChatController {
 
     @PostMapping("/message/sync")
     public void syncChatMessages(@Valid @RequestBody SyncChatMessagesVM syncChatMessagesVM,
-                                 BindingResult bindingResult) {
+                                 BindingResult bindingResult) throws InterruptedException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         chatService.syncChatMessages(syncChatMessagesVM.getAccountId(),
                                      syncChatMessagesVM.getIdentityToken(),
@@ -52,17 +53,19 @@ public class ChatController {
 
     //  TODO: remove me
     @PostMapping("/message/save")
-    public void saveChatMessage(@RequestBody ChatMessageVM chatMessageVM) {
-        ChatMessageDTO chatMessageDTO = chatService.saveChatMessage(chatMessageVM.getAccountId(),
-                                                                    chatMessageVM.getAccountId(),
-                                                                    chatMessageVM.getRecipientId(),
-                                                                    chatMessageVM.getChatId(),
-                                                                    chatMessageVM.getMessageId(),
-                                                                    chatMessageVM.getBody(),
-                                                                    chatMessageVM.getCreatedAt());
-        System.out.println("chat message created");
-        System.out.println(chatMessageDTO.getId());
-        System.out.println(chatMessageDTO.getCreatedAt());
+    public ResponseEntity<String> saveChatMessage(@RequestBody ChatMessageVM chatMessageVM)
+    throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new SwipeDTO()));
+//        ChatMessageDTO chatMessageDTO = chatService.saveChatMessage(chatMessageVM.getAccountId(),
+//                                                                    chatMessageVM.getAccountId(),
+//                                                                    chatMessageVM.getRecipientId(),
+//                                                                    chatMessageVM.getChatId(),
+//                                                                    chatMessageVM.getMessageId(),
+//                                                                    chatMessageVM.getBody(),
+//                                                                    chatMessageVM.getCreatedAt());
+//        System.out.println("chat message created");
+//        System.out.println(chatMessageDTO.getId());
+//        System.out.println(chatMessageDTO.getCreatedAt());
     }
 
 }

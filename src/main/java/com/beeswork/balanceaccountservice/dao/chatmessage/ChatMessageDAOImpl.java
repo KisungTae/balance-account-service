@@ -12,6 +12,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -47,13 +48,16 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
     }
 
     @Override
-    public List<ChatMessage> findAllIn(List<Long> chatMessageIds) {
-        return jpaQueryFactory.selectFrom(qChatMessage).where(qChatMessage.id.in(chatMessageIds)).fetch();
+    public List<ChatMessage> findAllInWithLock(List<Long> chatMessageIds) {
+        return entityManager.createQuery("from ChatMessage where id in (:chatMessageIds)", ChatMessage.class)
+                            .setParameter("chatMessageIds", chatMessageIds)
+                            .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                            .getResultList();
     }
 
     @Override
-    public ChatMessage findById(Long chatMessageId) {
-        return jpaQueryFactory.selectFrom(qChatMessage).where(qChatMessage.id.eq(chatMessageId)).fetchFirst();
+    public ChatMessage findByIdWithLock(Long chatMessageId) {
+        return entityManager.find(ChatMessage.class, chatMessageId, LockModeType.PESSIMISTIC_WRITE);
     }
 
     @Override

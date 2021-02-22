@@ -11,5 +11,5 @@ import java.util.Date;
 @Setter
 public class ListMatchesVM extends AccountIdentityVM {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private Date matchFetchedAt;
+    private Date fetchedAt;
 }

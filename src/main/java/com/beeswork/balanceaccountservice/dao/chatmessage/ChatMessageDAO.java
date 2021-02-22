@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface ChatMessageDAO extends BaseDAO<ChatMessage> {
     List<ChatMessageDTO> findAllUnreceived(UUID accountId);
     List<ChatMessageDTO> findAllUnfetched(UUID accountId);
-    List<ChatMessage> findAllIn(List<Long> chatMessageIds);
-    ChatMessage findById(Long chatMessageId);
+    List<ChatMessage> findAllInWithLock(List<Long> chatMessageIds);
+    ChatMessage findByIdWithLock(Long chatMessageId);
     ChatMessage findByMessageId(Long messageId);
 }

@@ -16,7 +16,6 @@ import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedDeletedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
-import org.apache.commons.lang3.time.DateUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -115,19 +113,27 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         return chatMessageDTO;
     }
 
+    @Override
+    @Transactional
     public void receivedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
-
+        checkIfAccountValid(accountDAO.findById(accountId), identityToken);
+        ChatMessage chatMessage = chatMessageDAO.findByIdWithLock(chatMessageId);
+        chatMessage.setReceived(true);
     }
 
+    @Override
+    @Transactional
     public void fetchedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
-
+        checkIfAccountValid(accountDAO.findById(accountId), identityToken);
+        ChatMessage chatMessage = chatMessageDAO.findByIdWithLock(chatMessageId);
+        chatMessage.setFetched(true);
     }
 
     @Override
     @Transactional
     public void syncChatMessages(UUID accountId, UUID identityToken, List<Long> chatMessageIds) {
-        checkIfAccountValid(accountDAO.findById(accountId), identityToken);
-        for (ChatMessage chatMessage : chatMessageDAO.findAllIn(chatMessageIds)) {
+//        checkIfAccountValid(accountDAO.findById(accountId), identityToken);
+        for (ChatMessage chatMessage : chatMessageDAO.findAllInWithLock(chatMessageIds)) {
             if (chatMessage.getAccountId().equals(accountId)) chatMessage.setFetched(true);
             else chatMessage.setReceived(true);
         }

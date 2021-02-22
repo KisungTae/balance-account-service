@@ -309,7 +309,7 @@ create table chat_message
     recipient_id uuid         not null,
     body         varchar(200) not null,
     read         boolean      not null,
-    fetched       boolean      not null,
+    fetched      boolean      not null,
     received     boolean      not null,
     created_at   timestamptz  not null,
 
@@ -320,9 +320,6 @@ create table chat_message
 
 create index chat_message_chat_id_created_at on chat_message (chat_id, created_at);
 
-
-select *
-from account;
 
 
 ---------------------------------------------------------------------------------------------
@@ -351,7 +348,16 @@ where matcher_id = 'f77865c1-e370-48f0-ad6a-c64154c938a0';
 select *
 from chat_message;
 
-delete from chat_message;
+delete
+from chat_message;
+
+select *
+from chat_message
+where account_id = '1e3a289c-9419-409e-9432-cd989b2547fc';
+
+
+
+update chat_message set fetched = false, received = false where id is not null;
 
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query End --------------------------------------------

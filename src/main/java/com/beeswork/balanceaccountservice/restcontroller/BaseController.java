@@ -31,8 +31,6 @@ public class BaseController {
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             fieldErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
-
-
         ExceptionResponse exceptionResponse = new ExceptionResponse(FIELD_EXCEPTION, "", fieldErrors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(exceptionResponse));
     }

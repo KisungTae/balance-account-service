@@ -16,8 +16,6 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Table(name = "chat_message")
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ChatMessage {
 
     public ChatMessage(Chat chat, Account account, Account recipient, Long messageId, String body, Date createdAt) {

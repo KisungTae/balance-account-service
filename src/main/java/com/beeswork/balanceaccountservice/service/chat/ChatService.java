@@ -16,5 +16,8 @@ public interface ChatService {
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
     ChatMessageDTO saveChatMessage(UUID accountId, UUID identityToken, UUID recipientId, Long chatId, Long messageId, String body, Date createdAt);
 
-    void syncChatMessages(UUID accountId, UUID identityToken, List<Long> chatMessageIds);
+    void syncChatMessages(UUID accountId, UUID identityToken, List<Long> chatMessageIds) throws InterruptedException;
+
+    void receivedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId);
+    void fetchedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId);
 }
