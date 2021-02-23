@@ -10,7 +10,7 @@ import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteExce
 import com.beeswork.balanceaccountservice.exception.photo.PhotoNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickExistsException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
@@ -56,7 +56,7 @@ public class ExceptionControllerAdvice {
     }
 
     @ExceptionHandler({AccountShortOfPointException.class, AccountBlockedException.class,
-                       SwipeClickedExistsException.class, BadRequestException.class,
+                       SwipeClickExistsException.class, BadRequestException.class,
                        SwipedBlockedException.class, SwipedNotFoundException.class,
                        QuestionSetChangedException.class, AccountEmailNotMutableException.class,
                        AccountEmailDuplicateException.class, PhotoInvalidDeleteException.class})

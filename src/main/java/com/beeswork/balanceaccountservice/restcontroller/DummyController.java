@@ -181,13 +181,13 @@ public class DummyController {
         for (int j = startIndex; j < endIndex; j++) {
             if (i == j) continue;
             Date now = new Date();
-            Swipe swipe = new Swipe(swiper,
-                                    accounts.get(j),
-                                    random.nextBoolean(),
-                                    (random.nextInt(10) + 1),
-                                    now,
-                                    now);
-
+            Swipe swipe = new Swipe();
+            swipe.setSwiper(swiper);
+            swipe.setSwiped(accounts.get(j));
+            swipe.setClicked(random.nextBoolean());
+            swipe.setCount((random.nextInt(10) + 1));
+            swipe.setCreatedAt(now);
+            swipe.setUpdatedAt(now);
             swiper.getSwipes().add(swipe);
         }
         entityManager.persist(swiper);

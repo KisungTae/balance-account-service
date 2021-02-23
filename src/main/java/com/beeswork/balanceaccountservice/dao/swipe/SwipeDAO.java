@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.dao.swipe;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAO;
+import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeId;
 import com.beeswork.balanceaccountservice.projection.ClickProjection;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
@@ -14,9 +15,6 @@ import java.util.UUID;
 public interface SwipeDAO extends BaseDAO<Swipe> {
 
     Swipe findById(SwipeId swipeId);
-    Swipe findWithAccounts(UUID swiperId, UUID swipedId);
-    boolean existsByClicked(UUID swiperId, UUID swipedId, boolean clicked);
-    List<ClickedProjection> findAllClickedAfter(UUID swipedId, Date fetchedAt);
-    List<ClickProjection> findAllClickAfter(UUID swiperId, Date fetchedAt);
-    Swipe findBy(UUID swiperId, UUID swipedId);
+    List<SwipeDTO> findAllClickAfter(UUID accountId, Date fetchedAt);
+    List<SwipeDTO> findAllClickedAfter(UUID accountId, Date fetchedAt);
 }

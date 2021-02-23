@@ -284,7 +284,9 @@ public class BalanceAccountServiceApplication {
 // TODO			83. remove columns like     @Column(name = "matched_id", insertable = false, updatable = false)
 //    				private UUID matchedId; because it takes up bytes on memory when cached
 
+// TODO			84. entity changes object type to primitive, like Long -> long, Boolean -> boolean
 
+// TODO			85. fireabse should be called from controller level, because click() could be called twice when versionexception thrown then two notification will be sent
 
 // TODO			Chat Business rules
 //				1. 	send, receipt and ack || receive and ack

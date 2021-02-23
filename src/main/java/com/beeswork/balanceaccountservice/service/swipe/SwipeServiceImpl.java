@@ -4,9 +4,6 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.accountquestion.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
-import com.beeswork.balanceaccountservice.dto.firebase.ClickedNotificationDTO;
-import com.beeswork.balanceaccountservice.dto.firebase.FirebaseNotification;
-import com.beeswork.balanceaccountservice.dto.firebase.MatchedNotificationDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
@@ -18,12 +15,12 @@ import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeId;
 import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickExistsException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
 import com.beeswork.balanceaccountservice.projection.ClickProjection;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
-import org.apache.commons.lang3.time.DateUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,24 +73,18 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         if (swiper.getFreeSwipe() < SWIPE_POINT && swiper.getPoint() < SWIPE_POINT)
             throw new AccountShortOfPointException();
 
-        Swipe swipe = swipeDAO.findBy(accountId, swipedId);
-
+        Swipe swipe = swipeDAO.findById(new SwipeId(accountId, swipedId));
         if (swipe != null && swipe.isClicked())
-            throw new SwipeClickedExistsException();
+            throw new SwipeClickExistsException();
 
-        if (swipe == null) {
-            Date today = new Date();
-            swipe = new Swipe(swiper, swiped, false, 0, today, today);
-        }
-
-        if (swipe.getCount() != 0)
-            swipe.setUpdatedAt(new Date());
-
+        Date updatedAt = new Date();
+        if (swipe == null)
+            swipe = new Swipe(swiper, swiped, updatedAt);
+        swipe.setUpdatedAt(updatedAt);
         swipe.setCount((swipe.getCount() + 1));
         swipeDAO.persist(swipe);
 
         List<QuestionDTO> questionDTOs = new ArrayList<>();
-
         for (AccountQuestion accountQuestion : swiped.getAccountQuestions()) {
             Question question = accountQuestion.getQuestion();
             questionDTOs.add(new QuestionDTO(question.getId(),
@@ -123,76 +114,53 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public ClickDTO click(UUID accountId,
-                          UUID identityToken,
-                          UUID swipedId,
-                          Map<Integer, Boolean> answers,
-                          Locale locale) throws InterruptedException {
+    public ClickDTO click(UUID accountId, UUID identityToken, UUID swipedId, Map<Integer, Boolean> answers) {
+        Swipe subSwipe = swipeDAO.findById(new SwipeId(accountId, swipedId));
 
-//      TODO: findWithAccounts null check
-//      TODO: two thread access at the same time (if we lock swipe, then second thread will wait for swipe so no dead lock?)
-//      TODO: df
+        if (subSwipe == null)
+            throw new SwipeNotFoundException();
+        if (subSwipe.isClicked())
+            throw new SwipeClickExistsException();
 
+        Account swiper = subSwipe.getSwiper();
+        Account swiped = subSwipe.getSwiped();
 
-        System.out.println(Thread.currentThread().getName() + " starts click()");
+        checkIfAccountValid(swiper, identityToken);
+        checkIfSwipedValid(swiped);
 
-        Swipe swipe = swipeDAO.findById(new SwipeId(accountId, swipedId));
-        int version = swipe.getVersion() + 1;
-        swipe.setVersion(version);
+        if (swiper.getFreeSwipe() >= SWIPE_POINT)
+            swiper.setFreeSwipe((swiper.getFreeSwipe() - SWIPE_POINT));
+        else if (swiper.getPoint() < SWIPE_POINT)
+            throw new AccountShortOfPointException();
+        else swiper.setPoint((swiper.getPoint() - SWIPE_POINT));
 
-        Thread.sleep(5000);
-//        System.out.println("swipe account name: " + swipe.getSwiper().getName());
+        ClickDTO clickDTO = new ClickDTO();
+        if (accountQuestionDAO.findAllByAnswer(swipedId, answers) != answers.size())
+            return clickDTO;
 
+        subSwipe.setClicked(true);
+        Date updatedAt = new Date();
+        subSwipe.setUpdatedAt(updatedAt);
 
-//        Swipe swipe = swipeDAO.findWithAccounts(accountId, swipedId);
-//
-//        Account swiper = swipe.getSwiper();
-//        Account swiped = swipe.getSwiped();
-//
-//        checkIfAccountValid(swiper, identityToken);
-//        checkIfSwipedValid(swiped);
-//
-//        rechargeFreeSwipe(swiper);
-//
-//        if (swiper.getFreeSwipe() >= SWIPE_POINT)
-//            swiper.setFreeSwipe((swiper.getFreeSwipe() - SWIPE_POINT));
-//        else if (swiper.getPoint() < SWIPE_POINT)
-//            throw new AccountShortOfPointException();
-//        else swiper.setPoint((swiper.getPoint() - SWIPE_POINT));
-//
-//        ClickDTO clickDTO = new ClickDTO();
-//
-//        if (accountQuestionDAO.findAllByAnswer(swipedId, answers) != answers.size())
-//            return clickDTO;
-//
-//        swipe.setClicked(true);
-//        Date updatedAt = new Date();
-//        swipe.setUpdatedAt(updatedAt);
+        Swipe objSwipe = swipeDAO.findById(new SwipeId(swipedId, accountId));
+        if (objSwipe == null) {
+            clickDTO.setupAsClick(swiped.getId(), updatedAt);
+        } else if (objSwipe.isClicked()) {
+            Chat chat = new Chat();
+            chatDAO.persist(chat);
 
+            swiper.getMatches().add(new Match(swiper, swiped, chat, false, updatedAt, updatedAt));
+            swiped.getMatches().add(new Match(swiped, swiper, chat, false, updatedAt, updatedAt));
 
-
-        // match
-//        if (swipeDAO.existsByClicked(swipedId, accountId, true)) {
-//            Chat chat = new Chat();
-//            chatDAO.persist(chat);
-//
-//            swiper.getMatches().add(new Match(swiper, swiped, chat, false, updatedAt, updatedAt));
-//            swiped.getMatches().add(new Match(swiped, swiper, chat, false, updatedAt, updatedAt));
-
-//            clickDTO.setupAsMatch(chat.getId(), swiped.getId(), swiped.getName(), swiped.getRepPhotoKey(), updatedAt);
-//            firebaseService.sendNotification(new MatchedNotificationDTO(swiped.getFcmToken(),
-//                                                                        swiped.getName(),
-//                                                                        swiped.getRepPhotoKey()),
-//                                             locale);
-//        } else {
-//            clickDTO.setupAsClick(swiped.getId(), updatedAt);
-//            firebaseService.sendNotification(new ClickedNotificationDTO(swiped.getFcmToken(),
-//                                                                        swiped.getName(),
-//                                                                        swiped.getRepPhotoKey()),
-//                                             locale);
-//        }
-//        return clickDTO;
-        return null;
+            subSwipe.setMatched(true);
+            objSwipe.setMatched(true);
+            clickDTO.setupAsMatch(chat.getId(), swiped.getId(), swiped.getName(), swiped.getRepPhotoKey(), updatedAt);
+        } else {
+            // for the case where two users click at the same time
+            objSwipe.setVersion((objSwipe.getVersion() + 1));
+            clickDTO.setupAsClick(swiped.getId(), updatedAt);
+        }
+        return clickDTO;
     }
 
     private void rechargeFreeSwipe(Account swiper) {

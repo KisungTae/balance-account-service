@@ -78,13 +78,12 @@ public class SwipeController extends BaseController {
     public ResponseEntity<String> click(@Valid @RequestBody ClickVM clickVM,
                                         BindingResult bindingResult,
                                         Locale locale)
-    throws JsonProcessingException, InterruptedException {
+    throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         ClickDTO clickDTO = swipeService.click(clickVM.getAccountId(),
                                                clickVM.getIdentityToken(),
                                                clickVM.getSwipedId(),
-                                               clickVM.getAnswers(),
-                                               locale);
+                                               clickVM.getAnswers());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO));
     }
 }

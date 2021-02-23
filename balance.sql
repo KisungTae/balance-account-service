@@ -254,6 +254,7 @@ create table swipe
     swiper_id   uuid        not null,
     swiped_id   uuid        not null,
     clicked     boolean     not null,
+    matched     boolean     not null,
     count       int         not null,
     super_click boolean     not null,
     created_at  timestamptz not null,
@@ -322,17 +323,21 @@ create index chat_message_chat_id_created_at on chat_message (chat_id, created_a
 
 
 
-
-
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query Start ------------------------------------------
 ---------------------------------------------------------------------------------------------
 
 
+explain
+select *
+from swipe
+where (swiper_id = 'b77f3fcd-4fdc-467f-8e4b-86f296ceaa11' and swiped_id = '5cb411d8-d9e0-4ac6-bc63-387656cfc95f')
+   or (swiped_id = '4c6a6b90-77cf-446e-bb6c-d2698dfcea7d' and swiper_id = '4f6e0148-51f5-4bce-b0fb-14d5fc95015f');
+
 select *
 from swipe
 where swiper_id = 'e20b05c2-56b6-4791-84c1-d8af6d82a9e9'
-and swiped_id = 'de2198e4-4d49-45bb-9ae8-c094e08a60e0';
+  and swiped_id = 'de2198e4-4d49-45bb-9ae8-c094e08a60e0';
 
 select *
 from chat_message

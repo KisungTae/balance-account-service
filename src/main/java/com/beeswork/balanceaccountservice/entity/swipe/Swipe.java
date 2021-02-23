@@ -42,6 +42,9 @@ public class Swipe {
     @Column(name = "clicked")
     private boolean clicked;
 
+    @Column(name = "matched")
+    private boolean matched;
+
     @Column(name = "count")
     private int count;
 
@@ -56,13 +59,12 @@ public class Swipe {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public Swipe(Account swiper, Account swiped, boolean clicked, int count, Date createdAt, Date updatedAt) {
+    public Swipe(Account swiper, Account swiped, Date createdAt) {
         this.swipeId = new SwipeId(swiper.getId(), swiped.getId());
         this.swiper = swiper;
         this.swiped = swiped;
-        this.clicked = clicked;
         this.count = count;
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.updatedAt = createdAt;
     }
 }
