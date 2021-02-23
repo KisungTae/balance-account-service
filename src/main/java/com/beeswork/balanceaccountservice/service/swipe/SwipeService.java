@@ -18,6 +18,7 @@ public interface SwipeService {
     List<ClickProjection> listClick(UUID accountId, UUID identityToken, Date fetchedAt);
     List<QuestionDTO> swipe(UUID accountId, UUID identityToken, UUID swipedId);
 
-    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-    ClickDTO click(UUID accountId, UUID identityToken, UUID swipedId, Map<Integer, Boolean> answers, Locale locale);
+//    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
+    ClickDTO click(UUID accountId, UUID identityToken, UUID swipedId, Map<Integer, Boolean> answers, Locale locale) throws
+                                                                                                                    InterruptedException;
 }

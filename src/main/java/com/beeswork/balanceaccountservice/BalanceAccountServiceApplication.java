@@ -279,6 +279,10 @@ public class BalanceAccountServiceApplication {
 // TODO			81. unmatch() makes match's deleted = true and unmatched = true but the other party's match's unmatched = true only
 //					--> implemented
 
+// TODO			82. split account into several table, so that I can cache small account not the whole account
+
+// TODO			83. remove columns like     @Column(name = "matched_id", insertable = false, updatable = false)
+//    				private UUID matchedId; because it takes up bytes on memory when cached
 
 
 

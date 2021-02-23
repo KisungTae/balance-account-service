@@ -190,7 +190,6 @@ create table account
     free_swipe_updated_at timestamptz  not null,
     created_at            timestamptz  not null,
     updated_at            timestamptz  not null
-
 );
 
 
@@ -251,6 +250,7 @@ create table account_question
 
 create table swipe
 (
+    version     int         not null,
     swiper_id   uuid        not null,
     swiped_id   uuid        not null,
     clicked     boolean     not null,
@@ -322,9 +322,17 @@ create index chat_message_chat_id_created_at on chat_message (chat_id, created_a
 
 
 
+
+
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query Start ------------------------------------------
 ---------------------------------------------------------------------------------------------
+
+
+select *
+from swipe
+where swiper_id = 'e20b05c2-56b6-4791-84c1-d8af6d82a9e9'
+and swiped_id = 'de2198e4-4d49-45bb-9ae8-c094e08a60e0';
 
 select *
 from chat_message
@@ -346,6 +354,9 @@ from match
 where matcher_id = 'f77865c1-e370-48f0-ad6a-c64154c938a0';
 
 select *
+from swipe;
+
+select *
 from chat_message;
 
 delete
@@ -357,7 +368,10 @@ where account_id = '1e3a289c-9419-409e-9432-cd989b2547fc';
 
 
 
-update chat_message set fetched = false, received = false where id is not null;
+update chat_message
+set fetched  = false,
+    received = false
+where id is not null;
 
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query End --------------------------------------------

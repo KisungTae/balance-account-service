@@ -78,7 +78,7 @@ public class SwipeController extends BaseController {
     public ResponseEntity<String> click(@Valid @RequestBody ClickVM clickVM,
                                         BindingResult bindingResult,
                                         Locale locale)
-    throws JsonProcessingException {
+    throws JsonProcessingException, InterruptedException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         ClickDTO clickDTO = swipeService.click(clickVM.getAccountId(),
                                                clickVM.getIdentityToken(),

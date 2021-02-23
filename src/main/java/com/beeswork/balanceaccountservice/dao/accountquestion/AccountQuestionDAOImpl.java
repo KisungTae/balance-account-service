@@ -25,14 +25,11 @@ public class AccountQuestionDAOImpl extends BaseDAOImpl<AccountQuestion> impleme
 
     @Override
     public long findAllByAnswer(UUID accountId, Map<Integer, Boolean> answers) {
-
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-
         for (Map.Entry<Integer, Boolean> entry : answers.entrySet()) {
             booleanBuilder.or(qAccountQuestion.questionId.eq(entry.getKey())
                                                          .and(qAccountQuestion.answer.eq(entry.getValue())));
         }
-
         return jpaQueryFactory.selectFrom(qAccountQuestion)
                               .where(qAccountQuestion.accountId.eq(accountId).and(booleanBuilder))
                               .fetchCount();

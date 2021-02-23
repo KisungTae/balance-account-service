@@ -19,6 +19,9 @@ import java.util.UUID;
 @Table(name = "swipe")
 public class Swipe {
 
+    @Version
+    private int version;
+
     @EmbeddedId
     private SwipeId swipeId;
 

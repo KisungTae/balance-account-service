@@ -5,6 +5,7 @@ import com.beeswork.balanceaccountservice.dto.swipe.QSwipeDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
+import com.beeswork.balanceaccountservice.entity.swipe.SwipeId;
 import com.beeswork.balanceaccountservice.projection.ClickProjection;
 import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.entity.swipe.QSwipe;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,9 +41,13 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
         super(entityManager, jpaQueryFactory);
     }
 
+    @Override
+    public Swipe findById(SwipeId swipeId) {
+        return jpaQueryFactory.selectFrom(qSwipe).where(qSwipe.swipeId.eq(swipeId)).fetchOne();
+    }
 
     @Override
-    public Swipe findWithAccounts(UUID swiperId, UUID swipedId) throws SwipeNotFoundException {
+    public Swipe findWithAccounts(UUID swiperId, UUID swipedId) {
         return jpaQueryFactory.selectFrom(qSwipe)
                               .innerJoin(qSwipe.swiper, qAccount).fetchJoin()
                               .innerJoin(qSwipe.swiped, qAccount).fetchJoin()
