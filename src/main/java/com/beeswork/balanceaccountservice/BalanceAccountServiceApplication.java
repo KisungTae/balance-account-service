@@ -9,6 +9,8 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 @EnableAsync
@@ -27,7 +29,6 @@ public class BalanceAccountServiceApplication {
 	public BalanceAccountServiceApplication(TaskExecutorProperties taskExecutorProperties) {
 		this.taskExecutorProperties = taskExecutorProperties;
 	}
-
 
 	@Bean(name="processExecutor")
 	public TaskExecutor taskExecutor() {
@@ -286,7 +287,15 @@ public class BalanceAccountServiceApplication {
 
 // TODO			84. entity changes object type to primitive, like Long -> long, Boolean -> boolean
 
-// TODO			85. fireabse should be called from controller level, because click() could be called twice when versionexception thrown then two notification will be sent
+// TODO			85. firebaseservice should be called from controller level, because click() could be called twice when versionexception thrown then two notification will be sent
+
+// TODO			86. get rid of question instead, answers's top and bottom options have questions like https://post.naver.com/viewer/postView.nhn?volumeNo=29296262&memberNo=38753951
+//					--> you can just put empty string to description in question table, then client will not display any description
+
+// TODO			87. move out notification to notiication service which has firebaseService and stompService
+
+
+
 
 // TODO			Chat Business rules
 //				1. 	send, receipt and ack || receive and ack

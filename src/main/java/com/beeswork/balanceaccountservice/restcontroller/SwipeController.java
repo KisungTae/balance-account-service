@@ -2,15 +2,11 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.ListSwipesDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
-import com.beeswork.balanceaccountservice.projection.ClickProjection;
-import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
 import com.beeswork.balanceaccountservice.service.swipe.SwipeService;
-import com.beeswork.balanceaccountservice.vm.swipe.ClickVM;
-import com.beeswork.balanceaccountservice.vm.swipe.ListClickVM;
-import com.beeswork.balanceaccountservice.vm.swipe.ListClickedVM;
-import com.beeswork.balanceaccountservice.vm.swipe.SwipeVM;
+import com.beeswork.balanceaccountservice.vm.swipe.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
@@ -42,35 +38,26 @@ public class SwipeController extends BaseController {
         this.firebaseService = firebaseService;
     }
 
-    @PostMapping
-    public ResponseEntity<String> swipe(@Valid @RequestBody SwipeVM swipeVM, BindingResult bindingResult)
+    @PostMapping("/like")
+    public ResponseEntity<String> like(@Valid @RequestBody LikeVM likeVM, BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<QuestionDTO> questionDTOs = swipeService.swipe(swipeVM.getAccountId(),
-                                                            swipeVM.getIdentityToken(),
-                                                            swipeVM.getSwipedId());
+        List<QuestionDTO> questionDTOs = swipeService.like(likeVM.getAccountId(),
+                                                           likeVM.getIdentityToken(),
+                                                           likeVM.getSwipedId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
     }
 
-    @GetMapping("/click/list")
-    public ResponseEntity<String> listClick(@Valid @ModelAttribute ListClickVM listClickVM,
-                                            BindingResult bindingResult) throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<ClickProjection> clickProjections = swipeService.listClick(listClickVM.getAccountId(),
-                                                                        listClickVM.getIdentityToken(),
-                                                                        listClickVM.getFetchedAt());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickProjections));
-    }
-
-    @GetMapping("/clicked/list")
-    public ResponseEntity<String> listClicked(@Valid @ModelAttribute ListClickedVM listClickedVM,
-                                              BindingResult bindingResult)
+    @GetMapping("/list")
+    public ResponseEntity<String> listSwipes(@Valid @ModelAttribute ListSwipesVM listSwipesVM,
+                                             BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<ClickedProjection> clickedProjections = swipeService.listClicked(listClickedVM.getAccountId(),
-                                                                              listClickedVM.getIdentityToken(),
-                                                                              listClickedVM.getFetchedAt());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickedProjections));
+        ListSwipesDTO listSwipesDTO = swipeService.listSwipes(listSwipesVM.getAccountId(),
+                                                              listSwipesVM.getIdentityToken(),
+                                                              listSwipesVM.getClicked(),
+                                                              listSwipesVM.getFetchedAt());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listSwipesDTO));
     }
 
 

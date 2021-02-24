@@ -15,6 +15,7 @@ import com.beeswork.balanceaccountservice.entity.photo.PhotoId;
 import com.beeswork.balanceaccountservice.entity.question.QQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
+import com.beeswork.balanceaccountservice.entity.swipe.SwipeId;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -182,8 +183,10 @@ public class DummyController {
             if (i == j) continue;
             Date now = new Date();
             Swipe swipe = new Swipe();
+            Account swiped = accounts.get(j);
+            swipe.setSwipeId(new SwipeId(swiper.getId(), swiped.getId()));
             swipe.setSwiper(swiper);
-            swipe.setSwiped(accounts.get(j));
+            swipe.setSwiped(swiped);
             swipe.setClicked(random.nextBoolean());
             swipe.setCount((random.nextInt(10) + 1));
             swipe.setCreatedAt(now);
@@ -242,6 +245,7 @@ public class DummyController {
             if (matchMap.containsKey(swipe.getSwipedId().toString() + swipe.getSwiperId().toString())) {
                 chat = matchMap.get(swipe.getSwipedId().toString() + swipe.getSwiperId().toString()).getChat();
             }
+            swipe.setMatched(true);
 
             Match newMatch = new Match();
             newMatch.setChat(chat);

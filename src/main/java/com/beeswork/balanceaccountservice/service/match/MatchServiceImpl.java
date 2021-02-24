@@ -43,7 +43,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public ListMatchDTO listMatches(UUID accountId, UUID identityToken, Date fetchedAt) {
 //        checkIfAccountValid(accountDAO.findById(accountId), identityToken);
-        ListMatchDTO listMatchDTO = new ListMatchDTO();
+        ListMatchDTO listMatchDTO = new ListMatchDTO(fetchedAt);
 
         List<MatchDTO> matchDTOs = matchDAO.findAllAfter(accountId, offsetFetchedAt(fetchedAt));
         for (MatchDTO matchDTO : matchDTOs) {

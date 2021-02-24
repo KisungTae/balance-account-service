@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+
+</head>
+
+<body>
+
+    <button onclick="postClickWithEachOtherLiked()">postClickWithEachOtherLiked</button>
+</body>
+
+</html>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+    function postClickWithEachOtherLiked() {
+        $.when(
+            $.ajax({
+                url: "http://localhost:8080/swipe/click",
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(getClickParam(
+                    'e01794ae-cb65-462e-9a07-6a4498b6ecfe', 
+                    '9495e4b6-1433-4d64-bed8-3760c9d3e6b2', 
+                    '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a')),
+                success: function() {
+                    console.log('success first postClickWithEachOtherLiked')
+                }, error: function(xhr, status, error) {
+                    var errorMessage = xhr.status + ': ' + xhr.statusText
+                    console.log('error first postClickWithEachOtherLiked')
+                    console.log('error message: ' + errorMessage)
+                }
+            }),
+
+            $.ajax({
+                url: "http://localhost:8080/swipe/click",
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(getClickParam(
+                    '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a', 
+                    '9495e4b6-1433-4d64-bed8-3760c9d3e6b2', 
+                    'e01794ae-cb65-462e-9a07-6a4498b6ecfe')),
+                success: function() {
+                    console.log('success second postClickWithEachOtherLiked')
+                }, error: function(xhr, status, error) {
+                    var errorMessage = xhr.status + ': ' + xhr.statusText
+                    console.log('error second postClickWithEachOtherLiked')
+                    console.log('error message: ' + errorMessage)
+                }
+            })
+        ).then(function() {
+
+        })
+    }
+
+    function getClickParam(accountId, identityToken, swipedId, answers) {
+        if (answers == null) {
+            answers = new Object();
+            answers[1] = false
+            answers[2] = false
+            answers[3] = true
+        }
+        return {
+            accountId: accountId,
+            identityToken: identityToken,
+            swipedId: swipedId,
+            answers: answers
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+    var form = new FormData();
+    form.append("size", "50");
+
+    var settings = {
+        "url": "http://localhost:8080/dummy/create/questions",
+        "method": "POST",
+        "timeout": 0,
+        "processData": false,
+        "mimeType": "multipart/form-data",
+        "contentType": false,
+        "data": form
+    };
+
+    for (var i = 0; i < 2; i++) {
+        send(settings)
+    }
+
+    function send(settings) {
+        $.ajax(settings).done(function (response) {
+            console.log(response);
+        });
+    }
+</script>
+
+
+<!-- aws s3 cp index.html s3://cvt-connect-ccp --acl public-read -->

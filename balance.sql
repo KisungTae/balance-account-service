@@ -328,11 +328,27 @@ create index chat_message_chat_id_created_at on chat_message (chat_id, created_a
 ---------------------------------------------------------------------------------------------
 
 
-explain
+select s1.swiper_id, s1.swiped_id, s2.swiper_id, s2.swiped_id
+from swipe s1
+inner join swipe s2 on s1.swiper_id = s2.swiped_id and s1.swiped_id = s2.swiper_id;
+
+
+select *
+from account;
+
+select *
+from swipe;
+
+update swipe set clicked = false, matched = false where swiper_id is not null;
+delete from match where matcher_id is not null;
+
 select *
 from swipe
-where (swiper_id = 'b77f3fcd-4fdc-467f-8e4b-86f296ceaa11' and swiped_id = '5cb411d8-d9e0-4ac6-bc63-387656cfc95f')
-   or (swiped_id = '4c6a6b90-77cf-446e-bb6c-d2698dfcea7d' and swiper_id = '4f6e0148-51f5-4bce-b0fb-14d5fc95015f');
+where (swiper_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a' and swiped_id = 'e01794ae-cb65-462e-9a07-6a4498b6ecfe')
+   or (swiper_id = 'e01794ae-cb65-462e-9a07-6a4498b6ecfe' and swiped_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a');
+
+
+
 
 select *
 from swipe

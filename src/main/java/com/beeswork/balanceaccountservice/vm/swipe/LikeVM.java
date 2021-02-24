@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class SwipeVM extends AccountIdentityVM {
+public class LikeVM extends AccountIdentityVM {
 
     @ValidUUID
     private UUID swipedId;

@@ -16,7 +16,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SwipeId implements Serializable {
-
     private UUID swiperId;
     private UUID swipedId;
 }
