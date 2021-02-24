@@ -18,10 +18,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "swipe")
 public class Swipe {
-
-    @Version
-    private int version;
-
     @EmbeddedId
     private SwipeId swipeId;
 

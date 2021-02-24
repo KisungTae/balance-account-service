@@ -327,25 +327,39 @@ create index chat_message_chat_id_created_at on chat_message (chat_id, created_a
 -------------------------------------- Query Start ------------------------------------------
 ---------------------------------------------------------------------------------------------
 
+explain select *
+from account a
+left join account_question aq on a.id = aq.account_id
+left join question q on aq.question_id = q.id
+where a.id = '67cfc7e3-9302-4a98-8870-b113baf81d73'
+and aq.selected = true;
+
 
 select s1.swiper_id, s1.swiped_id, s2.swiper_id, s2.swiped_id
 from swipe s1
 inner join swipe s2 on s1.swiper_id = s2.swiped_id and s1.swiped_id = s2.swiper_id;
 
-
-select *
-from account;
-
-select *
-from swipe;
-
 update swipe set clicked = false, matched = false where swiper_id is not null;
 delete from match where matcher_id is not null;
+
+select *
+from account
+where id = '67cfc7e3-9302-4a98-8870-b113baf81d73'
+or id = 'f8849505-878d-4d8a-8632-e284a1010529';
+
+
+
+select *
+from swipe
+where (swiper_id = '67cfc7e3-9302-4a98-8870-b113baf81d73' and swiped_id = 'f8849505-878d-4d8a-8632-e284a1010529')
+   or (swiper_id = 'f8849505-878d-4d8a-8632-e284a1010529' and swiped_id = '67cfc7e3-9302-4a98-8870-b113baf81d73');
 
 select *
 from swipe
 where (swiper_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a' and swiped_id = 'e01794ae-cb65-462e-9a07-6a4498b6ecfe')
    or (swiper_id = 'e01794ae-cb65-462e-9a07-6a4498b6ecfe' and swiped_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a');
+
+
 
 
 

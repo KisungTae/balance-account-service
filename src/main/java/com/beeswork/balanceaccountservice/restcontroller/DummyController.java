@@ -297,16 +297,16 @@ public class DummyController {
     @PostMapping("/create/questions")
     public void createDummyQuestions(@RequestParam int size) {
         System.out.println(Thread.currentThread().getName() + ": createDummyQuestions");
-//        for (int i = 1; i <= size; i++) {
-//            Question question = new Question();
-//            question.setDescription("question-" + i);
-//            question.setTopOption("question-" + i + " top option");
-//            question.setBottomOption("question-" + i + " bottom option");
-//            question.setCreatedAt(new Date());
-//            question.setUpdatedAt(new Date());
-//            entityManager.persist(question);
-//        }
-//        entityManager.flush();
+        for (int i = 1; i <= size; i++) {
+            Question question = new Question();
+            question.setDescription("question-" + i);
+            question.setTopOption("question-" + i + " top option");
+            question.setBottomOption("question-" + i + " bottom option");
+            question.setCreatedAt(new Date());
+            question.setUpdatedAt(new Date());
+            entityManager.persist(question);
+        }
+        entityManager.flush();
     }
 
     @Transactional

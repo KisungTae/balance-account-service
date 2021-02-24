@@ -68,14 +68,13 @@ public class Match {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public Match(Account matcher, Account matched, Chat chat, boolean unmatched, Date createdAt, Date updatedAt) {
+    public Match(Account matcher, Account matched, Chat chat, Date createdAt) {
         this.matchId = new MatchId(matcher.getId(), matched.getId());
         this.chat = chat;
         this.matcher = matcher;
         this.matched = matched;
-        this.unmatched = unmatched;
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.updatedAt = createdAt;
     }
 
     public UUID getMatcherId() {
