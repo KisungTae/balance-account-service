@@ -1,6 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.constant.SingleSignOnType;
+import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
@@ -104,7 +104,7 @@ public class DummyController {
         account.setBirth(birth);
         account.setGender(random.nextBoolean());
         account.setLocation(geometryFactory.createPoint(new Coordinate(lon, lat)));
-        account.setSingleSignOnType(SingleSignOnType.values()[random.nextInt(4)]);
+        account.setLoginType(LoginType.values()[random.nextInt(4)]);
         account.setScore(0);
         account.setPoint(50000);
         account.setFcmToken("");

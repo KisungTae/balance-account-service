@@ -4,7 +4,6 @@ import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountDeletedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedDeletedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import org.apache.commons.lang3.time.DateUtils;
@@ -23,18 +22,18 @@ public abstract class BaseServiceImpl {
         this.modelMapper = modelMapper;
     }
 
-    protected void checkIfAccountValid(Account account, UUID identityToken) {
-        checkIfAccountValid(account);
+    protected void validateAccount(Account account, UUID identityToken) {
+        validateAccount(account);
         if (!account.getIdentityToken().equals(identityToken)) throw new AccountNotFoundException();
     }
 
-    protected void checkIfAccountValid(Account account) {
+    protected void validateAccount(Account account) {
         if (account == null) throw new AccountNotFoundException();
         if (account.isDeleted()) throw new AccountDeletedException();
         if (account.isBlocked()) throw new AccountBlockedException();
     }
 
-    protected void checkIfSwipedValid(Account account) {
+    protected void validateSwiped(Account account) {
         if (account == null) throw new SwipedNotFoundException();
 //        if (account.isBlocked()) throw new SwipedBlockedException();
         if (account.isDeleted()) throw new SwipedDeletedException();

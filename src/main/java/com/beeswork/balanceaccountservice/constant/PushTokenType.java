@@ -1,6 +1,6 @@
 package com.beeswork.balanceaccountservice.constant;
 
-public enum PushNotificationType {
+public enum PushTokenType {
     FCM,
     APS
 }

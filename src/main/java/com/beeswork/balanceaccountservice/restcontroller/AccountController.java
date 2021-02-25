@@ -1,7 +1,7 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 
-import com.beeswork.balanceaccountservice.constant.PushNotificationType;
+import com.beeswork.balanceaccountservice.constant.PushTokenType;
 import com.beeswork.balanceaccountservice.dto.account.CardDTO;
 import com.beeswork.balanceaccountservice.dto.account.PreRecommendDTO;
 import com.beeswork.balanceaccountservice.dto.account.ProfileDTO;
@@ -33,6 +33,30 @@ public class AccountController extends BaseController {
         this.accountService = accountService;
     }
 
+    @PostMapping("/token/fcm")
+    public ResponseEntity<String> saveFCMToken(@Valid @RequestBody SavePushTokenVM savePushTokenVM,
+                                               BindingResult bindingResult)
+    throws JsonProcessingException {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        accountService.savePushToken(savePushTokenVM.getAccountId(),
+                                     savePushTokenVM.getIdentityToken(),
+                                     savePushTokenVM.getKey(),
+                                     PushTokenType.FCM);
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+    }
+
+    @PostMapping("/token/aps")
+    public ResponseEntity<String> saveAPSToken(@Valid @RequestBody SavePushTokenVM savePushTokenVM,
+                                               BindingResult bindingResult)
+    throws JsonProcessingException {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        accountService.savePushToken(savePushTokenVM.getAccountId(),
+                                     savePushTokenVM.getIdentityToken(),
+                                     savePushTokenVM.getKey(),
+                                     PushTokenType.APS);
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+    }
+
     @PostMapping("/delete")
     public ResponseEntity<String> deleteAccount(@Valid @RequestBody AccountIdentityVM accountIdentityVM,
                                                 BindingResult bindingResult) throws JsonProcessingException {
@@ -40,65 +64,6 @@ public class AccountController extends BaseController {
         accountService.deleteAccount(accountIdentityVM.getAccountId(), accountIdentityVM.getIdentityToken());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
-
-    @GetMapping("/profile")
-    public ResponseEntity<String> getProfile(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
-                                             BindingResult bindingResult) throws JsonProcessingException {
-
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-
-        ProfileDTO profileDTO = accountService.getProfile(accountIdentityVM.getAccountId(),
-                                                          accountIdentityVM.getIdentityToken());
-
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(profileDTO));
-    }
-
-    @PostMapping("/profile")
-    public ResponseEntity<String> saveProfile(@Valid @RequestBody SaveProfileVM saveProfileVM,
-                                              BindingResult bindingResult)
-    throws JsonProcessingException {
-
-        if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
-
-        accountService.saveProfile(saveProfileVM.getAccountId(),
-                                   saveProfileVM.getIdentityToken(),
-                                   saveProfileVM.getName(),
-                                   saveProfileVM.getBirth(),
-                                   saveProfileVM.getAbout(),
-                                   saveProfileVM.getHeight(),
-                                   saveProfileVM.getGender());
-
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
-    }
-
-    @PostMapping("/about")
-    public ResponseEntity<String> saveAbout(@Valid @RequestBody SaveAboutVM saveAboutVM,
-                                            BindingResult bindingResult) throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        accountService.saveAbout(saveAboutVM.getAccountId(),
-                                 saveAboutVM.getIdentityToken(),
-                                 saveAboutVM.getAbout(),
-                                 saveAboutVM.getHeight());
-
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
-    }
-
-    @PostMapping("/location")
-    public ResponseEntity<String> saveLocation(@Valid @RequestBody SaveLocationVM saveLocationVM,
-                                               BindingResult bindingResult) throws JsonProcessingException {
-
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-
-        accountService.saveLocation(saveLocationVM.getAccountId(),
-                                    saveLocationVM.getIdentityToken(),
-                                    saveLocationVM.getLatitude(),
-                                    saveLocationVM.getLongitude(),
-                                    saveLocationVM.getUpdatedAt());
-
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
-    }
-
-
 
     @PostMapping("/answers")
     public ResponseEntity<String> saveAnswers(@Valid @RequestBody SaveAnswersVM saveAnswersVM,
@@ -122,30 +87,4 @@ public class AccountController extends BaseController {
         accountService.saveEmail(saveEmailVM.getAccountId(), saveEmailVM.getIdentityToken(), saveEmailVM.getEmail());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
-
-    @GetMapping("/recommend")
-    public ResponseEntity<String> recommend(@Valid @ModelAttribute RecommendVM recommendVM,
-                                            BindingResult bindingResult)
-    throws JsonProcessingException {
-
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-
-        PreRecommendDTO preRecommendDTO = accountService.preRecommend(recommendVM.getAccountId(),
-                                                                      recommendVM.getIdentityToken(),
-                                                                      recommendVM.getLatitude(),
-                                                                      recommendVM.getLongitude(),
-                                                                      recommendVM.getLocationUpdatedAt(),
-                                                                      recommendVM.isReset());
-
-        List<CardDTO> cardDTOs = accountService.recommend(recommendVM.getDistance(),
-                                                          recommendVM.getMinAge(),
-                                                          recommendVM.getMaxAge(),
-                                                          recommendVM.isGender(),
-                                                          preRecommendDTO.getLocation(),
-                                                          preRecommendDTO.getIndex());
-
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(cardDTOs));
-    }
-
-
 }

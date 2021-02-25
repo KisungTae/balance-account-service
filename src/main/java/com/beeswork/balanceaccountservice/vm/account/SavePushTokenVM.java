@@ -7,8 +7,8 @@ import javax.validation.constraints.NotEmpty;
 
 @Getter
 @Setter
-public class SavePushNotificationTokenVM extends AccountIdentityVM {
+public class SavePushTokenVM extends AccountIdentityVM {
 
     @NotEmpty
-    private String token;
+    private String key;
 }

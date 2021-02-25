@@ -1,7 +1,7 @@
 package com.beeswork.balanceaccountservice.service.match;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
-import com.beeswork.balanceaccountservice.dao.chatmessage.ChatMessageDAO;
+import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;

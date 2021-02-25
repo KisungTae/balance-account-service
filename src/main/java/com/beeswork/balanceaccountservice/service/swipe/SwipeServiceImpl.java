@@ -1,7 +1,7 @@
 package com.beeswork.balanceaccountservice.service.swipe;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
-import com.beeswork.balanceaccountservice.dao.accountquestion.AccountQuestionDAO;
+import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
@@ -58,10 +58,10 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     @Transactional
     public List<QuestionDTO> like(UUID accountId, UUID identityToken, UUID swipedId) {
         Account swiper = accountDAO.findById(accountId);
-        checkIfAccountValid(swiper, identityToken);
+        validateAccount(swiper, identityToken);
 
         Account swiped = accountDAO.findById(swipedId);
-        checkIfSwipedValid(swiped);
+        validateSwiped(swiped);
 
         rechargeFreeSwipe(swiper);
         if (swiper.getFreeSwipe() < SWIPE_POINT && swiper.getPoint() < SWIPE_POINT)
@@ -86,7 +86,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public ListSwipesDTO listSwipes(UUID accountId, UUID identityToken, boolean clicked, Date fetchedAt) {
-        checkIfAccountValid(accountDAO.findById(accountId), identityToken);
+        validateAccount(accountDAO.findById(accountId), identityToken);
         ListSwipesDTO listSwipesDTO = new ListSwipesDTO(fetchedAt);
         if (clicked) listSwipesDTO.setSwipeDTOs(swipeDAO.findAllClickedAfter(accountId, fetchedAt));
         else listSwipesDTO.setSwipeDTOs(swipeDAO.findAllClickAfter(accountId, fetchedAt));
@@ -117,10 +117,10 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         else if (subSwipe.isMatched()) throw new SwipeMatchedExistsException();
 
         Account swiper = subSwipe.getSwiper();
-        checkIfAccountValid(swiper, identityToken);
+        validateAccount(swiper, identityToken);
 
         Account swiped = subSwipe.getSwiped();
-        checkIfSwipedValid(swiped);
+        validateSwiped(swiped);
 
         if (swiper.getFreeSwipe() >= SWIPE_POINT)
             swiper.setFreeSwipe((swiper.getFreeSwipe() - SWIPE_POINT));
@@ -129,7 +129,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         else swiper.setPoint((swiper.getPoint() - SWIPE_POINT));
 
         ClickDTO clickDTO = new ClickDTO();
-        if (accountQuestionDAO.findAllByAnswer(swipedId, answers) != answers.size())
+        if (accountQuestionDAO.findAllByAnswers(swipedId, answers) != answers.size())
             return clickDTO;
 
         Date updatedAt = new Date();

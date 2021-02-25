@@ -155,10 +155,6 @@ drop table account;
 
 
 
-
-
-drop table single_sign_on;
-drop table push_notification;
 drop table profile;
 
 -- TODO: 2020-09-14 execute these
@@ -168,13 +164,15 @@ CREATE EXTENSION if not exists postgis;
 create extension if not exists "uuid-ossp";
 
 
-create table single_sign_on
+create table login
 (
     id         varchar(100) not null,
     type       int          not null,
     account_id uuid         not null,
     email      varchar(256),
+    password   varchar(50)  not null,
     blocked    boolean      not null,
+    created_at timestamptz  not null,
 
     primary key (id, type),
     constraint social_login_account_id_fk foreign key (account_id) references account (id)
@@ -184,49 +182,55 @@ create table single_sign_on
 -- liked count will be reset on every night
 create table account
 (
-    version               int         not null,
     id                    uuid primary key,
     identity_token        uuid        not null,
-    blocked               boolean     not null,
-    deleted               boolean     not null,
     name                  varchar(15) not null,
     point                 int         not null,
     rep_photo_key         varchar(30) not null,
     free_swipe            int         not null,
     free_swipe_updated_at timestamptz not null,
+    blocked               boolean     not null,
+    deleted               boolean     not null,
+    version               int         not null,
     created_at            timestamptz not null,
     updated_at            timestamptz not null
 );
 
 
-create table push_notification
+create table push_token
 (
-    id    uuid         not null,
-    type  int          not null,
-    token varchar(500) not null,
+    account_id uuid         not null,
+    type       int          not null,
+    key        varchar(500) not null,
+    created_at timestamptz  not null,
+    updated_at timestamptz  not null,
 
-    primary key (id, type),
-    constraint push_notification_account_id_fk foreign key (id) references account (id)
+    primary key (account_id, type),
+    constraint push_notification_account_id_fk foreign key (account_id) references account (id)
 );
+
 
 create table profile
 (
-    id                  uuid primary key,
+    account_id          uuid primary key,
+    identity_token      uuid                   not null,
     name                varchar(15)            not null,
     birth_year          int                    not null,
     birth               Date                   not null,
     gender              boolean                not null,
     height              int,
-    about               varchar(500),
+    about               varchar(500)           not null,
     location            geography(point, 4326) not null,
     location_updated_at timestamptz            not null,
     score               int                    not null,
     page_index          int                    not null,
     enabled             boolean                not null,
     deleted             boolean                not null,
+    version             int                    not null,
+    created_at          timestamptz            not null,
+    updated_at          timestamptz            not null,
 
-
-    constraint profile_account_id_fk foreign key (id) references account (id)
+    constraint profile_account_id_fk foreign key (account_id) references account (id)
 );
 
 CREATE INDEX profile_location_idx ON profile USING GIST (location);
@@ -353,19 +357,27 @@ create index chat_message_chat_id_created_at on chat_message (chat_id, created_a
 -------------------------------------- Query Start ------------------------------------------
 ---------------------------------------------------------------------------------------------
 
+alter table account rename account_type to login_type;
+
+
+select *
+from push_token;
+
+select *
+from account;
+
 explain analyse
 select *
 from question
 where id in (select question_id
              from account_question
-             where account_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a'
-               and selected = true);
+             where account_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a' and selected = true);
 
 
 explain analyse
 select *
 from question q
-         left join account_question aq on q.id = aq.question_id
+left join account_question aq on q.id = aq.question_id
 where aq.account_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a'
   and aq.selected = true;
 
@@ -385,15 +397,15 @@ values ('8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a', 24, false, true, 4, current_time
 explain
 select *
 from account a
-         left join account_question aq on a.id = aq.account_id
-         left join question q on aq.question_id = q.id
+left join account_question aq on a.id = aq.account_id
+left join question q on aq.question_id = q.id
 where a.id = '67cfc7e3-9302-4a98-8870-b113baf81d73'
   and aq.selected = true;
 
 
 select s1.swiper_id, s1.swiped_id, s2.swiper_id, s2.swiped_id
 from swipe s1
-         inner join swipe s2 on s1.swiper_id = s2.swiped_id and s1.swiped_id = s2.swiper_id;
+inner join swipe s2 on s1.swiper_id = s2.swiped_id and s1.swiped_id = s2.swiper_id;
 
 update swipe
 set clicked = false,

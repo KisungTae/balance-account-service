@@ -29,6 +29,6 @@ public class SaveProfileVM extends AccountIdentityVM {
     @Length(min = 1, max = 500, message = "{about.length}")
     private String about;
 
-    private Integer height;
+    private int height;
 
 }

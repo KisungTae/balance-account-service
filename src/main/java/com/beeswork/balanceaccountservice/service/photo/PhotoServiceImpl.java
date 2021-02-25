@@ -1,7 +1,5 @@
 package com.beeswork.balanceaccountservice.service.photo;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dto.account.PhotoDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
@@ -37,7 +35,7 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     @Transactional
     public void addPhoto(UUID accountId, UUID identityToken, String photoKey, int sequence) {
         Account account = accountDAO.findWithPhotos(accountId, identityToken);
-        checkIfAccountValid(account);
+        validateAccount(account);
 
         if (account.getPhotos().size() >= MAX_NUM_OF_PHOTOS)
             throw new PhotoNumReachedMaxException();
@@ -60,7 +58,7 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
                    readOnly = true)
     public List<PhotoDTO> listPhotos(UUID accountId, UUID identityToken) {
         Account account = accountDAO.findWithPhotos(accountId, identityToken);
-        checkIfAccountValid(account);
+        validateAccount(account);
         return modelMapper.map(account.getPhotos(), new TypeToken<List<PhotoDTO>>() {}.getType());
     }
 
@@ -68,7 +66,7 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     @Transactional
     public void deletePhoto(UUID accountId, UUID identityToken, String photoKey) {
         Account account = accountDAO.findWithPhotos(accountId, identityToken);
-        checkIfAccountValid(account);
+        validateAccount(account);
 
         Photo photo = account.getPhotos()
                              .stream()
@@ -99,7 +97,7 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     @Transactional
     public void reorderPhotos(UUID accountId, UUID identityToken, Map<String, Integer> photoOrders) {
         Account account = accountDAO.findWithPhotos(accountId, identityToken);
-        checkIfAccountValid(account);
+        validateAccount(account);
 
         for (Photo photo : account.getPhotos()) {
             if (photoOrders.containsKey(photo.getKey()))

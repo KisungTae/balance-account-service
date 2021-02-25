@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.dao.chatmessage;
+package com.beeswork.balanceaccountservice.dao.chat;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;

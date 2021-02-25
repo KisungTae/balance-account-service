@@ -1,7 +1,7 @@
 package com.beeswork.balanceaccountservice.entity.account;
 
 
-import com.beeswork.balanceaccountservice.constant.PushNotificationType;
+import com.beeswork.balanceaccountservice.constant.PushTokenType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,10 +17,10 @@ import java.util.UUID;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
-public class PushNotificationId implements Serializable {
+public class PushTokenId implements Serializable {
 
     private UUID accountId;
 
     @Enumerated
-    private PushNotificationType type;
+    private PushTokenType type;
 }

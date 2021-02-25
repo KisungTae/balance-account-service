@@ -7,17 +7,21 @@ import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.UUID;
 
-//@Getter
-//@Setter
-//@NoArgsConstructor
-//@Entity
-//@Table(name = "profile")
+@Getter
+@Setter
+@NoArgsConstructor
+@Entity
+@Table(name = "profile")
 public class Profile {
 
+    @Id
+    private UUID accountId;
 
-
-    @OneToOne(mappedBy = "account")
+    @OneToOne
+    @JoinColumn(name = "account_id")
+    @MapsId
     private Account account;
 
     @Column(name = "name")
@@ -33,7 +37,7 @@ public class Profile {
     private boolean gender;
 
     @Column(name = "height")
-    private Integer height;
+    private int height;
 
     @Column(name = "about")
     private String about;
@@ -57,4 +61,37 @@ public class Profile {
 
     @Column(name = "deleted")
     private boolean deleted;
+
+    @Version
+    private int version;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
+
+    public Profile(Account account,
+                   String name,
+                   int birthYear,
+                   Date birth,
+                   boolean gender,
+                   Integer height,
+                   String about,
+                   Point location,
+                   Date createdAt) {
+        this.account = account;
+        this.name = name;
+        this.birthYear = birthYear;
+        this.birth = birth;
+        this.gender = gender;
+        this.height = height;
+        this.about = about;
+        this.location = location;
+        this.locationUpdatedAt = createdAt;
+        this.createdAt = createdAt;
+        this.updatedAt = createdAt;
+    }
 }

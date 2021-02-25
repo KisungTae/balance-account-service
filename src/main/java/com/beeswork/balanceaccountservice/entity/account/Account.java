@@ -1,6 +1,6 @@
 package com.beeswork.balanceaccountservice.entity.account;
 
-import com.beeswork.balanceaccountservice.constant.SingleSignOnType;
+import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.match.Match;
@@ -25,9 +25,6 @@ import java.util.*;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Account {
 
-    @Version
-    private int version;
-
     @Id
     @Column(name = "id")
     @GeneratedValue(generator = "UUID")
@@ -35,15 +32,25 @@ public class Account {
     @Type(type="pg-uuid")
     private UUID id;
 
-    @Column(name = "social_login_id")
-    private String socialLoginId;
-
     @Column(name = "identity_token")
     @Type(type = "pg-uuid")
     private UUID identityToken;
 
-    @Column(name = "enabled")
-    private boolean enabled;
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "point")
+    private int point;
+
+    @Column(name = "rep_photo_key")
+    private String repPhotoKey;
+
+    @Column(name = "free_swipe")
+    private int freeSwipe;
+
+    @Column(name = "free_swipe_updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date freeSwipeUpdatedAt;
 
     @Column(name = "blocked")
     private boolean blocked;
@@ -51,8 +58,36 @@ public class Account {
     @Column(name = "deleted")
     private boolean deleted;
 
-    @Column(name = "name")
-    private String name;
+    @Version
+    private int version;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
+
+
+
+
+
+    @Column(name = "index")
+    private int index;
+
+
+    @Column(name = "social_login_id")
+    private String socialLoginId;
+
+
+
+    @Column(name = "enabled")
+    private boolean enabled;
+
+
+
+
 
     @Column(name = "height")
     private Integer height;
@@ -75,24 +110,12 @@ public class Account {
     @Column(name = "score")
     private int score;
 
-    @Column(name = "index")
-    private int index;
 
-    @Column(name = "point")
-    private int point;
 
     @Column(name = "fcm_token")
     private String fcmToken;
 
-    @Column(name = "rep_photo_key")
-    private String repPhotoKey;
 
-    @Column(name = "free_swipe")
-    private int freeSwipe;
-
-    @Column(name = "free_swipe_updated_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date freeSwipeUpdatedAt;
 
     @Column(name = "location_updated_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -103,7 +126,7 @@ public class Account {
     private Point location;
 
     @Enumerated
-    private SingleSignOnType singleSignOnType;
+    private LoginType loginType;
 
     @OneToMany(mappedBy = "account",
                fetch = FetchType.LAZY,
@@ -129,17 +152,5 @@ public class Account {
                orphanRemoval = true)
     private List<Swipe> swipes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "account",
-               fetch = FetchType.LAZY,
-               cascade = CascadeType.ALL,
-               orphanRemoval = true)
-    private List<PushNotification> pushNotifications = new ArrayList<>();
 
-    @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
-
-    @Column(name = "updated_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;
 }

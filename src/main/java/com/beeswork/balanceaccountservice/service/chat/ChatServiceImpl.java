@@ -1,7 +1,7 @@
 package com.beeswork.balanceaccountservice.service.chat;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
-import com.beeswork.balanceaccountservice.dao.chatmessage.ChatMessageDAO;
+import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
@@ -116,7 +116,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     @Override
     @Transactional
     public void receivedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
-        checkIfAccountValid(accountDAO.findById(accountId), identityToken);
+        validateAccount(accountDAO.findById(accountId), identityToken);
         ChatMessage chatMessage = chatMessageDAO.findByIdWithLock(chatMessageId);
         chatMessage.setReceived(true);
     }
@@ -124,7 +124,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     @Override
     @Transactional
     public void fetchedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
-        checkIfAccountValid(accountDAO.findById(accountId), identityToken);
+        validateAccount(accountDAO.findById(accountId), identityToken);
         ChatMessage chatMessage = chatMessageDAO.findByIdWithLock(chatMessageId);
         chatMessage.setFetched(true);
     }

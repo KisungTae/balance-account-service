@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.dao.accountquestion;
+package com.beeswork.balanceaccountservice.dao.account;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -28,7 +27,7 @@ public class AccountQuestionDAOImpl extends BaseDAOImpl<AccountQuestion> impleme
     }
 
     @Override
-    public long findAllByAnswer(UUID accountId, Map<Integer, Boolean> answers) {
+    public long findAllByAnswers(UUID accountId, Map<Integer, Boolean> answers) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         for (Map.Entry<Integer, Boolean> entry : answers.entrySet()) {
             booleanBuilder.or(qAccountQuestion.questionId.eq(entry.getKey())
