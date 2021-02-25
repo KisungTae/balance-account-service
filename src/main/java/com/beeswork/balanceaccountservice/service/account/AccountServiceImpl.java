@@ -4,7 +4,8 @@ package com.beeswork.balanceaccountservice.service.account;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.beeswork.balanceaccountservice.config.properties.AWSProperties;
-import com.beeswork.balanceaccountservice.constant.AccountType;
+import com.beeswork.balanceaccountservice.constant.PushNotificationType;
+import com.beeswork.balanceaccountservice.constant.SingleSignOnType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
 import com.beeswork.balanceaccountservice.dto.account.*;
@@ -54,7 +55,10 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Autowired
     public AccountServiceImpl(AccountDAO accountDAO,
                               ModelMapper modelMapper,
-                              QuestionDAO questionDAO, AmazonS3 amazonS3, AWSProperties awsProperties, GeometryFactory geometryFactory) {
+                              QuestionDAO questionDAO,
+                              AmazonS3 amazonS3,
+                              AWSProperties awsProperties,
+                              GeometryFactory geometryFactory) {
         super(modelMapper);
         this.accountDAO = accountDAO;
         this.questionDAO = questionDAO;
@@ -122,8 +126,9 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
-    public void saveFCMToken(UUID accountId, UUID identityToken, String token) {
+    public void savePushNotificationToken(UUID accountId, UUID identityToken, String token, PushNotificationType type) {
         Account account = findValidAccount(accountId, identityToken);
+
         account.setFcmToken(token);
     }
 
@@ -190,7 +195,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     public void saveEmail(UUID accountId, UUID identityToken, String email) {
         Account account = findValidAccount(accountId, identityToken);
 
-        if (account.getAccountType() == AccountType.NAVER || account.getAccountType() == AccountType.GOOGLE)
+        if (account.getSingleSignOnType() == SingleSignOnType.NAVER ||
+            account.getSingleSignOnType() == SingleSignOnType.GOOGLE)
             throw new AccountEmailNotMutableException();
 
         if (accountDAO.existsByEmail(email))
@@ -201,8 +207,12 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
-    public PreRecommendDTO preRecommend(UUID accountId, UUID identityToken, Double latitude,
-                                        Double longitude, Date locationUpdatedAt, boolean reset) {
+    public PreRecommendDTO preRecommend(UUID accountId,
+                                        UUID identityToken,
+                                        Double latitude,
+                                        Double longitude,
+                                        Date locationUpdatedAt,
+                                        boolean reset) {
         Account account = findValidAccount(accountId, identityToken);
 
         PreRecommendDTO preRecommendDTO = new PreRecommendDTO();

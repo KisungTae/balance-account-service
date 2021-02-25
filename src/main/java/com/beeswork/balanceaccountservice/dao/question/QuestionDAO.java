@@ -5,6 +5,7 @@ import com.beeswork.balanceaccountservice.entity.question.Question;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public interface QuestionDAO extends BaseDAO<Question> {
 

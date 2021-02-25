@@ -246,13 +246,17 @@ public class BalanceAccountServiceApplication {
 //					--> it should return invalid accounts so that client can remove invalid clicked in the list
 
 // TODO			70. click() if two users click at the same time, then one can't see another swipe clicked which results in not create matches
+//					--> prevent deadlock login implemented by write lock on account
 
 // TODO			70. clickedProjection and clickProjection change to SwipeDTO and deleted the block field in the query
+//					--> implemented
 
 // TODO			70. findAllClickedAfter is convoluted, considering matched field to swipe so that retrieve swipes where matched = false, clicked = true
+//					--> implemented
 
 // TODO 		71. block account make the account's deleted field = true as well so that only the deleted field can be used for other users vadiliaty
-//					only the users themselves get the blocked exception, and the other users will get deleted on fetched something
+//					only the users themselves get the blocked exception, and the other users will get deleted on fetched something, and blocking a user also makes
+//					social_login, profile, account blocked and deleted = true
 
 // TODO			72. add deleted field in match and exclude deleted matches in listMatches()
 //					--> implemented
@@ -294,6 +298,7 @@ public class BalanceAccountServiceApplication {
 
 // TODO			87. move out notification to notiication service which has firebaseService and stompService
 
+// TODO			88. deleteAccount() should also delete social_login, profile, push_notificaiton as well as account
 
 
 

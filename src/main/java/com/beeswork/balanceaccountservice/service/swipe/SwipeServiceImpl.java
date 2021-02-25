@@ -9,7 +9,6 @@ import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ListSwipesDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
-import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.question.Question;
@@ -22,6 +21,7 @@ import com.beeswork.balanceaccountservice.exception.swipe.SwipeMatchedExistsExce
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -63,14 +63,13 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         Account swiped = accountDAO.findById(swipedId);
         checkIfSwipedValid(swiped);
 
-
-
-        if (swiped.getAccountQuestions().size() == 0)
-            throw new AccountQuestionNotFoundException();
-
         rechargeFreeSwipe(swiper);
         if (swiper.getFreeSwipe() < SWIPE_POINT && swiper.getPoint() < SWIPE_POINT)
             throw new AccountShortOfPointException();
+
+        List<Question> questions = accountQuestionDAO.findAllQuestionsSelected(swipedId);
+        if (questions == null || questions.size() <= 0)
+            throw new AccountQuestionNotFoundException();
 
         Swipe swipe = swipeDAO.findById(new SwipeId(accountId, swipedId), true);
         Date updatedAt = new Date();
@@ -81,11 +80,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         swipe.setCount((swipe.getCount() + 1));
         swipeDAO.persist(swipe);
 
-        List<QuestionDTO> questionDTOs = new ArrayList<>();
-        for (AccountQuestion accountQuestion : swiped.getAccountQuestions()) {
-            questionDTOs.add(modelMapper.map(accountQuestion.getQuestion(), QuestionDTO.class));
-        }
-        return questionDTOs;
+        return modelMapper.map(questions, new TypeToken<List<QuestionDTO>>() {}.getType());
     }
 
     @Override

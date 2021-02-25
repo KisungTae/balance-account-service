@@ -1,6 +1,6 @@
 package com.beeswork.balanceaccountservice.entity.account;
 
-import com.beeswork.balanceaccountservice.constant.AccountType;
+import com.beeswork.balanceaccountservice.constant.SingleSignOnType;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.match.Match;
@@ -103,7 +103,7 @@ public class Account {
     private Point location;
 
     @Enumerated
-    private AccountType accountType;
+    private SingleSignOnType singleSignOnType;
 
     @OneToMany(mappedBy = "account",
                fetch = FetchType.LAZY,
@@ -128,6 +128,12 @@ public class Account {
                cascade = CascadeType.ALL,
                orphanRemoval = true)
     private List<Swipe> swipes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "account",
+               fetch = FetchType.LAZY,
+               cascade = CascadeType.ALL,
+               orphanRemoval = true)
+    private List<PushNotification> pushNotifications = new ArrayList<>();
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

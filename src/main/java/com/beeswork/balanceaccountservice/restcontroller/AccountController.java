@@ -1,10 +1,10 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 
+import com.beeswork.balanceaccountservice.constant.PushNotificationType;
 import com.beeswork.balanceaccountservice.dto.account.CardDTO;
 import com.beeswork.balanceaccountservice.dto.account.PreRecommendDTO;
 import com.beeswork.balanceaccountservice.dto.account.ProfileDTO;
-import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
@@ -15,8 +15,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -100,19 +98,7 @@ public class AccountController extends BaseController {
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
-    @PostMapping("/fcm/token")
-    public ResponseEntity<String> saveFCMToken(@Valid @RequestBody SaveFCMTokenVM saveFCMTokenVM,
-                                               BindingResult bindingResult)
-    throws JsonProcessingException {
 
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-
-        accountService.saveFCMToken(saveFCMTokenVM.getAccountId(),
-                                    saveFCMTokenVM.getIdentityToken(),
-                                    saveFCMTokenVM.getToken());
-
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
-    }
 
     @PostMapping("/answers")
     public ResponseEntity<String> saveAnswers(@Valid @RequestBody SaveAnswersVM saveAnswersVM,
@@ -136,6 +122,7 @@ public class AccountController extends BaseController {
         accountService.saveEmail(saveEmailVM.getAccountId(), saveEmailVM.getIdentityToken(), saveEmailVM.getEmail());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
+
     @GetMapping("/recommend")
     public ResponseEntity<String> recommend(@Valid @ModelAttribute RecommendVM recommendVM,
                                             BindingResult bindingResult)

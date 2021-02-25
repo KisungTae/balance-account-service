@@ -1,12 +1,12 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.constant.SingleSignOnType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
-import com.beeswork.balanceaccountservice.entity.chat.QChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
@@ -26,7 +26,6 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.Session;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,8 +35,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -107,7 +104,7 @@ public class DummyController {
         account.setBirth(birth);
         account.setGender(random.nextBoolean());
         account.setLocation(geometryFactory.createPoint(new Coordinate(lon, lat)));
-        account.setAccountType(com.beeswork.balanceaccountservice.constant.AccountType.values()[random.nextInt(4)]);
+        account.setSingleSignOnType(SingleSignOnType.values()[random.nextInt(4)]);
         account.setScore(0);
         account.setPoint(50000);
         account.setFcmToken("");

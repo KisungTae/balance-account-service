@@ -63,7 +63,6 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public QuestionDTO randomQuestion(List<Integer> questionIds) {
-
         long count = questionDAO.count() - questionIds.size();
         int random = new Random().nextInt((int) count);
         Question question = questionDAO.findNthNotIn(questionIds, random);
@@ -74,7 +73,6 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<QuestionDTO> listRandomQuestions() {
-
         long count = questionDAO.count();
         int startIndex = new Random().nextInt((int) (count - MAX_NUM_OF_QUESTIONS));
         return modelMapper.map(questionDAO.findAllWithLimitAndOffset(MAX_NUM_OF_QUESTIONS, startIndex),

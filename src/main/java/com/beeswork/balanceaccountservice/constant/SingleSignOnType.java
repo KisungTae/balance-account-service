@@ -1,6 +1,6 @@
 package com.beeswork.balanceaccountservice.constant;
 
-public enum AccountType {
+public enum SingleSignOnType {
     NAVER,
     KAKAO,
     GOOGLE,

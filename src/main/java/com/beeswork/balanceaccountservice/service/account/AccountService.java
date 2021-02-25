@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.service.account;
 
+import com.beeswork.balanceaccountservice.constant.PushNotificationType;
 import com.beeswork.balanceaccountservice.dto.account.*;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import org.locationtech.jts.geom.Point;
@@ -29,7 +30,7 @@ public interface AccountService {
                       Date updatedAt);
 
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3,   backoff = @Backoff(delay = 1))
-    void saveFCMToken(UUID accountId, UUID identityToken, String token);
+    void savePushNotificationToken(UUID accountId, UUID identityToken, String token, PushNotificationType type);
 
     void saveAnswers(UUID accountId, UUID identityToken, Map<Integer, Boolean> answers);
 

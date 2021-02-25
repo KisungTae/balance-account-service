@@ -6,6 +6,7 @@ import com.beeswork.balanceaccountservice.entity.account.QAccount;
 import com.beeswork.balanceaccountservice.entity.account.QAccountQuestion;
 import com.beeswork.balanceaccountservice.entity.photo.QPhoto;
 import com.beeswork.balanceaccountservice.entity.question.QQuestion;
+import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.locationtech.jts.geom.Point;
@@ -68,6 +69,8 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
                               .where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken)))
                               .fetchOne();
     }
+
+
 
     @Override
     public Account findWithAccountQuestionsIn(UUID accountId, UUID identityToken, Set<Integer> questionIds) {
