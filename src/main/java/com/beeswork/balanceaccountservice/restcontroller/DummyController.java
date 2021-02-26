@@ -12,6 +12,7 @@ import com.beeswork.balanceaccountservice.entity.match.MatchId;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.photo.PhotoId;
+import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.question.QQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
@@ -45,11 +46,11 @@ public class DummyController {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private final MatchDAO        matchDAO;
-    private final ObjectMapper    objectMapper;
+    private final MatchDAO matchDAO;
+    private final ObjectMapper objectMapper;
     private final FirebaseService firebaseService;
-    private final AccountDAO      accountDAO;
-    private final ChatDAO         chatDAO;
+    private final AccountDAO accountDAO;
+    private final ChatDAO chatDAO;
 
     @Autowired
     public DummyController(MatchDAO matchDAO,
@@ -88,16 +89,16 @@ public class DummyController {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void saveAccount(double lat, double lon, int count, Random random, GeometryFactory geometryFactory)
-    throws InterruptedException {
+    public void saveAccount(double lat, double lon, int count, Random random, GeometryFactory geometryFactory) {
         Account account = new Account();
         Date birth = randomBirth();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(birth);
         Date now = new Date();
 
+        String name = "user-" + count;
         account.setIdentityToken(UUID.randomUUID());
-        account.setName("user-" + count);
+        account.setName(name);
         account.setEmail(count + "@gmail.com");
         account.setAbout(count + ": this is my profile");
         account.setBirthYear(calendar.get(Calendar.YEAR));
@@ -114,6 +115,20 @@ public class DummyController {
         account.setUpdatedAt(now);
         if (random.nextBoolean()) account.setHeight(random.nextInt(50) + 150);
 
+
+        // profile
+        Profile profile = new Profile(account,
+                                      name,
+                                      calendar.get(Calendar.YEAR),
+                                      birth,
+                                      random.nextBoolean(),
+                                      random.nextInt(50) + 150,
+                                      count + ": this is my profile",
+                                      geometryFactory.createPoint(new Coordinate(lon, lat)),
+                                      now);
+
+
+        // photo
         Date photoKeyDate = now;
         for (int p = 0; p < 5; p++) {
             Photo photo = new Photo();
@@ -130,6 +145,7 @@ public class DummyController {
         }
 
         entityManager.persist(account);
+        entityManager.persist(profile);
     }
 
     private Date randomBirth() {
@@ -141,10 +157,6 @@ public class DummyController {
         calendar.set(year, month, day, 0, 0);
         return calendar.getTime();
     }
-
-
-
-
 
 
     @Transactional
@@ -373,7 +385,6 @@ public class DummyController {
 //            }
 //        }
     }
-
 
 
     @GetMapping("/send/notification/clicked")

@@ -69,20 +69,16 @@ public class AccountController extends BaseController {
     public ResponseEntity<String> saveAnswers(@Valid @RequestBody SaveAnswersVM saveAnswersVM,
                                               BindingResult bindingResult)
     throws JsonProcessingException {
-
         if (bindingResult.hasErrors()) throw new BadRequestException();
-
         accountService.saveAnswers(saveAnswersVM.getAccountId(),
                                    saveAnswersVM.getIdentityToken(),
                                    saveAnswersVM.getAnswers());
-
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
     @PostMapping("/email")
     public ResponseEntity<String> saveEmail(@Valid @RequestBody SaveEmailVM saveEmailVM,
                                             BindingResult bindingResult) throws JsonProcessingException {
-
         if (bindingResult.hasErrors()) super.fieldExceptionResponse(bindingResult);
         accountService.saveEmail(saveEmailVM.getAccountId(), saveEmailVM.getIdentityToken(), saveEmailVM.getEmail());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));

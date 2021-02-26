@@ -25,8 +25,7 @@ public class SaveProfileVM extends AccountIdentityVM {
     @NotNull(message = "{gender.null}")
     private Boolean gender;
 
-    @NotEmpty(message = "{about.empty}")
-    @Length(min = 1, max = 500, message = "{about.length}")
+    @Length(max = 500, message = "{about.length}")
     private String about;
 
     private int height;

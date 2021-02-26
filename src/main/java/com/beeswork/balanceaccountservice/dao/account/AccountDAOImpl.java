@@ -108,38 +108,6 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
                               .leftJoin(qAccountQuestion.question, qQuestion).fetchJoin();
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<Object[]> findAllWithin(int distance,
-                                        int minAge,
-                                        int maxAge,
-                                        boolean gender,
-                                        int limit,
-                                        int offset,
-                                        Point point) {
-        return entityManager.createNativeQuery(
-                "select cast(b.id as varchar), b.name, b.about, b.birth_year, st_distance(b.location, :pivot), p.key, b.height " +
-                "from (select * " +
-                "      from account a  " +
-                "      where st_dwithin(location, :pivot, :distance) " +
-                "        and gender = :gender " +
-                "        and birth_year <= :minAge " +
-                "        and birth_year >= :maxAge " +
-                "        and enabled = true " +
-                "        and blocked = false " +
-                "        and deleted = false " +
-                "       limit :limit " +
-                "       offset :offset) as b " +
-                "left join photo as p " +
-                "on p.account_id = b.id")
-                            .setParameter("pivot", point)
-                            .setParameter("distance", distance)
-                            .setParameter("gender", gender)
-                            .setParameter("minAge", minAge)
-                            .setParameter("maxAge", maxAge)
-                            .setParameter("limit", limit)
-                            .setParameter("offset", offset)
-                            .getResultList();
-    }
+
 
 }

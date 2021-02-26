@@ -197,6 +197,7 @@ create table account
 );
 
 
+
 create table push_token
 (
     account_id uuid         not null,
@@ -213,13 +214,12 @@ create table push_token
 create table profile
 (
     account_id          uuid primary key,
-    identity_token      uuid                   not null,
     name                varchar(15)            not null,
     birth_year          int                    not null,
     birth               Date                   not null,
     gender              boolean                not null,
     height              int,
-    about               varchar(500)           not null,
+    about               varchar(500),
     location            geography(point, 4326) not null,
     location_updated_at timestamptz            not null,
     score               int                    not null,
@@ -232,6 +232,7 @@ create table profile
 
     constraint profile_account_id_fk foreign key (account_id) references account (id)
 );
+
 
 CREATE INDEX profile_location_idx ON profile USING GIST (location);
 
@@ -357,8 +358,13 @@ create index chat_message_chat_id_created_at on chat_message (chat_id, created_a
 -------------------------------------- Query Start ------------------------------------------
 ---------------------------------------------------------------------------------------------
 
-alter table account rename account_type to login_type;
 
+select *
+from profile;
+
+select *
+from photo
+where account_id = 'e01794ae-cb65-462e-9a07-6a4498b6ecfe';
 
 select *
 from push_token;
@@ -371,13 +377,14 @@ select *
 from question
 where id in (select question_id
              from account_question
-             where account_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a' and selected = true);
+             where account_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a'
+               and selected = true);
 
 
 explain analyse
 select *
 from question q
-left join account_question aq on q.id = aq.question_id
+         left join account_question aq on q.id = aq.question_id
 where aq.account_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a'
   and aq.selected = true;
 
@@ -393,19 +400,18 @@ insert into account_question
 values ('8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a', 24, false, true, 4, current_timestamp, current_timestamp);
 
 
-
 explain
 select *
 from account a
-left join account_question aq on a.id = aq.account_id
-left join question q on aq.question_id = q.id
+         left join account_question aq on a.id = aq.account_id
+         left join question q on aq.question_id = q.id
 where a.id = '67cfc7e3-9302-4a98-8870-b113baf81d73'
   and aq.selected = true;
 
 
 select s1.swiper_id, s1.swiped_id, s2.swiper_id, s2.swiped_id
 from swipe s1
-inner join swipe s2 on s1.swiper_id = s2.swiped_id and s1.swiped_id = s2.swiper_id;
+         inner join swipe s2 on s1.swiper_id = s2.swiped_id and s1.swiped_id = s2.swiper_id;
 
 update swipe
 set clicked = false,

@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public interface ProfileService {
 
-//    ProfileDTO getProfile(UUID accountId, UUID identityToken);
+    ProfileDTO getProfile(UUID accountId, UUID identityToken);
 
     // delay = 0 then default to 1 second
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
@@ -26,20 +26,21 @@ public interface ProfileService {
                      int height,
                      boolean gender);
 
-//    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-//    void saveAbout(UUID accountId, UUID identityToken, String about, Integer height);
-//
-//    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-//    void saveLocation(UUID accountId, UUID identityToken, double latitude, double longitude, Date updatedAt);
-//
-//    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-//    PreRecommendDTO preRecommend(UUID accountId,
-//                                 UUID identityToken,
-//                                 Double latitude,
-//                                 Double longitude,
-//                                 Date locationUpdatedAt,
-//                                 boolean reset);
-//    List<CardDTO> recommend(int distance, int minAge, int maxAge, boolean gender, Point location, int index);
+    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
+    void saveAbout(UUID accountId, UUID identityToken, String about, Integer height);
+
+    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
+    void saveLocation(UUID accountId, UUID identityToken, double latitude, double longitude, Date updatedAt);
+
+    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
+    PreRecommendDTO preRecommend(UUID accountId,
+                                 UUID identityToken,
+                                 Double latitude,
+                                 Double longitude,
+                                 Date locationUpdatedAt,
+                                 boolean reset);
+
+    List<CardDTO> recommend(int distance, int minAge, int maxAge, boolean gender, Point location, int pageIndex);
 
 
 }

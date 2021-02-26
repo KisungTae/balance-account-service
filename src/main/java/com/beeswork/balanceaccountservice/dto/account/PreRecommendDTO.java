@@ -9,5 +9,5 @@ import org.locationtech.jts.geom.Point;
 @Setter
 public class PreRecommendDTO {
     private Point location;
-    private int   index;
+    private int pageIndex;
 }

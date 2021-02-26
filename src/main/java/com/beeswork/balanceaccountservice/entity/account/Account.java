@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.entity.account;
 
 import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
+import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import lombok.Getter;
@@ -68,6 +69,11 @@ public class Account {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
+    @OneToOne(mappedBy = "account")
+    private Profile profile;
+
+
 
 
 
