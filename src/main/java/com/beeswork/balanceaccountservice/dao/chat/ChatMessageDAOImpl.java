@@ -26,10 +26,10 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
     public List<ChatMessageDTO> findAllUnreceived(UUID accountId) {
         return jpaQueryFactory.select(new QChatMessageDTO(qChatMessage.id,
                                                           qChatMessage.body,
-                                                          qChatMessage.chatId,
+                                                          qChatMessage.chat.id,
                                                           qChatMessage.createdAt))
                               .from(qChatMessage)
-                              .where(qChatMessage.recipientId.eq(accountId).and(qChatMessage.received.eq(false)))
+                              .where(qChatMessage.recipient.id.eq(accountId).and(qChatMessage.received.eq(false)))
                               .fetch();
     }
 
@@ -39,7 +39,7 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
                                                           qChatMessage.messageId,
                                                           qChatMessage.createdAt))
                               .from(qChatMessage)
-                              .where(qChatMessage.accountId.eq(accountId).and(qChatMessage.fetched.eq(false)))
+                              .where(qChatMessage.account.id.eq(accountId).and(qChatMessage.fetched.eq(false)))
                               .fetch();
     }
 

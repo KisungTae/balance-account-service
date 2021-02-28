@@ -1,5 +1,6 @@
-package com.beeswork.balanceaccountservice.vm.account;
+package com.beeswork.balanceaccountservice.vm.profile;
 
+import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;

@@ -1,12 +1,15 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.dto.account.CardDTO;
-import com.beeswork.balanceaccountservice.dto.account.PreRecommendDTO;
-import com.beeswork.balanceaccountservice.dto.account.ProfileDTO;
+import com.beeswork.balanceaccountservice.dto.profile.PreRecommendDTO;
+import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.profile.ProfileService;
 import com.beeswork.balanceaccountservice.vm.account.*;
+import com.beeswork.balanceaccountservice.vm.profile.RecommendVM;
+import com.beeswork.balanceaccountservice.vm.profile.SaveAboutVM;
+import com.beeswork.balanceaccountservice.vm.profile.SaveLocationVM;
+import com.beeswork.balanceaccountservice.vm.profile.SaveProfileVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
@@ -16,7 +19,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/profile")

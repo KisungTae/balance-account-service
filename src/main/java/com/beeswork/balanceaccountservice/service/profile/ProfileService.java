@@ -1,8 +1,8 @@
 package com.beeswork.balanceaccountservice.service.profile;
 
-import com.beeswork.balanceaccountservice.dto.account.CardDTO;
-import com.beeswork.balanceaccountservice.dto.account.PreRecommendDTO;
-import com.beeswork.balanceaccountservice.dto.account.ProfileDTO;
+import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
+import com.beeswork.balanceaccountservice.dto.profile.PreRecommendDTO;
+import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
 import org.locationtech.jts.geom.Point;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;

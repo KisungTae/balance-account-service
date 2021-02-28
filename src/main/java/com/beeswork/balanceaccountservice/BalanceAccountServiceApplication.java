@@ -285,6 +285,7 @@ public class BalanceAccountServiceApplication {
 //					--> implemented
 
 // TODO			82. split account into several table, so that I can cache small account not the whole account
+//					--> implemented
 
 // TODO			83. remove columns like     @Column(name = "matched_id", insertable = false, updatable = false)
 //    				private UUID matchedId; because it takes up bytes on memory when cached

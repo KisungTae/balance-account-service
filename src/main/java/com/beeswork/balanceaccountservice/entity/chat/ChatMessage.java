@@ -30,27 +30,21 @@ public class ChatMessage {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     @Column(name = "message_id")
-    private Long messageId;
-
-    @Column(name = "chat_id", insertable = false, updatable = false)
-    private Long chatId;
+    private long messageId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id")
     private Chat chat;
 
-    @Column(name = "account_id", insertable = false, updatable = false)
-    private UUID accountId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;
 
-    @Column(name = "recipient_id", insertable = false, updatable = false)
-    private UUID recipientId;
+    @Column(name = "account_id", insertable = false, updatable = false)
+    private UUID accountId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipient_id")

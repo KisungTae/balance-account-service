@@ -24,10 +24,10 @@ import java.util.UUID;
 @Repository
 public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
 
-    private final QAccount qAccount = QAccount.account;
+    private final QAccount         qAccount         = QAccount.account;
     private final QAccountQuestion qAccountQuestion = QAccountQuestion.accountQuestion;
-    private final QQuestion qQuestion = QQuestion.question;
-    private final QPhoto qPhoto = QPhoto.photo;
+    private final QQuestion        qQuestion        = QQuestion.question;
+    private final QPhoto           qPhoto           = QPhoto.photo;
 
     @Autowired
     public AccountDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
@@ -39,24 +39,10 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
         return entityManager.find(Account.class, accountId);
     }
 
-    @Override
-    public Account findBy(UUID accountId, UUID identityToken) {
-        return jpaQueryFactory.selectFrom(qAccount)
-                              .where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken)))
-                              .fetchOne();
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        return jpaQueryFactory.selectFrom(qAccount).where(qAccount.email.eq(email)).fetchCount() > 0;
-    }
-
     public Account findWithPhotosAndAccountQuestions(UUID accountId, UUID identityToken) {
         return jpaQueryFactory.selectFrom(qAccount)
-                              .leftJoin(qAccount.photos, qPhoto)
-                              .fetchJoin()
-                              .leftJoin(qAccount.accountQuestions, qAccountQuestion)
-                              .fetchJoin()
+                              .leftJoin(qAccount.photos, qPhoto).fetchJoin()
+                              .leftJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
                               .where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken)))
                               .fetchOne();
     }
@@ -70,35 +56,14 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
                               .fetchOne();
     }
 
-
-
-    @Override
-    public Account findWithAccountQuestionsIn(UUID accountId, UUID identityToken, Set<Integer> questionIds) {
-        return jpaQueryFactory.selectFrom(qAccount)
-                              .leftJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
-                              .where(qAccount.id.eq(accountId)
-                                                .and(qAccount.identityToken.eq(identityToken))
-                                                .and(qAccountQuestion.selected.eq(true)
-                                                                              .or(qAccountQuestion.questionId.in(
-                                                                                      questionIds))))
-                              .fetchOne();
-    }
-
     @Override
     public Account findWithAccountQuestions(UUID accountId, UUID identityToken) {
         return findWithAccountQuestions().where(qAccount.id.eq(accountId)
                                                            .and(qAccount.identityToken.eq(identityToken))
                                                            .and(qAccountQuestion.selected.eq(true)
-                                                                                         .or(qAccountQuestion.accountId.isNull())))
+                                                                                         .or(qAccountQuestion.accountQuestionId.accountId
+                                                                                                     .isNull())))
                                          .orderBy(qAccountQuestion.sequence.asc())
-                                         .fetchOne();
-    }
-
-    @Override
-    public Account findWithAccountQuestions(UUID accountId) {
-        return findWithAccountQuestions().where(qAccount.id.eq(accountId)
-                                                           .and(qAccountQuestion.selected.eq(true)
-                                                                                         .or(qAccountQuestion.accountId.isNull())))
                                          .fetchOne();
     }
 
@@ -107,7 +72,6 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
                               .leftJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
                               .leftJoin(qAccountQuestion.question, qQuestion).fetchJoin();
     }
-
 
 
 }

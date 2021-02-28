@@ -31,7 +31,7 @@ public class QuestionDAOImpl extends BaseDAOImpl<Question> implements QuestionDA
     }
 
     @Override
-    public List<Question> findAllByIds(Set<Integer> ids) {
+    public List<Question> findAllIn(Set<Integer> ids) {
         return jpaQueryFactory.selectFrom(qQuestion).where(qQuestion.id.in(ids)).fetch();
     }
 

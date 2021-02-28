@@ -1,9 +1,8 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.dto.account.PhotoDTO;
+import com.beeswork.balanceaccountservice.dto.photo.PhotoDTO;
 import com.beeswork.balanceaccountservice.dto.s3.PreSignedUrl;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
-import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.photo.PhotoService;
 import com.beeswork.balanceaccountservice.service.s3.S3Service;

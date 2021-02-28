@@ -1,8 +1,10 @@
 package com.beeswork.balanceaccountservice.dao.profile;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
+import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
+import com.beeswork.balanceaccountservice.dto.profile.CardDTOResultTransformer;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
-import com.beeswork.balanceaccountservice.entity.account.QProfile;
+import com.beeswork.balanceaccountservice.entity.profile.QProfile;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,15 +36,15 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Object[]> findAllWithin(int distance,
-                                        int minAge,
-                                        int maxAge,
-                                        boolean gender,
-                                        int limit,
-                                        int offset,
-                                        Point point) {
-        return entityManager.createNativeQuery(
-                "select cast(b.account_id as varchar), b.name, b.about, b.birth_year, st_distance(b.location, :pivot), p.key, b.height " +
+    public List<CardDTO> findAllWithin(int distance,
+                                       int minAge,
+                                       int maxAge,
+                                       boolean gender,
+                                       int limit,
+                                       int offset,
+                                       Point location) {
+        List<Object[]> rows = entityManager.createNativeQuery(
+                "select cast(b.account_id as varchar), b.name, b.about, b.birth_year, b.height, st_distance(b.location, :pivot), p.key " +
                 "from (select * " +
                 "      from profile  " +
                 "      where st_dwithin(location, :pivot, :distance) " +
@@ -55,13 +57,14 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                 "       offset :offset) as b " +
                 "left join photo as p " +
                 "on p.account_id = b.account_id")
-                            .setParameter("pivot", point)
-                            .setParameter("distance", distance)
-                            .setParameter("gender", gender)
-                            .setParameter("minAge", minAge)
-                            .setParameter("maxAge", maxAge)
-                            .setParameter("limit", limit)
-                            .setParameter("offset", offset)
-                            .getResultList();
+                                           .setParameter("pivot", location)
+                                           .setParameter("distance", distance)
+                                           .setParameter("gender", gender)
+                                           .setParameter("minAge", minAge)
+                                           .setParameter("maxAge", maxAge)
+                                           .setParameter("limit", limit)
+                                           .setParameter("offset", offset)
+                                           .getResultList();
+        return CardDTOResultTransformer.toList(rows);
     }
 }

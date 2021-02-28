@@ -13,10 +13,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MatchDAO extends BaseDAO<Match> {
-
-
     List<MatchDTO> findAllAfter(UUID matcherId, Date matchFetchedAt);
-    List<Match> findPairById(UUID matcherId, UUID matchedId);
-    Match findWithAccounts(UUID matcherId, UUID matchedId, Long chatId);
     Match findById(UUID matcherId, UUID matchedId);
 }

@@ -117,15 +117,7 @@ call populate_user();
 -- from users;
 --
 --
--- select *
--- from users
--- where st_dwithin(location, st_setsrid(st_point(126.907883, 37.463557), 4326), 5000)
---   and gender = 1
---   and (birth_year >= 1987 and birth_year <= 1990)
--- order by liked
--- limit 30
--- offset
--- 3000;
+
 
 
 -- BALANCE-TALK DATABASE
@@ -151,32 +143,19 @@ drop table match;
 drop table swipe;
 drop table chat_message;
 drop table chat;
+drop table login;
+drop table push_token;
+drop table profile;
 drop table account;
 
 
 
-drop table profile;
 
 -- TODO: 2020-09-14 execute these
 
 CREATE EXTENSION if not exists postgis;
 -- create UUID extension
 create extension if not exists "uuid-ossp";
-
-
-create table login
-(
-    id         varchar(100) not null,
-    type       int          not null,
-    account_id uuid         not null,
-    email      varchar(256),
-    password   varchar(50)  not null,
-    blocked    boolean      not null,
-    created_at timestamptz  not null,
-
-    primary key (id, type),
-    constraint social_login_account_id_fk foreign key (account_id) references account (id)
-);
 
 -- unregister deletes account
 -- liked count will be reset on every night
@@ -195,6 +174,22 @@ create table account
     created_at            timestamptz not null,
     updated_at            timestamptz not null
 );
+
+create table login
+(
+    id         varchar(100) not null,
+    type       int          not null,
+    account_id uuid         not null,
+    email      varchar(256),
+    password   varchar(50)  not null,
+    blocked    boolean      not null,
+    created_at timestamptz  not null,
+
+    primary key (id, type),
+    constraint login_account_id_fk foreign key (account_id) references account (id)
+);
+
+
 
 
 
@@ -235,6 +230,7 @@ create table profile
 
 
 CREATE INDEX profile_location_idx ON profile USING GIST (location);
+
 
 
 
@@ -358,6 +354,15 @@ create index chat_message_chat_id_created_at on chat_message (chat_id, created_a
 -------------------------------------- Query Start ------------------------------------------
 ---------------------------------------------------------------------------------------------
 
+
+
+
+select *
+from account_question;
+
+
+select *
+from account;
 
 select *
 from profile;

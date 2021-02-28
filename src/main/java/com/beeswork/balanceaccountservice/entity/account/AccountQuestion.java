@@ -41,27 +41,21 @@ public class AccountQuestion {
     @MapsId("accountId")
     private Account account;
 
-    @Column(name = "account_id",
-            insertable = false,
-            updatable = false)
-    private UUID accountId;
-
-    @Column(name = "question_id",
-            insertable = false,
-            updatable = false)
-    private Integer questionId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("questionId")
     private Question question;
 
-    public AccountQuestion(boolean selected, boolean answer, int sequence, Date createdAt, Date updatedAt, Account account, Question question) {
+    public AccountQuestion(boolean answer,
+                           int sequence,
+                           Date createdAt,
+                           Account account,
+                           Question question) {
         this.accountQuestionId = new AccountQuestionId(account.getId(), question.getId());
-        this.selected = selected;
+        this.selected = true;
         this.answer = answer;
         this.sequence = sequence;
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.updatedAt = createdAt;
         this.account = account;
         this.question = question;
     }

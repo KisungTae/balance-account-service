@@ -2,9 +2,6 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 
 import com.beeswork.balanceaccountservice.constant.PushTokenType;
-import com.beeswork.balanceaccountservice.dto.account.CardDTO;
-import com.beeswork.balanceaccountservice.dto.account.PreRecommendDTO;
-import com.beeswork.balanceaccountservice.dto.account.ProfileDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
@@ -19,7 +16,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/account")

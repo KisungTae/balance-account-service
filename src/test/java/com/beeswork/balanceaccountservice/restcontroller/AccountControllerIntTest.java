@@ -11,7 +11,7 @@
 //import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 //import com.beeswork.balanceaccountservice.vm.account.SaveAnswersVM;
 //import com.beeswork.balanceaccountservice.vm.account.SaveFCMTokenVM;
-//import com.beeswork.balanceaccountservice.vm.account.SaveLocationVM;
+//import com.beeswork.balanceaccountservice.vm.profile.SaveLocationVM;
 //import com.fasterxml.jackson.core.JsonProcessingException;
 //import com.fasterxml.jackson.databind.ObjectMapper;
 //import com.querydsl.jpa.impl.JPAQueryFactory;

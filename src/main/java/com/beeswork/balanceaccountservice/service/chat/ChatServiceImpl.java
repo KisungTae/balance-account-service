@@ -53,12 +53,12 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
                      Long.valueOf(chatId));
     }
 
-    private void validateChat(Match match, UUID identityToken, Long chatId) {
+    private void validateChat(Match match, UUID identityToken, long chatId) {
         if (match == null)
             throw new MatchNotFoundException();
         if (match.isUnmatched())
             throw new MatchUnmatchedException();
-        if (!match.getChatId().equals(chatId))
+        if (match.getChatId() != chatId)
             throw new MatchNotFoundException();
 
         Account matcher = match.getMatcher();
@@ -84,8 +84,8 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     public ChatMessageDTO saveChatMessage(UUID accountId,
                                           UUID identityToken,
                                           UUID recipientId,
-                                          Long chatId,
-                                          Long messageId,
+                                          long chatId,
+                                          long messageId,
                                           String body,
                                           Date createdAt) {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache

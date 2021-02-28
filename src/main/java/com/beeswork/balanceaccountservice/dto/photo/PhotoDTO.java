@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.dto.account;
+package com.beeswork.balanceaccountservice.dto.photo;
 
 
 import lombok.Getter;

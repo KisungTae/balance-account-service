@@ -11,11 +11,7 @@ import java.util.UUID;
 public interface AccountDAO extends BaseDAO<Account> {
 
     Account findById(UUID accountId);
-    Account findBy(UUID accountId, UUID identityToken);
-    boolean existsByEmail(String email);
     Account findWithPhotos(UUID accountId, UUID identityToken);
     Account findWithAccountQuestions(UUID accountId, UUID identityToken);
-    Account findWithAccountQuestions(UUID accountId);
-    Account findWithAccountQuestionsIn(UUID accountId, UUID identityToken, Set<Integer> questionIds);
     Account findWithPhotosAndAccountQuestions(UUID accountId, UUID identityToken);
 }

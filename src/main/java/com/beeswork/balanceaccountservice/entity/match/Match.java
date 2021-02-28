@@ -40,13 +40,13 @@ public class Match {
     private Chat chat;
 
     @Column(name = "chat_id", insertable = false, updatable = false)
-    private Long chatId;
-
-    @Column(name = "matcher_id", insertable = false, updatable = false)
-    private UUID matcherId;
-
-    @Column(name = "matched_id", insertable = false, updatable = false)
-    private UUID matchedId;
+    private long chatId;
+//
+//    @Column(name = "matcher_id", insertable = false, updatable = false)
+//    private UUID matcherId;
+//
+//    @Column(name = "matched_id", insertable = false, updatable = false)
+//    private UUID matchedId;
 
     @Column(name = "unmatched")
     private boolean unmatched;

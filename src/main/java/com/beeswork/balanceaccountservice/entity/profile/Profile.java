@@ -4,6 +4,8 @@ import com.beeswork.balanceaccountservice.entity.account.Account;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
 import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
@@ -20,8 +22,9 @@ public class Profile {
     @Id
     private UUID accountId;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
+    @LazyToOne(value = LazyToOneOption.NO_PROXY)
     @MapsId
     private Account account;
 
@@ -43,8 +46,7 @@ public class Profile {
     @Column(name = "about")
     private String about;
 
-    @Column(name = "location",
-            columnDefinition = "GEOGRAPHY(POINT)")
+    @Column(name = "location", columnDefinition = "GEOGRAPHY(POINT)")
     private Point location;
 
     @Column(name = "location_updated_at")

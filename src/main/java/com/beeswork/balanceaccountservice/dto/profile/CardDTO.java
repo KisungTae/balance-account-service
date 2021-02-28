@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.dto.account;
+package com.beeswork.balanceaccountservice.dto.profile;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class CardDTO {
-
     private String accountId;
     private String name;
     private String about;
@@ -20,7 +19,7 @@ public class CardDTO {
     private int birthYear;
     private int distance;
 
-    private List<String> photos = new ArrayList<>();
+    private List<String> photoKeys = new ArrayList<>();
 
     public CardDTO(String accountId, String name, String about, Integer height, int birthYear, int distance) {
         this.accountId = accountId;

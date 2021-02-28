@@ -1,7 +1,7 @@
 package com.beeswork.balanceaccountservice.service.photo;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
-import com.beeswork.balanceaccountservice.dto.account.PhotoDTO;
+import com.beeswork.balanceaccountservice.dto.photo.PhotoDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteException;

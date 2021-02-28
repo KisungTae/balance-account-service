@@ -1,7 +1,6 @@
 package com.beeswork.balanceaccountservice.service.photo;
 
-import com.beeswork.balanceaccountservice.dto.account.PhotoDTO;
-import com.beeswork.balanceaccountservice.dto.photo.GenerateS3PreSignedURLDTO;
+import com.beeswork.balanceaccountservice.dto.photo.PhotoDTO;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;

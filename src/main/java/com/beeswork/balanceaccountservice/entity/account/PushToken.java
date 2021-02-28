@@ -16,6 +16,7 @@ import java.util.Date;
 @Entity
 @Table(name = "push_token")
 public class PushToken {
+
     @EmbeddedId
     private PushTokenId pushTokenId;
 

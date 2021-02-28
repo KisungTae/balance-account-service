@@ -8,12 +8,13 @@ import com.beeswork.balanceaccountservice.entity.match.Match;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
 import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.*;
 
 
@@ -30,7 +31,7 @@ public class Account {
     @Column(name = "id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Type(type="pg-uuid")
+    @Type(type = "pg-uuid")
     private UUID id;
 
     @Column(name = "identity_token")
@@ -70,70 +71,6 @@ public class Account {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    @OneToOne(mappedBy = "account")
-    private Profile profile;
-
-
-
-
-
-
-
-    @Column(name = "index")
-    private int index;
-
-
-    @Column(name = "social_login_id")
-    private String socialLoginId;
-
-
-
-    @Column(name = "enabled")
-    private boolean enabled;
-
-
-
-
-
-    @Column(name = "height")
-    private Integer height;
-
-    @Column(name = "email")
-    private String email;
-
-    @Column(name = "birth_year")
-    private int birthYear;
-
-    @Column(name = "birth")
-    private Date birth;
-
-    @Column(name = "gender")
-    private boolean gender;
-
-    @Column(name = "about")
-    private String about;
-
-    @Column(name = "score")
-    private int score;
-
-
-
-    @Column(name = "fcm_token")
-    private String fcmToken;
-
-
-
-    @Column(name = "location_updated_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date locationUpdatedAt;
-
-    @Column(name = "location",
-            columnDefinition = "GEOGRAPHY(POINT)")
-    private Point location;
-
-    @Enumerated
-    private LoginType loginType;
-
     @OneToMany(mappedBy = "account",
                fetch = FetchType.LAZY,
                cascade = CascadeType.ALL,
@@ -157,6 +94,4 @@ public class Account {
                cascade = CascadeType.ALL,
                orphanRemoval = true)
     private List<Swipe> swipes = new ArrayList<>();
-
-
 }

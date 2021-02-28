@@ -1,6 +1,5 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
@@ -27,6 +26,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.Session;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,18 +51,20 @@ public class DummyController {
     private final FirebaseService firebaseService;
     private final AccountDAO accountDAO;
     private final ChatDAO chatDAO;
+    private final GeometryFactory geometryFactory;
 
     @Autowired
     public DummyController(MatchDAO matchDAO,
                            ObjectMapper objectMapper,
                            FirebaseService firebaseService,
                            AccountDAO accountDAO,
-                           ChatDAO chatDAO) {
+                           ChatDAO chatDAO, GeometryFactory geometryFactory) {
         this.matchDAO = matchDAO;
         this.objectMapper = objectMapper;
         this.firebaseService = firebaseService;
         this.accountDAO = accountDAO;
         this.chatDAO = chatDAO;
+        this.geometryFactory = geometryFactory;
     }
 
     @Transactional
@@ -99,22 +101,14 @@ public class DummyController {
         String name = "user-" + count;
         account.setIdentityToken(UUID.randomUUID());
         account.setName(name);
-        account.setEmail(count + "@gmail.com");
-        account.setAbout(count + ": this is my profile");
-        account.setBirthYear(calendar.get(Calendar.YEAR));
-        account.setBirth(birth);
-        account.setGender(random.nextBoolean());
-        account.setLocation(geometryFactory.createPoint(new Coordinate(lon, lat)));
-        account.setLoginType(LoginType.values()[random.nextInt(4)]);
-        account.setScore(0);
         account.setPoint(50000);
-        account.setFcmToken("");
         account.setFreeSwipe(2000);
         account.setFreeSwipeUpdatedAt(now);
         account.setCreatedAt(now);
         account.setUpdatedAt(now);
-        if (random.nextBoolean()) account.setHeight(random.nextInt(50) + 150);
 
+        Point point = geometryFactory.createPoint(new Coordinate(lon, lat));
+        point.setSRID(4326);
 
         // profile
         Profile profile = new Profile(account,
@@ -124,9 +118,10 @@ public class DummyController {
                                       random.nextBoolean(),
                                       random.nextInt(50) + 150,
                                       count + ": this is my profile",
-                                      geometryFactory.createPoint(new Coordinate(lon, lat)),
+                                      point,
                                       now);
 
+        profile.setEnabled(true);
 
         // photo
         Date photoKeyDate = now;

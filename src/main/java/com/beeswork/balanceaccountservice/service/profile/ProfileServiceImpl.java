@@ -2,9 +2,9 @@ package com.beeswork.balanceaccountservice.service.profile;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
-import com.beeswork.balanceaccountservice.dto.account.CardDTO;
-import com.beeswork.balanceaccountservice.dto.account.PreRecommendDTO;
-import com.beeswork.balanceaccountservice.dto.account.ProfileDTO;
+import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
+import com.beeswork.balanceaccountservice.dto.profile.PreRecommendDTO;
+import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.exception.profile.ProfileNotFoundException;
@@ -25,24 +25,18 @@ import java.util.*;
 @Service
 public class ProfileServiceImpl extends BaseServiceImpl implements ProfileService {
 
-    private static final int CARD_ID = 0;
-    private static final int CARD_NAME = 1;
-    private static final int CARD_ABOUT = 2;
-    private static final int CARD_BIRTH_YEAR = 3;
-    private static final int CARD_DISTANCE = 4;
-    private static final int CARD_PHOTO_KEY = 5;
-    private static final int CARD_HEIGHT = 6;
-
     private static final int PAGE_LIMIT = 15;
+
+    private static final int SRID = 4326;
 
     private static final int MAX_DISTANCE = 10000;
     private static final int MIN_DISTANCE = 1000;
 
-    private static final double DEFAULT_LATITUDE = 37.504508;
+    private static final double DEFAULT_LATITUDE  = 37.504508;
     private static final double DEFAULT_LONGITUDE = 127.048992;
 
-    private final AccountDAO accountDAO;
-    private final ProfileDAO profileDAO;
+    private final AccountDAO      accountDAO;
+    private final ProfileDAO      profileDAO;
     private final GeometryFactory geometryFactory;
 
     @Autowired
@@ -86,16 +80,22 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
                                        gender,
                                        height,
                                        about,
-                                       geometryFactory.createPoint(new Coordinate(DEFAULT_LONGITUDE, DEFAULT_LATITUDE)),
+                                       getLocation(DEFAULT_LONGITUDE, DEFAULT_LATITUDE),
                                        new Date()));
     }
 
     @Override
     @Transactional
     public void saveAbout(UUID accountId, UUID identityToken, String about, Integer height) {
-//        Profile profile = findValidProfile(accountId, identityToken);
+//        Profile profile = profileDAO.findById(accountId);
+//        System.out.println("profile"  + profile.getBirthYear());
+
+
         Account account = accountDAO.findById(accountId);
-        Profile profile1 = account.getProfile();
+        System.out.println("account: " + account.getRepPhotoKey());
+//        System.out.println("profile: " + account.getProfile().getBirthYear());
+
+//        Profile profile = findValidProfile(accountId, identityToken);
 //        profile.setAbout(about);
 //        profile.setHeight(height);
     }
@@ -107,10 +107,15 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     }
 
     private void saveLocation(Profile profile, double latitude, double longitude, Date updatedAt) {
-        profile.setLocation(geometryFactory.createPoint(new Coordinate(longitude, latitude)));
+        profile.setLocation(getLocation(latitude, longitude));
         profile.setLocationUpdatedAt(updatedAt);
     }
 
+    private Point getLocation(double latitude, double longitude) {
+        Point point = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+        point.setSRID(SRID);
+        return point;
+    }
 
     @Override
     @Transactional
@@ -147,42 +152,13 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
                                    int pageIndex) {
         if (distance < MIN_DISTANCE) distance = MIN_DISTANCE;
         else if (distance > MAX_DISTANCE) distance = MAX_DISTANCE;
-
-        List<Object[]> accounts = profileDAO.findAllWithin(distance,
-                                                           minAge,
-                                                           maxAge,
-                                                           gender,
-                                                           PAGE_LIMIT,
-                                                           pageIndex * PAGE_LIMIT,
-                                                           location);
-
-        String previousId = "";
-        List<CardDTO> cardDTOs = new ArrayList<>();
-        CardDTO cardDTO = new CardDTO();
-
-        for (Object[] cAccount : accounts) {
-            String id = cAccount[CARD_ID].toString();
-            if (!previousId.equals(id)) {
-
-                cardDTOs.add(cardDTO);
-                previousId = id;
-
-                String name = cAccount[CARD_NAME].toString();
-                String about = cAccount[CARD_ABOUT].toString();
-                int birthYear = Integer.parseInt(cAccount[CARD_BIRTH_YEAR].toString());
-                int distanceBetween = (int) ((double) cAccount[CARD_DISTANCE]);
-                Integer height = (Integer) cAccount[CARD_HEIGHT];
-
-                cardDTO = new CardDTO(id, name, about, height, birthYear, distanceBetween);
-            }
-
-            if (cAccount[CARD_PHOTO_KEY] != null)
-                cardDTO.getPhotos().add(cAccount[CARD_PHOTO_KEY].toString());
-        }
-
-        cardDTOs.add(cardDTO);
-        cardDTOs.remove(0);
-        return cardDTOs;
+        return profileDAO.findAllWithin(distance,
+                                        minAge,
+                                        maxAge,
+                                        gender,
+                                        PAGE_LIMIT,
+                                        pageIndex * PAGE_LIMIT,
+                                        location);
     }
 
     private Profile findValidProfile(UUID accountId, UUID identityToken) {

@@ -48,39 +48,18 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public Match findWithAccounts(UUID matcherId, UUID matchedId, Long chatId) {
-        Session session = entityManager.unwrap(Session.class);
-        return session.createQuery(
-                "select m from Match m where m.matcherId = :matcherId and m.matchedId = :matchedId and m.chatId = :chatId",
-                Match.class)
-                      .setParameter("matcherId", matcherId)
-                      .setParameter("matchedId", matchedId)
-                      .setParameter("chatId", chatId)
-                      .setHint("org.hibernate.cacheable", true)
-                      .getSingleResult();
-
-
-//        return jpaQueryFactory.selectFrom(qMatch)
-//                              .innerJoin(qMatch.matcher, qAccount).fetchJoin()
-//                              .innerJoin(qMatch.matched, qAccount).fetchJoin()
-//                              .where(qMatch.matcherId.eq(matcherId)
-//                                                     .and(qMatch.matchedId.eq(matchedId))
-//                                                     .and(qMatch.chatId.eq(chatId))).fetchOne();
-    }
-
-    @Override
     public List<MatchDTO> findAllAfter(UUID matcherId, Date matchFetchedAt) {
         Expression<Date> updatedAtCase = new CaseBuilder().when(qMatch.updatedAt.after(qAccount.updatedAt))
                                                           .then(qMatch.updatedAt)
                                                           .otherwise(qAccount.updatedAt);
 
         BooleanBuilder condition = new BooleanBuilder();
-        condition.and(qMatch.matcherId.eq(matcherId));
+        condition.and(qMatch.matcher.id.eq(matcherId));
         condition.and(qMatch.updatedAt.after(matchFetchedAt).or(qAccount.updatedAt.after(matchFetchedAt)));
         condition.and(qMatch.deleted.eq(false));
 
-        return jpaQueryFactory.select(new QMatchDTO(qMatch.chatId,
-                                                    qMatch.matchedId,
+        return jpaQueryFactory.select(new QMatchDTO(qMatch.chat.id,
+                                                    qMatch.matched.id,
                                                     qMatch.unmatched,
                                                     qAccount.name,
                                                     qAccount.repPhotoKey,
@@ -89,22 +68,9 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                                                     qMatch.createdAt,
                                                     updatedAtCase))
                               .from(qMatch)
-                              .leftJoin(qAccount).on(qAccount.id.eq(qMatch.matchedId))
+                              .leftJoin(qAccount).on(qAccount.id.eq(qMatch.matched.id))
                               .where(condition)
                               .fetch();
     }
-
-    @Override
-    public List<Match> findPairById(UUID matcherId, UUID matchedId) {
-        return jpaQueryFactory.selectFrom(qMatch)
-                              .where(qMatch.matcherId.eq(matcherId)
-                                                     .and(qMatch.matchedId.eq(matchedId))
-                                                     .or(qMatch.matcherId.eq(matchedId)
-                                                                         .and(qMatch.matchedId.eq(matcherId))))
-                              .innerJoin(qMatch.matcher, qAccount)
-                              .fetchJoin()
-                              .fetch();
-    }
-
 
 }
