@@ -22,6 +22,9 @@ import java.util.UUID;
 @Table(name = "profile")
 public class Profile {
 
+    @Version
+    private int version;
+
     @Id
     private UUID accountId;
 
@@ -67,9 +70,6 @@ public class Profile {
     @Column(name = "deleted")
     private boolean deleted;
 
-    @Version
-    private int version;
-
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -77,7 +77,6 @@ public class Profile {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
-
 
     public Profile(Account account,
                    String name,

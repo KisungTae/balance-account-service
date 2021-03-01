@@ -3,7 +3,6 @@ package com.beeswork.balanceaccountservice.service.swipe;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
-import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
@@ -123,7 +122,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         else swiper.setPoint((swiper.getPoint() - SWIPE_POINT));
 
         ClickDTO clickDTO = new ClickDTO();
-        if (accountQuestionDAO.findAllByAnswers(swipedId, answers) != answers.size())
+        if (accountQuestionDAO.countAllByAnswers(swipedId, answers) != answers.size())
             return clickDTO;
 
         Date updatedAt = new Date();

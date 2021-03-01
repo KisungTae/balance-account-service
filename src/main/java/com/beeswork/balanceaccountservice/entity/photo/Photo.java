@@ -30,12 +30,14 @@ public class Photo implements Comparable<Photo> {
     @Column(name = "sequence")
     private int sequence;
 
-
-
     public Photo(Account account, String key, int sequence) {
         this.photoId = new PhotoId(account.getId(), key);
         this.sequence = sequence;
         this.account = account;
+    }
+
+    public String getKey() {
+        return photoId.getKey();
     }
 
     @Override

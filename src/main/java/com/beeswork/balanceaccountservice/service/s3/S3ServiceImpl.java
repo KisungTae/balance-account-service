@@ -4,7 +4,9 @@ import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.regions.DefaultAwsRegionProviderChain;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.beeswork.balanceaccountservice.dto.s3.PreSignedUrl;
+import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.HmacAlgorithms;
@@ -15,7 +17,10 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -60,6 +65,21 @@ public class S3ServiceImpl implements S3Service {
         String signature = computeSignature(encodePolicy, secretKey, region, now);
         preSignedUrl.sign(encodePolicy, signature);
         return preSignedUrl;
+    }
+
+    @Override
+    @Async("processExecutor")
+    public void deletePhotosAsync(UUID accountId, List<String> photoKeys) {
+        ArrayList<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<>();
+        String stringAccountId = accountId.toString();
+        for (String photoKey : photoKeys)
+            keys.add(new DeleteObjectsRequest.KeyVersion(stringAccountId + "/" + photoKey));
+
+        if (!keys.isEmpty()) {
+            DeleteObjectsRequest request = new DeleteObjectsRequest(BALANCE_PHOTO_BUCKET).withKeys(keys)
+                                                                                         .withQuiet(true);
+            amazonS3.deleteObjects(request);
+        }
     }
 
     private String computeSignature(String encodedPolicy, String secretKey, String region, Instant date) {

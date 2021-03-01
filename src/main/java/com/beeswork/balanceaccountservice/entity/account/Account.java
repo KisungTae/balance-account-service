@@ -88,4 +88,10 @@ public class Account {
                cascade = CascadeType.ALL,
                orphanRemoval = true)
     private List<Photo> photos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "account",
+               fetch = FetchType.LAZY,
+               cascade = CascadeType.ALL,
+               orphanRemoval = true)
+    private List<PushToken> pushTokens = new ArrayList<>();
 }

@@ -279,8 +279,8 @@ create index match_matcher_id_matched_id_chat_id on match (matcher_id, matched_i
 create table photo
 (
     key        varchar(30) not null,
-    sequence   int         not null,
     account_id uuid        not null,
+    sequence   int         not null,
 
     primary key (account_id, key),
     constraint photo_account_id_fk foreign key (account_id) references account (id)
@@ -289,11 +289,9 @@ create table photo
 create index photo_account_id_idx on photo (account_id);
 
 
-
-
-
 create table profile
 (
+    version             int                    not null,
     account_id          uuid primary key,
     name                varchar(15)            not null,
     birth_year          int                    not null,
@@ -307,7 +305,6 @@ create table profile
     page_index          int                    not null,
     enabled             boolean                not null,
     deleted             boolean                not null,
-    version             int                    not null,
     created_at          timestamptz            not null,
     updated_at          timestamptz            not null,
 
@@ -316,10 +313,6 @@ create table profile
 
 
 CREATE INDEX profile_location_idx ON profile USING GIST (location);
-
-
-
-
 
 create table question
 (
@@ -330,7 +323,6 @@ create table question
     created_at    timestamptz  not null,
     updated_at    timestamptz  not null
 );
-
 
 create table swipe
 (

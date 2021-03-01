@@ -30,14 +30,7 @@ public class QuestionController extends BaseController {
         this.questionService = questionService;
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<String> listQuestions(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
-                                                BindingResult bindingResult) throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<QuestionDTO> questionDTOs = questionService.listQuestions(accountIdentityVM.getAccountId(),
-                                                                       accountIdentityVM.getIdentityToken());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
-    }
+
 
     @GetMapping("/random")
     public ResponseEntity<String> randomQuestion(@Valid @ModelAttribute RandomQuestionVM randomQuestionVM,

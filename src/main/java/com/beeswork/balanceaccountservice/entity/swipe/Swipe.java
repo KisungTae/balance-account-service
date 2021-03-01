@@ -18,6 +18,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "swipe")
 public class Swipe {
+
     @EmbeddedId
     private SwipeId swipeId;
 
@@ -53,7 +54,6 @@ public class Swipe {
         this.swipeId = new SwipeId(swiper.getId(), swiped.getId());
         this.swiper = swiper;
         this.swiped = swiped;
-        this.count = count;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
     }

@@ -39,7 +39,8 @@ public class PhotoController extends BaseController {
 
     @PostMapping("/add")
     public ResponseEntity<String> addPhoto(@Valid @RequestBody AddPhotoVM addPhotoVM,
-                                           BindingResult bindingResult) throws JsonProcessingException {
+                                           BindingResult bindingResult)
+    throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         photoService.addPhoto(addPhotoVM.getAccountId(),
                               addPhotoVM.getIdentityToken(),

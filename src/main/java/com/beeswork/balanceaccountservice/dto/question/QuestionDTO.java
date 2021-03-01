@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.dto.question;
 
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,6 @@ import javax.persistence.Id;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class QuestionDTO {
 
     private int id;
@@ -27,5 +27,14 @@ public class QuestionDTO {
         this.description = description;
         this.topOption = topOption;
         this.bottomOption = bottomOption;
+    }
+
+    @QueryProjection
+    public QuestionDTO(int id, String description, String topOption, String bottomOption, Boolean answer) {
+        this.id = id;
+        this.description = description;
+        this.topOption = topOption;
+        this.bottomOption = bottomOption;
+        this.answer = answer;
     }
 }

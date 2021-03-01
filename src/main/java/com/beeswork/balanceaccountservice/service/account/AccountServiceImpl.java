@@ -8,21 +8,30 @@ import com.beeswork.balanceaccountservice.constant.PushTokenType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.account.PushTokenDAO;
+import com.beeswork.balanceaccountservice.dao.login.LoginDAO;
+import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
+import com.beeswork.balanceaccountservice.dto.account.DeleteAccountDTO;
+import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.account.PushToken;
 import com.beeswork.balanceaccountservice.entity.account.PushTokenId;
+import com.beeswork.balanceaccountservice.entity.login.Login;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
+import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImpl extends BaseServiceImpl implements AccountService {
@@ -31,9 +40,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     private final QuestionDAO        questionDAO;
     private final PushTokenDAO       pushTokenDAO;
     private final AccountQuestionDAO accountQuestionDAO;
-
-    private final AmazonS3      amazonS3;
-    private final AWSProperties awsProperties;
+    private final ProfileDAO profileDAO;
+    private final LoginDAO loginDAO;
 
     @Autowired
     public AccountServiceImpl(AccountDAO accountDAO,
@@ -41,15 +49,15 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
                               QuestionDAO questionDAO,
                               PushTokenDAO pushTokenDAO,
                               AccountQuestionDAO accountQuestionDAO,
-                              AmazonS3 amazonS3,
-                              AWSProperties awsProperties) {
+                              ProfileDAO profileDAO,
+                              LoginDAO loginDAO) {
         super(modelMapper);
         this.accountDAO = accountDAO;
         this.questionDAO = questionDAO;
         this.pushTokenDAO = pushTokenDAO;
         this.accountQuestionDAO = accountQuestionDAO;
-        this.amazonS3 = amazonS3;
-        this.awsProperties = awsProperties;
+        this.profileDAO = profileDAO;
+        this.loginDAO = loginDAO;
     }
 
     @Override
@@ -119,50 +127,36 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     }
 
     @Override
-    @Transactional
-    public void deleteAccount(UUID accountId, UUID identityToken) {
-//        Account account = accountDAO.findWithPhotosAndAccountQuestions(accountId, identityToken);
-//
-//        // delete photos in s3
-//        ArrayList<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<>();
-//
-//        for (Photo photo : account.getPhotos()) {
-//            keys.add(new DeleteObjectsRequest.KeyVersion(account.getId().toString() + "/" + photo.getPhotoId().getKey()));
-//        }
-//
-//        if (!keys.isEmpty()) {
-//            DeleteObjectsRequest deleteObjectsRequest =
-//                    new DeleteObjectsRequest(awsProperties.getBalancePhotoBucket()).withKeys(keys).withQuiet(true);
-//            amazonS3.deleteObjects(deleteObjectsRequest);
-//        }
-//
-//        // delete photos in database
-//        account.getPhotos().clear();
-//
-//        // delete account_questions
-//        account.getAccountQuestions().clear();
-//
-//        // delete profile
-//        Date today = new Date();
-
-//        account.setDeleted(true);
-//        account.setSocialLoginId(null);
-//        account.setIdentityToken(null);
-//        account.setName("");
-//        account.setEmail("");
-//        account.setHeight(0);
-//        account.setBirthYear(0);
-//        account.setBirth(today);
-//        account.setAbout("");
-//        account.setScore(0);
-//        account.setIndex(0);
-//        account.setPoint(0);
-//        account.setLocation(null);
-//        account.setRepPhotoKey(null);
-//        account.setLocationUpdatedAt(today);
-//        account.setFcmToken(null);
-//        account.setUpdatedAt(today);
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public List<QuestionDTO> listQuestions(UUID accountId, UUID identityToken) {
+        validateAccount(accountDAO.findById(accountId), identityToken);
+        return accountQuestionDAO.findAllQuestionDTOsWithAnswer(accountId);
     }
 
+
+    @Override
+    @Transactional
+    public DeleteAccountDTO deleteAccount(UUID accountId, UUID identityToken) {
+        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
+
+        Login login = loginDAO.findByAccountId(accountId);
+        if (login != null) loginDAO.remove(login);
+
+        Profile profile = profileDAO.findById(accountId);
+        if (profile != null) profileDAO.remove(profile);
+
+        account.getPushTokens().clear();
+        account.getAccountQuestions().clear();
+        account.setDeleted(true);
+        account.setUpdatedAt(new Date());
+
+        List<Photo> photos = account.getPhotos();
+        DeleteAccountDTO deleteAccountDTO = new DeleteAccountDTO();
+        deleteAccountDTO.setAccountId(accountId);
+        deleteAccountDTO.setPhotoKeys(photos.stream().map(Photo::getKey).collect(Collectors.toList()));
+        photos.clear();
+
+        return deleteAccountDTO;
+    }
 
 }

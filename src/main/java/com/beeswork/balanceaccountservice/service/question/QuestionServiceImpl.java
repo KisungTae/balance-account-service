@@ -40,30 +40,6 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<QuestionDTO> listQuestions(UUID accountId, UUID identityToken) {
-        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
-        List<AccountQuestion> accountQuestions = account.getAccountQuestions();
-
-        List<QuestionDTO> questionDTOs = new ArrayList<>();
-        for (AccountQuestion accountQuestion : accountQuestions) {
-            Question question = accountQuestion.getQuestion();
-            questionDTOs.add(new QuestionDTO(question.getId(),
-                                             question.getDescription(),
-                                             question.getTopOption(),
-                                             question.getBottomOption(),
-                                             accountQuestion.isAnswer()));
-        }
-
-        for (int i = accountQuestions.size(); i < MAX_NUM_OF_QUESTIONS; i++) {
-            List<Integer> questionIds = questionDTOs.stream().map(QuestionDTO::getId).collect(Collectors.toList());
-            questionDTOs.add(randomQuestion(questionIds));
-        }
-
-        return questionDTOs;
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public QuestionDTO randomQuestion(List<Integer> questionIds) {
         long count = questionDAO.count() - questionIds.size();
         int random = new Random().nextInt((int) count);
