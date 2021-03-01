@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
 import com.beeswork.balanceaccountservice.dto.profile.PreRecommendDTO;
 import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
@@ -19,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/profile")
@@ -92,12 +94,13 @@ public class ProfileController extends BaseController {
                                                                       recommendVM.getLongitude(),
                                                                       recommendVM.getLocationUpdatedAt(),
                                                                       recommendVM.isReset());
-        return ResponseEntity.status(HttpStatus.OK)
-                             .body(objectMapper.writeValueAsString(profileService.recommend(recommendVM.getDistance(),
-                                                                                            recommendVM.getMinAge(),
-                                                                                            recommendVM.getMaxAge(),
-                                                                                            recommendVM.isGender(),
-                                                                                            preRecommendDTO.getLocation(),
-                                                                                            preRecommendDTO.getPageIndex())));
+
+        List<CardDTO> cardDTOs = profileService.recommend(recommendVM.getDistance(),
+                                                          recommendVM.getMinAge(),
+                                                          recommendVM.getMaxAge(),
+                                                          recommendVM.isGender(),
+                                                          preRecommendDTO.getLocation(),
+                                                          preRecommendDTO.getPageIndex());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(cardDTOs));
     }
 }

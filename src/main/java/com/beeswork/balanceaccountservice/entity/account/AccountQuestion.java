@@ -20,6 +20,14 @@ public class AccountQuestion {
     @EmbeddedId
     private AccountQuestionId accountQuestionId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("accountId")
+    private Account account;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("questionId")
+    private Question question;
+
     @Column(name = "selected")
     private boolean selected;
 
@@ -36,14 +44,6 @@ public class AccountQuestion {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("accountId")
-    private Account account;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("questionId")
-    private Question question;
 
     public AccountQuestion(boolean answer,
                            int sequence,

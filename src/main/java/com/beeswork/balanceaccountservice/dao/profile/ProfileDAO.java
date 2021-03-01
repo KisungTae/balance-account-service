@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ProfileDAO extends BaseDAO<Profile> {
-
     Profile findById(UUID accountId);
     boolean existsById(UUID accountId);
     List<CardDTO> findAllWithin(int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point location);

@@ -32,10 +32,10 @@ public class Question {
     @Column(name = "bottom_option")
     private String bottomOption;
 
-    @OneToMany(mappedBy = "question",
-               cascade = CascadeType.ALL,
-               orphanRemoval = true)
-    private List<AccountQuestion> accountQuestions = new ArrayList<>();
+//    @OneToMany(mappedBy = "question",
+//               cascade = CascadeType.ALL,
+//               orphanRemoval = true)
+//    private List<AccountQuestion> accountQuestions = new ArrayList<>();
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

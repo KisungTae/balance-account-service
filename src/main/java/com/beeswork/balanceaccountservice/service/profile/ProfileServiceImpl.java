@@ -32,11 +32,11 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     private static final int MAX_DISTANCE = 10000;
     private static final int MIN_DISTANCE = 1000;
 
-    private static final double DEFAULT_LATITUDE  = 37.504508;
+    private static final double DEFAULT_LATITUDE = 37.504508;
     private static final double DEFAULT_LONGITUDE = 127.048992;
 
-    private final AccountDAO      accountDAO;
-    private final ProfileDAO      profileDAO;
+    private final AccountDAO accountDAO;
+    private final ProfileDAO profileDAO;
     private final GeometryFactory geometryFactory;
 
     @Autowired
@@ -73,31 +73,17 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         Account account = accountDAO.findById(accountId);
         validateAccount(account, identityToken);
         if (profileDAO.existsById(accountId)) return;
-        profileDAO.persist(new Profile(account,
-                                       name,
-                                       DateUtil.getYearFrom(birth),
-                                       birth,
-                                       gender,
-                                       height,
-                                       about,
-                                       getLocation(DEFAULT_LONGITUDE, DEFAULT_LATITUDE),
-                                       new Date()));
+        int birthYear = DateUtil.getYearFrom(birth);
+        Point location = getLocation(DEFAULT_LONGITUDE, DEFAULT_LATITUDE);
+        profileDAO.persist(new Profile(account, name, birthYear, birth, gender, height, about, location, new Date()));
     }
 
     @Override
     @Transactional
     public void saveAbout(UUID accountId, UUID identityToken, String about, Integer height) {
-//        Profile profile = profileDAO.findById(accountId);
-//        System.out.println("profile"  + profile.getBirthYear());
-
-
-        Account account = accountDAO.findById(accountId);
-        System.out.println("account: " + account.getRepPhotoKey());
-//        System.out.println("profile: " + account.getProfile().getBirthYear());
-
-//        Profile profile = findValidProfile(accountId, identityToken);
-//        profile.setAbout(about);
-//        profile.setHeight(height);
+        Profile profile = findValidProfile(accountId, identityToken);
+        profile.setAbout(about);
+        profile.setHeight(height);
     }
 
     @Override
@@ -152,19 +138,14 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
                                    int pageIndex) {
         if (distance < MIN_DISTANCE) distance = MIN_DISTANCE;
         else if (distance > MAX_DISTANCE) distance = MAX_DISTANCE;
-        return profileDAO.findAllWithin(distance,
-                                        minAge,
-                                        maxAge,
-                                        gender,
-                                        PAGE_LIMIT,
-                                        pageIndex * PAGE_LIMIT,
-                                        location);
+        int offset = pageIndex * PAGE_LIMIT;
+        return profileDAO.findAllWithin(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, location);
     }
 
     private Profile findValidProfile(UUID accountId, UUID identityToken) {
-        validateAccount(accountDAO.findById(accountId), identityToken);
         Profile profile = profileDAO.findById(accountId);
         if (profile == null) throw new ProfileNotFoundException();
+        validateAccount(profile.getAccount(), identityToken);
         return profile;
     }
 

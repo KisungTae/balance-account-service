@@ -24,7 +24,7 @@ public class Chat {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     @OneToMany(mappedBy = "chat",
                fetch = FetchType.LAZY,

@@ -35,6 +35,9 @@ public class PushToken {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
+
+
+
     public PushToken(Account account, PushTokenType type, String key, Date createdAt) {
         this.pushTokenId = new PushTokenId(account.getId(), type);
         this.account = account;

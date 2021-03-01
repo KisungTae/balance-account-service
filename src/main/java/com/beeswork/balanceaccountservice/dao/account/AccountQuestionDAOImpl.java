@@ -21,7 +21,7 @@ import java.util.UUID;
 public class AccountQuestionDAOImpl extends BaseDAOImpl<AccountQuestion> implements AccountQuestionDAO {
 
     private final QAccountQuestion qAccountQuestion = QAccountQuestion.accountQuestion;
-    private final QQuestion        qQuestion        = QQuestion.question;
+    private final QQuestion qQuestion = QQuestion.question;
 
     @Autowired
     public AccountQuestionDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {

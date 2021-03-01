@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.entity.profile;
 
 import com.beeswork.balanceaccountservice.entity.account.Account;
+import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,7 +10,9 @@ import org.hibernate.annotations.LazyToOneOption;
 import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -24,7 +27,6 @@ public class Profile {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
-    @LazyToOne(value = LazyToOneOption.NO_PROXY)
     @MapsId
     private Account account;
 
@@ -75,6 +77,7 @@ public class Profile {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
 
     public Profile(Account account,
                    String name,

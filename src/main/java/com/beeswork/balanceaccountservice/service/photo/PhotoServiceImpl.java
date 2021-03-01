@@ -8,7 +8,9 @@ import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteExce
 import com.beeswork.balanceaccountservice.exception.photo.PhotoNotFoundException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoNumReachedMaxException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
+import net.sf.ehcache.CacheManager;
 import org.modelmapper.ModelMapper;
+
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,8 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     private static final int MAX_NUM_OF_PHOTOS = 6;
 
     @Autowired
-    public PhotoServiceImpl(ModelMapper modelMapper, AccountDAO accountDAO) {
+    public PhotoServiceImpl(ModelMapper modelMapper,
+                            AccountDAO accountDAO) {
         super(modelMapper);
         this.accountDAO = accountDAO;
     }
@@ -34,21 +37,19 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     @Override
     @Transactional
     public void addPhoto(UUID accountId, UUID identityToken, String photoKey, int sequence) {
-        Account account = accountDAO.findWithPhotos(accountId, identityToken);
-        validateAccount(account);
-
-        if (account.getPhotos().size() >= MAX_NUM_OF_PHOTOS)
+        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
+        List<Photo> photos = account.getPhotos();
+        if (photos.size() >= MAX_NUM_OF_PHOTOS)
             throw new PhotoNumReachedMaxException();
 
-        Photo photo = account.getPhotos()
-                             .stream()
-                             .filter(p -> p.getKey().equals(photoKey))
-                             .findAny()
-                             .orElse(null);
+        Photo photo = photos.stream()
+                            .filter(p -> p.getPhotoId().getKey().equals(photoKey))
+                            .findAny()
+                            .orElse(null);
 
-        if (photo == null) account.getPhotos().add(new Photo(account, photoKey, sequence));
+        if (photo == null) photos.add(new Photo(account, photoKey, sequence));
         else photo.setSequence(sequence);
-        resetRepPhoto(account);
+        resetRepPhoto(account, photos);
         accountDAO.persist(account);
     }
 
@@ -57,37 +58,32 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
                    isolation = Isolation.READ_COMMITTED,
                    readOnly = true)
     public List<PhotoDTO> listPhotos(UUID accountId, UUID identityToken) {
-        Account account = accountDAO.findWithPhotos(accountId, identityToken);
-        validateAccount(account);
+        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
         return modelMapper.map(account.getPhotos(), new TypeToken<List<PhotoDTO>>() {}.getType());
     }
 
     @Override
     @Transactional
     public void deletePhoto(UUID accountId, UUID identityToken, String photoKey) {
-        Account account = accountDAO.findWithPhotos(accountId, identityToken);
-        validateAccount(account);
+        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
+        List<Photo> photos = account.getPhotos();
 
-        Photo photo = account.getPhotos()
-                             .stream()
-                             .filter(p -> p.getKey().equals(photoKey))
-                             .findAny()
-                             .orElseThrow(PhotoNotFoundException::new);
+        Photo photo = photos.stream()
+                            .filter(p -> p.getPhotoId().getKey().equals(photoKey))
+                            .findAny()
+                            .orElseThrow(PhotoNotFoundException::new);
 
-        if (account.getPhotos().size() <= 1)
-            throw new PhotoInvalidDeleteException();
-
-        account.getPhotos().remove(photo);
-        resetRepPhoto(account);
+        if (photos.size() <= 1) throw new PhotoInvalidDeleteException();
+        photos.remove(photo);
+        resetRepPhoto(account, photos);
     }
 
-    private void resetRepPhoto(Account account) {
-        if (account.getPhotos().size() <= 0) return;
+    private void resetRepPhoto(Account account, List<Photo> photos) {
+        if (photos.size() <= 0) return;
+        Collections.sort(photos);
+        Photo repPhoto = photos.get(0);
 
-        Collections.sort(account.getPhotos());
-        Photo repPhoto = account.getPhotos().get(0);
-
-        if (repPhoto != null && !repPhoto.getPhotoId().getKey().equals(account.getRepPhotoKey())) {
+        if (!repPhoto.getPhotoId().getKey().equals(account.getRepPhotoKey())) {
             account.setRepPhotoKey(repPhoto.getPhotoId().getKey());
             account.setUpdatedAt(new Date());
         }
@@ -96,13 +92,12 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     @Override
     @Transactional
     public void reorderPhotos(UUID accountId, UUID identityToken, Map<String, Integer> photoOrders) {
-        Account account = accountDAO.findWithPhotos(accountId, identityToken);
-        validateAccount(account);
-
-        for (Photo photo : account.getPhotos()) {
-            if (photoOrders.containsKey(photo.getKey()))
-                photo.setSequence(photoOrders.get(photo.getKey()));
+        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
+        List<Photo> photos = account.getPhotos();
+        for (Photo photo : photos) {
+            if (photoOrders.containsKey(photo.getPhotoId().getKey()))
+                photo.setSequence(photoOrders.get(photo.getPhotoId().getKey()));
         }
-        resetRepPhoto(account);
+        resetRepPhoto(account, photos);
     }
 }

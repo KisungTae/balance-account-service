@@ -119,7 +119,6 @@ call populate_user();
 --
 
 
-
 -- BALANCE-TALK DATABASE
 
 
@@ -149,8 +148,6 @@ drop table profile;
 drop table account;
 
 
-
-
 -- TODO: 2020-09-14 execute these
 
 CREATE EXTENSION if not exists postgis;
@@ -161,6 +158,7 @@ create extension if not exists "uuid-ossp";
 -- liked count will be reset on every night
 create table account
 (
+    version               int         not null,
     id                    uuid primary key,
     identity_token        uuid        not null,
     name                  varchar(15) not null,
@@ -170,27 +168,27 @@ create table account
     free_swipe_updated_at timestamptz not null,
     blocked               boolean     not null,
     deleted               boolean     not null,
-    version               int         not null,
     created_at            timestamptz not null,
     updated_at            timestamptz not null
 );
 
-create table login
+create table account_question
 (
-    id         varchar(100) not null,
-    type       int          not null,
-    account_id uuid         not null,
-    email      varchar(256),
-    password   varchar(50)  not null,
-    blocked    boolean      not null,
-    created_at timestamptz  not null,
+    account_id  uuid        not null,
+    question_id int         not null,
+    selected    boolean     not null,
+    answer      boolean     not null,
+    sequence    int         not null,
+    created_at  timestamptz not null,
+    updated_at  timestamptz not null,
 
-    primary key (id, type),
-    constraint login_account_id_fk foreign key (account_id) references account (id)
+    primary key (account_id, question_id),
+    constraint account_question_account_id_fk foreign key (account_id) references account (id),
+    constraint account_question_question_id_fk foreign key (question_id) references question (id)
 );
 
-
-
+-- create index account_question_question_id_idx on account_question (question_id);
+-- create index account_question_account_id_selected_idx on account_question (account_id, selected);
 
 
 create table push_token
@@ -204,6 +202,94 @@ create table push_token
     primary key (account_id, type),
     constraint push_notification_account_id_fk foreign key (account_id) references account (id)
 );
+
+create table chat
+(
+    id bigserial primary key
+);
+
+create table chat_message
+(
+    id           bigserial primary key,
+    message_id   bigint       not null,
+    body         varchar(200) not null,
+    read         boolean      not null,
+    fetched      boolean      not null,
+    received     boolean      not null,
+    chat_id      bigint       not null,
+    account_id   uuid         not null,
+    recipient_id uuid         not null,
+    created_at   timestamptz  not null,
+    updated_at   timestamptz  not null,
+
+    constraint chat_message_chat_id_fk foreign key (chat_id) references chat (id),
+    constraint chat_message_account_id_fk foreign key (account_id) references account (id),
+    constraint chat_message_recipient_id_fk foreign key (recipient_id) references account (id)
+);
+
+create index chat_message_chat_id_created_at on chat_message (chat_id, created_at);
+
+
+
+create table login
+(
+    id         varchar(100) not null,
+    type       int          not null,
+    account_id uuid         not null,
+    email      varchar(256),
+    password   varchar(50)  not null,
+    blocked    boolean      not null,
+    created_at timestamptz  not null,
+    updated_at timestamptz  not null,
+
+    primary key (id, type),
+    constraint login_account_id_fk foreign key (account_id) references account (id)
+);
+
+
+-- if match between 1 and 2 then
+-- 1 - 2 saved
+-- 2 - 1 saved
+-- application can also have match table in its light database to store messages in the chat
+-- last_read_at will be updated when app is deleted
+create table match
+(
+    version    int         not null,
+    matcher_id uuid        not null,
+    matched_id uuid        not null,
+    chat_id    bigint      not null,
+    unmatched  boolean     not null,
+    unmatcher  boolean     not null,
+    active     boolean     not null,
+    deleted    boolean     not null,
+    created_at timestamptz not null,
+    updated_at timestamptz not null,
+
+    primary key (matcher_id, matched_id),
+    constraint match_matcher_id_fk foreign key (matcher_id) references account (id),
+    constraint match_matched_id_fk foreign key (matched_id) references account (id),
+    constraint match_chat_id_fk foreign key (chat_id) references chat (id)
+);
+
+create index match_matcher_id_idx on match (matcher_id);
+create index match_matched_id_idx on match (matched_id);
+create index match_matcher_id_matched_id_chat_id on match (matcher_id, matched_id, chat_id);
+
+
+create table photo
+(
+    key        varchar(30) not null,
+    sequence   int         not null,
+    account_id uuid        not null,
+
+    primary key (account_id, key),
+    constraint photo_account_id_fk foreign key (account_id) references account (id)
+);
+
+create index photo_account_id_idx on photo (account_id);
+
+
+
 
 
 create table profile
@@ -234,18 +320,6 @@ CREATE INDEX profile_location_idx ON profile USING GIST (location);
 
 
 
-create table photo
-(
-    key        varchar(30) not null,
-    sequence   int         not null,
-    account_id uuid        not null,
-
-    primary key (account_id, key),
-    constraint photo_account_id_fk foreign key (account_id) references account (id)
-);
-
-create index photo_account_id_idx on photo (account_id);
-
 
 create table question
 (
@@ -257,23 +331,6 @@ create table question
     updated_at    timestamptz  not null
 );
 
-create table account_question
-(
-    account_id  uuid        not null,
-    question_id int         not null,
-    selected    boolean     not null,
-    answer      boolean     not null,
-    sequence    int         not null,
-    created_at  timestamptz not null,
-    updated_at  timestamptz not null,
-
-    primary key (account_id, question_id),
-    constraint account_question_account_id_fk foreign key (account_id) references account (id),
-    constraint account_question_question_id_fk foreign key (question_id) references question (id)
-);
-
--- create index account_question_question_id_idx on account_question (question_id);
--- create index account_question_account_id_selected_idx on account_question (account_id, selected);
 
 create table swipe
 (
@@ -295,66 +352,13 @@ create table swipe
 create index swipe_swiper_id_idx on swipe (swiper_id);
 create index swipe_swiped_id_idx on swipe (swiped_id);
 
-create table chat
-(
-    id bigserial primary key
-);
 
--- if match between 1 and 2 then
--- 1 - 2 saved
--- 2 - 1 saved
--- application can also have match table in its light database to store messages in the chat
--- last_read_at will be updated when app is deleted
-create table match
-(
-    version    int         not null,
-    matcher_id uuid        not null,
-    matched_id uuid        not null,
-    chat_id    bigint      not null,
-    unmatched  boolean     not null,
-    unmatcher  boolean     not null,
-    active     boolean     not null,
-    deleted    boolean     not null,
-    created_at timestamptz not null,
-    updated_at timestamptz not null,
-
-    primary key (matcher_id, matched_id),
-    constraint match_matcher_id_fk foreign key (matcher_id) references account (id),
-    constraint match_matched_id_fk foreign key (matched_id) references account (id),
-    constraint match_chat_id_fk foreign key (chat_id) references chat (id)
-);
-
-create index match_matcher_id_idx on match (matcher_id);
-create index match_matched_id_idx on match (matched_id);
-create index match_matcher_id_matched_id_chat_id on match (matcher_id, matched_id, chat_id);
-
-create table chat_message
-(
-    id           bigserial primary key,
-    message_id   bigint       not null,
-    chat_id      bigint       not null,
-    account_id   uuid         not null,
-    recipient_id uuid         not null,
-    body         varchar(200) not null,
-    read         boolean      not null,
-    fetched      boolean      not null,
-    received     boolean      not null,
-    created_at   timestamptz  not null,
-
-    constraint chat_message_chat_id_fk foreign key (chat_id) references chat (id),
-    constraint chat_message_account_id_fk foreign key (account_id) references account (id),
-    constraint chat_message_recipient_id_fk foreign key (recipient_id) references account (id)
-);
-
-create index chat_message_chat_id_created_at on chat_message (chat_id, created_at);
 
 
 
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query Start ------------------------------------------
 ---------------------------------------------------------------------------------------------
-
-
 
 
 select *

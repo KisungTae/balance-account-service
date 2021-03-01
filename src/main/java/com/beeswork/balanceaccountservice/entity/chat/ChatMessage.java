@@ -18,15 +18,6 @@ import java.util.UUID;
 @Table(name = "chat_message")
 public class ChatMessage {
 
-    public ChatMessage(Chat chat, Account account, Account recipient, Long messageId, String body, Date createdAt) {
-        this.chat = chat;
-        this.account = account;
-        this.recipient = recipient;
-        this.messageId = messageId;
-        this.body = body;
-        this.createdAt = createdAt;
-    }
-
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,12 +30,12 @@ public class ChatMessage {
     @JoinColumn(name = "chat_id")
     private Chat chat;
 
+    @Column(name = "account_id", insertable = false, updatable = false)
+    private UUID accountId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;
-
-    @Column(name = "account_id", insertable = false, updatable = false)
-    private UUID accountId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipient_id")
@@ -65,4 +56,17 @@ public class ChatMessage {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
+
+    public ChatMessage(Chat chat, Account account, Account recipient, Long messageId, String body, Date createdAt) {
+        this.chat = chat;
+        this.account = account;
+        this.recipient = recipient;
+        this.messageId = messageId;
+        this.body = body;
+        this.createdAt = createdAt;
+    }
 }

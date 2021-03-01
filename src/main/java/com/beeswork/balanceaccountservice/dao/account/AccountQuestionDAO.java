@@ -13,5 +13,4 @@ public interface AccountQuestionDAO extends BaseDAO<AccountQuestion> {
     List<AccountQuestion> findAllIn(UUID accountId, Set<Integer> questionIds);
     long findAllByAnswers(UUID accountId, Map<Integer, Boolean> answers);
     List<Question> findAllQuestionsSelected(UUID accountId);
-
 }

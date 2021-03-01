@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.service.swipe;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
+import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
@@ -57,11 +58,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     @Override
     @Transactional
     public List<QuestionDTO> like(UUID accountId, UUID identityToken, UUID swipedId) {
-        Account swiper = accountDAO.findById(accountId);
-        validateAccount(swiper, identityToken);
-
-        Account swiped = accountDAO.findById(swipedId);
-        validateSwiped(swiped);
+        Account swiper = validateAccount(accountDAO.findById(accountId), identityToken);
+        Account swiped = validateSwiped(accountDAO.findById(swipedId));
 
         rechargeFreeSwipe(swiper);
         if (swiper.getFreeSwipe() < SWIPE_POINT && swiper.getPoint() < SWIPE_POINT)
@@ -79,7 +77,6 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         swipe.setCount((swipe.getCount() + 1));
         swipeDAO.persist(swipe);
-
         return modelMapper.map(questions, new TypeToken<List<QuestionDTO>>() {}.getType());
     }
 
@@ -116,11 +113,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         else if (subSwipe.isClicked()) throw new SwipeClickedExistsException();
         else if (subSwipe.isMatched()) throw new SwipeMatchedExistsException();
 
-        Account swiper = subSwipe.getSwiper();
-        validateAccount(swiper, identityToken);
-
-        Account swiped = subSwipe.getSwiped();
-        validateSwiped(swiped);
+        Account swiper = validateAccount(subSwipe.getSwiper(), identityToken);
+        Account swiped = validateSwiped(subSwipe.getSwiped());
 
         if (swiper.getFreeSwipe() >= SWIPE_POINT)
             swiper.setFreeSwipe((swiper.getFreeSwipe() - SWIPE_POINT));

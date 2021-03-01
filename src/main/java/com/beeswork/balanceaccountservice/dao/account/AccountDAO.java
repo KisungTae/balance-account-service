@@ -11,7 +11,4 @@ import java.util.UUID;
 public interface AccountDAO extends BaseDAO<Account> {
 
     Account findById(UUID accountId);
-    Account findWithPhotos(UUID accountId, UUID identityToken);
-    Account findWithAccountQuestions(UUID accountId, UUID identityToken);
-    Account findWithPhotosAndAccountQuestions(UUID accountId, UUID identityToken);
 }

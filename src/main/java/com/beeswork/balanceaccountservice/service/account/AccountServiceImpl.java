@@ -55,7 +55,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void savePushToken(UUID accountId, UUID identityToken, String key, PushTokenType type) {
-        Account account = findValidAccount(accountId, identityToken);
+        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
         PushToken pushToken = pushTokenDAO.findById(new PushTokenId(accountId, type));
         if (pushToken == null)
             pushToken = new PushToken(account, type, key, new Date());
@@ -75,8 +75,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void saveAnswers(UUID accountId, UUID identityToken, Map<Integer, Boolean> answers) {
-        Account account = accountDAO.findById(accountId);
-        validateAccount(account, identityToken);
+        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
         List<AccountQuestion> accountQuestions = accountQuestionDAO.findAllIn(accountId, answers.keySet());
 
         Map<Integer, Integer> sequences = new LinkedHashMap<>();
@@ -121,45 +120,30 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional
-    public void saveEmail(UUID accountId, UUID identityToken, String email) {
-        Account account = findValidAccount(accountId, identityToken);
-
-//        if (account.getLoginType() == LoginType.NAVER ||
-//            account.getLoginType() == LoginType.GOOGLE)
-//            throw new AccountEmailNotMutableException();
-//
-//        if (accountDAO.existsByEmail(email))
-//            throw new AccountEmailDuplicateException();
-//
-//        account.setEmail(email);
-    }
-
-    @Override
-    @Transactional
     public void deleteAccount(UUID accountId, UUID identityToken) {
-        Account account = accountDAO.findWithPhotosAndAccountQuestions(accountId, identityToken);
-
-        // delete photos in s3
-        ArrayList<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<>();
-
-        for (Photo photo : account.getPhotos()) {
-            keys.add(new DeleteObjectsRequest.KeyVersion(account.getId().toString() + "/" + photo.getKey()));
-        }
-
-        if (!keys.isEmpty()) {
-            DeleteObjectsRequest deleteObjectsRequest =
-                    new DeleteObjectsRequest(awsProperties.getBalancePhotoBucket()).withKeys(keys).withQuiet(true);
-            amazonS3.deleteObjects(deleteObjectsRequest);
-        }
-
-        // delete photos in database
-        account.getPhotos().clear();
-
-        // delete account_questions
-        account.getAccountQuestions().clear();
-
-        // delete profile
-        Date today = new Date();
+//        Account account = accountDAO.findWithPhotosAndAccountQuestions(accountId, identityToken);
+//
+//        // delete photos in s3
+//        ArrayList<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<>();
+//
+//        for (Photo photo : account.getPhotos()) {
+//            keys.add(new DeleteObjectsRequest.KeyVersion(account.getId().toString() + "/" + photo.getPhotoId().getKey()));
+//        }
+//
+//        if (!keys.isEmpty()) {
+//            DeleteObjectsRequest deleteObjectsRequest =
+//                    new DeleteObjectsRequest(awsProperties.getBalancePhotoBucket()).withKeys(keys).withQuiet(true);
+//            amazonS3.deleteObjects(deleteObjectsRequest);
+//        }
+//
+//        // delete photos in database
+//        account.getPhotos().clear();
+//
+//        // delete account_questions
+//        account.getAccountQuestions().clear();
+//
+//        // delete profile
+//        Date today = new Date();
 
 //        account.setDeleted(true);
 //        account.setSocialLoginId(null);
@@ -180,9 +164,5 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 //        account.setUpdatedAt(today);
     }
 
-    private Account findValidAccount(UUID accountId, UUID identityToken) {
-        Account account = accountDAO.findById(accountId);
-        validateAccount(account, identityToken);
-        return account;
-    }
+
 }

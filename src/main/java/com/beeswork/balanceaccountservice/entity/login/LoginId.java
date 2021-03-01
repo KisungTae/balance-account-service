@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.entity.account;
+package com.beeswork.balanceaccountservice.entity.login;
 
 import com.beeswork.balanceaccountservice.constant.LoginType;
 import lombok.AllArgsConstructor;

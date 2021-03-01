@@ -27,6 +27,9 @@ import java.util.*;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Account {
 
+    @Version
+    private int version;
+
     @Id
     @Column(name = "id")
     @GeneratedValue(generator = "UUID")
@@ -60,9 +63,6 @@ public class Account {
     @Column(name = "deleted")
     private boolean deleted;
 
-    @Version
-    private int version;
-
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -88,10 +88,4 @@ public class Account {
                cascade = CascadeType.ALL,
                orphanRemoval = true)
     private List<Photo> photos = new ArrayList<>();
-
-    @OneToMany(mappedBy = "swiper",
-               fetch = FetchType.LAZY,
-               cascade = CascadeType.ALL,
-               orphanRemoval = true)
-    private List<Swipe> swipes = new ArrayList<>();
 }

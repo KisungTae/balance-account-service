@@ -48,9 +48,9 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
 
     @Override
     public List<SwipeDTO> findAllClickAfter(UUID accountId, Date fetchedAt) {
-        return jpaQueryFactory.select(new QSwipeDTO(qSwipe.swipedId, qSwipe.updatedAt))
+        return jpaQueryFactory.select(new QSwipeDTO(qSwipe.swipeId.swipedId, qSwipe.updatedAt))
                               .from(qSwipe)
-                              .where(qSwipe.swiperId.eq(accountId)
+                              .where(qSwipe.swipeId.swiperId.eq(accountId)
                                                     .and(qSwipe.updatedAt.after(fetchedAt))
                                                     .and(qSwipe.clicked.eq(true))
                                                     .and(qSwipe.matched.eq(false)))
@@ -62,13 +62,13 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
                                                           .then(qSwipe.updatedAt)
                                                           .otherwise(qAccount.updatedAt);
 
-        return jpaQueryFactory.select(new QSwipeDTO(qSwipe.swiperId,
+        return jpaQueryFactory.select(new QSwipeDTO(qSwipe.swipeId.swiperId,
                                                     qAccount.repPhotoKey,
                                                     qAccount.deleted,
                                                     updatedAtCase))
                               .from(qSwipe)
-                              .leftJoin(qAccount).on(qSwipe.swiperId.eq(qAccount.id))
-                              .where(qSwipe.swipedId.eq(accountId)
+                              .leftJoin(qAccount).on(qSwipe.swipeId.swiperId.eq(qAccount.id))
+                              .where(qSwipe.swipeId.swipedId.eq(accountId)
                                                     .and(qSwipe.clicked.eq(true))
                                                     .and(qSwipe.matched.eq(false))
                                                     .and(qSwipe.updatedAt.after(fetchedAt)

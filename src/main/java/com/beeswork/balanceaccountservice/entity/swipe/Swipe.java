@@ -21,12 +21,6 @@ public class Swipe {
     @EmbeddedId
     private SwipeId swipeId;
 
-    @Column(name = "swiper_id", updatable = false, insertable = false)
-    private UUID swiperId;
-
-    @Column(name = "swiped_id", updatable = false, insertable = false)
-    private UUID swipedId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("swiperId")
     private Account swiper;

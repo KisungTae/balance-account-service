@@ -19,6 +19,5 @@ import java.util.UUID;
 public class AccountQuestionId implements Serializable {
 
     private UUID accountId;
-    private Integer questionId;
-
+    private int questionId;
 }

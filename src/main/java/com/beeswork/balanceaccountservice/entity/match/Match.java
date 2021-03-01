@@ -35,18 +35,12 @@ public class Match {
     @MapsId("matchedId")
     private Account matched;
 
+    @Column(name = "chat_id", insertable = false, updatable = false)
+    private long chatId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id")
     private Chat chat;
-
-    @Column(name = "chat_id", insertable = false, updatable = false)
-    private long chatId;
-//
-//    @Column(name = "matcher_id", insertable = false, updatable = false)
-//    private UUID matcherId;
-//
-//    @Column(name = "matched_id", insertable = false, updatable = false)
-//    private UUID matchedId;
 
     @Column(name = "unmatched")
     private boolean unmatched;

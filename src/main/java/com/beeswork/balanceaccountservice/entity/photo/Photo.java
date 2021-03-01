@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.entity.photo;
 
 
 import com.beeswork.balanceaccountservice.entity.account.Account;
+import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,18 +23,14 @@ public class Photo implements Comparable<Photo> {
     @EmbeddedId
     private PhotoId photoId;
 
-    @Column(name = "key", insertable = false, updatable = false)
-    private String key;
-
-    @Column(name = "account_id", insertable = false, updatable = false)
-    private UUID accountId;
-
-    @Column(name = "sequence")
-    private Integer sequence;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("accountId")
     private Account account;
+
+    @Column(name = "sequence")
+    private int sequence;
+
+
 
     public Photo(Account account, String key, int sequence) {
         this.photoId = new PhotoId(account.getId(), key);
@@ -43,7 +40,6 @@ public class Photo implements Comparable<Photo> {
 
     @Override
     public int compareTo(@NonNull Photo o) {
-        if (sequence == null || o.sequence == null) return 0;
-        return this.sequence.compareTo(o.sequence);
+        return Integer.compare(this.sequence, o.sequence);
     }
 }

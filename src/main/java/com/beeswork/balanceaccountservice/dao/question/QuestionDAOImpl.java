@@ -50,7 +50,7 @@ public class QuestionDAOImpl extends BaseDAOImpl<Question> implements QuestionDA
     }
 
     @Override
-    public List<Question> findAllWithLimitAndOffset(int limit, int offset) {
+    public List<Question> findAll(int limit, int offset) {
         return jpaQueryFactory.selectFrom(qQuestion).limit(limit).offset(offset).fetch();
     }
 

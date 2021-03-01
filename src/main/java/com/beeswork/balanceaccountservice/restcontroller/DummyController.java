@@ -195,7 +195,8 @@ public class DummyController {
             swipe.setCount((random.nextInt(10) + 1));
             swipe.setCreatedAt(now);
             swipe.setUpdatedAt(now);
-            swiper.getSwipes().add(swipe);
+            entityManager.persist(swipe);
+//            swiper.getSwipes().add(swipe);
         }
         entityManager.persist(swiper);
     }
@@ -204,21 +205,21 @@ public class DummyController {
     public void updateAccountAndMatch() throws InterruptedException {
         List<Account> accounts = new JPAQueryFactory(entityManager).selectFrom(QAccount.account).fetch();
         Random random = new Random();
-        for (Account account : accounts) {
-            if (random.nextBoolean()) {
-                account.setUpdatedAt(new Date());
-                Thread.sleep(10);
-            } else if (account.getMatches().size() > 0) {
-                Match match = account.getMatches().get(0);
-                List<Match> matches = new JPAQueryFactory(entityManager).selectFrom(QMatch.match)
-                                                                        .where(QMatch.match.chatId.eq(match.getChatId()))
-                                                                        .fetch();
-                Date date = new Date();
-                for (Match match1 : matches) {
-                    match1.setUpdatedAt(date);
-                }
-            }
-        }
+//        for (Account account : accounts) {
+//            if (random.nextBoolean()) {
+//                account.setUpdatedAt(new Date());
+//                Thread.sleep(10);
+//            } else if (account.getMatches().size() > 0) {
+//                Match match = account.getMatches().get(0);
+//                List<Match> matches = new JPAQueryFactory(entityManager).selectFrom(QMatch.match)
+//                                                                        .where(QMatch.match.chatId.eq(match.getChatId()))
+//                                                                        .fetch();
+//                Date date = new Date();
+//                for (Match match1 : matches) {
+//                    match1.setUpdatedAt(date);
+//                }
+//            }
+//        }
     }
 
     @PostMapping("/update/rep-photo-updated-at")
@@ -233,9 +234,9 @@ public class DummyController {
 
 
         List<Swipe> swipes = entityManager.unwrap(Session.class).createQuery("select s1 from Swipe s1 " +
-                                                                             "inner join Swipe s2 on s1.swipedId = s2.swiperId " +
+                                                                             "inner join Swipe s2 on s1.swipeId.swipedId = s2.swipeId.swiperId " +
                                                                              "where s1.clicked = true and s2.clicked = true " +
-                                                                             "and s1.swiperId = s2.swipedId order by s1.swiperId",
+                                                                             "and s1.swipeId.swiperId = s2.swipeId.swipedId order by s1.swipeId.swiperId",
                                                                              Swipe.class).getResultList();
         HashMap<String, Match> matchMap = new HashMap<>();
 
@@ -245,9 +246,9 @@ public class DummyController {
             Date date = new Date();
             Chat chat = new Chat();
 
-            MatchId theOtherPartyMatchId = new MatchId(swipe.getSwipedId(), swipe.getSwiperId());
-            if (matchMap.containsKey(swipe.getSwipedId().toString() + swipe.getSwiperId().toString())) {
-                chat = matchMap.get(swipe.getSwipedId().toString() + swipe.getSwiperId().toString()).getChat();
+            MatchId theOtherPartyMatchId = new MatchId(swipe.getSwipeId().getSwipedId(), swipe.getSwipeId().getSwiperId());
+            if (matchMap.containsKey(swipe.getSwipeId().getSwipedId().toString() + swipe.getSwipeId().getSwiperId().toString())) {
+                chat = matchMap.get(swipe.getSwipeId().getSwipedId().toString() + swipe.getSwipeId().getSwiperId().toString()).getChat();
             }
             swipe.setMatched(true);
 
@@ -260,13 +261,13 @@ public class DummyController {
             newMatch.setCreatedAt(date);
             newMatch.setUpdatedAt(date);
 
-            MatchId matchId = new MatchId(swipe.getSwiperId(), swipe.getSwipedId());
+            MatchId matchId = new MatchId(swipe.getSwipeId().getSwiperId(), swipe.getSwipeId().getSwipedId());
             newMatch.setMatchId(matchId);
 
             chatDAO.persist(chat);
             matchDAO.persist(newMatch);
 
-            matchMap.put(swipe.getSwiperId().toString() + swipe.getSwipedId().toString(), newMatch);
+            matchMap.put(swipe.getSwipeId().getSwiperId().toString() + swipe.getSwipeId().getSwipedId().toString(), newMatch);
         }
     }
 

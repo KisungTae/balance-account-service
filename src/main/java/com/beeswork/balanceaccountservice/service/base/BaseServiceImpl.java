@@ -22,9 +22,10 @@ public abstract class BaseServiceImpl {
         this.modelMapper = modelMapper;
     }
 
-    protected void validateAccount(Account account, UUID identityToken) {
+    protected Account validateAccount(Account account, UUID identityToken) {
         validateAccount(account);
         if (!account.getIdentityToken().equals(identityToken)) throw new AccountNotFoundException();
+        return account;
     }
 
     protected void validateAccount(Account account) {
@@ -33,10 +34,10 @@ public abstract class BaseServiceImpl {
         if (account.isBlocked()) throw new AccountBlockedException();
     }
 
-    protected void validateSwiped(Account account) {
+    protected Account validateSwiped(Account account) {
         if (account == null) throw new SwipedNotFoundException();
-//        if (account.isBlocked()) throw new SwipedBlockedException();
         if (account.isDeleted()) throw new SwipedDeletedException();
+        return account;
     }
 
     protected Date offsetFetchedAt(Date date) {

@@ -27,7 +27,7 @@ import java.util.List;
 public class PhotoController extends BaseController {
 
     private final PhotoService photoService;
-    private final S3Service    s3Service;
+    private final S3Service s3Service;
 
     @Autowired
     public PhotoController(ObjectMapper objectMapper, ModelMapper modelMapper, PhotoService photoService,
@@ -46,7 +46,8 @@ public class PhotoController extends BaseController {
                               addPhotoVM.getPhotoKey(),
                               addPhotoVM.getSequence());
 
-        PreSignedUrl preSignedUrl = s3Service.preSignedUrl(addPhotoVM.getAccountId().toString(), addPhotoVM.getPhotoKey());
+        PreSignedUrl preSignedUrl = s3Service.preSignedUrl(addPhotoVM.getAccountId().toString(),
+                                                           addPhotoVM.getPhotoKey());
 
         return ResponseEntity.status(HttpStatus.OK)
                              .body(objectMapper.writeValueAsString(preSignedUrl));
@@ -79,11 +80,9 @@ public class PhotoController extends BaseController {
     public ResponseEntity<String> deletePhoto(@Valid @RequestBody DeletePhotoVM deletePhotoVM,
                                               BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-
         photoService.deletePhoto(deletePhotoVM.getAccountId(),
                                  deletePhotoVM.getIdentityToken(),
                                  deletePhotoVM.getPhotoKey());
-
         s3Service.deletePhoto(deletePhotoVM.getAccountId().toString(), deletePhotoVM.getPhotoKey());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }

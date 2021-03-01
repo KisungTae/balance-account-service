@@ -24,11 +24,6 @@ import java.util.UUID;
 @Repository
 public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
 
-    private final QAccount         qAccount         = QAccount.account;
-    private final QAccountQuestion qAccountQuestion = QAccountQuestion.accountQuestion;
-    private final QQuestion        qQuestion        = QQuestion.question;
-    private final QPhoto           qPhoto           = QPhoto.photo;
-
     @Autowired
     public AccountDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
         super(entityManager, jpaQueryFactory);
@@ -38,40 +33,4 @@ public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
     public Account findById(UUID accountId) {
         return entityManager.find(Account.class, accountId);
     }
-
-    public Account findWithPhotosAndAccountQuestions(UUID accountId, UUID identityToken) {
-        return jpaQueryFactory.selectFrom(qAccount)
-                              .leftJoin(qAccount.photos, qPhoto).fetchJoin()
-                              .leftJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
-                              .where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken)))
-                              .fetchOne();
-    }
-
-    @Override
-    public Account findWithPhotos(UUID accountId, UUID identityToken) {
-        return jpaQueryFactory.selectFrom(qAccount)
-                              .leftJoin(qAccount.photos, qPhoto)
-                              .fetchJoin()
-                              .where(qAccount.id.eq(accountId).and(qAccount.identityToken.eq(identityToken)))
-                              .fetchOne();
-    }
-
-    @Override
-    public Account findWithAccountQuestions(UUID accountId, UUID identityToken) {
-        return findWithAccountQuestions().where(qAccount.id.eq(accountId)
-                                                           .and(qAccount.identityToken.eq(identityToken))
-                                                           .and(qAccountQuestion.selected.eq(true)
-                                                                                         .or(qAccountQuestion.accountQuestionId.accountId
-                                                                                                     .isNull())))
-                                         .orderBy(qAccountQuestion.sequence.asc())
-                                         .fetchOne();
-    }
-
-    private JPAQuery<Account> findWithAccountQuestions() {
-        return jpaQueryFactory.selectFrom(qAccount)
-                              .leftJoin(qAccount.accountQuestions, qAccountQuestion).fetchJoin()
-                              .leftJoin(qAccountQuestion.question, qQuestion).fetchJoin();
-    }
-
-
 }
