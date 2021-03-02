@@ -302,6 +302,10 @@ public class BalanceAccountServiceApplication {
 // TODO			87. move out notification to notiication service which has firebaseService and stompService
 
 // TODO			88. deleteAccount() should also delete social_login, profile, push_notificaiton as well as account
+//					--> implemented
+
+// TODO			89. deletePhotosAsync() in S3Service throws one or more objects could not be dleted eexception
+
 
 
 

@@ -104,8 +104,10 @@ public class DummyController {
         account.setPoint(50000);
         account.setFreeSwipe(2000);
         account.setFreeSwipeUpdatedAt(now);
+        account.setRepPhotoKey("");
         account.setCreatedAt(now);
         account.setUpdatedAt(now);
+
 
         Point point = geometryFactory.createPoint(new Coordinate(lon, lat));
         point.setSRID(4326);

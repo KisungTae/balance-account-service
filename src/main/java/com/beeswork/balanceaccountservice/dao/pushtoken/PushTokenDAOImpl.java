@@ -1,15 +1,16 @@
-package com.beeswork.balanceaccountservice.dao.account;
+package com.beeswork.balanceaccountservice.dao.pushtoken;
 
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
-import com.beeswork.balanceaccountservice.entity.account.PushToken;
-import com.beeswork.balanceaccountservice.entity.account.PushTokenId;
+import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
+import com.beeswork.balanceaccountservice.entity.pushtoken.PushTokenId;
 import com.beeswork.balanceaccountservice.entity.account.QPushToken;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.util.UUID;
 
 @Repository
 public class PushTokenDAOImpl extends BaseDAOImpl<PushToken> implements PushTokenDAO {
@@ -23,6 +24,15 @@ public class PushTokenDAOImpl extends BaseDAOImpl<PushToken> implements PushToke
 
     @Override
     public PushToken findById(PushTokenId pushTokenId) {
-        return jpaQueryFactory.selectFrom(qPushToken).where(qPushToken.pushTokenId.eq(pushTokenId)).fetchOne();
+        return jpaQueryFactory.selectFrom(qPushToken).where(qPushToken.pushTokenId.eq(pushTokenId)).fetchFirst();
+    }
+
+    @Override
+    public PushToken findRecent(UUID accountId) {
+        return jpaQueryFactory.selectFrom(qPushToken)
+                              .where(qPushToken.account.id.eq(accountId))
+                              .orderBy(qPushToken.updatedAt.desc())
+                              .limit(1)
+                              .fetchFirst();
     }
 }

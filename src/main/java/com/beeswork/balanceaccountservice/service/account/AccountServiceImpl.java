@@ -1,13 +1,9 @@
 package com.beeswork.balanceaccountservice.service.account;
 
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.DeleteObjectsRequest;
-import com.beeswork.balanceaccountservice.config.properties.AWSProperties;
-import com.beeswork.balanceaccountservice.constant.PushTokenType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
-import com.beeswork.balanceaccountservice.dao.account.PushTokenDAO;
+import com.beeswork.balanceaccountservice.dao.pushtoken.PushTokenDAO;
 import com.beeswork.balanceaccountservice.dao.login.LoginDAO;
 import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
@@ -15,8 +11,6 @@ import com.beeswork.balanceaccountservice.dto.account.DeleteAccountDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
-import com.beeswork.balanceaccountservice.entity.account.PushToken;
-import com.beeswork.balanceaccountservice.entity.account.PushTokenId;
 import com.beeswork.balanceaccountservice.entity.login.Login;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
@@ -36,9 +30,9 @@ import java.util.stream.Collectors;
 @Service
 public class AccountServiceImpl extends BaseServiceImpl implements AccountService {
 
-    private final AccountDAO         accountDAO;
-    private final QuestionDAO        questionDAO;
-    private final PushTokenDAO       pushTokenDAO;
+    private final AccountDAO accountDAO;
+    private final QuestionDAO questionDAO;
+    private final PushTokenDAO pushTokenDAO;
     private final AccountQuestionDAO accountQuestionDAO;
     private final ProfileDAO profileDAO;
     private final LoginDAO loginDAO;
@@ -60,19 +54,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         this.loginDAO = loginDAO;
     }
 
-    @Override
-    @Transactional
-    public void savePushToken(UUID accountId, UUID identityToken, String key, PushTokenType type) {
-        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
-        PushToken pushToken = pushTokenDAO.findById(new PushTokenId(accountId, type));
-        if (pushToken == null)
-            pushToken = new PushToken(account, type, key, new Date());
-        else {
-            pushToken.setKey(key);
-            pushToken.setUpdatedAt(new Date());
-        }
-        pushTokenDAO.persist(pushToken);
-    }
+
 
     //  TEST 1. save accountQuestionDTOs without setAccount() and setQuestion()
     //          --> Hibernate does not insert those objects, no exception thrown
@@ -87,26 +69,27 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         List<AccountQuestion> accountQuestions = accountQuestionDAO.findAllIn(accountId, answers.keySet());
 
         Map<Integer, Integer> sequences = new LinkedHashMap<>();
-        int sequence = 1;
+        int initialSequence = 1;
 
         for (Integer key : answers.keySet()) {
-            sequences.put(key, sequence);
-            sequence++;
+            sequences.put(key, initialSequence);
+            initialSequence++;
         }
 
-        for (int i = accountQuestions.size() - 1; i >= 0; i--) {
-            AccountQuestion accountQuestion = accountQuestions.get(i);
-            int questionId = accountQuestion.getQuestionId();
+        if (accountQuestions != null) {
+            for (int i = accountQuestions.size() - 1; i >= 0; i--) {
+                AccountQuestion accountQuestion = accountQuestions.get(i);
+                int questionId = accountQuestion.getQuestionId();
 
-            if (answers.containsKey(questionId)) {
-                accountQuestion.setSelected(true);
-                accountQuestion.setAnswer(answers.get(questionId));
-                accountQuestion.setSequence(sequences.get(questionId));
-                accountQuestion.setUpdatedAt(new Date());
-
-                answers.remove(questionId);
-                sequences.remove(questionId);
-            } else accountQuestion.setSelected(false);
+                if (answers.containsKey(questionId)) {
+                    accountQuestion.setSelected(true);
+                    accountQuestion.setAnswer(answers.get(questionId));
+                    accountQuestion.setSequence(sequences.get(questionId));
+                    accountQuestion.setUpdatedAt(new Date());
+                    answers.remove(questionId);
+                    sequences.remove(questionId);
+                } else accountQuestion.setSelected(false);
+            }
         }
 
         if (answers.size() > 0) {
@@ -117,11 +100,10 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
             Date date = new Date();
             for (Question question : questions) {
                 int questionId = question.getId();
-                accountQuestions.add(new AccountQuestion(answers.get(questionId),
-                                                         sequences.get(questionId),
-                                                         date,
-                                                         account,
-                                                         question));
+                boolean answer = answers.get(questionId);
+                int sequence = sequences.get(questionId);
+                AccountQuestion accountQuestion = new AccountQuestion(answer, sequence, date, account, question);
+                account.getAccountQuestions().add(accountQuestion);
             }
         }
     }

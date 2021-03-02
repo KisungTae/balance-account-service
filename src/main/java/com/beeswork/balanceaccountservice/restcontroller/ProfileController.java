@@ -7,10 +7,7 @@ import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.profile.ProfileService;
 import com.beeswork.balanceaccountservice.vm.account.*;
-import com.beeswork.balanceaccountservice.vm.profile.RecommendVM;
-import com.beeswork.balanceaccountservice.vm.profile.SaveAboutVM;
-import com.beeswork.balanceaccountservice.vm.profile.SaveLocationVM;
-import com.beeswork.balanceaccountservice.vm.profile.SaveProfileVM;
+import com.beeswork.balanceaccountservice.vm.profile.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
@@ -43,6 +40,16 @@ public class ProfileController extends BaseController {
         ProfileDTO profileDTO = profileService.getProfile(accountIdentityVM.getAccountId(),
                                                           accountIdentityVM.getIdentityToken());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(profileDTO));
+    }
+
+    public ResponseEntity<String> getCard(@Valid @ModelAttribute GetCardVM getCardVM,
+                                          BindingResult bindingResult)
+    throws JsonProcessingException {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        CardDTO cardDTO = profileService.getCard(getCardVM.getAccountId(),
+                                                 getCardVM.getIdentityToken(),
+                                                 getCardVM.getSwipedId());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(cardDTO));
     }
 
     @PostMapping

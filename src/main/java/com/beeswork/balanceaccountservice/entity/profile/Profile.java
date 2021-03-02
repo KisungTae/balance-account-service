@@ -67,9 +67,6 @@ public class Profile {
     @Column(name = "enabled")
     private boolean enabled;
 
-    @Column(name = "deleted")
-    private boolean deleted;
-
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.entity.account;
+package com.beeswork.balanceaccountservice.entity.pushtoken;
 
 
 import com.beeswork.balanceaccountservice.constant.PushTokenType;

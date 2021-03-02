@@ -1,7 +1,5 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-
-import com.beeswork.balanceaccountservice.constant.PushTokenType;
 import com.beeswork.balanceaccountservice.dto.account.DeleteAccountDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
@@ -38,40 +36,6 @@ public class AccountController extends BaseController {
         this.s3Service = s3Service;
     }
 
-    @PostMapping("/push-token/fcm")
-    public ResponseEntity<String> saveFCMToken(@Valid @RequestBody SavePushTokenVM savePushTokenVM,
-                                               BindingResult bindingResult)
-    throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        accountService.savePushToken(savePushTokenVM.getAccountId(),
-                                     savePushTokenVM.getIdentityToken(),
-                                     savePushTokenVM.getKey(),
-                                     PushTokenType.FCM);
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
-    }
-
-    @PostMapping("/push-token/aps")
-    public ResponseEntity<String> saveAPSToken(@Valid @RequestBody SavePushTokenVM savePushTokenVM,
-                                               BindingResult bindingResult)
-    throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        accountService.savePushToken(savePushTokenVM.getAccountId(),
-                                     savePushTokenVM.getIdentityToken(),
-                                     savePushTokenVM.getKey(),
-                                     PushTokenType.APS);
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
-    }
-
-    @PostMapping("/delete")
-    public ResponseEntity<String> deleteAccount(@Valid @RequestBody AccountIdentityVM accountIdentityVM,
-                                                BindingResult bindingResult) throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        DeleteAccountDTO deleteAccountDTO = accountService.deleteAccount(accountIdentityVM.getAccountId(),
-                                                                         accountIdentityVM.getIdentityToken());
-        s3Service.deletePhotosAsync(deleteAccountDTO.getAccountId(), deleteAccountDTO.getPhotoKeys());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
-    }
-
     @PostMapping("/question/answers")
     public ResponseEntity<String> saveAnswers(@Valid @RequestBody SaveAnswersVM saveAnswersVM,
                                               BindingResult bindingResult)
@@ -90,6 +54,16 @@ public class AccountController extends BaseController {
         List<QuestionDTO> questionDTOs = accountService.listQuestions(accountIdentityVM.getAccountId(),
                                                                       accountIdentityVM.getIdentityToken());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<String> deleteAccount(@Valid @RequestBody AccountIdentityVM accountIdentityVM,
+                                                BindingResult bindingResult) throws JsonProcessingException {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        DeleteAccountDTO deleteAccountDTO = accountService.deleteAccount(accountIdentityVM.getAccountId(),
+                                                                         accountIdentityVM.getIdentityToken());
+        s3Service.deletePhotosAsync(deleteAccountDTO.getAccountId(), deleteAccountDTO.getPhotoKeys());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
 

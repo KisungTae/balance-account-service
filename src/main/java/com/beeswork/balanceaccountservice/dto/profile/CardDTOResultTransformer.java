@@ -5,34 +5,37 @@ import java.util.List;
 
 public class CardDTOResultTransformer {
 
-    private static final int CARD_ID         = 0;
-    private static final int CARD_NAME       = 1;
-    private static final int CARD_ABOUT      = 2;
-    private static final int CARD_BIRTH_YEAR = 3;
-    private static final int CARD_HEIGHT     = 4;
-    private static final int CARD_DISTANCE   = 5;
-    private static final int CARD_PHOTO_KEY  = 6;
+    private static final int ID = 0;
+    private static final int NAME = 1;
+    private static final int BIRTH_YEAR = 2;
+    private static final int GENDER = 3;
+    private static final int HEIGHT = 4;
+    private static final int ABOUT = 5;
+    private static final int DISTANCE = 6;
+    private static final int PHOTO_KEY = 7;
 
-    public static List<CardDTO> toList(List<Object[]> rows) {
+    public static List<CardDTO> map(List<Object[]> rows) {
         List<CardDTO> cardDTOs = new ArrayList<>();
         CardDTO cardDTO = new CardDTO();
         String previousId = "";
 
         for (Object[] row : rows) {
-            String id = row[CARD_ID].toString();
+            String id = row[ID].toString();
             if (!previousId.equals(id)) {
                 cardDTOs.add(cardDTO);
                 previousId = id;
-                cardDTO = new CardDTO(id,
-                                      row[CARD_NAME].toString(),
-                                      row[CARD_ABOUT].toString(),
-                                      (int) row[CARD_HEIGHT],
-                                      Integer.parseInt(row[CARD_BIRTH_YEAR].toString()),
-                                      (int) ((double) row[CARD_DISTANCE]));
+                String name = row[NAME].toString();
+                int birthYear = Integer.parseInt(row[BIRTH_YEAR].toString());
+                boolean gender = Boolean.parseBoolean(row[GENDER].toString());
+                int height = (int) row[HEIGHT];
+                String about = row[ABOUT].toString();
+                int distance = (int) ((double) row[DISTANCE]);
+                cardDTO = new CardDTO(id, name, birthYear, gender, height, about, distance);
             }
 
-            if (row[CARD_PHOTO_KEY] != null)
-                cardDTO.getPhotoKeys().add(row[CARD_PHOTO_KEY].toString());
+            Object photoKey = row[PHOTO_KEY];
+            if (photoKey != null)
+                cardDTO.getPhotoKeys().add(photoKey.toString());
         }
         cardDTOs.add(cardDTO);
         cardDTOs.remove(0);

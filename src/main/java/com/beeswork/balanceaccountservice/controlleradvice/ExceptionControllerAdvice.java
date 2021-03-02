@@ -6,8 +6,11 @@ import com.amazonaws.SdkClientException;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 import com.beeswork.balanceaccountservice.exception.account.*;
+import com.beeswork.balanceaccountservice.exception.login.EmailNotMutableException;
+import com.beeswork.balanceaccountservice.exception.login.LoginNotFoundException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoNotFoundException;
+import com.beeswork.balanceaccountservice.exception.profile.ProfileNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
@@ -15,9 +18,10 @@ import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
-import com.beeswork.balanceaccountservice.exception.account.AccountEmailDuplicateException;
+import com.beeswork.balanceaccountservice.exception.login.EmailDuplicateException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hibernate.QueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -28,6 +32,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.persistence.NonUniqueResultException;
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
 import java.util.Locale;
 
 @RestControllerAdvice(annotations = RestController.class)
@@ -35,6 +42,7 @@ public class ExceptionControllerAdvice {
 
     private static final String INTERNAL_SERVER_EXCEPTION = "internal.server.exception";
     private static final String QUERY_EXCEPTION = "query.exception";
+    private static final String PERSISTENCE_EXCEPTION = "persistence.exception";
 
     private final MessageSource messageSource;
     private final ObjectMapper objectMapper;
@@ -47,7 +55,8 @@ public class ExceptionControllerAdvice {
 
     //  TEST 1. if exception is thrown inside handleNotFoundException, then it will throw handleNotFoundException not route to General Exception handler
     @ExceptionHandler({AccountNotFoundException.class, QuestionNotFoundException.class, SwipeNotFoundException.class,
-                       PhotoNotFoundException.class, AccountQuestionNotFoundException.class})
+                       PhotoNotFoundException.class, AccountQuestionNotFoundException.class,
+                       LoginNotFoundException.class, ProfileNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)
     throws Exception {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -58,8 +67,9 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler({AccountShortOfPointException.class, AccountBlockedException.class,
                        SwipeClickedExistsException.class, BadRequestException.class,
                        SwipedBlockedException.class, SwipedNotFoundException.class,
-                       QuestionSetChangedException.class, AccountEmailNotMutableException.class,
-                       AccountEmailDuplicateException.class, PhotoInvalidDeleteException.class})
+                       QuestionSetChangedException.class, EmailNotMutableException.class,
+                       EmailDuplicateException.class, PhotoInvalidDeleteException.class,
+                       AccountDeletedException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -82,20 +92,25 @@ public class ExceptionControllerAdvice {
                              .body(messageSource.getMessage(QUERY_EXCEPTION, null, locale));
     }
 
-
-//    @ExceptionHandler({QueryException.class})
-//    public ResponseEntity<String> handleQueryException(QueryException exception, Locale locale) {
-//        exception.
+//    @ExceptionHandler({PersistenceException.class})
+//    public ResponseEntity<String> handlePersistenceException(PersistenceException exception, Locale locale) {
 //        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 //                             .contentType(MediaType.APPLICATION_JSON)
-//                             .body(messageSource.getMessage(ExceptionCode.QUERY_EXCEPTION, null, locale));
+//                             .body(messageSource.getMessage(PERSISTENCE_EXCEPTION, null, locale));
 //    }
-
+//
+//    @ExceptionHandler({QueryException.class})
+//    public ResponseEntity<String> handleQueryException(QueryException exception, Locale locale) {
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                             .contentType(MediaType.APPLICATION_JSON)
+//                             .body(messageSource.getMessage(QUERY_EXCEPTION, null, locale));
+//    }
+//
 //    @ExceptionHandler({Exception.class})
 //    public ResponseEntity<String> handleException(Locale locale) throws JsonProcessingException {
 //        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 //                             .contentType(MediaType.APPLICATION_JSON)
-//                             .body(exceptionResponse(ExceptionCode.INTERNAL_SERVER_EXCEPTION, locale));
+//                             .body(exceptionResponse(INTERNAL_SERVER_EXCEPTION, locale));
 //    }
 
     private String exceptionResponse(String exceptionCode, Locale locale) throws JsonProcessingException {

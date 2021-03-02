@@ -30,8 +30,8 @@ public abstract class BaseServiceImpl {
 
     protected void validateAccount(Account account) {
         if (account == null) throw new AccountNotFoundException();
-        if (account.isDeleted()) throw new AccountDeletedException();
         if (account.isBlocked()) throw new AccountBlockedException();
+        if (account.isDeleted()) throw new AccountDeletedException();
     }
 
     protected Account validateSwiped(Account account) {

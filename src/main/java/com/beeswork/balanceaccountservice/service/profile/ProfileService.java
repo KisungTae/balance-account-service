@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.service.profile;
 
+import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
 import com.beeswork.balanceaccountservice.dto.profile.PreRecommendDTO;
 import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
@@ -15,6 +16,7 @@ import java.util.UUID;
 public interface ProfileService {
 
     ProfileDTO getProfile(UUID accountId, UUID identityToken);
+    CardDTO getCard(UUID accountId, UUID identityToken, UUID swipedId);
 
     // delay = 0 then default to 1 second
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))

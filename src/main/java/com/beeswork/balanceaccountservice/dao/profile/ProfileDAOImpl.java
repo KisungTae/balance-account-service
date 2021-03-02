@@ -3,6 +3,8 @@ package com.beeswork.balanceaccountservice.dao.profile;
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
 import com.beeswork.balanceaccountservice.dto.profile.CardDTOResultTransformer;
+import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
+import com.beeswork.balanceaccountservice.entity.photo.QPhoto;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.profile.QProfile;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -18,6 +20,7 @@ import java.util.UUID;
 public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
 
     private final QProfile qProfile = QProfile.profile;
+    private final QPhoto qPhoto = QPhoto.photo;
 
     @Autowired
     public ProfileDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
@@ -26,7 +29,21 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
 
     @Override
     public Profile findById(UUID accountId) {
-        return jpaQueryFactory.selectFrom(qProfile).where(qProfile.accountId.eq(accountId)).fetchOne();
+        return jpaQueryFactory.selectFrom(qProfile).where(qProfile.accountId.eq(accountId)).fetchFirst();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public CardDTO findCardDTO(UUID swipedId, Point pivot) {
+        List<Object[]> rows = entityManager.createNativeQuery(
+                "select cast(pr.account_id as varchar), pr.name, pr.birth_year, pr.gender, pr.height, pr.about, st_distance(pr.location, :pivot), ph.key " +
+                "from profile pr " +
+                "left join photo ph on pr.account_id = ph.account_id " +
+                "where pr.account_id = :swipedId ")
+                                         .setParameter("swipedId", swipedId)
+                                         .setParameter("pivot", pivot)
+                                         .getResultList();
+        return CardDTOResultTransformer.map(rows).get(0);
     }
 
     @Override
@@ -36,15 +53,15 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<CardDTO> findAllWithin(int distance,
-                                       int minAge,
-                                       int maxAge,
-                                       boolean gender,
-                                       int limit,
-                                       int offset,
-                                       Point location) {
+    public List<CardDTO> findAllCardDTOsWithin(int distance,
+                                               int minAge,
+                                               int maxAge,
+                                               boolean gender,
+                                               int limit,
+                                               int offset,
+                                               Point pivot) {
         List<Object[]> rows = entityManager.createNativeQuery(
-                "select cast(b.account_id as varchar), b.name, b.about, b.birth_year, b.height, st_distance(b.location, :pivot), p.key " +
+                "select cast(b.account_id as varchar), b.name, b.birth_year, b.gender, b.height, b.about, st_distance(b.location, :pivot), p.key " +
                 "from (select * " +
                 "      from profile  " +
                 "      where st_dwithin(location, :pivot, :distance) " +
@@ -52,12 +69,11 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                 "        and birth_year <= :minAge " +
                 "        and birth_year >= :maxAge " +
                 "        and enabled = true " +
-                "        and deleted = false " +
                 "       limit :limit " +
                 "       offset :offset) as b " +
                 "left join photo as p " +
                 "on p.account_id = b.account_id")
-                                           .setParameter("pivot", location)
+                                           .setParameter("pivot", pivot)
                                            .setParameter("distance", distance)
                                            .setParameter("gender", gender)
                                            .setParameter("minAge", minAge)
@@ -65,6 +81,6 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                                            .setParameter("limit", limit)
                                            .setParameter("offset", offset)
                                            .getResultList();
-        return CardDTOResultTransformer.toList(rows);
+        return CardDTOResultTransformer.map(rows);
     }
 }

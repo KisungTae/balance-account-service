@@ -80,53 +80,5 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
         matchedMatch.setUpdatedAt(updatedAt);
     }
 
-
-//    private void setResponseLimitSize() throws JsonProcessingException {
-//        ListMatchDTO listMatchDTO = new ListMatchDTO();
-//        listMatchDTO.setMatchFetchedAt(new Date());
-//
-//        emptyListMatchDTOJsonSize = objectMapper.writeValueAsString(listMatchDTO).getBytes().length;
-//
-//        listMatchDTO.setMatchDTOs(new ArrayList<>());
-//        matchDTOListJsonSize = objectMapper.writeValueAsString(listMatchDTO)
-//                                           .getBytes().length - emptyListMatchDTOJsonSize;
-//
-//        String name = "열글자면삼십바이트다";
-//        String photoKey = "2011-10-05T14:48:00.000+00:00";
-//        Long chatId = Long.MAX_VALUE;
-//        UUID matchedId = UUID.randomUUID();
-//        listMatchDTO.getMatchDTOs()
-//                    .add(new MatchDTO(chatId, matchedId, false, name, photoKey, false, new Date(), null));
-//        matchDTOJsonSize = objectMapper.writeValueAsString(listMatchDTO).getBytes().length - matchDTOListJsonSize - emptyListMatchDTOJsonSize;
-//
-//
-//        listMatchDTO.setMatchDTOs(null);
-//        listMatchDTO.setSentChatMessageDTOs(new ArrayList<>());
-//        sentChatMessageDTOListJsonSize =
-//                objectMapper.writeValueAsString(listMatchDTO).getBytes().length - emptyListMatchDTOJsonSize;
-//
-//        ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
-//        chatMessageDTO.setId(Long.MAX_VALUE);
-//        chatMessageDTO.setMessageId(Long.MAX_VALUE);
-//        chatMessageDTO.setCreatedAt(new Date());
-//        listMatchDTO.getSentChatMessageDTOs().add(chatMessageDTO);
-//        sentChatMessageDTOJsonSize =
-//                objectMapper.writeValueAsString(listMatchDTO).getBytes().length - sentChatMessageDTOListJsonSize - emptyListMatchDTOJsonSize;
-//
-//
-//        listMatchDTO.setSentChatMessageDTOs(null);
-//        listMatchDTO.setReceivedChatMessageDTOs(new ArrayList<>());
-//        receivedChatMessageDTOListJsonSize =
-//                objectMapper.writeValueAsString(listMatchDTO).getBytes().length - emptyListMatchDTOJsonSize;
-//
-//
-//        String body = "가".repeat(200);
-//        List<ChatMessageDTO> received = new ArrayList<>();
-//        received.add(new ChatMessageDTO(Long.MAX_VALUE, body, Long.MAX_VALUE, new Date()));
-//        listMatchDTO.setReceivedChatMessageDTOs(received);
-//        receivedChatMessageDTOJsonSize =
-//                objectMapper.writeValueAsString(received).getBytes().length - receivedChatMessageDTOListJsonSize - emptyListMatchDTOJsonSize;
-//    }
-
 }
 

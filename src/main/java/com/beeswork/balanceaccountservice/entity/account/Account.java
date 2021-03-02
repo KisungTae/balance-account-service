@@ -1,15 +1,12 @@
 package com.beeswork.balanceaccountservice.entity.account;
 
-import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
-import com.beeswork.balanceaccountservice.entity.profile.Profile;
-import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
+import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.*;
-import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
 import javax.persistence.CascadeType;

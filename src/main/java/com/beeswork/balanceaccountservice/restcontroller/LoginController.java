@@ -2,7 +2,7 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.login.LoginService;
-import com.beeswork.balanceaccountservice.vm.account.SaveEmailVM;
+import com.beeswork.balanceaccountservice.vm.login.SaveEmailVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;

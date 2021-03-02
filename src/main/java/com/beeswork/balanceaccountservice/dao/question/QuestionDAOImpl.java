@@ -27,7 +27,7 @@ public class QuestionDAOImpl extends BaseDAOImpl<Question> implements QuestionDA
 
     @Override
     public Question findById(Integer questionId) {
-        return jpaQueryFactory.selectFrom(qQuestion).where(qQuestion.id.eq(questionId)).fetchOne();
+        return jpaQueryFactory.selectFrom(qQuestion).where(qQuestion.id.eq(questionId)).fetchFirst();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class QuestionDAOImpl extends BaseDAOImpl<Question> implements QuestionDA
                               .where(qQuestion.id.notIn(questionIds))
                               .offset(offset)
                               .limit(1)
-                              .fetchOne();
+                              .fetchFirst();
     }
 
     @Override

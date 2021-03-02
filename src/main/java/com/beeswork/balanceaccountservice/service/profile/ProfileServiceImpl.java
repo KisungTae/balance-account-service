@@ -55,6 +55,12 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         return modelMapper.map(findValidProfile(accountId, identityToken), ProfileDTO.class);
     }
 
+    @Override
+    public CardDTO getCard(UUID accountId, UUID identityToken, UUID swipedId) {
+        Profile profile = findValidProfile(accountId, identityToken);
+        return profileDAO.findCardDTO(swipedId, profile.getLocation());
+    }
+
     //  DESC 1. when registering, an account will be created with enabled = false, then when finish profiles,
     //          it will update enabled = true because users might get cards for which profile has not been updated
     //  TEST 2. save account without any changes but changes in accountQuestions --> Hibernate does not publish update DML for unchanged account even if you change accountQuestions
@@ -139,7 +145,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         if (distance < MIN_DISTANCE) distance = MIN_DISTANCE;
         else if (distance > MAX_DISTANCE) distance = MAX_DISTANCE;
         int offset = pageIndex * PAGE_LIMIT;
-        return profileDAO.findAllWithin(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, location);
+        return profileDAO.findAllCardDTOsWithin(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, location);
     }
 
     private Profile findValidProfile(UUID accountId, UUID identityToken) {

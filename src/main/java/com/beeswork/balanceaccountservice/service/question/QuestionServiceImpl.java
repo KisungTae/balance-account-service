@@ -1,11 +1,8 @@
 package com.beeswork.balanceaccountservice.service.question;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
-import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
-import com.beeswork.balanceaccountservice.entity.account.Account;
-import com.beeswork.balanceaccountservice.entity.account.AccountQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
@@ -16,26 +13,20 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Repository
 public class QuestionServiceImpl extends BaseServiceImpl implements QuestionService {
 
     private final QuestionDAO questionDAO;
-    private final AccountDAO accountDAO;
 
-    private static final int MAX_NUM_OF_QUESTIONS = 3;
+    private static final int MIN_NUM_OF_QUESTIONS = 3;
 
     public QuestionServiceImpl(QuestionDAO questionDAO,
-                               ModelMapper modelMapper,
-                               AccountDAO accountDAO) {
+                               ModelMapper modelMapper) {
         super(modelMapper);
         this.questionDAO = questionDAO;
-        this.accountDAO = accountDAO;
     }
 
     @Override
@@ -51,8 +42,8 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<QuestionDTO> listRandomQuestions() {
-        int offset = new Random().nextInt((int) (questionDAO.count() - MAX_NUM_OF_QUESTIONS));
-        List<Question> questions = questionDAO.findAll(MAX_NUM_OF_QUESTIONS, offset);
+        int offset = new Random().nextInt((int) (questionDAO.count() - MIN_NUM_OF_QUESTIONS));
+        List<Question> questions = questionDAO.findAll(MIN_NUM_OF_QUESTIONS, offset);
         return modelMapper.map(questions, new TypeToken<List<QuestionDTO>>() {}.getType());
     }
 

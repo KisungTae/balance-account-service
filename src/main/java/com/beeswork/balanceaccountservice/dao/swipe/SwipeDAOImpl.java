@@ -43,7 +43,7 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     @Override
     public Swipe findById(SwipeId swipeId, boolean writeLock) {
         if (writeLock) return entityManager.find(Swipe.class, swipeId, LockModeType.PESSIMISTIC_WRITE);
-        else return jpaQueryFactory.selectFrom(qSwipe).where(qSwipe.swipeId.eq(swipeId)).fetchOne();
+        else return jpaQueryFactory.selectFrom(qSwipe).where(qSwipe.swipeId.eq(swipeId)).fetchFirst();
     }
 
     @Override

@@ -154,6 +154,7 @@ CREATE EXTENSION if not exists postgis;
 -- create UUID extension
 create extension if not exists "uuid-ossp";
 
+
 -- unregister deletes account
 -- liked count will be reset on every night
 create table account
@@ -170,6 +171,16 @@ create table account
     deleted               boolean     not null,
     created_at            timestamptz not null,
     updated_at            timestamptz not null
+);
+
+create table question
+(
+    id            serial primary key,
+    description   varchar(200) not null,
+    top_option    varchar(50)  not null,
+    bottom_option varchar(50)  not null,
+    created_at    timestamptz  not null,
+    updated_at    timestamptz  not null
 );
 
 create table account_question
@@ -235,9 +246,9 @@ create table login
 (
     id         varchar(100) not null,
     type       int          not null,
-    account_id uuid         not null,
+    account_id uuid unique  not null,
     email      varchar(256),
-    password   varchar(50)  not null,
+    password   varchar(50),
     blocked    boolean      not null,
     created_at timestamptz  not null,
     updated_at timestamptz  not null,
@@ -304,7 +315,6 @@ create table profile
     score               int                    not null,
     page_index          int                    not null,
     enabled             boolean                not null,
-    deleted             boolean                not null,
     created_at          timestamptz            not null,
     updated_at          timestamptz            not null,
 
@@ -314,19 +324,9 @@ create table profile
 
 CREATE INDEX profile_location_idx ON profile USING GIST (location);
 
-create table question
-(
-    id            serial primary key,
-    description   varchar(200) not null,
-    top_option    varchar(50)  not null,
-    bottom_option varchar(50)  not null,
-    created_at    timestamptz  not null,
-    updated_at    timestamptz  not null
-);
 
 create table swipe
 (
-    version     int         not null,
     swiper_id   uuid        not null,
     swiped_id   uuid        not null,
     clicked     boolean     not null,
@@ -346,144 +346,39 @@ create index swipe_swiped_id_idx on swipe (swiped_id);
 
 
 
-
-
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query Start ------------------------------------------
 ---------------------------------------------------------------------------------------------
-
-
-select *
-from account_question;
-
-
-select *
-from account;
-
-select *
-from profile;
-
-select *
-from photo
-where account_id = 'e01794ae-cb65-462e-9a07-6a4498b6ecfe';
-
-select *
-from push_token;
-
-select *
-from account;
-
-explain analyse
-select *
-from question
-where id in (select question_id
-             from account_question
-             where account_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a'
-               and selected = true);
-
-
-explain analyse
-select *
-from question q
-         left join account_question aq on q.id = aq.question_id
-where aq.account_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a'
-  and aq.selected = true;
-
-
-select *
-from account_question;
-
-select *
-from account_question
-where account_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a';
-
-insert into account_question
-values ('8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a', 24, false, true, 4, current_timestamp, current_timestamp);
-
-
-explain
-select *
-from account a
-         left join account_question aq on a.id = aq.account_id
-         left join question q on aq.question_id = q.id
-where a.id = '67cfc7e3-9302-4a98-8870-b113baf81d73'
-  and aq.selected = true;
-
-
-select s1.swiper_id, s1.swiped_id, s2.swiper_id, s2.swiped_id
-from swipe s1
-         inner join swipe s2 on s1.swiper_id = s2.swiped_id and s1.swiped_id = s2.swiper_id;
-
-update swipe
-set clicked = false,
-    matched = false
-where swiper_id is not null;
-delete
-from match
-where matcher_id is not null;
-
-select *
-from account
-where id = '67cfc7e3-9302-4a98-8870-b113baf81d73'
-   or id = 'f8849505-878d-4d8a-8632-e284a1010529';
-
-
-
-select *
-from swipe
-where (swiper_id = '67cfc7e3-9302-4a98-8870-b113baf81d73' and swiped_id = 'f8849505-878d-4d8a-8632-e284a1010529')
-   or (swiper_id = 'f8849505-878d-4d8a-8632-e284a1010529' and swiped_id = '67cfc7e3-9302-4a98-8870-b113baf81d73');
-
-select *
-from swipe
-where (swiper_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a' and swiped_id = 'e01794ae-cb65-462e-9a07-6a4498b6ecfe')
-   or (swiper_id = 'e01794ae-cb65-462e-9a07-6a4498b6ecfe' and swiped_id = '8d087dc8-2dc3-40d4-b0ed-f3e509c23d2a');
-
-
-
-select *
-from swipe
-where swiper_id = 'e20b05c2-56b6-4791-84c1-d8af6d82a9e9'
-  and swiped_id = 'de2198e4-4d49-45bb-9ae8-c094e08a60e0';
-
-select *
-from chat_message
-order by id;
-
-select *
-from account
-where id = 'f77865c1-e370-48f0-ad6a-c64154c938a0';
-
 
 select matcher_id, count(matcher_id)
 from match
 group by matcher_id
 order by count(matcher_id) desc;
 
+select *
+from account
+where id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
 
 select *
 from match
-where matcher_id = 'f77865c1-e370-48f0-ad6a-c64154c938a0';
+where chat_id = 13;
 
 select *
-from swipe;
-
-select *
-from chat_message;
-
-delete
-from chat_message;
-
-select *
-from chat_message
-where account_id = '1e3a289c-9419-409e-9432-cd989b2547fc';
+from profile
+where account_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
 
 
 
-update chat_message
-set fetched  = false,
-    received = false
-where id is not null;
+
+
+
+
+
+
+
+
+
+
 
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query End --------------------------------------------

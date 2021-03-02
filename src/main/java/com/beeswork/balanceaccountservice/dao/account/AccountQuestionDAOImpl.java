@@ -66,7 +66,7 @@ public class AccountQuestionDAOImpl extends BaseDAOImpl<AccountQuestion> impleme
                                                        qQuestion.bottomOption,
                                                        qAccountQuestion.answer))
                               .from(qAccountQuestion)
-                              .leftJoin(qQuestion)
+                              .leftJoin(qQuestion).on(qAccountQuestion.accountQuestionId.questionId.eq(qQuestion.id))
                               .where(conditionForSelected(accountId))
                               .fetch();
     }
