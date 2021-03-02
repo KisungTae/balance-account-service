@@ -1,41 +1,29 @@
 package com.beeswork.balanceaccountservice.service.stomp;
 
-import com.beeswork.balanceaccountservice.config.WebConfig;
-import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
-import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
-import com.beeswork.balanceaccountservice.dto.firebase.MessageNotificationDTO;
-import com.beeswork.balanceaccountservice.entity.account.Account;
-import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
+import com.beeswork.balanceaccountservice.service.fcm.FCMService;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
-import org.apache.commons.lang3.LocaleUtils;
 import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.core.QueueInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
-
-import java.util.Locale;
-import java.util.UUID;
 
 @Service
 public class StompServiceImpl implements StompService {
 
-    private final        FirebaseService       firebaseService;
-    private final        SimpMessagingTemplate simpMessagingTemplate;
+    private final FCMService            FCMService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
     private final        AmqpAdmin             amqpAdmin;
     private final        AccountDAO            accountDAO;
     private static final String                ACCEPT_LANGUAGE = "accept-language";
 
     @Autowired
-    public StompServiceImpl(FirebaseService firebaseService,
+    public StompServiceImpl(FCMService FCMService,
                             SimpMessagingTemplate simpMessagingTemplate,
                             AmqpAdmin amqpAdmin,
                             AccountDAO accountDAO) {
-        this.firebaseService = firebaseService;
+        this.FCMService = FCMService;
         this.simpMessagingTemplate = simpMessagingTemplate;
         this.amqpAdmin = amqpAdmin;
         this.accountDAO = accountDAO;

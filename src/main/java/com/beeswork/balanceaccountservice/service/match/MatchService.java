@@ -1,7 +1,6 @@
 package com.beeswork.balanceaccountservice.service.match;
 
 import com.beeswork.balanceaccountservice.dto.match.ListMatchDTO;
-import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;

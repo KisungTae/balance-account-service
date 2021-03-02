@@ -1,6 +1,5 @@
-package com.beeswork.balanceaccountservice.service.firebase;
+package com.beeswork.balanceaccountservice.service.fcm;
 
-import com.beeswork.balanceaccountservice.dto.firebase.AbstractFirebaseNotification;
 import com.beeswork.balanceaccountservice.dto.firebase.FirebaseNotification;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -16,7 +15,7 @@ import java.util.Locale;
 
 
 @Service
-public class FirebaseServiceImpl implements FirebaseService {
+public class FCMServiceImpl implements FCMService {
 
     private final FirebaseMessaging firebaseMessaging;
     private final MessageSource     messageSource;
@@ -30,9 +29,9 @@ public class FirebaseServiceImpl implements FirebaseService {
     private static final String CLICK_RESULT     = "clickResult";
 
     @Autowired
-    public FirebaseServiceImpl(FirebaseMessaging firebaseMessaging,
-                               MessageSource messageSource,
-                               Message.Builder messageBuilder) {
+    public FCMServiceImpl(FirebaseMessaging firebaseMessaging,
+                          MessageSource messageSource,
+                          Message.Builder messageBuilder) {
         this.firebaseMessaging = firebaseMessaging;
         this.messageSource = messageSource;
         this.messageBuilder = messageBuilder;

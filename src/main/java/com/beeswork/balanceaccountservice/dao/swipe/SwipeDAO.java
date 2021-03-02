@@ -3,8 +3,6 @@ package com.beeswork.balanceaccountservice.dao.swipe;
 import com.beeswork.balanceaccountservice.dao.base.BaseDAO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeId;
-import com.beeswork.balanceaccountservice.projection.ClickProjection;
-import com.beeswork.balanceaccountservice.projection.ClickedProjection;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
 

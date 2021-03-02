@@ -17,7 +17,7 @@ import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeId;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
-import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
+import com.beeswork.balanceaccountservice.service.fcm.FCMService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -42,26 +42,25 @@ import java.util.*;
 @RequestMapping("/dummy")
 public class DummyController {
 
-
     @PersistenceContext
     private EntityManager entityManager;
 
     private final MatchDAO matchDAO;
     private final ObjectMapper objectMapper;
-    private final FirebaseService firebaseService;
-    private final AccountDAO accountDAO;
+    private final FCMService   FCMService;
+    private final AccountDAO   accountDAO;
     private final ChatDAO chatDAO;
     private final GeometryFactory geometryFactory;
 
     @Autowired
     public DummyController(MatchDAO matchDAO,
                            ObjectMapper objectMapper,
-                           FirebaseService firebaseService,
+                           FCMService FCMService,
                            AccountDAO accountDAO,
                            ChatDAO chatDAO, GeometryFactory geometryFactory) {
         this.matchDAO = matchDAO;
         this.objectMapper = objectMapper;
-        this.firebaseService = firebaseService;
+        this.FCMService = FCMService;
         this.accountDAO = accountDAO;
         this.chatDAO = chatDAO;
         this.geometryFactory = geometryFactory;

@@ -3,8 +3,6 @@ package com.beeswork.balanceaccountservice.dao.profile;
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
 import com.beeswork.balanceaccountservice.dto.profile.CardDTOResultTransformer;
-import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
-import com.beeswork.balanceaccountservice.entity.photo.QPhoto;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.profile.QProfile;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -20,7 +18,6 @@ import java.util.UUID;
 public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
 
     private final QProfile qProfile = QProfile.profile;
-    private final QPhoto qPhoto = QPhoto.photo;
 
     @Autowired
     public ProfileDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
@@ -43,7 +40,7 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                                          .setParameter("swipedId", swipedId)
                                          .setParameter("pivot", pivot)
                                          .getResultList();
-        return CardDTOResultTransformer.map(rows).get(0);
+        return CardDTOResultTransformer.map(rows);
     }
 
     @Override
@@ -81,6 +78,6 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                                            .setParameter("limit", limit)
                                            .setParameter("offset", offset)
                                            .getResultList();
-        return CardDTOResultTransformer.map(rows);
+        return CardDTOResultTransformer.mapList(rows);
     }
 }

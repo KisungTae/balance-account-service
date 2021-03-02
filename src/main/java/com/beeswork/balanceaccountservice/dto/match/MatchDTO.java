@@ -12,11 +12,11 @@ import java.util.UUID;
 public class MatchDTO {
     private Long    chatId;
     private UUID    matchedId;
-    private boolean unmatched;
+    private Boolean unmatched;
     private String  name;
     private String  repPhotoKey;
-    private boolean deleted;
-    private boolean active;
+    private Boolean deleted;
+    private Boolean active;
     private Date    createdAt;
     private Date    updatedAt;
 
@@ -38,6 +38,19 @@ public class MatchDTO {
         this.deleted = deleted;
         this.active = active;
         this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public MatchDTO(UUID matchedId, Date updatedAt) {
+        this.matchedId = matchedId;
+        this.updatedAt = updatedAt;
+    }
+
+    public MatchDTO(Long chatId, UUID matchedId, String name, String repPhotoKey, Date updatedAt) {
+        this.chatId = chatId;
+        this.matchedId = matchedId;
+        this.name = name;
+        this.repPhotoKey = repPhotoKey;
         this.updatedAt = updatedAt;
     }
 }

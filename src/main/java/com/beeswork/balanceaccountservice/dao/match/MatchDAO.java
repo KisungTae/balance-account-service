@@ -4,8 +4,6 @@ import com.beeswork.balanceaccountservice.dao.base.BaseDAO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
-import com.beeswork.balanceaccountservice.entity.match.MatchId;
-import com.beeswork.balanceaccountservice.projection.MatchProjection;
 import com.querydsl.core.Tuple;
 
 import java.util.Date;

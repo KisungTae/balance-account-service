@@ -68,5 +68,6 @@ public class ChatMessage {
         this.messageId = messageId;
         this.body = body;
         this.createdAt = createdAt;
+        this.updatedAt = createdAt;
     }
 }

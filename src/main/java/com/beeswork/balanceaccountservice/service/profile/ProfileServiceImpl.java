@@ -58,7 +58,9 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     @Override
     public CardDTO getCard(UUID accountId, UUID identityToken, UUID swipedId) {
         Profile profile = findValidProfile(accountId, identityToken);
-        return profileDAO.findCardDTO(swipedId, profile.getLocation());
+        CardDTO cardDTO = profileDAO.findCardDTO(swipedId, profile.getLocation());
+        if (cardDTO == null) throw new ProfileNotFoundException();
+        return cardDTO;
     }
 
     //  DESC 1. when registering, an account will be created with enabled = false, then when finish profiles,

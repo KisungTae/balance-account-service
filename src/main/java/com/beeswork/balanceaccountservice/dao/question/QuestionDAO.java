@@ -9,7 +9,6 @@ import java.util.UUID;
 
 public interface QuestionDAO extends BaseDAO<Question> {
 
-    Question findById(Integer questionId);
     List<Question> findAllIn(Set<Integer> ids);
     Question findNthNotIn(List<Integer> questionIds, int offset);
     long count();

@@ -18,16 +18,10 @@ import java.util.UUID;
 public class QuestionDAOImpl extends BaseDAOImpl<Question> implements QuestionDAO {
 
     private final QQuestion qQuestion = QQuestion.question;
-    private final QAccountQuestion qAccountQuestion = QAccountQuestion.accountQuestion;
 
     @Autowired
     public QuestionDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
         super(entityManager, jpaQueryFactory);
-    }
-
-    @Override
-    public Question findById(Integer questionId) {
-        return jpaQueryFactory.selectFrom(qQuestion).where(qQuestion.id.eq(questionId)).fetchFirst();
     }
 
     @Override

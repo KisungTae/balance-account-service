@@ -1,6 +1,6 @@
 package com.beeswork.balanceaccountservice.dto.swipe;
 
-import com.beeswork.balanceaccountservice.projection.MatchProjection;
+import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,16 +17,16 @@ public class ClickDTO {
         MATCH
     }
 
-    private Result          result = Result.MISS;
-    private MatchProjection match;
+    private Result   result = Result.MISS;
+    private MatchDTO matchDTO;
 
-    public void setupAsClick(UUID swipedId, Date swipeUpdatedAt) {
+    public void setupAsClick(UUID swipedId, Date updatedAt) {
         this.result = Result.CLICK;
-        this.match = new MatchProjection(swipedId, swipeUpdatedAt);
+        this.matchDTO = new MatchDTO(swipedId, updatedAt);
     }
 
-    public void setupAsMatch(Long chatId, UUID swipedId, String swipedName, String matchedPhotoKey, Date matchUpdated) {
+    public void setupAsMatch(Long chatId, UUID matchedId, String name, String repPhotoKey, Date updatedAt) {
         this.result = Result.MATCH;
-        this.match = new MatchProjection(chatId, swipedId, swipedName, matchedPhotoKey, matchUpdated);
+        this.matchDTO = new MatchDTO(chatId, matchedId, name, repPhotoKey, updatedAt);
     }
 }

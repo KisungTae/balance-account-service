@@ -357,7 +357,7 @@ order by count(matcher_id) desc;
 
 select *
 from account
-where id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
+where id = 'adbcbc08-8aa6-47d7-8cef-faf66aee082b';
 
 select *
 from match
@@ -365,14 +365,24 @@ where chat_id = 13;
 
 select *
 from profile
-where account_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
+where account_id = '69161188-1ba5-484c-860b-00faf97fa962';
 
 
 
 
 
+select *
+from swipe
+where swiper_id = '69161188-1ba5-484c-860b-00faf97fa962';
+
+select *
+from account
+where id not in (select swiped_id from swipe where swiper_id = '69161188-1ba5-484c-860b-00faf97fa962');
 
 
+select *
+from account_question
+where account_id = '69161188-1ba5-484c-860b-00faf97fa962';
 
 
 

@@ -42,6 +42,7 @@ public class ProfileController extends BaseController {
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(profileDTO));
     }
 
+    @GetMapping("/card")
     public ResponseEntity<String> getCard(@Valid @ModelAttribute GetCardVM getCardVM,
                                           BindingResult bindingResult)
     throws JsonProcessingException {

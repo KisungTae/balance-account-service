@@ -4,7 +4,7 @@ import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ListSwipesDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
-import com.beeswork.balanceaccountservice.service.firebase.FirebaseService;
+import com.beeswork.balanceaccountservice.service.fcm.FCMService;
 import com.beeswork.balanceaccountservice.service.swipe.SwipeService;
 import com.beeswork.balanceaccountservice.vm.swipe.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,18 +24,15 @@ import java.util.Locale;
 @RequestMapping("/swipe")
 public class SwipeController extends BaseController {
 
-    private final SwipeService    swipeService;
-    private final FirebaseService firebaseService;
+    private final SwipeService swipeService;
 
     @Autowired
     public SwipeController(ObjectMapper objectMapper,
                            ModelMapper modelMapper,
-                           SwipeService swipeService,
-                           FirebaseService firebaseService) {
+                           SwipeService swipeService) {
 
         super(objectMapper, modelMapper);
         this.swipeService = swipeService;
-        this.firebaseService = firebaseService;
     }
 
     @PostMapping("/like")

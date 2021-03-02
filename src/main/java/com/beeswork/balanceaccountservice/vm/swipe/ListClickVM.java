@@ -12,5 +12,5 @@ import java.util.Date;
 public class ListClickVM extends AccountIdentityVM {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private Date fetchedAt;
+    private Date fetchedAt = new Date();
 }

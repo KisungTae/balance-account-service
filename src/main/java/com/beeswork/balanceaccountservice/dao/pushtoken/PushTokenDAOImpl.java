@@ -4,7 +4,7 @@ package com.beeswork.balanceaccountservice.dao.pushtoken;
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushTokenId;
-import com.beeswork.balanceaccountservice.entity.account.QPushToken;
+import com.beeswork.balanceaccountservice.entity.pushtoken.QPushToken;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

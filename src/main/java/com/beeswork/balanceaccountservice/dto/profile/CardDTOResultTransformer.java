@@ -14,8 +14,16 @@ public class CardDTOResultTransformer {
     private static final int DISTANCE = 6;
     private static final int PHOTO_KEY = 7;
 
-    public static List<CardDTO> map(List<Object[]> rows) {
+    public static CardDTO map(List<Object[]> rows) {
+        List<CardDTO> cardDTOs = mapList(rows);
+        if (cardDTOs.size() <= 0) return null;
+        else return cardDTOs.get(0);
+    }
+
+    public static List<CardDTO> mapList(List<Object[]> rows) {
         List<CardDTO> cardDTOs = new ArrayList<>();
+        if (rows == null || rows.size() <= 0) return cardDTOs;
+
         CardDTO cardDTO = new CardDTO();
         String previousId = "";
 
