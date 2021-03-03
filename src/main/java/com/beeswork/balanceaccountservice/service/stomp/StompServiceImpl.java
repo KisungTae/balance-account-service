@@ -1,35 +1,42 @@
 package com.beeswork.balanceaccountservice.service.stomp;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
-import com.beeswork.balanceaccountservice.dto.push.Notification;
-import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
+import com.beeswork.balanceaccountservice.dto.push.Push;
 import com.beeswork.balanceaccountservice.service.fcm.FCMService;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.QueueInformation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
+
 @Service
 public class StompServiceImpl implements StompService {
 
-    private final FCMService FCMService;
-    private final SimpMessagingTemplate simpMessagingTemplate;
-    private final AmqpAdmin amqpAdmin;
-    private final AccountDAO accountDAO;
-    private static final String ACCEPT_LANGUAGE = "accept-language";
+    private final        FCMService            fcmService;
+    private final        SimpMessagingTemplate simpMessagingTemplate;
+    private final        AmqpAdmin             amqpAdmin;
+    private final        AccountDAO            accountDAO;
+    private final        MessageSource         messageSource;
+    private static final String                ACCEPT_LANGUAGE = "accept-language";
+
 
     @Autowired
-    public StompServiceImpl(FCMService FCMService,
+    public StompServiceImpl(FCMService fcmService,
                             SimpMessagingTemplate simpMessagingTemplate,
                             AmqpAdmin amqpAdmin,
-                            AccountDAO accountDAO) {
-        this.FCMService = FCMService;
+                            AccountDAO accountDAO,
+                            MessageSource messageSource) {
+        this.fcmService = fcmService;
         this.simpMessagingTemplate = simpMessagingTemplate;
         this.amqpAdmin = amqpAdmin;
         this.accountDAO = accountDAO;
+        this.messageSource = messageSource;
     }
 
     //  NOTE 1. convertAndSend to not existing queue, it creates a new queue under the queue desitination
@@ -48,16 +55,15 @@ public class StompServiceImpl implements StompService {
 
     @Override
     @Async("processExecutor")
-    public void sendPushNotification(Notification notification) {
-
+    public void sendPush(Push push, Locale locale) {
+        String queue = push.getAccountId().toString();
+        if (queueExists(queue)) simpMessagingTemplate.convertAndSend(queue, push);
+        else fcmService.sendPush(push, locale);
     }
 
-    public void pushAfterClick(ClickDTO clickDTO) {
-
-        ClickDTO pushClickDTO = new ClickDTO();
+    private boolean queueExists(String queue) {
+        QueueInformation queueInformation = amqpAdmin.getQueueInfo(queue);
+        return queueInformation != null && queueInformation.getConsumerCount() > 0;
     }
-
-
-
 
 }

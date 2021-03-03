@@ -1,9 +1,8 @@
 package com.beeswork.balanceaccountservice.dto.swipe;
 
-import com.beeswork.balanceaccountservice.dto.push.ClickedNotification;
-import com.beeswork.balanceaccountservice.dto.push.MatchedNotification;
-import com.beeswork.balanceaccountservice.dto.push.Notification;
-import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
+import com.beeswork.balanceaccountservice.dto.push.ClickedPush;
+import com.beeswork.balanceaccountservice.dto.push.MatchedPush;
+import com.beeswork.balanceaccountservice.dto.push.Push;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,20 +15,12 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ClickDTO {
 
-    public enum Result {
-        MISS,
-        CLICK,
-        MATCH
-    }
+    private Push clickPush;
+    private Push clickedPush;
 
-    private Result result = Result.MISS;
-    private MatchDTO matchDTO;
-    private Notification notification;
-
-    public void setupAsClicked(UUID swiperId, String swiperRepPhotoKey, UUID clickedId) {
-        this.result = Result.CLICK;
-        this.matchDTO = new MatchDTO(clickedId);
-        this.notification = new ClickedNotification(swiperId, swiperRepPhotoKey);
+    public void setupAsClicked(UUID clickerId, String clickerRepPhotoKey, UUID clickedId) {
+        this.clickPush = new ClickedPush(clickedId, null);
+        this.clickedPush = new ClickedPush(clickerId, clickerRepPhotoKey);
     }
 
     public void setupAsMatched(long chatId,
@@ -40,8 +31,7 @@ public class ClickDTO {
                                String matcherName,
                                String matcherRepPhotoKey,
                                Date createdAt) {
-        this.result = Result.MATCH;
-        this.matchDTO = new MatchDTO(chatId, matchedId, matchedName, matchedRepPhotoKey, createdAt);
-        this.notification = new MatchedNotification(chatId, matcherId, matcherName, matcherRepPhotoKey, createdAt);
+        this.clickPush = new MatchedPush(chatId, matchedId, matchedName, matchedRepPhotoKey, createdAt);
+        this.clickedPush = new MatchedPush(chatId, matcherId, matcherName, matcherRepPhotoKey, createdAt);
     }
 }

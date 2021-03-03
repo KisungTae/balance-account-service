@@ -131,7 +131,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         subSwipe.setUpdatedAt(updatedAt);
 
         if (objSwipe == null || !objSwipe.isClicked())
-            clickDTO.setupAsClicked(swiper.getId(), swiper.getName(), swiped.getId());
+            clickDTO.setupAsClicked(swiper.getId(), swiper.getRepPhotoKey(), swiped.getId());
         else {
             Chat chat = new Chat();
             chatDAO.persist(chat);
@@ -142,12 +142,12 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             subSwipe.setMatched(true);
             objSwipe.setMatched(true);
             clickDTO.setupAsMatched(chat.getId(),
-                                    swiper.getId(),
-                                    swiper.getName(),
-                                    swiper.getRepPhotoKey(),
                                     swiped.getId(),
                                     swiped.getName(),
                                     swiped.getRepPhotoKey(),
+                                    swiper.getId(),
+                                    swiper.getName(),
+                                    swiper.getRepPhotoKey(),
                                     updatedAt);
         }
         return clickDTO;

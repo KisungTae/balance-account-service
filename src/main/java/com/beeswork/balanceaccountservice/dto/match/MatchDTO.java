@@ -41,16 +41,4 @@ public class MatchDTO {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-
-    public MatchDTO(UUID matchedId) {
-        this.matchedId = matchedId;
-    }
-
-    public MatchDTO(Long chatId, UUID matchedId, String name, String repPhotoKey, Date createdAt) {
-        this.chatId = chatId;
-        this.matchedId = matchedId;
-        this.name = name;
-        this.repPhotoKey = repPhotoKey;
-        this.createdAt = createdAt;
-    }
 }
