@@ -12,9 +12,8 @@ import java.util.Date;
 @Setter
 public class ListSwipesVM extends AccountIdentityVM {
 
-    @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private Date fetchedAt;
+    private Date fetchedAt = new Date();
 
     @NotNull
     private Boolean clicked;

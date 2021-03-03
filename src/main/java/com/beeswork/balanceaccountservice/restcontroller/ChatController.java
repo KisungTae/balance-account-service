@@ -18,7 +18,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/chat")
@@ -37,7 +36,7 @@ public class ChatController {
 
     @MessageMapping("/send")
     public void send(@Payload ChatMessageVM chatMessageVM, MessageHeaders messageHeaders) {
-        stompService.send(chatMessageVM, messageHeaders);
+        stompService.sendChatMessage(chatMessageVM, messageHeaders);
     }
 
     @PostMapping("/message/sync")

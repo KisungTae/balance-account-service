@@ -10,15 +10,16 @@ import java.util.UUID;
 @Getter
 @Setter
 public class MatchDTO {
-    private Long    chatId;
-    private UUID    matchedId;
+
+    private Long chatId;
+    private UUID matchedId;
     private Boolean unmatched;
-    private String  name;
-    private String  repPhotoKey;
+    private String name;
+    private String repPhotoKey;
     private Boolean deleted;
     private Boolean active;
-    private Date    createdAt;
-    private Date    updatedAt;
+    private Date createdAt;
+    private Date updatedAt;
 
     @QueryProjection
     public MatchDTO(Long chatId,
@@ -41,16 +42,15 @@ public class MatchDTO {
         this.updatedAt = updatedAt;
     }
 
-    public MatchDTO(UUID matchedId, Date updatedAt) {
+    public MatchDTO(UUID matchedId) {
         this.matchedId = matchedId;
-        this.updatedAt = updatedAt;
     }
 
-    public MatchDTO(Long chatId, UUID matchedId, String name, String repPhotoKey, Date updatedAt) {
+    public MatchDTO(Long chatId, UUID matchedId, String name, String repPhotoKey, Date createdAt) {
         this.chatId = chatId;
         this.matchedId = matchedId;
         this.name = name;
         this.repPhotoKey = repPhotoKey;
-        this.updatedAt = updatedAt;
+        this.createdAt = createdAt;
     }
 }

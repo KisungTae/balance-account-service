@@ -4,7 +4,7 @@ import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ListSwipesDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
-import com.beeswork.balanceaccountservice.service.fcm.FCMService;
+import com.beeswork.balanceaccountservice.service.stomp.StompService;
 import com.beeswork.balanceaccountservice.service.swipe.SwipeService;
 import com.beeswork.balanceaccountservice.vm.swipe.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,14 +25,17 @@ import java.util.Locale;
 public class SwipeController extends BaseController {
 
     private final SwipeService swipeService;
+    private final StompService stompService;
 
     @Autowired
     public SwipeController(ObjectMapper objectMapper,
                            ModelMapper modelMapper,
-                           SwipeService swipeService) {
+                           SwipeService swipeService,
+                           StompService stompService) {
 
         super(objectMapper, modelMapper);
         this.swipeService = swipeService;
+        this.stompService = stompService;
     }
 
     @PostMapping("/like")
@@ -57,7 +60,6 @@ public class SwipeController extends BaseController {
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listSwipesDTO));
     }
 
-
     @PostMapping("/click")
     public ResponseEntity<String> click(@Valid @RequestBody ClickVM clickVM,
                                         BindingResult bindingResult,
@@ -68,6 +70,8 @@ public class SwipeController extends BaseController {
                                                clickVM.getIdentityToken(),
                                                clickVM.getSwipedId(),
                                                clickVM.getAnswers());
+        stompService.sendPushNotification(clickDTO.getNotification());
+        clickDTO.setNotification(null);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO));
     }
 }

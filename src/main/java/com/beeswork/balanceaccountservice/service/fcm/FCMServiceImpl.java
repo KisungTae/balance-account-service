@@ -1,11 +1,11 @@
 package com.beeswork.balanceaccountservice.service.fcm;
 
-import com.beeswork.balanceaccountservice.dto.firebase.FirebaseNotification;
+import com.beeswork.balanceaccountservice.dao.pushtoken.PushTokenDAO;
+import com.beeswork.balanceaccountservice.dto.push.Notification;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.scheduling.annotation.Async;
@@ -20,6 +20,7 @@ public class FCMServiceImpl implements FCMService {
     private final FirebaseMessaging firebaseMessaging;
     private final MessageSource     messageSource;
     private final Message.Builder   messageBuilder;
+    private final PushTokenDAO pushTokenDAO;
 
     private static final String CLICKED_NOTIFICATION_TITLE = "clicked.notification.title";
     private static final String MATCHED_NOTIFICATION_TITLE = "matched.notification.title";
@@ -31,19 +32,22 @@ public class FCMServiceImpl implements FCMService {
     @Autowired
     public FCMServiceImpl(FirebaseMessaging firebaseMessaging,
                           MessageSource messageSource,
-                          Message.Builder messageBuilder) {
+                          Message.Builder messageBuilder,
+                          PushTokenDAO pushTokenDAO) {
         this.firebaseMessaging = firebaseMessaging;
         this.messageSource = messageSource;
         this.messageBuilder = messageBuilder;
+        this.pushTokenDAO = pushTokenDAO;
     }
 
 
     @Override
     @Async("processExecutor")
-    public void sendNotification(FirebaseNotification firebaseNotification, Locale locale) {
+    public void sendNotification(Notification notification, Locale locale) {
         try {
-            if (firebaseNotification.validateFCMToken())
-                firebaseMessaging.send(firebaseNotification.buildMessage(messageBuilder, messageSource, locale));
+
+            if (notification.validateFCMToken())
+                firebaseMessaging.send(notification.buildFCMMessage(messageBuilder, messageSource, locale));
         } catch (FirebaseMessagingException e) {
             e.printStackTrace();
         }
@@ -52,14 +56,14 @@ public class FCMServiceImpl implements FCMService {
     @Override
     @Async("processExecutor")
     public void sendNotification(ClickDTO clickDTO, Locale locale) {
-        switch (clickDTO.getResult()) {
-            case CLICK:
-                sendNotification(clickedMessageBuilder(clickDTO, locale));
-            case MATCH:
-                sendNotification(matchedMessageBuilder(clickDTO, locale));
-            default:
-                break;
-        }
+//        switch (clickDTO.getResult()) {
+//            case CLICK:
+//                sendNotification(clickedMessageBuilder(clickDTO, locale));
+//            case MATCH:
+//                sendNotification(matchedMessageBuilder(clickDTO, locale));
+//            default:
+//                break;
+//        }
     }
 
     private Message.Builder clickedMessageBuilder(ClickDTO clickDTO, Locale locale) {
@@ -91,9 +95,9 @@ public class FCMServiceImpl implements FCMService {
         }
     }
 
-    private Notification notification(String titleKey, Locale locale) {
+    private com.google.firebase.messaging.Notification notification(String titleKey, Locale locale) {
         String title = messageSource.getMessage(titleKey, null, locale);
-        return Notification.builder().setTitle(title).setBody("").build();
+        return com.google.firebase.messaging.Notification.builder().setTitle(title).setBody("").build();
     }
 
 //    private void sendNotification(String token, Map<String, String> data)

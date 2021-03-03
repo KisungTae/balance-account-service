@@ -33,12 +33,12 @@ import java.util.*;
 @Service
 public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
-    private static final int SWIPE_POINT      = 200;
+    private static final int SWIPE_POINT = 200;
     private static final int FREE_SWIPE_A_DAY = 2000;
 
-    private final AccountDAO         accountDAO;
-    private final SwipeDAO           swipeDAO;
-    private final ChatDAO            chatDAO;
+    private final AccountDAO accountDAO;
+    private final SwipeDAO swipeDAO;
+    private final ChatDAO chatDAO;
     private final AccountQuestionDAO accountQuestionDAO;
 
     @Autowired
@@ -76,7 +76,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         swipe.setCount((swipe.getCount() + 1));
         swipeDAO.persist(swipe);
-        return modelMapper.map(questions, new TypeToken<List<QuestionDTO>>() {}.getType());
+        return modelMapper.map(questions, new TypeToken<List<QuestionDTO>>() {
+        }.getType());
     }
 
     @Override
@@ -130,7 +131,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         subSwipe.setUpdatedAt(updatedAt);
 
         if (objSwipe == null || !objSwipe.isClicked())
-            clickDTO.setupAsClick(swiped.getId(), updatedAt);
+            clickDTO.setupAsClicked(swiper.getId(), swiper.getName(), swiped.getId());
         else {
             Chat chat = new Chat();
             chatDAO.persist(chat);
@@ -140,7 +141,14 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
             subSwipe.setMatched(true);
             objSwipe.setMatched(true);
-            clickDTO.setupAsMatch(chat.getId(), swiped.getId(), swiped.getName(), swiped.getRepPhotoKey(), updatedAt);
+            clickDTO.setupAsMatched(chat.getId(),
+                                    swiper.getId(),
+                                    swiper.getName(),
+                                    swiper.getRepPhotoKey(),
+                                    swiped.getId(),
+                                    swiped.getName(),
+                                    swiped.getRepPhotoKey(),
+                                    updatedAt);
         }
         return clickDTO;
     }
