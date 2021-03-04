@@ -19,12 +19,9 @@ import java.util.Locale;
 public class FCMServiceImpl extends BaseServiceImpl implements FCMService {
 
     private final FirebaseMessaging firebaseMessaging;
-    private final MessageSource     messageSource;
-    private final Message.Builder   messageBuilder;
-    private final PushTokenDAO      pushTokenDAO;
-
-    private static final String CLICKED_NOTIFICATION_TITLE = "clicked.notification.title";
-    private static final String MATCHED_NOTIFICATION_TITLE = "matched.notification.title";
+    private final MessageSource messageSource;
+    private final Message.Builder messageBuilder;
+    private final PushTokenDAO pushTokenDAO;
 
     @Autowired
     public FCMServiceImpl(FirebaseMessaging firebaseMessaging,
@@ -41,19 +38,18 @@ public class FCMServiceImpl extends BaseServiceImpl implements FCMService {
 
     @Override
     public void sendPush(Push push, Locale locale) {
+        if (push == null) return;
         try {
             PushToken pushToken = pushTokenDAO.findRecent(push.getAccountId());
             validateAccount(pushToken.getAccount());
-            PushTokenType pushTokenType = pushToken.getPushTokenId().getType();
+            String key = pushToken.getKey();
+            if (key == null || key.isEmpty()) return;
 
+            PushTokenType pushTokenType = pushToken.getPushTokenId().getType();
             if (pushTokenType == PushTokenType.APS)
                 System.out.println("implement aps notification service");
             else if (pushTokenType == PushTokenType.FCM)
-                firebaseMessaging.send(push.buildFCMMessage(messageBuilder,
-                                                            messageSource,
-                                                            pushToken.getKey(),
-                                                            locale));
-
+                firebaseMessaging.send(push.buildFCMMessage(messageBuilder, messageSource, key, locale));
         } catch (FirebaseMessagingException e) {
             e.printStackTrace();
         }

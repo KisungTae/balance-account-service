@@ -207,6 +207,7 @@ public class BalanceAccountServiceApplication {
 // TODO			57. change to throw badrequestexception if field errors inclde accountId and IdentityToekn in base controller
 
 // TODO			58. check delete photo in account service and the findWithPhotosAndAccountQuestions()
+//
 
 // TODO			59. retrieve chatMessages make sent body = null
 //					--> implemented
@@ -231,6 +232,7 @@ public class BalanceAccountServiceApplication {
 // TODO			65. decide how many minutes subtract from lastChatMessagecreated, lastAccountudpatedAt .. etc
 
 // TODO			66. change repPhotoKey in Account, so when create account at very first time, put empty string for repPhotoKey
+//
 
 // TODO			67. remove chatId in chatMessage and findAllSentAfter()
 //					--> chatId removed in findAllUnsynced
@@ -295,11 +297,13 @@ public class BalanceAccountServiceApplication {
 //					--> implemented
 
 // TODO			85. firebaseservice should be called from controller level, because click() could be called twice when versionexception thrown then two notification will be sent
+//					--> implemented
 
 // TODO			86. get rid of question instead, answers's top and bottom options have questions like https://post.naver.com/viewer/postView.nhn?volumeNo=29296262&memberNo=38753951
 //					--> you can just put empty string to description in question table, then client will not display any description
 
 // TODO			87. move out notification to notiication service which has firebaseService and stompService
+//					--> implemented
 
 // TODO			88. deleteAccount() should also delete social_login, profile, push_notificaiton as well as account
 //					--> implemented

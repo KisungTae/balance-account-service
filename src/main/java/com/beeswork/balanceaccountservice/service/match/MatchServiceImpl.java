@@ -3,7 +3,7 @@ package com.beeswork.balanceaccountservice.service.match;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
-import com.beeswork.balanceaccountservice.dto.match.ListMatchDTO;
+import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
@@ -23,9 +23,9 @@ import java.util.UUID;
 
 @Service
 public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
-    private final  AccountDAO     accountDAO;
-    private final  MatchDAO       matchDAO;
-    private final  ChatMessageDAO chatMessageDAO;
+    private final AccountDAO accountDAO;
+    private final MatchDAO matchDAO;
+    private final ChatMessageDAO chatMessageDAO;
 
     @Autowired
     public MatchServiceImpl(ModelMapper modelMapper,
@@ -41,20 +41,23 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public ListMatchDTO listMatches(UUID accountId, UUID identityToken, Date fetchedAt) {
-//        checkIfAccountValid(accountDAO.findById(accountId), identityToken);
-        ListMatchDTO listMatchDTO = new ListMatchDTO(fetchedAt);
-
+    public ListMatchesDTO listMatches(UUID accountId, UUID identityToken, Date fetchedAt) {
+        validateAccount(accountDAO.findById(accountId), identityToken);
+        ListMatchesDTO listMatchesDTO = new ListMatchesDTO(fetchedAt);
         List<MatchDTO> matchDTOs = matchDAO.findAllAfter(accountId, offsetFetchedAt(fetchedAt));
-        for (MatchDTO matchDTO : matchDTOs) {
-            if (matchDTO.getUpdatedAt().after(listMatchDTO.getFetchedAt()))
-                listMatchDTO.setFetchedAt(matchDTO.getUpdatedAt());
-            matchDTO.setUpdatedAt(null);
+
+        if (matchDTOs != null) {
+            for (MatchDTO matchDTO : matchDTOs) {
+                if (matchDTO.getUpdatedAt().after(listMatchesDTO.getFetchedAt()))
+                    listMatchesDTO.setFetchedAt(matchDTO.getUpdatedAt());
+                matchDTO.setUpdatedAt(null);
+            }
         }
-        listMatchDTO.setMatchDTOs(matchDTOs);
-        listMatchDTO.setReceivedChatMessageDTOs(chatMessageDAO.findAllUnreceived(accountId));
-        listMatchDTO.setSentChatMessageDTOs(chatMessageDAO.findAllUnfetched(accountId));
-        return listMatchDTO;
+
+        listMatchesDTO.setMatchDTOs(matchDTOs);
+        listMatchesDTO.setReceivedChatMessageDTOs(chatMessageDAO.findAllUnreceived(accountId));
+        listMatchesDTO.setSentChatMessageDTOs(chatMessageDAO.findAllUnfetched(accountId));
+        return listMatchesDTO;
     }
 
     @Override

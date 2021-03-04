@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.dto.push;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.firebase.messaging.Message;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.context.MessageSource;
 

@@ -71,6 +71,6 @@ public class SwipeController extends BaseController {
                                                clickVM.getSwipedId(),
                                                clickVM.getAnswers());
         stompService.sendPush(clickDTO.getClickedPush(), locale);
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO.getClickPush()));
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO.getClickerPush()));
     }
 }

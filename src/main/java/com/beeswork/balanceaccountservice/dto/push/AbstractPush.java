@@ -14,6 +14,7 @@ import java.util.Locale;
 public abstract class AbstractPush implements Push {
 
     public enum Type {
+        MISSED,
         CLICKED,
         MATCHED,
         CHAT_MESSAGE

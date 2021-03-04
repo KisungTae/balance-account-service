@@ -56,6 +56,7 @@ public class StompServiceImpl implements StompService {
     @Override
     @Async("processExecutor")
     public void sendPush(Push push, Locale locale) {
+        if (push == null) return;
         String queue = push.getAccountId().toString();
         if (queueExists(queue)) simpMessagingTemplate.convertAndSend(queue, push);
         else fcmService.sendPush(push, locale);

@@ -8,14 +8,14 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ListMatchDTO {
+public class ListMatchesDTO {
 
     private Date                 fetchedAt;
     private List<MatchDTO>       matchDTOs;
     private List<ChatMessageDTO> sentChatMessageDTOs;
     private List<ChatMessageDTO> receivedChatMessageDTOs;
 
-    public ListMatchDTO(Date fetchedAt) {
+    public ListMatchesDTO(Date fetchedAt) {
         this.fetchedAt = fetchedAt;
     }
 }

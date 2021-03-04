@@ -1,6 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.dto.match.ListMatchDTO;
+import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.match.MatchService;
@@ -34,10 +34,10 @@ public class MatchController extends BaseController {
                                               BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ListMatchDTO listMatchDTO = matchService.listMatches(listMatchesVM.getAccountId(),
-                                                             listMatchesVM.getIdentityToken(),
-                                                             listMatchesVM.getFetchedAt());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listMatchDTO));
+        ListMatchesDTO listMatchesDTO = matchService.listMatches(listMatchesVM.getAccountId(),
+                                                                 listMatchesVM.getIdentityToken(),
+                                                                 listMatchesVM.getFetchedAt());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listMatchesDTO));
     }
 
     @PostMapping("/unmatch")

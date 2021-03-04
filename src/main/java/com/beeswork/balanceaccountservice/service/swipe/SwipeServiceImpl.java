@@ -123,8 +123,10 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         else swiper.setPoint((swiper.getPoint() - SWIPE_POINT));
 
         ClickDTO clickDTO = new ClickDTO();
-        if (accountQuestionDAO.countAllByAnswers(swipedId, answers) != answers.size())
+        if (accountQuestionDAO.countAllByAnswers(swipedId, answers) != answers.size()) {
+            clickDTO.setupAsMissed();
             return clickDTO;
+        }
 
         Date updatedAt = new Date();
         subSwipe.setClicked(true);

@@ -32,7 +32,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     private final AccountDAO accountDAO;
     private final QuestionDAO questionDAO;
-    private final PushTokenDAO pushTokenDAO;
     private final AccountQuestionDAO accountQuestionDAO;
     private final ProfileDAO profileDAO;
     private final LoginDAO loginDAO;
@@ -41,19 +40,16 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     public AccountServiceImpl(AccountDAO accountDAO,
                               ModelMapper modelMapper,
                               QuestionDAO questionDAO,
-                              PushTokenDAO pushTokenDAO,
                               AccountQuestionDAO accountQuestionDAO,
                               ProfileDAO profileDAO,
                               LoginDAO loginDAO) {
         super(modelMapper);
         this.accountDAO = accountDAO;
         this.questionDAO = questionDAO;
-        this.pushTokenDAO = pushTokenDAO;
         this.accountQuestionDAO = accountQuestionDAO;
         this.profileDAO = profileDAO;
         this.loginDAO = loginDAO;
     }
-
 
 
     //  TEST 1. save accountQuestionDTOs without setAccount() and setQuestion()
@@ -64,7 +60,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          accountQuestions to check if it needs to remove or insert or update entities
     @Override
     @Transactional
-    public void saveAnswers(UUID accountId, UUID identityToken, Map<Integer, Boolean> answers) {
+    public void saveQuestionAnswers(UUID accountId, UUID identityToken, Map<Integer, Boolean> answers) {
         Account account = validateAccount(accountDAO.findById(accountId), identityToken);
         List<AccountQuestion> accountQuestions = accountQuestionDAO.findAllIn(accountId, answers.keySet());
 

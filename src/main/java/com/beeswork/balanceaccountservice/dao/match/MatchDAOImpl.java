@@ -55,7 +55,6 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
         condition.and(qMatch.matcher.id.eq(matcherId));
         condition.and(qMatch.updatedAt.after(matchFetchedAt).or(qAccount.updatedAt.after(matchFetchedAt)));
         condition.and(qMatch.deleted.eq(false));
-
         return jpaQueryFactory.select(new QMatchDTO(qMatch.chat.id,
                                                     qMatch.matched.id,
                                                     qMatch.unmatched,

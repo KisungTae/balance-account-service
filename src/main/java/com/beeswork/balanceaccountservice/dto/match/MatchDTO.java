@@ -13,11 +13,11 @@ public class MatchDTO {
 
     private Long chatId;
     private UUID matchedId;
-    private Boolean unmatched;
+    private boolean active;
+    private boolean unmatched;
     private String name;
     private String repPhotoKey;
-    private Boolean deleted;
-    private Boolean active;
+    private boolean deleted;
     private Date createdAt;
     private Date updatedAt;
 

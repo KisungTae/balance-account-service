@@ -41,9 +41,9 @@ public class AccountController extends BaseController {
                                               BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        accountService.saveAnswers(saveAnswersVM.getAccountId(),
-                                   saveAnswersVM.getIdentityToken(),
-                                   saveAnswersVM.getAnswers());
+        accountService.saveQuestionAnswers(saveAnswersVM.getAccountId(),
+                                           saveAnswersVM.getIdentityToken(),
+                                           saveAnswersVM.getAnswers());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
