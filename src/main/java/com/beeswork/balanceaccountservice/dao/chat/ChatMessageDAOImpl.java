@@ -36,6 +36,7 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
     @Override
     public List<ChatMessageDTO> findAllUnfetched(UUID accountId) {
         return jpaQueryFactory.select(new QChatMessageDTO(qChatMessage.id,
+                                                          qChatMessage.chat.id,
                                                           qChatMessage.messageId,
                                                           qChatMessage.createdAt))
                               .from(qChatMessage)

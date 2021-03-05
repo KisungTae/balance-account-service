@@ -41,7 +41,7 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
     @Override
-    public List<SwipeDTO> findAllClickAfter(UUID accountId, Date fetchedAt) {
+    public List<SwipeDTO> findAllClickedsAfter(UUID accountId, Date fetchedAt) {
         return jpaQueryFactory.select(new QSwipeDTO(qSwipe.swipeId.swipedId, qSwipe.updatedAt))
                               .from(qSwipe)
                               .where(qSwipe.swipeId.swiperId.eq(accountId)
@@ -51,7 +51,7 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
                               .fetch();
     }
 
-    public List<SwipeDTO> findAllClickedAfter(UUID accountId, Date fetchedAt) {
+    public List<SwipeDTO> findAllClickersAfter(UUID accountId, Date fetchedAt) {
         Expression<Date> updatedAtCase = new CaseBuilder().when(qSwipe.updatedAt.after(qAccount.updatedAt))
                                                           .then(qSwipe.updatedAt)
                                                           .otherwise(qAccount.updatedAt);

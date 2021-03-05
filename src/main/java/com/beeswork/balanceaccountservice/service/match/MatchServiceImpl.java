@@ -48,12 +48,17 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
         if (matchDTOs != null) {
             for (MatchDTO matchDTO : matchDTOs) {
+                if (matchDTO.isDeleted()) matchDTO.setName(null);
+                if (matchDTO.isUnmatched() || matchDTO.isDeleted()) {
+                    matchDTO.setRepPhotoKey(null);
+                    matchDTO.setCreatedAt(null);
+                    matchDTO.setActive(true);
+                }
                 if (matchDTO.getUpdatedAt().after(listMatchesDTO.getFetchedAt()))
                     listMatchesDTO.setFetchedAt(matchDTO.getUpdatedAt());
                 matchDTO.setUpdatedAt(null);
             }
         }
-
         listMatchesDTO.setMatchDTOs(matchDTOs);
         listMatchesDTO.setReceivedChatMessageDTOs(chatMessageDAO.findAllUnreceived(accountId));
         listMatchesDTO.setSentChatMessageDTOs(chatMessageDAO.findAllUnfetched(accountId));

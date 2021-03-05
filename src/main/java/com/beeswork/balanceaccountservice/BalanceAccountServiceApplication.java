@@ -235,7 +235,6 @@ public class BalanceAccountServiceApplication {
 //
 
 // TODO			67. remove chatId in chatMessage and findAllSentAfter()
-//					--> chatId removed in findAllUnsynced
 
 // TODO			68. update received of chatmessage could throw exception when version is on the entity, should be fine,
 //  				because all of them update received = true does not matter if first or second one updates the same entitiy it will result in received = true

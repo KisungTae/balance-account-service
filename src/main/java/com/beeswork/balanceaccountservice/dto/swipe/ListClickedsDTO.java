@@ -9,11 +9,13 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ListSwipesDTO {
+public class ListClickedsDTO {
     private List<SwipeDTO> swipeDTOs;
     private Date fetchedAt;
 
-    public ListSwipesDTO(Date fetchedAt) {
+    public ListClickedsDTO(List<SwipeDTO> swipeDTOs, Date fetchedAt) {
+        this.swipeDTOs = swipeDTOs;
         this.fetchedAt = fetchedAt;
     }
 }
+

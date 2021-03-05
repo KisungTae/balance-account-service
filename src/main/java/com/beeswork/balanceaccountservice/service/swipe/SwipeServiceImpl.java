@@ -6,7 +6,7 @@ import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.ListSwipesDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.ListClickedsDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
@@ -82,19 +82,25 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public ListSwipesDTO listSwipes(UUID accountId, UUID identityToken, boolean clicked, Date fetchedAt) {
+    public ListClickedsDTO listClickeds(UUID accountId, UUID identityToken, Date fetchedAt) {
         validateAccount(accountDAO.findById(accountId), identityToken);
-        ListSwipesDTO listSwipesDTO = new ListSwipesDTO(fetchedAt);
-        if (clicked) listSwipesDTO.setSwipeDTOs(swipeDAO.findAllClickedAfter(accountId, fetchedAt));
-        else listSwipesDTO.setSwipeDTOs(swipeDAO.findAllClickAfter(accountId, fetchedAt));
+        ListClickedsDTO listClickedsDTO = new ListClickedsDTO(swipeDAO.findAllClickedsAfter(accountId, fetchedAt), fetchedAt);
+        if (listClickedsDTO.getSwipeDTOs() == null) return listClickedsDTO;
 
-        for (SwipeDTO swipeDTO : listSwipesDTO.getSwipeDTOs()) {
+        for (SwipeDTO swipeDTO : listClickedsDTO.getSwipeDTOs()) {
             Date updatedAt = swipeDTO.getUpdatedAt();
-            if (updatedAt != null && updatedAt.after(listSwipesDTO.getFetchedAt()))
-                listSwipesDTO.setFetchedAt(swipeDTO.getUpdatedAt());
+            if (updatedAt != null && updatedAt.after(listClickedsDTO.getFetchedAt()))
+                listClickedsDTO.setFetchedAt(swipeDTO.getUpdatedAt());
             swipeDTO.setUpdatedAt(null);
         }
-        return listSwipesDTO;
+        return listClickedsDTO;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public List<SwipeDTO> listClickers(UUID accountId, UUID identityToken, Date fetchedAt) {
+        validateAccount(accountDAO.findById(accountId), identityToken);
+        return swipeDAO.findAllClickersAfter(accountId, fetchedAt);
     }
 
     @Override
