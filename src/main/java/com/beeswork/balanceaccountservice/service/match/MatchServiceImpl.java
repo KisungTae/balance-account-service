@@ -48,7 +48,6 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
         if (matchDTOs != null) {
             for (MatchDTO matchDTO : matchDTOs) {
-                if (matchDTO.isDeleted()) matchDTO.setName(null);
                 if (matchDTO.isUnmatched() || matchDTO.isDeleted()) {
                     matchDTO.setRepPhotoKey(null);
                     matchDTO.setCreatedAt(null);
