@@ -219,27 +219,38 @@ create table chat
     id bigserial primary key
 );
 
+
 create table chat_message
 (
     id           bigserial primary key,
-    message_id   bigint       not null,
+    chat_id      bigint       not null,
+    recipient_id uuid         not null,
     body         varchar(200) not null,
     read         boolean      not null,
-    fetched      boolean      not null,
     received     boolean      not null,
-    chat_id      bigint       not null,
-    account_id   uuid         not null,
-    recipient_id uuid         not null,
     created_at   timestamptz  not null,
     updated_at   timestamptz  not null,
 
     constraint chat_message_chat_id_fk foreign key (chat_id) references chat (id),
-    constraint chat_message_account_id_fk foreign key (account_id) references account (id),
     constraint chat_message_recipient_id_fk foreign key (recipient_id) references account (id)
 );
 
 create index chat_message_chat_id_created_at on chat_message (chat_id, created_at);
 
+
+create table sent_chat_message
+(
+    chat_message_id bigint primary key,
+    account_id      uuid        not null,
+    message_id      bigint      not null,
+    fetched         boolean     not null,
+    created_at      timestamptz not null,
+    updated_at      timestamptz not null,
+
+    constraint sent_chat_message_chat_message_id_fk foreign key (chat_message_id) references chat_message (id),
+    constraint sent_chat_message_account_id_fk foreign key (account_id) references account (id)
+
+);
 
 
 create table login
@@ -355,9 +366,13 @@ from match
 group by matcher_id
 order by count(matcher_id) desc;
 
+
+select *
+from account;
+
 select *
 from account
-where id = 'adbcbc08-8aa6-47d7-8cef-faf66aee082b';
+where id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
 
 select *
 from match
@@ -366,9 +381,6 @@ where chat_id = 13;
 select *
 from profile
 where account_id = '69161188-1ba5-484c-860b-00faf97fa962';
-
-
-
 
 
 select *
@@ -384,11 +396,27 @@ select *
 from account_question
 where account_id = '69161188-1ba5-484c-860b-00faf97fa962';
 
+select *
+from chat_message;
 
 
 
+select *
+from sent_chat_message;
+
+select *
+from match
+where matcher_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
 
 
+
+select *
+from chat_message
+where recipient_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
+
+select *
+from sent_chat_message
+where account_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
 
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query End --------------------------------------------

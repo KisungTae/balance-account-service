@@ -10,5 +10,6 @@ import java.util.List;
 @Getter
 @Setter
 public class SyncChatMessagesVM extends AccountIdentityVM {
-    private List<Long> chatMessageIds = new ArrayList<>();
+    private List<Long> receivedChatMessageIds = new ArrayList<>();
+    private List<Long> sentChatMessageIds = new ArrayList<>();
 }

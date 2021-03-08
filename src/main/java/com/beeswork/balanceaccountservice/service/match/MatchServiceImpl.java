@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.service.match;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
+import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
@@ -26,16 +27,19 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     private final AccountDAO accountDAO;
     private final MatchDAO matchDAO;
     private final ChatMessageDAO chatMessageDAO;
+    private final SentChatMessageDAO sentChatMessageDAO;
 
     @Autowired
     public MatchServiceImpl(ModelMapper modelMapper,
                             AccountDAO accountDAO,
                             MatchDAO matchDAO,
-                            ChatMessageDAO chatMessageDAO) {
+                            ChatMessageDAO chatMessageDAO,
+                            SentChatMessageDAO sentChatMessageDAO) {
         super(modelMapper);
         this.accountDAO = accountDAO;
         this.matchDAO = matchDAO;
         this.chatMessageDAO = chatMessageDAO;
+        this.sentChatMessageDAO = sentChatMessageDAO;
     }
 
 
@@ -60,7 +64,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
         }
         listMatchesDTO.setMatchDTOs(matchDTOs);
         listMatchesDTO.setReceivedChatMessageDTOs(chatMessageDAO.findAllUnreceived(accountId));
-        listMatchesDTO.setSentChatMessageDTOs(chatMessageDAO.findAllUnfetched(accountId));
+        listMatchesDTO.setSentChatMessageDTOs(sentChatMessageDAO.findAllUnfetched(accountId));
         return listMatchesDTO;
     }
 

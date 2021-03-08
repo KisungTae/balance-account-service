@@ -2,10 +2,12 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
+import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
+import com.beeswork.balanceaccountservice.entity.chat.SentChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.MatchId;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
@@ -50,6 +52,7 @@ public class DummyController {
     private final FCMService   FCMService;
     private final AccountDAO   accountDAO;
     private final ChatDAO chatDAO;
+    private final SentChatMessageDAO sentChatMessageDAO;
     private final GeometryFactory geometryFactory;
 
     @Autowired
@@ -57,12 +60,15 @@ public class DummyController {
                            ObjectMapper objectMapper,
                            FCMService FCMService,
                            AccountDAO accountDAO,
-                           ChatDAO chatDAO, GeometryFactory geometryFactory) {
+                           ChatDAO chatDAO,
+                           SentChatMessageDAO sentChatMessageDAO,
+                           GeometryFactory geometryFactory) {
         this.matchDAO = matchDAO;
         this.objectMapper = objectMapper;
         this.FCMService = FCMService;
         this.accountDAO = accountDAO;
         this.chatDAO = chatDAO;
+        this.sentChatMessageDAO = sentChatMessageDAO;
         this.geometryFactory = geometryFactory;
     }
 
@@ -332,14 +338,16 @@ public class DummyController {
                     boolean who = random.nextBoolean();
                     Account sender = who ? match.getMatcher() : match.getMatched();
                     Account receiver = who ? match.getMatched() : match.getMatcher();
-                    match.getChat()
-                         .getChatMessages()
-                         .add(new ChatMessage(match.getChat(),
-                                              sender,
-                                              receiver,
-                                              (long) i + innerCount,
-                                              "message-" + random.nextFloat(),
-                                              date));
+                    ChatMessage chatMessage = new ChatMessage(match.getChat(),
+                                                              receiver,
+                                                              "message-" + random.nextFloat(),
+                                                              date);
+                    match.getChat().getChatMessages().add(chatMessage);
+
+                    SentChatMessage sentChatMessage = new SentChatMessage(chatMessage, sender, innerCount, date);
+                    sentChatMessageDAO.persist(sentChatMessage);
+
+
                 }
             }
         }

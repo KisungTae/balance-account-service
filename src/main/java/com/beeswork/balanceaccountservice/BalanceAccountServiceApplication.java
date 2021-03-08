@@ -309,6 +309,8 @@ public class BalanceAccountServiceApplication {
 
 // TODO			89. deletePhotosAsync() in S3Service throws one or more objects could not be dleted eexception
 
+// TODO			90. when create chatMessage, create sentChatMessage as well
+
 
 
 

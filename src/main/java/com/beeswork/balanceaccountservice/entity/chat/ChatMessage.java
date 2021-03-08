@@ -23,19 +23,9 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "message_id")
-    private long messageId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id")
     private Chat chat;
-
-    @Column(name = "account_id", insertable = false, updatable = false)
-    private UUID accountId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
-    private Account account;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipient_id")
@@ -46,9 +36,6 @@ public class ChatMessage {
 
     @Column(name = "read")
     private boolean read;
-
-    @Column(name = "fetched")
-    private boolean fetched;
 
     @Column(name = "received")
     private boolean received;
@@ -61,11 +48,9 @@ public class ChatMessage {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public ChatMessage(Chat chat, Account account, Account recipient, Long messageId, String body, Date createdAt) {
+    public ChatMessage(Chat chat, Account recipient, String body, Date createdAt) {
         this.chat = chat;
-        this.account = account;
         this.recipient = recipient;
-        this.messageId = messageId;
         this.body = body;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;

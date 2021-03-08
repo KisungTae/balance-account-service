@@ -22,9 +22,8 @@ public class ChatMessageDTO {
     private Date   createdAt;
 
     @QueryProjection
-    public ChatMessageDTO(Long id, Long chatId, Long messageId, Date createdAt) {
+    public ChatMessageDTO(Long id, Long messageId, Date createdAt) {
         this.id = id;
-        this.chatId = chatId;
         this.messageId = messageId;
         this.createdAt = createdAt;
     }

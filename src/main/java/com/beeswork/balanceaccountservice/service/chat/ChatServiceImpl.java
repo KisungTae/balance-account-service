@@ -2,10 +2,12 @@ package com.beeswork.balanceaccountservice.service.chat;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
+import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
+import com.beeswork.balanceaccountservice.entity.chat.SentChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountDeletedException;
@@ -30,19 +32,22 @@ import java.util.UUID;
 @Service
 public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
 
-    private final MatchDAO       matchDAO;
+    private final MatchDAO matchDAO;
     private final ChatMessageDAO chatMessageDAO;
-    private final AccountDAO     accountDAO;
+    private final AccountDAO accountDAO;
+    private final SentChatMessageDAO sentChatMessageDAO;
 
     @Autowired
     public ChatServiceImpl(MatchDAO matchDAO,
                            ChatMessageDAO chatMessageDAO,
                            ModelMapper modelMapper,
-                           AccountDAO accountDAO) {
+                           AccountDAO accountDAO,
+                           SentChatMessageDAO sentChatMessageDAO) {
         super(modelMapper);
         this.matchDAO = matchDAO;
         this.chatMessageDAO = chatMessageDAO;
         this.accountDAO = accountDAO;
+        this.sentChatMessageDAO = sentChatMessageDAO;
     }
 
     @Override
@@ -92,15 +97,12 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         Match match = matchDAO.findById(accountId, recipientId);
 //        validateChat(match, identityToken, chatId);
 
-        ChatMessage chatMessage = chatMessageDAO.findByMessageId(messageId);
-        if (chatMessage == null) {
-            chatMessage = new ChatMessage(match.getChat(),
-                                          match.getMatcher(),
-                                          match.getMatched(),
-                                          messageId,
-                                          body,
-                                          createdAt);
+        SentChatMessage sentChatMessage = sentChatMessageDAO.findByMessageId(messageId);
+        if (sentChatMessage == null) {
+            ChatMessage chatMessage = new ChatMessage(match.getChat(), match.getMatched(), body, createdAt);
+            sentChatMessage = new SentChatMessage(chatMessage, match.getMatcher(), messageId, createdAt);
             chatMessageDAO.persist(chatMessage);
+            sentChatMessageDAO.persist(sentChatMessage);
         }
 
         if (!match.isActive()) {
@@ -108,8 +110,8 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
             matchDAO.persist(match);
         }
         ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
-        chatMessageDTO.setId(chatMessage.getId());
-        chatMessageDTO.setCreatedAt(chatMessage.getCreatedAt());
+        chatMessageDTO.setId(sentChatMessage.getChatMessageId());
+        chatMessageDTO.setCreatedAt(sentChatMessage.getCreatedAt());
         return chatMessageDTO;
     }
 
@@ -117,7 +119,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     @Transactional
     public void receivedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
         validateAccount(accountDAO.findById(accountId), identityToken);
-        ChatMessage chatMessage = chatMessageDAO.findByIdWithLock(chatMessageId);
+        ChatMessage chatMessage = chatMessageDAO.findById(chatMessageId);
         chatMessage.setReceived(true);
     }
 
@@ -125,38 +127,20 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     @Transactional
     public void fetchedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
         validateAccount(accountDAO.findById(accountId), identityToken);
-        ChatMessage chatMessage = chatMessageDAO.findByIdWithLock(chatMessageId);
-        chatMessage.setFetched(true);
+        SentChatMessage sentChatMessage = sentChatMessageDAO.findByMessageId(chatMessageId);
+        sentChatMessage.setFetched(true);
     }
 
     @Override
     @Transactional
-    public void syncChatMessages(UUID accountId, UUID identityToken, List<Long> chatMessageIds) {
-//        checkIfAccountValid(accountDAO.findById(accountId), identityToken);
-        for (ChatMessage chatMessage : chatMessageDAO.findAllInWithLock(chatMessageIds)) {
-            if (chatMessage.getAccountId().equals(accountId)) chatMessage.setFetched(true);
-            else chatMessage.setReceived(true);
-        }
+    public void syncChatMessages(UUID accountId,
+                                 UUID identityToken,
+                                 List<Long> sentChatMessageIds,
+                                 List<Long> receivedChatMessageIds) {
+//        validateAccount(accountDAO.findById(accountId), identityToken);
+        List<ChatMessage> receivedChatMessages = chatMessageDAO.findAllIn(receivedChatMessageIds);
+        for (ChatMessage chatMessage : receivedChatMessages) chatMessage.setReceived(true);
+        List<SentChatMessage> sentChatMessages = sentChatMessageDAO.findAllIn(sentChatMessageIds);
+        for (SentChatMessage sentChatMessage : sentChatMessages) sentChatMessage.setFetched(true);
     }
-
-
-//    @Override
-//    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-//    public List<ChatMessageDTO> listChatMessages(UUID accountId,
-//                                                 UUID identityToken,
-//                                                 UUID recipientId,
-//                                                 Long chatId,
-//                                                 Date lastChatMessageCreatedAt) {
-//        validateChat(matchDAO.findById(accountId, recipientId), identityToken, chatId);
-//        List<ChatMessageDTO> chatMessageDTOs = new ArrayList<>();
-//        for (ChatMessage chatMessage : chatMessageDAO.findAllByChatIdAfter(chatId, DateUtils.addHours(lastChatMessageCreatedAt, -1))) {
-//            ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessage, ChatMessageDTO.class);
-//            if (chatMessage.getAccountId().equals(recipientId))
-//                chatMessageDTO.setMessageId(null);
-//            chatMessageDTOs.add(chatMessageDTO);
-//        }
-//        return chatMessageDTOs;
-//    }
-
-
 }

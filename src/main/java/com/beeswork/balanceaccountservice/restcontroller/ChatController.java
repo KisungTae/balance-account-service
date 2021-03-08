@@ -45,7 +45,8 @@ public class ChatController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         chatService.syncChatMessages(syncChatMessagesVM.getAccountId(),
                                      syncChatMessagesVM.getIdentityToken(),
-                                     syncChatMessagesVM.getChatMessageIds());
+                                     syncChatMessagesVM.getSentChatMessageIds(),
+                                     syncChatMessagesVM.getReceivedChatMessageIds());
     }
 
     //  TODO: remove me
