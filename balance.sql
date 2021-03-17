@@ -410,6 +410,18 @@ where matcher_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
 
 
 
+
+
+update match set unmatched = false, unmatcher = false, deleted = false, updated_at = current_timestamp
+where matcher_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
+
+
+update match set unmatched = true, unmatcher = true, deleted = false, updated_at = current_timestamp
+where matcher_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
+
+
+
+
 select *
 from chat_message
 where recipient_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';

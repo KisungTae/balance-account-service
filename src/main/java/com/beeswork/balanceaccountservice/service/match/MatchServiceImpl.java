@@ -54,7 +54,6 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
             for (MatchDTO matchDTO : matchDTOs) {
                 if (matchDTO.isUnmatched() || matchDTO.isDeleted()) {
                     matchDTO.setRepPhotoKey(null);
-                    matchDTO.setCreatedAt(null);
                     matchDTO.setActive(true);
                 }
                 if (matchDTO.getUpdatedAt().after(listMatchesDTO.getFetchedAt()))
