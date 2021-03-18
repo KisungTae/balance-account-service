@@ -8,6 +8,7 @@ import com.beeswork.balanceaccountservice.exception.BaseException;
 import com.beeswork.balanceaccountservice.exception.account.*;
 import com.beeswork.balanceaccountservice.exception.login.EmailNotMutableException;
 import com.beeswork.balanceaccountservice.exception.login.LoginNotFoundException;
+import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoNotFoundException;
 import com.beeswork.balanceaccountservice.exception.profile.ProfileNotFoundException;
@@ -56,7 +57,7 @@ public class ExceptionControllerAdvice {
     //  TEST 1. if exception is thrown inside handleNotFoundException, then it will throw handleNotFoundException not route to General Exception handler
     @ExceptionHandler({AccountNotFoundException.class, QuestionNotFoundException.class, SwipeNotFoundException.class,
                        PhotoNotFoundException.class, AccountQuestionNotFoundException.class,
-                       LoginNotFoundException.class, ProfileNotFoundException.class})
+                       LoginNotFoundException.class, ProfileNotFoundException.class, MatchNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)
     throws Exception {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)

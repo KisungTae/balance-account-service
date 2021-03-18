@@ -311,7 +311,7 @@ public class BalanceAccountServiceApplication {
 
 // TODO			90. when create chatMessage, create sentChatMessage as well
 
-
+// TODO			91. consider offsetTime = milliseconds otherwise listMatches() in android will keep increasing rowId of the same match
 
 
 // TODO			Chat Business rules

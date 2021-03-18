@@ -367,13 +367,30 @@ from match
 group by matcher_id
 order by count(matcher_id) desc;
 
+
+delete from match;
+delete from sent_chat_message;
+delete from chat_message;
+
+update chat_message set received = false;
+update sent_chat_message set fetched = false;
+
 select *
 from match
 order by updated_at desc;
 
+select *
+from match
+where unmatched = true;
 
-update match set unmatched = true, updated_at = current_timestamp where chat_id = 217 or chat_id = 218;
+select *
+from match
+where chat_id = 77 or chat_id = 76;
 
+update match set unmatched = true, updated_at = '2021-03-28 20:25:48.218952' where chat_id = 77 or chat_id = 76;
+update match set deleted = false;
+select *
+from match;
 
 select *
 from chat_message;
@@ -388,7 +405,7 @@ from account;
 
 select *
 from account
-where id = 'fc3753a0-5683-49f9-96f5-ee04e10f01d5';
+where id = '0a70c357-c414-4a3c-b7cc-3720dd505269';
 
 select *
 from match

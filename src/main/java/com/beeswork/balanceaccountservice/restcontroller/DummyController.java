@@ -328,7 +328,7 @@ public class DummyController {
             if (random.nextBoolean()) {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(date);
-                calendar.add(Calendar.HOUR_OF_DAY, 1);
+                calendar.add(Calendar.HOUR, -1);
                 date = calendar.getTime();
             }
 
@@ -434,6 +434,8 @@ public class DummyController {
         }
 
 
+
+
 //        Random random = new Random();
 //        for (Match match : matches) {
 //            int messageCount = random.nextInt(20);
@@ -471,6 +473,7 @@ public class DummyController {
 //            }
 //        }
     }
+
 
 
     @GetMapping("/send/notification/clicked")
