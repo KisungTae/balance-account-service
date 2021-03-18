@@ -140,6 +140,7 @@ drop table question;
 drop table photo;
 drop table match;
 drop table swipe;
+drop table sent_chat_message;
 drop table chat_message;
 drop table chat;
 drop table login;
@@ -366,13 +367,28 @@ from match
 group by matcher_id
 order by count(matcher_id) desc;
 
+select *
+from match
+order by updated_at desc;
+
+
+update match set unmatched = true, updated_at = current_timestamp where chat_id = 217 or chat_id = 218;
+
+
+select *
+from chat_message;
+
+delete from match;
+
+select *
+from swipe;
 
 select *
 from account;
 
 select *
 from account
-where id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
+where id = 'fc3753a0-5683-49f9-96f5-ee04e10f01d5';
 
 select *
 from match
@@ -410,7 +426,8 @@ where matcher_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
 
 
 
-
+select *
+from match;
 
 update match set unmatched = false, unmatcher = false, deleted = false, updated_at = current_timestamp
 where matcher_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';

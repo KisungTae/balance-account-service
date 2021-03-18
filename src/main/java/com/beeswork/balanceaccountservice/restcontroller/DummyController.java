@@ -72,6 +72,79 @@ public class DummyController {
         this.geometryFactory = geometryFactory;
     }
 
+
+    @Transactional
+    @PostMapping("/create/swipe-for-account")
+    public void createDummySwipeForAccount(@RequestParam UUID accountId) {
+        Account swiper = accountDAO.findById(accountId);
+        List<Account> accounts = new JPAQueryFactory(entityManager).selectFrom(QAccount.account).fetch();
+        Random random = new Random();
+
+        for (Account swiped : accounts) {
+            if (swiper.getId().equals(swiped.getId())) continue;
+
+            Date now = new Date();
+            Swipe subSwipe = new Swipe();
+            subSwipe.setSwipeId(new SwipeId(swiper.getId(), swiped.getId()));
+            subSwipe.setSwiper(swiper);
+            subSwipe.setSwiped(swiped);
+            subSwipe.setClicked(random.nextBoolean());
+            subSwipe.setCount((random.nextInt(10) + 1));
+            subSwipe.setCreatedAt(now);
+            subSwipe.setUpdatedAt(now);
+
+            now = new Date();
+            Swipe objSwipe = new Swipe();
+            objSwipe.setSwipeId(new SwipeId(swiped.getId(), swiper.getId()));
+            objSwipe.setSwiper(swiped);
+            objSwipe.setSwiped(swiper);
+            objSwipe.setClicked(random.nextBoolean());
+            objSwipe.setCount((random.nextInt(10) + 1));
+            objSwipe.setCreatedAt(now);
+            objSwipe.setUpdatedAt(now);
+
+            entityManager.persist(subSwipe);
+            entityManager.persist(objSwipe);
+        }
+
+    }
+
+    @Transactional
+    @PostMapping("/create/match-for-account")
+    public void createDummyMatchForAccount(@RequestParam UUID accountId) {
+        Account account = accountDAO.findById(accountId);
+
+    }
+
+    @Transactional
+    @PostMapping("/create/chat-message-for-account")
+    public void createDummyChatMessageForAccount(@RequestParam UUID accountId) {
+        Account account = accountDAO.findById(accountId);
+        Random random = new Random();
+        int innerCount = 0;
+        Date date = new Date();
+        for (Match match : account.getMatches()) {
+            if (random.nextBoolean()) {
+                innerCount++;
+                boolean who = random.nextBoolean();
+                Account sender = who ? match.getMatcher() : match.getMatched();
+                Account receiver = who ? match.getMatched() : match.getMatcher();
+                ChatMessage chatMessage = new ChatMessage(match.getChat(),
+                                                          receiver,
+                                                          "message-" + random.nextFloat(),
+                                                          date);
+                match.getChat().getChatMessages().add(chatMessage);
+
+                SentChatMessage sentChatMessage = new SentChatMessage(chatMessage, sender, innerCount, date);
+                sentChatMessageDAO.persist(sentChatMessage);
+
+
+            }
+        }
+
+    }
+
+
     @Transactional
     @PostMapping("/create/accounts")
     public void createDummyAccounts(@RequestParam int size) throws InterruptedException {
@@ -237,7 +310,7 @@ public class DummyController {
 
     @Transactional
     @PostMapping("/create/match")
-    public void createDummyMatch() throws InterruptedException {
+    public void createDummyMatch() {
 
 
         List<Swipe> swipes = entityManager.unwrap(Session.class).createQuery("select s1 from Swipe s1 " +
@@ -246,14 +319,21 @@ public class DummyController {
                                                                              "and s1.swipeId.swiperId = s2.swipeId.swipedId order by s1.swipeId.swiperId",
                                                                              Swipe.class).getResultList();
         HashMap<String, Match> matchMap = new HashMap<>();
+        Random random = new Random();
+
+        Date date = new Date();
 
         for (Swipe swipe : swipes) {
 
-            Thread.sleep(10);
-            Date date = new Date();
+            if (random.nextBoolean()) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date);
+                calendar.add(Calendar.HOUR_OF_DAY, 1);
+                date = calendar.getTime();
+            }
+
             Chat chat = new Chat();
 
-            MatchId theOtherPartyMatchId = new MatchId(swipe.getSwipeId().getSwipedId(), swipe.getSwipeId().getSwiperId());
             if (matchMap.containsKey(swipe.getSwipeId().getSwipedId().toString() + swipe.getSwipeId().getSwiperId().toString())) {
                 chat = matchMap.get(swipe.getSwipeId().getSwipedId().toString() + swipe.getSwipeId().getSwiperId().toString()).getChat();
             }
@@ -263,6 +343,7 @@ public class DummyController {
             newMatch.setChat(chat);
             newMatch.setMatcher(swipe.getSwiper());
             newMatch.setMatched(swipe.getSwiped());
+
             newMatch.setUnmatcher(false);
 
             newMatch.setCreatedAt(date);
