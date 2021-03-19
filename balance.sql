@@ -368,101 +368,68 @@ group by matcher_id
 order by count(matcher_id) desc;
 
 
-delete from match;
-delete from sent_chat_message;
-delete from chat_message;
-
-update chat_message set received = false;
-update sent_chat_message set fetched = false;
-
-select *
-from match
-order by updated_at desc;
-
-select *
-from match
-where unmatched = true;
-
-select *
-from match
-where chat_id = 77 or chat_id = 76;
-
-update match set unmatched = true, updated_at = '2021-03-28 20:25:48.218952' where chat_id = 77 or chat_id = 76;
-update match set deleted = false;
-select *
-from match;
-
-select *
-from chat_message;
-
-delete from match;
-
-select *
-from swipe;
-
-select *
-from account;
-
-select *
-from account
-where id = '0a70c357-c414-4a3c-b7cc-3720dd505269';
-
-select *
-from match
-where chat_id = 13;
-
-select *
-from profile
-where account_id = '69161188-1ba5-484c-860b-00faf97fa962';
 
 
-select *
-from swipe
-where swiper_id = '69161188-1ba5-484c-860b-00faf97fa962';
-
-select *
-from account
-where id not in (select swiped_id from swipe where swiper_id = '69161188-1ba5-484c-860b-00faf97fa962');
+drop table match_test;
+drop table chat_test;
 
 
-select *
-from account_question
-where account_id = '69161188-1ba5-484c-860b-00faf97fa962';
+create table match_test
+(
+    id serial primary key,
+    name varchar(100)
+);
 
-select *
-from chat_message;
+create table chat_test
+(
+    id serial primary key,
+    match_test_id int,
+    body varchar(100)
+);
+
+
+select max(ct.id)
+from match_test
+left join chat_test ct on match_test.id = ct.match_test_id
+group by  ct.match_test_id;
 
 
 
-select *
-from sent_chat_message;
-
-select *
-from match
-where matcher_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
+select max(id)
+from chat_test
+group by match_test_id;
 
 
-
-select *
-from match;
-
-update match set unmatched = false, unmatcher = false, deleted = false, updated_at = current_timestamp
-where matcher_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
+insert into match_test values (default, 'match-1');
+insert into match_test values (default, 'match-2');
+insert into match_test values (default, 'match-3');
+insert into match_test values (default, 'match-4');
 
 
-update match set unmatched = true, unmatcher = true, deleted = false, updated_at = current_timestamp
-where matcher_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
+insert into chat_test values (default, 1, 'chat-message');
+insert into chat_test values (default, 1, 'chat-message');
+insert into chat_test values (default, 1, 'chat-message');
+
+insert into chat_test values (default, 2, 'chat-message');
+insert into chat_test values (default, 2, 'chat-message');
+insert into chat_test values (default, 2, 'chat-message');
+
+insert into chat_test values (default, 3, 'chat-message');
+insert into chat_test values (default, 3, 'chat-message');
+insert into chat_test values (default, 3, 'chat-message');
+
+insert into chat_test values (default, 4, 'chat-message');
+insert into chat_test values (default, 4, 'chat-message');
+insert into chat_test values (default, 4, 'chat-message');
+insert into chat_test values (default, 4, 'chat-message');
 
 
 
 
-select *
-from chat_message
-where recipient_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
 
-select *
-from sent_chat_message
-where account_id = '93ad368a-80ce-4f9e-922d-4e7c230edd5a';
+
+
+
 
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query End --------------------------------------------
