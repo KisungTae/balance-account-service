@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -29,8 +28,8 @@ public class SentChatMessage {
     @JoinColumn(name = "account_id")
     private Account account;
 
-    @Column(name = "message_id")
-    private long messageId;
+    @Column(name = "key")
+    private long key;
 
     @Column(name = "fetched")
     private boolean fetched;
@@ -43,10 +42,10 @@ public class SentChatMessage {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public SentChatMessage(ChatMessage chatMessage, Account account, long messageId, Date createdAt) {
+    public SentChatMessage(ChatMessage chatMessage, Account account, long key, Date createdAt) {
         this.chatMessage = chatMessage;
         this.account = account;
-        this.messageId = messageId;
+        this.key = key;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
     }

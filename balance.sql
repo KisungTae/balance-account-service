@@ -243,7 +243,7 @@ create table sent_chat_message
 (
     chat_message_id bigint primary key,
     account_id      uuid        not null,
-    message_id      bigint      not null,
+    key             bigint      not null,
     fetched         boolean     not null,
     created_at      timestamptz not null,
     updated_at      timestamptz not null,
@@ -253,6 +253,11 @@ create table sent_chat_message
 
 );
 
+select *
+from chat_message;
+
+update chat_message set received = false;
+update sent_chat_message set fetched = false;
 
 create table login
 (
@@ -369,29 +374,28 @@ order by count(matcher_id) desc;
 
 
 
-
 drop table match_test;
 drop table chat_test;
 
 
 create table match_test
 (
-    id serial primary key,
+    id   serial primary key,
     name varchar(100)
 );
 
 create table chat_test
 (
-    id serial primary key,
+    id            serial primary key,
     match_test_id int,
-    body varchar(100)
+    body          varchar(100)
 );
 
 
 select max(ct.id)
 from match_test
 left join chat_test ct on match_test.id = ct.match_test_id
-group by  ct.match_test_id;
+group by ct.match_test_id;
 
 
 
@@ -400,34 +404,45 @@ from chat_test
 group by match_test_id;
 
 
-insert into match_test values (default, 'match-1');
-insert into match_test values (default, 'match-2');
-insert into match_test values (default, 'match-3');
-insert into match_test values (default, 'match-4');
+insert into match_test
+values (default, 'match-1');
+insert into match_test
+values (default, 'match-2');
+insert into match_test
+values (default, 'match-3');
+insert into match_test
+values (default, 'match-4');
 
 
-insert into chat_test values (default, 1, 'chat-message');
-insert into chat_test values (default, 1, 'chat-message');
-insert into chat_test values (default, 1, 'chat-message');
+insert into chat_test
+values (default, 1, 'chat-message');
+insert into chat_test
+values (default, 1, 'chat-message');
+insert into chat_test
+values (default, 1, 'chat-message');
 
-insert into chat_test values (default, 2, 'chat-message');
-insert into chat_test values (default, 2, 'chat-message');
-insert into chat_test values (default, 2, 'chat-message');
+insert into chat_test
+values (default, 2, 'chat-message');
+insert into chat_test
+values (default, 2, 'chat-message');
+insert into chat_test
+values (default, 2, 'chat-message');
 
-insert into chat_test values (default, 3, 'chat-message');
-insert into chat_test values (default, 3, 'chat-message');
-insert into chat_test values (default, 3, 'chat-message');
+insert into chat_test
+values (default, 3, 'chat-message');
+insert into chat_test
+values (default, 3, 'chat-message');
+insert into chat_test
+values (default, 3, 'chat-message');
 
-insert into chat_test values (default, 4, 'chat-message');
-insert into chat_test values (default, 4, 'chat-message');
-insert into chat_test values (default, 4, 'chat-message');
-insert into chat_test values (default, 4, 'chat-message');
-
-
-
-
-
-
+insert into chat_test
+values (default, 4, 'chat-message');
+insert into chat_test
+values (default, 4, 'chat-message');
+insert into chat_test
+values (default, 4, 'chat-message');
+insert into chat_test
+values (default, 4, 'chat-message');
 
 
 

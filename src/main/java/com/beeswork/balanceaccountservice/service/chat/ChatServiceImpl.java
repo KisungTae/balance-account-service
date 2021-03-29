@@ -139,8 +139,15 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
                                  List<Long> receivedChatMessageIds) {
 //        validateAccount(accountDAO.findById(accountId), identityToken);
         List<ChatMessage> receivedChatMessages = chatMessageDAO.findAllIn(receivedChatMessageIds);
-        for (ChatMessage chatMessage : receivedChatMessages) chatMessage.setReceived(true);
+        Date now = new Date();
+        for (ChatMessage chatMessage : receivedChatMessages) {
+            chatMessage.setReceived(true);
+            chatMessage.setUpdatedAt(now);
+        }
         List<SentChatMessage> sentChatMessages = sentChatMessageDAO.findAllIn(sentChatMessageIds);
-        for (SentChatMessage sentChatMessage : sentChatMessages) sentChatMessage.setFetched(true);
+        for (SentChatMessage sentChatMessage : sentChatMessages) {
+            sentChatMessage.setFetched(true);
+            sentChatMessage.setUpdatedAt(now);
+        }
     }
 }
