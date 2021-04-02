@@ -2,7 +2,7 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.ListClickedsDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.ListClickedDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
@@ -54,10 +54,10 @@ public class SwipeController extends BaseController {
                                              BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ListClickedsDTO listClickedsDTO = swipeService.listClickeds(listSwipesVM.getAccountId(),
-                                                                    listSwipesVM.getIdentityToken(),
-                                                                    listSwipesVM.getFetchedAt());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listClickedsDTO));
+        ListClickedDTO listClickedDTO = swipeService.listClicked(listSwipesVM.getAccountId(),
+                                                                 listSwipesVM.getIdentityToken(),
+                                                                 listSwipesVM.getFetchedAt());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listClickedDTO));
     }
 
     @GetMapping("/clicker/list")

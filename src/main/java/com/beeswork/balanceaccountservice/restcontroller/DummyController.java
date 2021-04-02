@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
+import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
@@ -73,6 +74,14 @@ public class DummyController {
     }
 
 
+
+    @Transactional
+    @PostMapping("/create/for-list-matches")
+    public void createDummyForListMatches() {
+
+    }
+
+
     @Transactional
     @PostMapping("/create/swipe-for-account")
     public void createDummySwipeForAccount(@RequestParam UUID accountId) {
@@ -118,29 +127,38 @@ public class DummyController {
 
     @Transactional
     @PostMapping("/create/chat-message-for-account")
-    public void createDummyChatMessageForAccount(@RequestParam UUID accountId) {
+    public void createDummyChatMessageForAccount(@RequestParam UUID accountId, @RequestParam int seed) {
         Account account = accountDAO.findById(accountId);
         Random random = new Random();
-        int innerCount = 0;
+        int innerCount = seed;
         Date date = new Date();
-        for (Match match : account.getMatches()) {
-            if (random.nextBoolean()) {
-                innerCount++;
-                boolean who = random.nextBoolean();
-                Account sender = who ? match.getMatcher() : match.getMatched();
-                Account receiver = who ? match.getMatched() : match.getMatcher();
-                ChatMessage chatMessage = new ChatMessage(match.getChat(),
-                                                          receiver,
-                                                          "message-" + random.nextFloat(),
-                                                          date);
-                match.getChat().getChatMessages().add(chatMessage);
 
-                SentChatMessage sentChatMessage = new SentChatMessage(chatMessage, sender, innerCount, date);
-                sentChatMessageDAO.persist(sentChatMessage);
+        for (int i = 0; i < 3; i++) {
+            date = DateUtils.addSeconds(date, 30);
+            for (Match match : account.getMatches()) {
+                if (random.nextBoolean()) {
+                    innerCount++;
+                    boolean who = random.nextBoolean();
+                    Account sender = who ? match.getMatcher() : match.getMatched();
+                    Account receiver = who ? match.getMatched() : match.getMatcher();
+                    ChatMessage chatMessage = new ChatMessage(match.getChat(),
+                                                              receiver,
+                                                              "message-" + random.nextFloat(),
+                                                              date);
+                    match.getChat().getChatMessages().add(chatMessage);
+
+                    if (sender.getId().equals(account.getId())) {
+                        SentChatMessage sentChatMessage = new SentChatMessage(chatMessage, sender, innerCount, date);
+                        sentChatMessageDAO.persist(sentChatMessage);
+                    }
 
 
+
+
+                }
             }
         }
+
 
     }
 

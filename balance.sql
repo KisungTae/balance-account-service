@@ -253,12 +253,6 @@ create table sent_chat_message
 
 );
 
-select *
-from chat_message;
-
-update chat_message set received = false;
-update sent_chat_message set fetched = false;
-
 create table login
 (
     id         varchar(100) not null,
@@ -373,76 +367,50 @@ group by matcher_id
 order by count(matcher_id) desc;
 
 
+select *
+from sent_chat_message;
 
-drop table match_test;
-drop table chat_test;
-
-
-create table match_test
-(
-    id   serial primary key,
-    name varchar(100)
-);
-
-create table chat_test
-(
-    id            serial primary key,
-    match_test_id int,
-    body          varchar(100)
-);
-
-
-select max(ct.id)
-from match_test
-left join chat_test ct on match_test.id = ct.match_test_id
-group by ct.match_test_id;
+select cm.chat_id, cm.body, scm.created_at, cm.id, scm.key
+from sent_chat_message scm
+inner join chat_message cm on cm.id = scm.chat_message_id;
 
 
 
-select max(id)
-from chat_test
-group by match_test_id;
+
+update sent_chat_message set fetched = false;
+update chat_message set received = false;
 
 
-insert into match_test
-values (default, 'match-1');
-insert into match_test
-values (default, 'match-2');
-insert into match_test
-values (default, 'match-3');
-insert into match_test
-values (default, 'match-4');
+select *
+from sent_chat_message;
+
+select *
+from chat_message order by recipient_id;
 
 
-insert into chat_test
-values (default, 1, 'chat-message');
-insert into chat_test
-values (default, 1, 'chat-message');
-insert into chat_test
-values (default, 1, 'chat-message');
+delete from sent_chat_message;
+delete from chat_message;
 
-insert into chat_test
-values (default, 2, 'chat-message');
-insert into chat_test
-values (default, 2, 'chat-message');
-insert into chat_test
-values (default, 2, 'chat-message');
 
-insert into chat_test
-values (default, 3, 'chat-message');
-insert into chat_test
-values (default, 3, 'chat-message');
-insert into chat_test
-values (default, 3, 'chat-message');
 
-insert into chat_test
-values (default, 4, 'chat-message');
-insert into chat_test
-values (default, 4, 'chat-message');
-insert into chat_test
-values (default, 4, 'chat-message');
-insert into chat_test
-values (default, 4, 'chat-message');
+delete from sent_chat_message;
+delete from chat_message;
+delete from match;
+delete from swipe;
+
+delete from photo;
+delete from profile;
+delete from account;
+
+
+
+select *
+from account
+where id = '0a70c357-c414-4a3c-b7cc-3720dd505269';
+
+
+
+
 
 
 

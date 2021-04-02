@@ -6,7 +6,7 @@ import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.ListClickedsDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.ListClickedDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
@@ -33,12 +33,12 @@ import java.util.*;
 @Service
 public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
-    private static final int SWIPE_POINT = 200;
+    private static final int SWIPE_POINT      = 200;
     private static final int FREE_SWIPE_A_DAY = 2000;
 
-    private final AccountDAO accountDAO;
-    private final SwipeDAO swipeDAO;
-    private final ChatDAO chatDAO;
+    private final AccountDAO         accountDAO;
+    private final SwipeDAO           swipeDAO;
+    private final ChatDAO            chatDAO;
     private final AccountQuestionDAO accountQuestionDAO;
 
     @Autowired
@@ -82,18 +82,18 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public ListClickedsDTO listClickeds(UUID accountId, UUID identityToken, Date fetchedAt) {
+    public ListClickedDTO listClicked(UUID accountId, UUID identityToken, Date fetchedAt) {
         validateAccount(accountDAO.findById(accountId), identityToken);
-        ListClickedsDTO listClickedsDTO = new ListClickedsDTO(swipeDAO.findAllClickedsAfter(accountId, fetchedAt), fetchedAt);
-        if (listClickedsDTO.getSwipeDTOs() == null) return listClickedsDTO;
+        ListClickedDTO listClickedDTO = new ListClickedDTO(swipeDAO.findAllClickedAfter(accountId, fetchedAt), fetchedAt);
+        if (listClickedDTO.getSwipeDTOs() == null) return listClickedDTO;
 
-        for (SwipeDTO swipeDTO : listClickedsDTO.getSwipeDTOs()) {
+        for (SwipeDTO swipeDTO : listClickedDTO.getSwipeDTOs()) {
             Date updatedAt = swipeDTO.getUpdatedAt();
-            if (updatedAt != null && updatedAt.after(listClickedsDTO.getFetchedAt()))
-                listClickedsDTO.setFetchedAt(swipeDTO.getUpdatedAt());
+            if (updatedAt != null && updatedAt.after(listClickedDTO.getFetchedAt()))
+                listClickedDTO.setFetchedAt(swipeDTO.getUpdatedAt());
             swipeDTO.setUpdatedAt(null);
         }
-        return listClickedsDTO;
+        return listClickedDTO;
     }
 
     @Override
