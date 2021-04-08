@@ -361,7 +361,6 @@ public class DummyController {
             newMatch.setChat(chat);
             newMatch.setMatcher(swipe.getSwiper());
             newMatch.setMatched(swipe.getSwiped());
-
             newMatch.setUnmatcher(false);
 
             newMatch.setCreatedAt(date);

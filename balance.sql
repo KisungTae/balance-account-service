@@ -215,6 +215,7 @@ create table push_token
     constraint push_notification_account_id_fk foreign key (account_id) references account (id)
 );
 
+
 create table chat
 (
     id bigserial primary key
@@ -366,53 +367,20 @@ from match
 group by matcher_id
 order by count(matcher_id) desc;
 
+select *
+from account where id = '9c280698-25f0-4cef-94a2-4a79c363e1eb';
 
 select *
-from sent_chat_message;
+from match
+where matcher_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb';
 
-select cm.chat_id, cm.body, scm.created_at, cm.id, scm.key
-from sent_chat_message scm
-inner join chat_message cm on cm.id = scm.chat_message_id;
-
-
-
-
-update sent_chat_message set fetched = false;
-update chat_message set received = false;
-
-
-select *
-from sent_chat_message;
+update match set unmatched = true, updated_at = current_timestamp where chat_id = 9 or chat_id = 2;
 
 select *
 from chat_message order by recipient_id;
 
-
-delete from sent_chat_message;
-delete from chat_message;
-
-
-
-delete from sent_chat_message;
-delete from chat_message;
-delete from match;
-delete from swipe;
-
-delete from photo;
-delete from profile;
-delete from account;
-
-
-
 select *
-from account
-where id = '0a70c357-c414-4a3c-b7cc-3720dd505269';
-
-
-
-
-
-
+from sent_chat_message;
 
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query End --------------------------------------------
