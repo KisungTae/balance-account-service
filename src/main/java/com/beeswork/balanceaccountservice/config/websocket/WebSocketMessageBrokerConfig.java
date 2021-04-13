@@ -39,14 +39,14 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // config.enableSimpleBroker("/queue");
+//        config.enableSimpleBroker("/queue");
+//        config.enableSimpleBroker("/topic");
         config.setApplicationDestinationPrefixes("/app");
         config.enableStompBrokerRelay("/queue")
               .setRelayHost("localhost")
               .setRelayPort(61613)
               .setClientLogin("guest")
               .setClientPasscode("guest");
-
     }
 
     @Override
@@ -58,33 +58,33 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chat").withSockJS();
-        registry.setErrorHandler(stompErrorHandler());
+//        registry.setErrorHandler(stompErrorHandler());
     }
 
-    @Bean
-    public StompChannelInterceptor chatChannelInterceptor() {
-        return new StompChannelInterceptor();
-    }
+//    @Bean
+//    public StompChannelInterceptor chatChannelInterceptor() {
+//        return new StompChannelInterceptor();
+//    }
+//
+//    @Bean
+//    public StompErrorHandler stompErrorHandler() {
+//        return new StompErrorHandler();
+//    }
 
-    @Bean
-    public StompErrorHandler stompErrorHandler() {
-        return new StompErrorHandler();
-    }
 
-
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(chatChannelInterceptor());
-        registration.interceptors(new ExecutorChannelInterceptor() {
-            @SneakyThrows
-            @Override
-            public void afterMessageHandled(@NonNull Message<?> inMessage,
-                                            @NonNull MessageChannel inChannel,
-                                            @NonNull MessageHandler handler,
-                                            Exception ex) {
-                StompHeaderAccessor inAccessor = StompHeaderAccessor.wrap(inMessage);
-                if (StompCommand.SEND.equals(inAccessor.getCommand()) &&
-                    handler instanceof StompBrokerRelayMessageHandler) {
+//    @Override
+//    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        registration.interceptors(chatChannelInterceptor());
+//        registration.interceptors(new ExecutorChannelInterceptor() {
+//            @SneakyThrows
+//            @Override
+//            public void afterMessageHandled(@NonNull Message<?> inMessage,
+//                                            @NonNull MessageChannel inChannel,
+//                                            @NonNull MessageHandler handler,
+//                                            Exception ex) {
+//                StompHeaderAccessor inAccessor = StompHeaderAccessor.wrap(inMessage);
+//                if (StompCommand.SEND.equals(inAccessor.getCommand()) &&
+//                    handler instanceof StompBrokerRelayMessageHandler) {
 
 //                    String receipt = inAccessor.getReceipt();
 //                    ChatMessageDTO chatMessageDTO =
@@ -103,18 +103,18 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 //                    outChannel.send(MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageDTO)
 //                                                                             .getBytes(),
 //                                                                 outAccessor.getMessageHeaders()));
-                }
-            }
-        });
-    }
+//                }
+//            }
+//        });
+//    }
 
-    @Override
-    public void configureClientOutboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new ChannelInterceptor() {
-            @Override
-            public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
-                outChannel = channel;
-            }
-        });
-    }
+//    @Override
+//    public void configureClientOutboundChannel(ChannelRegistration registration) {
+//        registration.interceptors(new ChannelInterceptor() {
+//            @Override
+//            public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
+//                outChannel = channel;
+//            }
+//        });
+//    }
 }

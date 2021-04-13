@@ -68,9 +68,14 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>-->
 <!--<script th:src="@{/webjars/stomp-websocket/2.3.3-1/stomp.js}" type="text/javascript"></script>-->
-<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.min.js"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.min.js"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+
 <script type="application/javascript">
 
     let stompClient
@@ -98,61 +103,72 @@
         }
     }
 
+    function connectionSuccess() {
+        // stompClient.subscribe('/topic/javainuse', onMessageReceived);
+        // stompClient.send("/app/chat.newUser", {}, JSON.stringify({
+        //     sender : name,
+        //     type : 'newUser'
+        // }))
+    }
 
     function connect() {
 
-        console.log({exclusive: false, durable: true, 'auto-delete': true,
-            'account-id': $('#accountId').val(),
-            'identity-token': $('#identityToken').val(),
-            'chat-id': $('#chatId').val(),
-            'recipient-id': $('#recipientId').val()})
+        var socket = new SockJS('/chat');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, connectionSuccess);
 
-        stompClient = new StompJs.Client({
-            brokerURL: 'ws://localhost:8080/chat/websocket',
-            connectHeaders: {
-                login: 'user',
-                passcode: 'password',
-            },
-            debug: function (str) {
-                // console.log(str)
-            },
-            reconnectDelay: 500000,
-            heartbeatIncoming: 4000,
-            heartbeatOutgoing: 4000,
-        })
+        // console.log({exclusive: false, durable: true, 'auto-delete': true,
+        //     'account-id': $('#accountId').val(),
+        //     'identity-token': $('#identityToken').val(),
+        //     'chat-id': $('#chatId').val(),
+        //     'recipient-id': $('#recipientId').val()})
 
-        stompClient.onConnect = function (frame) {
-            stompClient.subscribe('/queue/' + $('#accountId').val() + '-' +  $('#chatId').val(),
-                function (output) {
-                    if (output.body) {
-                        console.log('received')
-                        console.log(output)
-                        showBroadcastMessage(createTextNode(JSON.parse(output.body)))
-                    } else {
-                        console.log('Output body is empty')
-                    }
-                }, {exclusive: false, durable: true, 'auto-delete': true,
-                    'account-id': $('#accountId').val(),
-                    'identity-token': $('#identityToken').val(),
-                    'chat-id': $('#chatId').val(),
-                    'receipt': $('#accountId').val(),
-                    'recipient-id': $('#recipientId').val()})
-            setConnected(true)
-        }
+        // stompClient = new StompJs.Client({
+        //     brokerURL: 'ws://localhost:8080/chat',
+        //     connectHeaders: {
+        //         login: 'user',
+        //         passcode: 'password',
+        //     },
+        //     debug: function (str) {
+        //         // console.log(str)
+        //     },
+        //     reconnectDelay: 500000,
+        //     heartbeatIncoming: 4000,
+        //     heartbeatOutgoing: 4000,
+        // })
 
-        stompClient.onStompError = function (frame) {
-            console.log('Broker reported error: ' + frame.headers['message'])
-            console.log('Additional details: ' + frame.body)
-            console.log('frame:')
-            console.log(frame)
-        }
-
-        stompClient.onUnhandledReceipt = function (frame) {
-            console.log('onUnhandledReceipt')
-            console.log(frame)
-        }
-
-        stompClient.activate()
+        // stompClient.onConnect = function (frame) {
+        //     stompClient.subscribe('/queue/' + $('#accountId').val() + '-' +  $('#chatId').val(),
+        //         function (output) {
+        //             if (output.body) {
+        //                 console.log('received')
+        //                 console.log(output)
+        //                 showBroadcastMessage(createTextNode(JSON.parse(output.body)))
+        //             } else {
+        //                 console.log('Output body is empty')
+        //             }
+        //         }, {exclusive: false, durable: true, 'auto-delete': true,
+        //             'account-id': $('#accountId').val(),
+        //             'identity-token': $('#identityToken').val(),
+        //             'chat-id': $('#chatId').val(),
+        //             'receipt': $('#accountId').val(),
+        //             'recipient-id': $('#recipientId').val()})
+        //     setConnected(true)
+        // }
+        //
+        // stompClient.onStompError = function (frame) {
+        //     console.log('Broker reported error: ' + frame.headers['message'])
+        //     console.log('Additional details: ' + frame.body)
+        //     console.log('frame:')
+        //     console.log(frame)
+        // }
+        //
+        // stompClient.onUnhandledReceipt = function (frame) {
+        //     console.log('onUnhandledReceipt')
+        //     console.log(frame)
+        // }
+        //
+        // stompClient.activate()
 
 
     }

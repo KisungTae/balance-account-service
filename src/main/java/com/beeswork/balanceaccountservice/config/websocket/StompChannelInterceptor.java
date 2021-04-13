@@ -42,11 +42,11 @@ public class StompChannelInterceptor implements ChannelInterceptor {
     @SneakyThrows
     @Override
     public Message<?> preSend(Message<?> message, @NonNull MessageChannel channel) {
-        MessageHeaders messageHeaders = message.getHeaders();
-        StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
-        StompCommand stompCommand = stompHeaderAccessor.getCommand();
+//        MessageHeaders messageHeaders = message.getHeaders();
+//        StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
+//        StompCommand stompCommand = stompHeaderAccessor.getCommand();
 
-        if (StompCommand.SUBSCRIBE.equals(stompCommand)) {
+//        if (StompCommand.SUBSCRIBE.equals(stompCommand)) {
 //            String accountId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.ACCOUNT_ID);
 //            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
 //            String recipientId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECIPIENT_ID);
@@ -63,14 +63,14 @@ public class StompChannelInterceptor implements ChannelInterceptor {
 //                !TRUE.equals(stompHeaderAccessor.getFirstNativeHeader(StompHeader.DURABLE)))
 //                throw new BadRequestException();
 
-        } else if (StompCommand.SEND.equals(stompCommand)) {
-            ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message,
-                                                                                                ChatMessageVM.class);
-            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
-            String messageId = stompHeaderAccessor.getMessageId();
+//        } else if (StompCommand.SEND.equals(stompCommand)) {
+//            ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message,
+//                                                                                                ChatMessageVM.class);
+//            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
+//            String messageId = stompHeaderAccessor.getMessageId();
 //            validateFields(chatMessageVM, identityToken, messageId);
-            checkValidUUID(identityToken);
-            checkValidNumber(messageId);
+//            checkValidUUID(identityToken);
+//            checkValidNumber(messageId);
 //            chatMessageVM.setId(chatService.saveChatMessage(chatMessageVM.getAccountId(),
 //                                                            UUID.fromString(identityToken),
 //                                                            chatMessageVM.getRecipientId(),
@@ -78,9 +78,9 @@ public class StompChannelInterceptor implements ChannelInterceptor {
 //                                                            Long.valueOf(messageId),
 //                                                            chatMessageVM.getBody(),
 //                                                            chatMessageVM.getCreatedAt()));
-            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM),
-                                                stompHeaderAccessor.getMessageHeaders());
-        }
+//            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM),
+//                                                stompHeaderAccessor.getMessageHeaders());
+//        }
         return message;
     }
 
