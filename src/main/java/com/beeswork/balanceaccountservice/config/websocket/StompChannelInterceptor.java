@@ -34,9 +34,6 @@ public class StompChannelInterceptor implements ChannelInterceptor {
 
 
     private static final Pattern VALID_UUID_PATTERN = Pattern.compile(RegexExpression.VALID_UUID);
-    private static final String FALSE = Boolean.toString(false);
-    private static final String TRUE = Boolean.toString(true);
-
 
     //  NOTE 1. if exception is thrown from compositeMessageConverter.fromMessage for invalid UUId or Long then ignore the request
     @SneakyThrows

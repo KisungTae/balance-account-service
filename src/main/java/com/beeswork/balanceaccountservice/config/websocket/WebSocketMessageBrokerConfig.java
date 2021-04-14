@@ -49,22 +49,22 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
               .setClientPasscode("guest");
     }
 
-    @Override
-    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
+//    @Override
+//    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
 //        registry.setMessageSizeLimit(1);
 //        registry.setSendBufferSizeLimit(1);
-    }
+//    }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/chat").withSockJS();
+        registry.addEndpoint("/chat");
 //        registry.setErrorHandler(stompErrorHandler());
     }
 
-    @Bean
-    public StompChannelInterceptor chatChannelInterceptor() {
-        return new StompChannelInterceptor();
-    }
+//    @Bean
+//    public StompChannelInterceptor chatChannelInterceptor() {
+//        return new StompChannelInterceptor();
+//    }
 //
 //    @Bean
 //    public StompErrorHandler stompErrorHandler() {
@@ -72,9 +72,9 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 //    }
 
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(chatChannelInterceptor());
+//    @Override
+//    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        registration.interceptors(chatChannelInterceptor());
 //        registration.interceptors(new ExecutorChannelInterceptor() {
 //            @SneakyThrows
 //            @Override
@@ -106,7 +106,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 //                }
 //            }
 //        });
-    }
+//    }
 
 //    @Override
 //    public void configureClientOutboundChannel(ChannelRegistration registration) {
