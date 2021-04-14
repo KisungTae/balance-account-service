@@ -41,8 +41,8 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     public void configureMessageBroker(MessageBrokerRegistry config) {
 //        config.enableSimpleBroker("/queue");
 //        config.enableSimpleBroker("/topic");
-        config.setApplicationDestinationPrefixes("/app");
-        config.enableStompBrokerRelay("/queue")
+        config.setApplicationDestinationPrefixes("/app")
+              .enableStompBrokerRelay("/queue")
               .setRelayHost("localhost")
               .setRelayPort(61613)
               .setClientLogin("guest")
@@ -61,10 +61,10 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 //        registry.setErrorHandler(stompErrorHandler());
     }
 
-//    @Bean
-//    public StompChannelInterceptor chatChannelInterceptor() {
-//        return new StompChannelInterceptor();
-//    }
+    @Bean
+    public StompChannelInterceptor chatChannelInterceptor() {
+        return new StompChannelInterceptor();
+    }
 //
 //    @Bean
 //    public StompErrorHandler stompErrorHandler() {
@@ -72,9 +72,9 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 //    }
 
 
-//    @Override
-//    public void configureClientInboundChannel(ChannelRegistration registration) {
-//        registration.interceptors(chatChannelInterceptor());
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(chatChannelInterceptor());
 //        registration.interceptors(new ExecutorChannelInterceptor() {
 //            @SneakyThrows
 //            @Override
@@ -85,7 +85,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 //                StompHeaderAccessor inAccessor = StompHeaderAccessor.wrap(inMessage);
 //                if (StompCommand.SEND.equals(inAccessor.getCommand()) &&
 //                    handler instanceof StompBrokerRelayMessageHandler) {
-
+//
 //                    String receipt = inAccessor.getReceipt();
 //                    ChatMessageDTO chatMessageDTO =
 //                            (ChatMessageDTO) compositeMessageConverter.fromMessage(inMessage, ChatMessageDTO.class);
@@ -106,7 +106,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 //                }
 //            }
 //        });
-//    }
+    }
 
 //    @Override
 //    public void configureClientOutboundChannel(ChannelRegistration registration) {

@@ -42,10 +42,15 @@ public class StompChannelInterceptor implements ChannelInterceptor {
     @SneakyThrows
     @Override
     public Message<?> preSend(Message<?> message, @NonNull MessageChannel channel) {
-//        MessageHeaders messageHeaders = message.getHeaders();
-//        StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
-//        StompCommand stompCommand = stompHeaderAccessor.getCommand();
+        System.out.println("preSend!!!!!!!!!!!!");
+        MessageHeaders messageHeaders = message.getHeaders();
+        StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
+        StompCommand stompCommand = stompHeaderAccessor.getCommand();
 
+        System.out.println("stompCommand: " + stompCommand);
+        Object destination = messageHeaders.get(StompHeader.SIMP_DESTINATION);
+        System.out.println("destination: " + destination.toString());
+//
 //        if (StompCommand.SUBSCRIBE.equals(stompCommand)) {
 //            String accountId = stompHeaderAccessor.getFirstNativeHeader(StompHeader.ACCOUNT_ID);
 //            String identityToken = stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN);
