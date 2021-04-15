@@ -5,24 +5,15 @@ import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
-import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.chat.SentChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
-import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
-import com.beeswork.balanceaccountservice.exception.account.AccountDeletedException;
-import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipedDeletedException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -50,14 +41,6 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         this.sentChatMessageDAO = sentChatMessageDAO;
     }
 
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public void validateChat(String accountId, String identityToken, String recipientId, String chatId) {
-        validateChat(matchDAO.findById(UUID.fromString(accountId), UUID.fromString(recipientId)),
-                     UUID.fromString(identityToken),
-                     Long.valueOf(chatId));
-    }
-
     private void validateChat(Match match, UUID identityToken, long chatId) {
         if (match == null)
             throw new MatchNotFoundException();
@@ -66,22 +49,8 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         if (match.getChatId() != chatId)
             throw new MatchNotFoundException();
 
-        Account matcher = match.getMatcher();
-        Account matched = match.getMatched();
-
-        if (matcher == null || !matcher.getIdentityToken().equals(identityToken))
-            throw new AccountNotFoundException();
-        if (matcher.isBlocked())
-            throw new AccountBlockedException();
-        if (matcher.isDeleted())
-            throw new AccountDeletedException();
-
-        if (matched == null)
-            throw new SwipedNotFoundException();
-        if (matched.isBlocked())
-            throw new SwipedBlockedException();
-        if (matched.isDeleted())
-            throw new SwipedDeletedException();
+        validateAccount(match.getMatcher(), identityToken);
+        validateSwiped(match.getMatched());
     }
 
     @Override
@@ -90,17 +59,17 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
                                           UUID identityToken,
                                           UUID recipientId,
                                           long chatId,
-                                          long messageId,
-                                          String body,
-                                          Date createdAt) {
+                                          long key,
+                                          String body) {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
         Match match = matchDAO.findById(accountId, recipientId);
-//        validateChat(match, identityToken, chatId);
+        validateChat(match, identityToken, chatId);
 
-        SentChatMessage sentChatMessage = sentChatMessageDAO.findByMessageId(messageId);
+        Date now = new Date();
+        SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(key);
         if (sentChatMessage == null) {
-            ChatMessage chatMessage = new ChatMessage(match.getChat(), match.getMatched(), body, createdAt);
-            sentChatMessage = new SentChatMessage(chatMessage, match.getMatcher(), messageId, createdAt);
+            ChatMessage chatMessage = new ChatMessage(match.getChat(), match.getMatched(), body, now);
+            sentChatMessage = new SentChatMessage(chatMessage, match.getMatcher(), key, now);
             chatMessageDAO.persist(chatMessage);
             sentChatMessageDAO.persist(sentChatMessage);
         }
@@ -127,7 +96,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     @Transactional
     public void fetchedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
         validateAccount(accountDAO.findById(accountId), identityToken);
-        SentChatMessage sentChatMessage = sentChatMessageDAO.findByMessageId(chatMessageId);
+        SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(chatMessageId);
         sentChatMessage.setFetched(true);
     }
 

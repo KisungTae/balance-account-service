@@ -52,6 +52,12 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     }
 
 
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public void validateAccount(UUID accountId, UUID identityToken) {
+        validateAccount(accountDAO.findById(accountId), identityToken);
+    }
+
     //  TEST 1. save accountQuestionDTOs without setAccount() and setQuestion()
     //          --> Hibernate does not insert those objects, no exception thrown
     //  TEST 2. create new accountQuestionDTO with the same AccountQuestionId

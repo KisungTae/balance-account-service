@@ -61,20 +61,20 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 //        registry.setErrorHandler(stompErrorHandler());
     }
 
-//    @Bean
-//    public StompChannelInterceptor chatChannelInterceptor() {
-//        return new StompChannelInterceptor();
-//    }
-//
+    @Bean
+    public StompChannelInterceptor chatChannelInterceptor() {
+        return new StompChannelInterceptor();
+    }
+
 //    @Bean
 //    public StompErrorHandler stompErrorHandler() {
 //        return new StompErrorHandler();
 //    }
 
 
-//    @Override
-//    public void configureClientInboundChannel(ChannelRegistration registration) {
-//        registration.interceptors(chatChannelInterceptor());
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(chatChannelInterceptor());
 //        registration.interceptors(new ExecutorChannelInterceptor() {
 //            @SneakyThrows
 //            @Override
@@ -106,7 +106,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 //                }
 //            }
 //        });
-//    }
+    }
 
 //    @Override
 //    public void configureClientOutboundChannel(ChannelRegistration registration) {
