@@ -3,6 +3,8 @@ package com.beeswork.balanceaccountservice.config.websocket;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 
+import com.beeswork.balanceaccountservice.exception.InternalServerException;
+import io.micrometer.core.lang.NonNullApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -25,18 +27,14 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
                                              @NonNull byte[] errorPayload,
                                              Throwable cause,
                                              StompHeaderAccessor clientHeaderAccessor) {
-        System.out.println("stomperrorhandler handleInternal");
         Locale locale = StompHeader.getLocaleFromAcceptLanguageHeader(clientHeaderAccessor);
         if (cause != null && cause.getCause() != null) {
-            if (cause.getCause() instanceof BaseException) {
-                BaseException exception = (BaseException) cause.getCause();
-                String exceptionMessage = messageSource.getMessage(exception.getExceptionCode(), null, locale);
-                errorHeaderAccessor.setMessage(exceptionMessage);
-                errorHeaderAccessor.addNativeHeader(StompHeader.ERROR, exception.getExceptionCode());
-
-                if (clientHeaderAccessor != null)
-                    errorHeaderAccessor.setMessageId(clientHeaderAccessor.getMessageId());
-            }
+            BaseException exception;
+            if (cause.getCause() instanceof BaseException) exception = (BaseException) cause.getCause();
+            else exception = new InternalServerException();
+            String exceptionMessage = messageSource.getMessage(exception.getExceptionCode(), null, locale);
+            errorHeaderAccessor.addNativeHeader(StompHeader.ERROR, exception.getExceptionCode());
+            errorHeaderAccessor.setMessage(exceptionMessage);
         }
         return super.handleInternal(errorHeaderAccessor, errorPayload, cause, clientHeaderAccessor);
     }

@@ -55,22 +55,21 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 //        registry.setSendBufferSizeLimit(1);
 //    }
 
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/chat");
-//        registry.setErrorHandler(stompErrorHandler());
-    }
-
     @Bean
     public StompChannelInterceptor chatChannelInterceptor() {
         return new StompChannelInterceptor();
     }
 
-//    @Bean
-//    public StompErrorHandler stompErrorHandler() {
-//        return new StompErrorHandler();
-//    }
+    @Bean
+    public StompErrorHandler stompErrorHandler() {
+        return new StompErrorHandler();
+    }
 
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/chat");
+        registry.setErrorHandler(stompErrorHandler());
+    }
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {

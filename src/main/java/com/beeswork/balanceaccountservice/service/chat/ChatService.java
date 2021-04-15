@@ -12,19 +12,8 @@ import java.util.UUID;
 public interface ChatService {
 
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-    ChatMessageDTO saveChatMessage(UUID accountId,
-                                   UUID identityToken,
-                                   UUID recipientId,
-                                   long chatId,
-                                   long key,
-                                   String body);
-
+    long saveChatMessage(UUID accountId, UUID identityToken, UUID recipientId, long chatId, long key, String body, Date createdAt);
     void receivedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId);
-
     void fetchedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId);
-
-    void syncChatMessages(UUID accountId,
-                          UUID identityToken,
-                          List<Long> sentChatMessageIds,
-                          List<Long> receivedChatMessageIds);
+    void syncChatMessages(UUID accountId, UUID identityToken, List<Long> sentChatMessageIds, List<Long> receivedChatMessageIds);
 }
