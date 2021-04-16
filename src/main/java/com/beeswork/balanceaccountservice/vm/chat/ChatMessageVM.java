@@ -11,9 +11,6 @@ import java.util.UUID;
 public class ChatMessageVM {
     private Long id;
     private String body;
-    private Long messageId;
     private UUID accountId;
     private UUID recipientId;
-    private Long chatId;
-    private final Date createdAt = new Date();
 }

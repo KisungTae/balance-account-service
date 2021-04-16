@@ -4,7 +4,6 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
-import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.chat.SentChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
@@ -41,7 +40,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         this.sentChatMessageDAO = sentChatMessageDAO;
     }
 
-    private void validateChat(Match match, UUID identityToken, long chatId) {
+    private void validateMatch(Match match, UUID identityToken, long chatId) {
         if (match == null)
             throw new MatchNotFoundException();
         if (match.isUnmatched())
@@ -50,20 +49,21 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
             throw new MatchNotFoundException();
 
         validateAccount(match.getMatcher(), identityToken);
-        validateSwiped(match.getMatched());
+//        validateSwiped(match.getMatched());
     }
 
     @Override
     @Transactional
-    public long saveChatMessage(UUID accountId, UUID identityToken, UUID recipientId, long chatId, long key, String body, Date createdAt) {
+    public long saveChatMessage(UUID accountId, UUID identityToken, UUID recipientId, long key, String body) {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
         Match match = matchDAO.findById(accountId, recipientId);
-        validateChat(match, identityToken, chatId);
+//        validateMatch(match, identityToken, chatId);
 
         SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(key);
         if (sentChatMessage == null) {
-            ChatMessage chatMessage = new ChatMessage(match.getChat(), match.getMatched(), body, createdAt);
-            sentChatMessage = new SentChatMessage(chatMessage, match.getMatcher(), key, createdAt);
+            Date now = new Date();
+            ChatMessage chatMessage = new ChatMessage(match.getChat(), match.getMatched(), body, now);
+            sentChatMessage = new SentChatMessage(chatMessage, match.getMatcher(), key, now);
             chatMessageDAO.persist(chatMessage);
             sentChatMessageDAO.persist(sentChatMessage);
         }
