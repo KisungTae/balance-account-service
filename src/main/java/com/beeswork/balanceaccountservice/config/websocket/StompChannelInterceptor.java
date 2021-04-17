@@ -50,8 +50,9 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
         StompCommand stompCommand = stompHeaderAccessor.getCommand();
 
-//        if (StompCommand.SUBSCRIBE.equals(stompCommand)) validateBeforeSubscribe(stompHeaderAccessor, messageHeaders);
-//        else if (StompCommand.SEND.equals(stompCommand)) return saveAndSend(stompHeaderAccessor, message);
+        System.out.println("presend");
+        if (StompCommand.SUBSCRIBE.equals(stompCommand)) validateBeforeSubscribe(stompHeaderAccessor, messageHeaders);
+//        else if (StompCommand.SEND.equals(stompCommand)) return saveAndSend(stompHeaderAccessor, message, messageHeaders);
         return message;
     }
 
@@ -60,9 +61,7 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         UUID accountId = Convert.toUUIDOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.ID), badRequestException);
         UUID identityToken = Convert.toUUIDOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN), badRequestException);
         accountService.validateAccount(accountId, identityToken);
-        Object destination = messageHeaders.get(StompHeader.SIMP_DESTINATION);
-        if (destination == null || !destination.toString().replace("/queue/", "").equals(accountId.toString()))
-            throw new BadRequestException();
+        validateDestination(messageHeaders.get(StompHeader.SIMP_DESTINATION), accountId);
 
         boolean autoDelete = Convert.toBooleanOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.AUTO_DELETE), badRequestException);
         boolean exclusive = Convert.toBooleanOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.EXCLUSIVE), badRequestException);
@@ -70,19 +69,32 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         if (!autoDelete || exclusive || !durable) throw badRequestException;
     }
 
-    private Message<?> saveAndSend(StompHeaderAccessor stompHeaderAccessor, Message<?> message) throws JsonProcessingException {
+    private Message<?> saveAndSend(StompHeaderAccessor stompHeaderAccessor, Message<?> message, MessageHeaders messageHeaders)
+    throws JsonProcessingException {
 //      TODO: check destination and recipient id
-        BadRequestException badRequestException = new BadRequestException();
-        ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
-        if (chatMessageVM == null) throw new BadRequestException();
-
-//        UUID accountId = Convert.toUUIDOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.ID), badRequestException);
+//      TODO: set key to null
+//        BadRequestException badRequestException = new BadRequestException();
+//        ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
+//        if (chatMessageVM == null) throw new BadRequestException();
+//
+//        UUID accountId = Convert.toUUIDOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.ACCOUNT_ID), badRequestException);
 //        UUID identityToken = Convert.toUUIDOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN), badRequestException);
 //        UUID recipientId = Convert.toUUIDOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECIPIENT_ID), badRequestException);
-//        long messageId = Convert.toLongOrThrow(stompHeaderAccessor.getMessageId(), badRequestException);
-//        long chatMessageId = chatService.saveChatMessage(accountId, identityToken, recipientId, messageId, chatMessageVM.getBody());
+//        validateDestination(messageHeaders.get(StompHeader.SIMP_DESTINATION), recipientId);
+//        long receipt = Convert.toLongOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECEIPT), badRequestException);
+//        long chatMessageId = chatService.saveChatMessage(accountId,
+//                                                         identityToken,
+//                                                         recipientId,
+//                                                         receipt,
+//                                                         chatMessageVM.getBody(),
+//                                                         chatMessageVM.getCreatedAt());
 //        chatMessageVM.setId(chatMessageId);
 //        return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM), stompHeaderAccessor.getMessageHeaders());
         return null;
+    }
+
+    private void validateDestination(Object destination, UUID id) {
+        if (destination == null || !destination.toString().replace("/queue/", "").equals(id.toString()))
+            throw new BadRequestException();
     }
 }

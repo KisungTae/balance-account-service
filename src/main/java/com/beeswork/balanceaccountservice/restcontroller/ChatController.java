@@ -34,8 +34,10 @@ public class ChatController {
         this.objectMapper = objectMapper;
     }
 
-    @MessageMapping("/send")
+    @MessageMapping("/chat/send")
     public void send(@Payload ChatMessageVM chatMessageVM, MessageHeaders messageHeaders) {
+        System.out.println("send chatmessage");
+
         stompService.sendChatMessage(chatMessageVM, messageHeaders);
     }
 

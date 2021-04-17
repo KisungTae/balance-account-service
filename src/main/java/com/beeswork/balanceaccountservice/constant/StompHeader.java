@@ -24,6 +24,7 @@ public class StompHeader {
     public static final String QUEUE_SEPARATOR  = "-";
     public static final String ACCEPT_LANGUAGE = "accept-language";
     public static final String ERROR = "error";
+    public static final String RECEIPT = "receipt";
 
 
     public static Locale getLocaleFromAcceptLanguageHeader(StompHeaderAccessor stompHeaderAccessor) {
