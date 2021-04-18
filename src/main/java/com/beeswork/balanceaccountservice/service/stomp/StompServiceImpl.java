@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.service.stomp;
 
+import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dto.push.Push;
 import com.beeswork.balanceaccountservice.service.fcm.FCMService;
@@ -50,7 +51,8 @@ public class StompServiceImpl implements StompService {
 //                                                                        account.getFcmToken()),
 //                                             getLocaleFromMessageHeaders(messageHeaders));
 //        } else simpMessagingTemplate.convertAndSend(StompHeader.QUEUE_PREFIX + queue, chatMessageDTO);
-
+        System.out.println("simpMessagingTemplate.convertAndSend(StompHeader.SIMP_DESTINATION, chatMessageVM)");
+//        simpMessagingTemplate.convertAndSend(StompHeader.SIMP_DESTINATION, chatMessageVM);
     }
 
     @Override

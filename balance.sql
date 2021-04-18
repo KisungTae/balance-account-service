@@ -376,6 +376,17 @@ select *
 from match
 where matcher_id = '136d4f5e-469c-4fc0-9d7d-d04c895bf99d';
 
+select *
+from chat_message;
+
+select id, key, body
+from sent_chat_message
+inner join chat_message cm on sent_chat_message.chat_message_id = cm.id
+where account_id = '136d4f5e-469c-4fc0-9d7d-d04c895bf99d';
+
+
+select *
+from sent_chat_message;
 
 
 update match set unmatched = true, updated_at = current_timestamp where chat_id = 9 or chat_id = 2;

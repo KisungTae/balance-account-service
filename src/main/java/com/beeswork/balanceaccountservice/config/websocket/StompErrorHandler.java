@@ -39,8 +39,3 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
         return super.handleInternal(errorHeaderAccessor, errorPayload, cause, clientHeaderAccessor);
     }
 }
-
-
-//            return MessageBuilder.createMessage(exceptionMessage.getBytes(StandardCharsets.UTF_8),
-//                                                errorHeaderAccessor.getMessageHeaders());
-//            return super.handleInternal(errorHeaderAccessor, errorPayload, cause, clientHeaderAccessor);
