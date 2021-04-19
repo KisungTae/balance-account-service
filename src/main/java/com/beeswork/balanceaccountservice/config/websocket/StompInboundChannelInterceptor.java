@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.config.websocket;
 
 import com.beeswork.balanceaccountservice.constant.StompHeader;
+import com.beeswork.balanceaccountservice.dto.push.ChatMessagePush;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
@@ -52,7 +53,7 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
         StompCommand stompCommand = stompHeaderAccessor.getCommand();
 
         if (StompCommand.SUBSCRIBE.equals(stompCommand)) validateBeforeSubscribe(stompHeaderAccessor, messageHeaders);
-        else if (StompCommand.SEND.equals(stompCommand)) return validateBeforeSend(stompHeaderAccessor, message, messageHeaders);
+        else if (StompCommand.SEND.equals(stompCommand)) return validateBeforeSend(stompHeaderAccessor, message);
         return message;
     }
 
@@ -69,7 +70,7 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
     }
 
 
-    private Message<?> validateBeforeSend(StompHeaderAccessor stompHeaderAccessor, Message<?> message, MessageHeaders messageHeaders)
+    private Message<?> validateBeforeSend(StompHeaderAccessor stompHeaderAccessor, Message<?> message)
     throws JsonProcessingException {
         BadRequestException badRequestException = new BadRequestException();
         ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);

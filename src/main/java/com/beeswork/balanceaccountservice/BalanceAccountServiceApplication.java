@@ -314,6 +314,7 @@ public class BalanceAccountServiceApplication {
 // TODO			91. consider offsetTime = milliseconds otherwise listMatches() in android will keep increasing rowId of the same match
 
 // TODO			92. listMatches deleted just set unmatched = true and get rid of deleted in matchDTO
+//					--> implemented, android also updated accordingly
 
 // TODO			Chat Business rules
 //				1. 	send, receipt and ack || receive and ack

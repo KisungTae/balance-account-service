@@ -1,10 +1,12 @@
 package com.beeswork.balanceaccountservice.service.stomp;
 
+import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dto.push.Push;
 import com.beeswork.balanceaccountservice.service.fcm.FCMService;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.QueueInformation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 
 @Service
 public class StompServiceImpl implements StompService {
@@ -51,8 +56,10 @@ public class StompServiceImpl implements StompService {
 //                                                                        account.getFcmToken()),
 //                                             getLocaleFromMessageHeaders(messageHeaders));
 //        } else simpMessagingTemplate.convertAndSend(StompHeader.QUEUE_PREFIX + queue, chatMessageDTO);
-        System.out.println("simpMessagingTemplate.convertAndSend(StompHeader.SIMP_DESTINATION, chatMessageVM)");
-//        simpMessagingTemplate.convertAndSend(StompHeader.SIMP_DESTINATION, chatMessageVM);
+//        messageHeaders.put("test-header", "");
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(StompHeader.PUSH_TYPE, PushType.CHAT_MESSAGE);
+        simpMessagingTemplate.convertAndSend("/queue/136d4f5e-469c-4fc0-9d7d-d04c895bf99d", chatMessageVM);
     }
 
     @Override

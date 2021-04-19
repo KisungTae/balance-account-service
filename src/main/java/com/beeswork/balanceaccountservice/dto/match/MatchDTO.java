@@ -17,7 +17,10 @@ public class MatchDTO {
     private boolean unmatched;
     private String name;
     private String repPhotoKey;
+
+    @JsonIgnore
     private boolean deleted;
+
     private Date createdAt;
     private Date updatedAt;
 

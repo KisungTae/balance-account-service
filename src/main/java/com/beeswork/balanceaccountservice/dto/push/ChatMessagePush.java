@@ -2,8 +2,11 @@ package com.beeswork.balanceaccountservice.dto.push;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.firebase.messaging.Message;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.context.MessageSource;
 
+import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -11,7 +14,7 @@ public class ChatMessagePush extends AbstractPush {
 
     private static final String PUSH_BODY_CODE = "push.chat.message.body";
 
-    private final String senderName;
+    private String senderName;
 
     public ChatMessagePush(String senderName) {
         super(Type.CHAT_MESSAGE);

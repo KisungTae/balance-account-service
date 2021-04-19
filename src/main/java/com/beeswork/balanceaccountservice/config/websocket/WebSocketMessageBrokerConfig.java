@@ -1,5 +1,7 @@
 package com.beeswork.balanceaccountservice.config.websocket;
 
+import com.beeswork.balanceaccountservice.constant.PushType;
+import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.util.StringUtils;
@@ -79,14 +81,15 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                 if (StompCommand.SEND.equals(inAccessor.getCommand())) {
                     ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
                     String receipt = inAccessor.getReceipt();
-                    if (StringUtils.isEmpty(receipt) || chatMessageVM == null) return;
+                    if (StringUtils.isEmpty(receipt) || outChannel == null || chatMessageVM == null) return;
 
                     StompHeaderAccessor outAccessor = StompHeaderAccessor.create(StompCommand.RECEIPT);
                     outAccessor.setSessionId(inAccessor.getSessionId());
                     outAccessor.setReceiptId(inAccessor.getReceipt());
                     chatMessageVM.setBody(null);
-                    outChannel.send(MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM).getBytes(),
-                                                                 outAccessor.getMessageHeaders()));
+                    if (chatMessageVM.getId() == null) chatMessageVM.setCreatedAt(null);
+                    byte[] payload = objectMapper.writeValueAsString(chatMessageVM).getBytes();
+                    outChannel.send(MessageBuilder.createMessage(payload, outAccessor.getMessageHeaders()));
                 }
             }
         });

@@ -9,8 +9,8 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ChatMessageVM {
-    private       Long   id;
-    private       String body;
-    private       Long   chatId;
-    private final Date   createdAt = new Date();
+    private Long   id;
+    private String body;
+    private Long   chatId;
+    private Date   createdAt = new Date();
 }
