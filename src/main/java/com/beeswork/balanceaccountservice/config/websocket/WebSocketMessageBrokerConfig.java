@@ -93,7 +93,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                 }
             }
         });
-    }
+    }   
 
     @Override
     public void configureClientOutboundChannel(ChannelRegistration registration) {
