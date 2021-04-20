@@ -2,6 +2,8 @@ package com.beeswork.balanceaccountservice.config.websocket;
 
 import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
+import com.beeswork.balanceaccountservice.service.chat.ChatService;
+import com.beeswork.balanceaccountservice.service.chat.ChatServiceImpl;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.util.StringUtils;
@@ -87,7 +89,8 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                     outAccessor.setSessionId(inAccessor.getSessionId());
                     outAccessor.setReceiptId(inAccessor.getReceipt());
                     chatMessageVM.setBody(null);
-                    if (chatMessageVM.getId() == null) chatMessageVM.setCreatedAt(null);
+                    if (chatMessageVM.getId() == null || chatMessageVM.getId() == ChatService.UNMATCHED)
+                        chatMessageVM.setCreatedAt(null);
                     byte[] payload = objectMapper.writeValueAsString(chatMessageVM).getBytes();
                     outChannel.send(MessageBuilder.createMessage(payload, outAccessor.getMessageHeaders()));
                 }

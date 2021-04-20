@@ -29,6 +29,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     private final AccountDAO accountDAO;
     private final SentChatMessageDAO sentChatMessageDAO;
 
+
     @Autowired
     public ChatServiceImpl(MatchDAO matchDAO,
                            ChatMessageDAO chatMessageDAO,
@@ -51,12 +52,12 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     public Long saveChatMessage(UUID accountId, UUID identityToken, long chatId, UUID recipientId, long key, String body, Date createdAt) {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
         Match match = matchDAO.findById(accountId, recipientId);
-        if (match == null || match.isUnmatched()) return null;
-
+        if (match == null) return null;
+        validateAccount(match.getMatcher(), identityToken);
         Account matched = match.getMatched();
         Chat chat = match.getChat();
-        if (matched == null || matched.isDeleted() || chat == null || chat.getId() != chatId) return null;
-        validateAccount(match.getMatcher(), identityToken);
+        if (matched == null || chat == null || chat.getId() != chatId) return null;
+        if (match.isUnmatched() || match.getMatched().isDeleted()) return UNMATCHED;
 
         SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(key);
         if (sentChatMessage == null) {
