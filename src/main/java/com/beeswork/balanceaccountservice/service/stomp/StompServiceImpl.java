@@ -57,11 +57,11 @@ public class StompServiceImpl implements StompService {
 //                                             getLocaleFromMessageHeaders(messageHeaders));
 //        } else simpMessagingTemplate.convertAndSend(StompHeader.QUEUE_PREFIX + queue, chatMessageDTO);
 //        messageHeaders.put("test-header", "");
-        Map<String, Object> headers = new HashMap<>();
-        headers.put(StompHeader.PUSH_TYPE, PushType.CHAT_MESSAGE);
-        headers.put("message-id", chatMessageVM.getId());
-        
-        simpMessagingTemplate.convertAndSend("/queue/136d4f5e-469c-4fc0-9d7d-d04c895bf99d", chatMessageVM);
+//        Map<String, Object> headers = new HashMap<>();
+//        headers.put(StompHeader.PUSH_TYPE, PushType.CHAT_MESSAGE);
+//        headers.put("message-id", chatMessageVM.getId());
+//
+//        simpMessagingTemplate.convertAndSend("/queue/136d4f5e-469c-4fc0-9d7d-d04c895bf99d", chatMessageVM);
     }
 
     @Override
