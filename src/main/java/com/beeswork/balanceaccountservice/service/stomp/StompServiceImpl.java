@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dto.push.Push;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import com.beeswork.balanceaccountservice.service.fcm.FCMService;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,10 +17,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class StompServiceImpl implements StompService {
@@ -48,6 +46,31 @@ public class StompServiceImpl implements StompService {
     //  NOTE 1. convertAndSend to not existing queue, it creates a new queue under the queue desitination
     @Override
     public void sendChatMessage(ChatMessageVM chatMessageVM, MessageHeaders messageHeaders) {
+        UUID recipientId = chatMessageVM.getRecipientId();
+        if (recipientId == null) throw new SwipedNotFoundException();
+        QueueInformation queueInformation = amqpAdmin.getQueueInfo(recipientId.toString());
+
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(StompHeader.PUSH_TYPE, PushType.CHAT_MESSAGE);
+//        headers.put("message-id", chatMessageVM.getId());
+        headers.put("auto-delete", true);
+        headers.put("exclusive", false);
+        headers.put("durable", true);
+
+//      TODO: remove me
+        simpMessagingTemplate.convertAndSend(StompHeader.QUEUE_PREFIX + "136d4f5e-469c-4fc0-9d7d-d04c895bf99d",
+                                             chatMessageVM,
+                                             headers);
+
+//        if (queueInformation == null || queueInformation.getConsumerCount() <= 0) {
+//            System.out.println("queue not found in rabbitmq");
+//            Account account = accountDAO.findById(UUID.fromString(chatMessageDTO.getAccountId()));
+//            firebaseService.sendNotification(new MessageNotificationDTO(account.getName(),
+//                                                                        account.getFcmToken()),
+//                                             getLocaleFromMessageHeaders(messageHeaders));
+//        } else simpMessagingTemplate.convertAndSend(StompHeader.QUEUE_PREFIX + recipientId.toString());
+
+
 //        String queue = chatMessageDTO.getRecipientId() + StompHeader.QUEUE_SEPARATOR + chatMessageDTO.getChatId();
 //        QueueInformation queueInformation = amqpAdmin.getQueueInfo(queue);
 //        if (queueInformation == null || queueInformation.getConsumerCount() <= 0) {

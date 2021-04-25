@@ -24,7 +24,10 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.ExecutorChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.util.MultiValueMap;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class StompInboundChannelInterceptor implements ChannelInterceptor {
@@ -48,25 +51,43 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
     @SneakyThrows
     @Override
     public Message<?> preSend(Message<?> message, @NonNull MessageChannel channel) {
-        MessageHeaders messageHeaders = message.getHeaders();
         StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
         StompCommand stompCommand = stompHeaderAccessor.getCommand();
 
-        if (StompCommand.SUBSCRIBE.equals(stompCommand)) validateBeforeSubscribe(stompHeaderAccessor, messageHeaders);
-        else if (StompCommand.SEND.equals(stompCommand)) return validateBeforeSend(stompHeaderAccessor, message);
+        if (StompCommand.SUBSCRIBE.equals(stompCommand))
+            return validateBeforeSubscribe(stompHeaderAccessor, message);
+        else if (StompCommand.SEND.equals(stompCommand))
+            return validateBeforeSend(stompHeaderAccessor, message);
+
         return message;
     }
 
-    private void validateBeforeSubscribe(StompHeaderAccessor stompHeaderAccessor, MessageHeaders messageHeaders) {
+    private Message<?> validateBeforeSubscribe(StompHeaderAccessor headerAccessor, Message<?> message) {
         BadRequestException badRequestException = new BadRequestException();
-        UUID accountId = Convert.toUUIDOrThrow(getIdFromDestination(messageHeaders.get(StompHeader.SIMP_DESTINATION)), badRequestException);
-        UUID identityToken = Convert.toUUIDOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN), badRequestException);
+        UUID accountId = Convert.toUUIDOrThrow(getIdFromDestination(headerAccessor.getDestination()), badRequestException);
+        UUID identityToken = Convert.toUUIDOrThrow(headerAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN), badRequestException);
         accountService.validateAccount(accountId, identityToken);
 
-        boolean autoDelete = Convert.toBooleanOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.AUTO_DELETE), badRequestException);
-        boolean exclusive = Convert.toBooleanOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.EXCLUSIVE), badRequestException);
-        boolean durable = Convert.toBooleanOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.DURABLE), badRequestException);
-        if (!autoDelete || exclusive || !durable) throw badRequestException;
+
+        StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.SUBSCRIBE);
+        accessor.setSessionId(headerAccessor.getSessionId());
+        accessor.setDestination(headerAccessor.getDestination());
+//        accessor.addNativeHeader(StompHeader.ID, headerAccessor.getFirstNativeHeader(StompHeader.ID));
+        accessor.addNativeHeader(StompHeader.ACK, headerAccessor.getFirstNativeHeader(StompHeader.ACK));
+        accessor.addNativeHeader(StompHeader.AUTO_DELETE, String.valueOf(true));
+        accessor.addNativeHeader(StompHeader.DURABLE, String.valueOf(true));
+        accessor.addNativeHeader(StompHeader.EXCLUSIVE, String.valueOf(false));
+        accessor.setHeartbeat(headerAccessor.getHeartbeat()[0], headerAccessor.getHeartbeat()[1]);
+        accessor.setSubscriptionId(headerAccessor.getFirstNativeHeader(StompHeader.ID));
+        accessor.setAck(headerAccessor.getFirstNativeHeader(StompHeader.ACK));
+
+//        boolean autoDelete = Convert.toBooleanOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.AUTO_DELETE), badRequestException);
+//        boolean exclusive = Convert.toBooleanOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.EXCLUSIVE), badRequestException);
+//        boolean durable = Convert.toBooleanOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.DURABLE), badRequestException);
+//        if (!autoDelete || exclusive || !durable) throw badRequestException;
+        Message<?> message1 = MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
+
+        return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
     }
 
 
@@ -78,12 +99,11 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
 
         UUID accountId = Convert.toUUIDOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.ACCOUNT_ID), badRequestException);
         UUID identityToken = Convert.toUUIDOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN), badRequestException);
-        UUID recipientId = Convert.toUUIDOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECIPIENT_ID), badRequestException);
         long receipt = Convert.toLongOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECEIPT), badRequestException);
         long chatMessageId = chatService.saveChatMessage(accountId,
                                                          identityToken,
                                                          chatMessageVM.getChatId(),
-                                                         recipientId,
+                                                         chatMessageVM.getRecipientId(),
                                                          receipt,
                                                          chatMessageVM.getBody(),
                                                          chatMessageVM.getCreatedAt());
@@ -93,7 +113,7 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
 
     private String getIdFromDestination(Object destination) {
         if (destination == null) throw new BadRequestException();
-        return destination.toString().replace("/queue/", "");
+        return destination.toString().replace(StompHeader.QUEUE_PREFIX, "");
     }
 
 }
