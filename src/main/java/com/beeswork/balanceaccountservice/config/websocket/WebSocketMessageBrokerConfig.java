@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.config.websocket;
 
 import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
+import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.service.chat.ChatServiceImpl;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.util.StringUtils;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -25,6 +27,8 @@ import org.springframework.messaging.support.ExecutorChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.socket.config.annotation.*;
 
+import java.util.Locale;
+
 @Configuration
 @EnableWebSocket
 @EnableWebSocketMessageBroker
@@ -35,6 +39,9 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private MessageSource messageSource;
 
     private MessageChannel outChannel;
 
@@ -88,9 +95,16 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                     StompHeaderAccessor outAccessor = StompHeaderAccessor.create(StompCommand.RECEIPT);
                     outAccessor.setSessionId(inAccessor.getSessionId());
                     outAccessor.setReceiptId(inAccessor.getReceipt());
+
+                    Locale locale = StompHeader.getLocaleFromAcceptLanguageHeader(inAccessor);
+
                     chatMessageVM.setBody(null);
-                    if (chatMessageVM.getId() == null || chatMessageVM.getId() == ChatService.UNMATCHED)
+                    if (chatMessageVM.getId() == null) {
                         chatMessageVM.setCreatedAt(null);
+                        chatMessageVM.setBody(messageSource.getMessage(BadRequestException.BAD_REQUEST_EXCEPTION, null, locale));
+                    } else if (chatMessageVM.getId() == ChatService.UNMATCHED) {
+                        chatMessageVM.setCreatedAt(null);
+                    }
                     byte[] payload = objectMapper.writeValueAsString(chatMessageVM).getBytes();
                     outChannel.send(MessageBuilder.createMessage(payload, outAccessor.getMessageHeaders()));
                 }

@@ -72,21 +72,12 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.SUBSCRIBE);
         accessor.setSessionId(headerAccessor.getSessionId());
         accessor.setDestination(headerAccessor.getDestination());
-//        accessor.addNativeHeader(StompHeader.ID, headerAccessor.getFirstNativeHeader(StompHeader.ID));
-        accessor.addNativeHeader(StompHeader.ACK, headerAccessor.getFirstNativeHeader(StompHeader.ACK));
         accessor.addNativeHeader(StompHeader.AUTO_DELETE, String.valueOf(true));
         accessor.addNativeHeader(StompHeader.DURABLE, String.valueOf(true));
         accessor.addNativeHeader(StompHeader.EXCLUSIVE, String.valueOf(false));
         accessor.setHeartbeat(headerAccessor.getHeartbeat()[0], headerAccessor.getHeartbeat()[1]);
         accessor.setSubscriptionId(headerAccessor.getFirstNativeHeader(StompHeader.ID));
         accessor.setAck(headerAccessor.getFirstNativeHeader(StompHeader.ACK));
-
-//        boolean autoDelete = Convert.toBooleanOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.AUTO_DELETE), badRequestException);
-//        boolean exclusive = Convert.toBooleanOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.EXCLUSIVE), badRequestException);
-//        boolean durable = Convert.toBooleanOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.DURABLE), badRequestException);
-//        if (!autoDelete || exclusive || !durable) throw badRequestException;
-        Message<?> message1 = MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
-
         return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
     }
 
@@ -100,7 +91,7 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
         UUID accountId = Convert.toUUIDOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.ACCOUNT_ID), badRequestException);
         UUID identityToken = Convert.toUUIDOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN), badRequestException);
         long receipt = Convert.toLongOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECEIPT), badRequestException);
-        long chatMessageId = chatService.saveChatMessage(accountId,
+        Long chatMessageId = chatService.saveChatMessage(accountId,
                                                          identityToken,
                                                          chatMessageVM.getChatId(),
                                                          chatMessageVM.getRecipientId(),

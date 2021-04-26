@@ -369,34 +369,23 @@ order by count(matcher_id) desc;
 
 select *
 from account
-where id = '136d4f5e-469c-4fc0-9d7d-d04c895bf99d';
+where id = '9c280698-25f0-4cef-94a2-4a79c363e1eb';
+
+select *
+from account
+where id = '6a391ce3-d13d-4ec1-9bbe-f522a8a76e31';
+
 
 
 select *
 from match
-where matcher_id = '136d4f5e-469c-4fc0-9d7d-d04c895bf99d';
+where matcher_id = '6a391ce3-d13d-4ec1-9bbe-f522a8a76e31';
 
 select *
-from chat_message;
-
-select id, key, body, fetched, cm.created_at
-from sent_chat_message
-inner join chat_message cm on sent_chat_message.chat_message_id = cm.id
-where account_id = '136d4f5e-469c-4fc0-9d7d-d04c895bf99d';
+from chat_message
+where recipient_id = '6a391ce3-d13d-4ec1-9bbe-f522a8a76e31';
 
 
-
-select *
-from sent_chat_message;
-
-
-update match set unmatched = true, updated_at = current_timestamp where chat_id = 9 or chat_id = 2;
-
-select *
-from chat_message order by recipient_id;
-
-select *
-from sent_chat_message;
 
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query End --------------------------------------------
