@@ -79,4 +79,16 @@ public class Match {
         return matchId.getMatchedId();
     }
 
+    public void setupAsUnmatcher(Date updatedAt) {
+        this.unmatcher = true;
+        this.deleted = true;
+        setupAsUnmatched(updatedAt);
+    }
+
+    public void setupAsUnmatched(Date updatedAt) {
+        this.active = true;
+        this.unmatched = true;
+        this.updatedAt = updatedAt;
+    }
+
 }

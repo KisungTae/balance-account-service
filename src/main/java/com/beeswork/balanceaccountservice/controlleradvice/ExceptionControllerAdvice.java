@@ -14,6 +14,8 @@ import com.beeswork.balanceaccountservice.exception.photo.PhotoNotFoundException
 import com.beeswork.balanceaccountservice.exception.profile.ProfileNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
+import com.beeswork.balanceaccountservice.exception.report.ReportReasonNotFoundException;
+import com.beeswork.balanceaccountservice.exception.report.ReportedNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
@@ -22,7 +24,6 @@ import com.beeswork.balanceaccountservice.response.ExceptionResponse;
 import com.beeswork.balanceaccountservice.exception.login.EmailDuplicateException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hibernate.QueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -33,9 +34,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.persistence.NonUniqueResultException;
-import javax.persistence.PersistenceException;
-import java.sql.SQLException;
 import java.util.Locale;
 
 @RestControllerAdvice(annotations = RestController.class)
@@ -57,7 +55,8 @@ public class ExceptionControllerAdvice {
     //  TEST 1. if exception is thrown inside handleNotFoundException, then it will throw handleNotFoundException not route to General Exception handler
     @ExceptionHandler({AccountNotFoundException.class, QuestionNotFoundException.class, SwipeNotFoundException.class,
                        PhotoNotFoundException.class, AccountQuestionNotFoundException.class,
-                       LoginNotFoundException.class, ProfileNotFoundException.class, MatchNotFoundException.class})
+                       LoginNotFoundException.class, ProfileNotFoundException.class, MatchNotFoundException.class, ReportReasonNotFoundException.class,
+                       ReportedNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)
     throws Exception {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)

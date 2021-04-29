@@ -8,7 +8,9 @@ import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundExc
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,13 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Random;
 
-@Repository
+@Service
 public class QuestionServiceImpl extends BaseServiceImpl implements QuestionService {
 
     private final QuestionDAO questionDAO;
 
     private static final int MIN_NUM_OF_QUESTIONS = 3;
 
+    @Autowired
     public QuestionServiceImpl(QuestionDAO questionDAO,
                                ModelMapper modelMapper) {
         super(modelMapper);

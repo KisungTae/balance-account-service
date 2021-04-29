@@ -7,6 +7,7 @@ import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
 import com.beeswork.balanceaccountservice.service.s3.S3Service;
 import com.beeswork.balanceaccountservice.vm.account.*;
+import com.beeswork.balanceaccountservice.vm.report.ReportVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
@@ -24,7 +25,7 @@ import java.util.List;
 public class AccountController extends BaseController {
 
     private final AccountService accountService;
-    private final S3Service      s3Service;
+    private final S3Service s3Service;
 
     @Autowired
     public AccountController(ObjectMapper objectMapper,
@@ -65,6 +66,4 @@ public class AccountController extends BaseController {
         s3Service.deletePhotosAsync(deleteAccountDTO.getAccountId(), deleteAccountDTO.getPhotoKeys());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
-
-
 }

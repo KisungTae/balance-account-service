@@ -75,22 +75,17 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
         Match matcherMatch = matchDAO.findById(accountId, unmatchedId);
         Match matchedMatch = matchDAO.findById(unmatchedId, accountId);
 
-        if (matcherMatch == null || matchedMatch == null)
-            throw new MatchNotFoundException();
-
-        if (!matcherMatch.getMatcher().getIdentityToken().equals(identityToken))
-            throw new AccountNotFoundException();
+        if (matcherMatch == null || matchedMatch == null) throw new MatchNotFoundException();
+        validateAccount(matcherMatch.getMatcher(), identityToken);
 
         Date updatedAt = new Date();
-        matcherMatch.setUnmatched(true);
-        matcherMatch.setUnmatcher(true);
-        matcherMatch.setDeleted(true);
-        matcherMatch.setUpdatedAt(updatedAt);
-
-        matchedMatch.setUnmatched(true);
-        matchedMatch.setUnmatcher(false);
-        matchedMatch.setUpdatedAt(updatedAt);
+        if (matcherMatch.isUnmatched()) {
+            matcherMatch.setDeleted(true);
+            matcherMatch.setUpdatedAt(updatedAt);
+        } else {
+            matcherMatch.setupAsUnmatcher(updatedAt);
+            matchedMatch.setupAsUnmatched(updatedAt);
+        }
     }
-
 }
 

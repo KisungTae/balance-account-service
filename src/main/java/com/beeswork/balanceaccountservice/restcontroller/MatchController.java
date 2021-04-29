@@ -6,6 +6,7 @@ import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.match.MatchService;
 import com.beeswork.balanceaccountservice.vm.match.ListMatchesVM;
 import com.beeswork.balanceaccountservice.vm.match.UnmatchVM;
+import com.beeswork.balanceaccountservice.vm.report.ReportVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
@@ -20,6 +21,7 @@ import javax.validation.Valid;
 
 @Validated
 @RestController
+@RequestMapping("/match")
 public class MatchController extends BaseController {
     private final MatchService matchService;
 
@@ -29,7 +31,7 @@ public class MatchController extends BaseController {
         this.matchService = matchService;
     }
 
-    @GetMapping("/match/list")
+    @GetMapping("/list")
     public ResponseEntity<String> listMatches(@Valid @ModelAttribute ListMatchesVM listMatchesVM,
                                               BindingResult bindingResult)
     throws JsonProcessingException {

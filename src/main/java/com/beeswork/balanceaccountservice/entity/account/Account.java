@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.entity.account;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.match.Match;
+import com.beeswork.balanceaccountservice.entity.report.Report;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

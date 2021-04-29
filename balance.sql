@@ -357,6 +357,41 @@ create index swipe_swiper_id_idx on swipe (swiper_id);
 create index swipe_swiped_id_idx on swipe (swiped_id);
 
 
+drop table report;
+drop table report_reason;
+
+create table report_reason
+(
+    id   serial primary key,
+    name varchar(50)
+);
+
+insert into report_reason
+values (default, 'inappropriate messages');
+insert into report_reason
+values (default, 'inappropriate photos');
+insert into report_reason
+values (default, 'feels like spam');
+insert into report_reason
+values (default, 'user is underage');
+insert into report_reason
+values (default, 'other');
+
+create table report
+(
+    id               serial primary key,
+    description      varchar(500),
+    reporter_id      uuid        not null,
+    reported_id      uuid        not null,
+    report_reason_id int         not null,
+    created_at       timestamptz not null,
+
+    constraint report_reporter_id_fk foreign key (reporter_id) references account (id),
+    constraint report_reported_id_fk foreign key (reported_id) references account (id),
+    constraint report_report_reason_id_fk foreign key (report_reason_id) references report_reason (id)
+);
+
+
 
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query Start ------------------------------------------
@@ -367,6 +402,13 @@ from match
 group by matcher_id
 order by count(matcher_id) desc;
 
+
+select *
+from report;
+
+select *
+from account;
+
 select *
 from account
 where id = '9c280698-25f0-4cef-94a2-4a79c363e1eb';
@@ -376,6 +418,10 @@ from account
 where id = '6a391ce3-d13d-4ec1-9bbe-f522a8a76e31';
 
 
+
+select *
+from match
+where matcher_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb';
 
 select *
 from match
@@ -415,25 +461,7 @@ create table report_resolution_type
     description varchar(20)
 );
 
-create table report_reason
-(
-    id          serial primary key,
-    description varchar(50)
-);
 
-create table report
-(
-    id               serial primary key,
-    reporter_id      uuid         not null,
-    reported_id      uuid         not null,
-    description      varchar(200) not null,
-    report_reason_id int          not null,
-    created_at       timestamptz  not null,
-
-    constraint report_reporter_id_fk foreign key (reporter_id) references account (id),
-    constraint report_reported_id_fk foreign key (reported_id) references account (id),
-    constraint report_report_reason_id_fk foreign key (report_reason_id) references report_reason (id)
-);
 
 create table report_resolution
 (
