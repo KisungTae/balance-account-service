@@ -6,7 +6,7 @@ import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.ListClickedDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.ListSwipesDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
@@ -56,7 +56,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public List<QuestionDTO> like(UUID accountId, UUID identityToken, UUID swipedId) {
+    public List<QuestionDTO> swipe(UUID accountId, UUID identityToken, UUID swipedId) {
         Account swiper = validateAccount(accountDAO.findById(accountId), identityToken);
         Account swiped = validateSwiped(accountDAO.findById(swipedId));
 
@@ -76,31 +76,32 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         swipe.setCount((swipe.getCount() + 1));
         swipeDAO.persist(swipe);
-        return modelMapper.map(questions, new TypeToken<List<QuestionDTO>>() {
-        }.getType());
+        return modelMapper.map(questions, new TypeToken<List<QuestionDTO>>() {}.getType());
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public ListClickedDTO listClicked(UUID accountId, UUID identityToken, Date fetchedAt) {
+    public ListSwipesDTO listSwipes(UUID accountId, UUID identityToken, Date fetchedAt) {
         validateAccount(accountDAO.findById(accountId), identityToken);
-        ListClickedDTO listClickedDTO = new ListClickedDTO(swipeDAO.findAllClickedAfter(accountId, fetchedAt), fetchedAt);
-        if (listClickedDTO.getSwipeDTOs() == null) return listClickedDTO;
+        return listSwipes(swipeDAO.findSwipes(accountId, fetchedAt), fetchedAt);
+    }
 
-        for (SwipeDTO swipeDTO : listClickedDTO.getSwipeDTOs()) {
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public ListSwipesDTO listClicks(UUID accountId, UUID identityToken, Date fetchedAt) {
+        validateAccount(accountDAO.findById(accountId), identityToken);
+        return listSwipes(swipeDAO.findClicks(accountId, fetchedAt), fetchedAt);
+    }
+
+    private ListSwipesDTO listSwipes(List<SwipeDTO> swipeDTOs, Date fetchedAt) {
+        ListSwipesDTO listSwipesDTO = new ListSwipesDTO(swipeDTOs, fetchedAt);
+        for (SwipeDTO swipeDTO : listSwipesDTO.getSwipeDTOs()) {
             Date updatedAt = swipeDTO.getUpdatedAt();
-            if (updatedAt != null && updatedAt.after(listClickedDTO.getFetchedAt()))
-                listClickedDTO.setFetchedAt(swipeDTO.getUpdatedAt());
+            if (updatedAt != null && updatedAt.after(listSwipesDTO.getFetchedAt()))
+                listSwipesDTO.setFetchedAt(swipeDTO.getUpdatedAt());
             swipeDTO.setUpdatedAt(null);
         }
-        return listClickedDTO;
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<SwipeDTO> listClickers(UUID accountId, UUID identityToken, Date fetchedAt) {
-        validateAccount(accountDAO.findById(accountId), identityToken);
-        return swipeDAO.findAllClickersAfter(accountId, fetchedAt);
+        return listSwipesDTO;
     }
 
     @Override
