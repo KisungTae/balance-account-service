@@ -404,32 +404,39 @@ order by count(matcher_id) desc;
 
 
 select *
-from report;
-
-select *
-from account;
-
-select *
-from account
-where id = '9c280698-25f0-4cef-94a2-4a79c363e1eb';
-
-select *
-from account
-where id = '6a391ce3-d13d-4ec1-9bbe-f522a8a76e31';
-
+from swipe
+where matched = false
+and clicked = true
+and swiped_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb';
 
 
 select *
-from match
-where matcher_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb';
+from account_question
+where account_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe';
 
 select *
-from match
-where matcher_id = '6a391ce3-d13d-4ec1-9bbe-f522a8a76e31';
+from question;
+
+
+
+delete from match
+where (matcher_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and matched_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe')
+    or (matched_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and matcher_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe');
+
+
+update swipe set matched = false, clicked = false
+where (swiper_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and swiped_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe');
+
+
+update swipe set matched = false
+where (swiped_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and swiper_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe');
+
+
 
 select *
-from chat_message
-where recipient_id = '6a391ce3-d13d-4ec1-9bbe-f522a8a76e31';
+from swipe
+where (swiper_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and swiped_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe')
+   or (swiped_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and swiper_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe');
 
 
 

@@ -14,7 +14,4 @@ public class ListSwipesVM extends AccountIdentityVM {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date fetchedAt = new Date();
-
-    @NotNull
-    private Boolean clicked;
 }

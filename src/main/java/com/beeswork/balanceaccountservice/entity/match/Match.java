@@ -35,6 +35,9 @@ public class Match {
     @MapsId("matchedId")
     private Account matched;
 
+    @Column(name = "matched_id", insertable = false, updatable = false)
+    private UUID matchedId;
+
     @Column(name = "chat_id", insertable = false, updatable = false)
     private long chatId;
 

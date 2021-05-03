@@ -1,9 +1,13 @@
 package com.beeswork.balanceaccountservice.config;
 
 
+import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
+import com.beeswork.balanceaccountservice.entity.match.Match;
+import net.sf.ehcache.search.parser.MAggregate;
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +26,19 @@ public class ModelMapperConfig {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         modelMapper.getConfiguration().setSkipNullEnabled(true);
         setCustomMapping(modelMapper);
+        modelMapper.addMappings(matchToDTOMappings());
         return modelMapper;
+    }
+
+    private PropertyMap<Match, MatchDTO> matchToDTOMappings() {
+        return new PropertyMap<>() {
+            @Override protected void configure() {
+                skip(destination.getUpdatedAt());
+                skip(destination.getActive());
+                skip(destination.getDeleted());
+                skip(destination.getUnmatched());
+            }
+        };
     }
 
 

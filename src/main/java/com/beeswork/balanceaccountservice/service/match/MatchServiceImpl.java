@@ -52,7 +52,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
         if (matchDTOs != null) {
             for (MatchDTO matchDTO : matchDTOs) {
-                if (matchDTO.isUnmatched() || matchDTO.isDeleted()) {
+                if (matchDTO.getUnmatched() || matchDTO.getDeleted()) {
                     matchDTO.setRepPhotoKey(null);
                     matchDTO.setCreatedAt(null);
                     matchDTO.setActive(true);
@@ -61,6 +61,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
                 if (matchDTO.getUpdatedAt().after(listMatchesDTO.getFetchedAt()))
                     listMatchesDTO.setFetchedAt(matchDTO.getUpdatedAt());
                 matchDTO.setUpdatedAt(null);
+                matchDTO.setDeleted(null);
             }
         }
         listMatchesDTO.setMatchDTOs(matchDTOs);

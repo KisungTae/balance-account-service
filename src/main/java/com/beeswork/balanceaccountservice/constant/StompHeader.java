@@ -27,12 +27,17 @@ public class StompHeader {
     public static final String RECEIPT = "receipt";
     public static final String PUSH_TYPE = "push-type";
     public static final String ACK = "ack";
+    public static final String MESSAGE_ID = "message-id";
+    public static final String PRIVATE_QUEUE_SUBSCRIPTION_ID = "0";
+    public static final String DEFAULT_ACK = "auto";
+    public static final String SUBSCRIPTION = "subscription";
 
 
     public static Locale getLocaleFromAcceptLanguageHeader(StompHeaderAccessor stompHeaderAccessor) {
         if (stompHeaderAccessor == null) return WebConfig.defaultLocale();
         return getLocaleFromAcceptLanguageHeader(stompHeaderAccessor.getFirstNativeHeader(ACCEPT_LANGUAGE));
     }
+
 
     @SuppressWarnings("unchecked")
     public static Locale getLocaleFromAcceptLanguageHeader(MessageHeaders messageHeaders) {

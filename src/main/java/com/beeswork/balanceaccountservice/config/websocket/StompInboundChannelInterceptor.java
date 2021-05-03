@@ -68,16 +68,14 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
         UUID identityToken = Convert.toUUIDOrThrow(headerAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN), badRequestException);
         accountService.validateAccount(accountId, identityToken);
 
-
         StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.SUBSCRIBE);
         accessor.setSessionId(headerAccessor.getSessionId());
         accessor.setDestination(headerAccessor.getDestination());
         accessor.addNativeHeader(StompHeader.AUTO_DELETE, String.valueOf(true));
         accessor.addNativeHeader(StompHeader.DURABLE, String.valueOf(true));
         accessor.addNativeHeader(StompHeader.EXCLUSIVE, String.valueOf(false));
-        accessor.setHeartbeat(headerAccessor.getHeartbeat()[0], headerAccessor.getHeartbeat()[1]);
-        accessor.setSubscriptionId(headerAccessor.getFirstNativeHeader(StompHeader.ID));
-        accessor.setAck(headerAccessor.getFirstNativeHeader(StompHeader.ACK));
+        accessor.setSubscriptionId(StompHeader.PRIVATE_QUEUE_SUBSCRIPTION_ID);
+        accessor.setAck(StompHeader.DEFAULT_ACK);
         return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
     }
 

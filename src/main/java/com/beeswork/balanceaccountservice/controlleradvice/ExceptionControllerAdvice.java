@@ -16,6 +16,7 @@ import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundExc
 import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
 import com.beeswork.balanceaccountservice.exception.report.ReportReasonNotFoundException;
 import com.beeswork.balanceaccountservice.exception.report.ReportedNotFoundException;
+import com.beeswork.balanceaccountservice.exception.stomp.QueueNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
@@ -56,7 +57,7 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler({AccountNotFoundException.class, QuestionNotFoundException.class, SwipeNotFoundException.class,
                        PhotoNotFoundException.class, AccountQuestionNotFoundException.class,
                        LoginNotFoundException.class, ProfileNotFoundException.class, MatchNotFoundException.class, ReportReasonNotFoundException.class,
-                       ReportedNotFoundException.class})
+                       ReportedNotFoundException.class, QueueNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)
     throws Exception {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)

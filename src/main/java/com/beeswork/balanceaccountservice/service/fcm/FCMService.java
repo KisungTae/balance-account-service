@@ -6,5 +6,7 @@ import java.util.Locale;
 
 public interface FCMService {
 
+    void sendChatMessage();
+    void sendMatch();
     void sendPush(Push push, Locale locale);
 }

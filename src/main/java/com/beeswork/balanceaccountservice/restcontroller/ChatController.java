@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
@@ -8,6 +9,7 @@ import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.beeswork.balanceaccountservice.vm.chat.SyncChatMessagesVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,24 +26,26 @@ import javax.validation.Valid;
 public class ChatController {
 
     private final StompService stompService;
-    private final ChatService  chatService;
+    private final ChatService chatService;
     private final ObjectMapper objectMapper;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public ChatController(StompService stompService, ChatService chatService, ObjectMapper objectMapper) {
+    public ChatController(StompService stompService, ChatService chatService, ObjectMapper objectMapper, ModelMapper modelMapper) {
         this.stompService = stompService;
         this.chatService = chatService;
         this.objectMapper = objectMapper;
+        this.modelMapper = modelMapper;
     }
 
     @MessageMapping("/chat/send")
     public void send(@Payload ChatMessageVM chatMessageVM, MessageHeaders messageHeaders) {
-        stompService.sendChatMessage(chatMessageVM, messageHeaders);
+        stompService.sendChatMessage(modelMapper.map(chatMessageVM, ChatMessageDTO.class), messageHeaders);
     }
 
     @PostMapping("/message/sync")
     public void syncChatMessages(@Valid @RequestBody SyncChatMessagesVM syncChatMessagesVM,
-                                 BindingResult bindingResult) throws InterruptedException {
+                                 BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         chatService.syncChatMessages(syncChatMessagesVM.getAccountId(),
                                      syncChatMessagesVM.getIdentityToken(),

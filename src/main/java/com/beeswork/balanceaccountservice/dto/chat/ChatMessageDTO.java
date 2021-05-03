@@ -6,16 +6,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class ChatMessageDTO {
-    private Long   id;
+    private Long id;
+    private UUID recipientId;
     private String body;
-    private Long   key;
-    private Long   chatId;
-    private Date   createdAt;
+    private Long key;
+    private Long chatId;
+    private Date createdAt;
 
     @QueryProjection
     public ChatMessageDTO(Long id, Long key, Date createdAt) {

@@ -1,8 +1,10 @@
 package com.beeswork.balanceaccountservice.dto.match;
 
+import com.beeswork.balanceaccountservice.constant.ClickResult;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
@@ -10,19 +12,30 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class MatchDTO {
+    private ClickResult clickResult;
     private Long chatId;
+    private UUID matcherId;
     private UUID matchedId;
-    private boolean active;
-    private boolean unmatched;
+    private Boolean active;
+    private Boolean unmatched;
     private String name;
     private String repPhotoKey;
-
-    @JsonIgnore
-    private boolean deleted;
-
+    private Boolean deleted;
     private Date createdAt;
     private Date updatedAt;
+
+    public MatchDTO(ClickResult clickResult) {
+        this.clickResult = clickResult;
+    }
+
+    public MatchDTO(ClickResult clickResult, UUID matcherId, UUID matchedId, String repPhotoKey) {
+        this.matcherId = matcherId;
+        this.clickResult = clickResult;
+        this.matchedId = matchedId;
+        this.repPhotoKey = repPhotoKey;
+    }
 
     @QueryProjection
     public MatchDTO(Long chatId,

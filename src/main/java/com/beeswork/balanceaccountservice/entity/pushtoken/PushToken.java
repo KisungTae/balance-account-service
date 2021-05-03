@@ -42,4 +42,8 @@ public class PushToken {
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
     }
+
+    public PushTokenType getType() {
+        return pushTokenId.getType();
+    }
 }
