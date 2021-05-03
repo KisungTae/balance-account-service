@@ -72,20 +72,20 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Override
     @Transactional
-    public void unmatch(UUID accountId, UUID identityToken, UUID unmatchedId) {
-        Match matcherMatch = matchDAO.findById(accountId, unmatchedId);
-        Match matchedMatch = matchDAO.findById(unmatchedId, accountId);
+    public void unmatch(UUID accountId, UUID identityToken, UUID swipedId) {
+        Match swiperMatch = matchDAO.findById(accountId, swipedId);
+        Match swipedMatch = matchDAO.findById(swipedId, accountId);
 
-        if (matcherMatch == null || matchedMatch == null) throw new MatchNotFoundException();
-        validateAccount(matcherMatch.getMatcher(), identityToken);
+        if (swiperMatch == null || swipedMatch == null) throw new MatchNotFoundException();
+        validateAccount(swiperMatch.getSwiper(), identityToken);
 
         Date updatedAt = new Date();
-        if (matcherMatch.isUnmatched()) {
-            matcherMatch.setDeleted(true);
-            matcherMatch.setUpdatedAt(updatedAt);
+        if (swiperMatch.isUnmatched()) {
+            swiperMatch.setDeleted(true);
+            swiperMatch.setUpdatedAt(updatedAt);
         } else {
-            matcherMatch.setupAsUnmatcher(updatedAt);
-            matchedMatch.setupAsUnmatched(updatedAt);
+            swiperMatch.setupAsUnmatcher(updatedAt);
+            swipedMatch.setupAsUnmatched(updatedAt);
         }
     }
 }

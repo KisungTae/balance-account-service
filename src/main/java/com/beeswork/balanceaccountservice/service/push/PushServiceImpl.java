@@ -10,11 +10,13 @@ import com.beeswork.balanceaccountservice.service.fcm.FCMService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
+
 @Service
 public class PushServiceImpl implements PushService {
 
-    private final FCMService fcmService;
-    private final APNSService apnsService;
+    private final FCMService   fcmService;
+    private final APNSService  apnsService;
     private final PushTokenDAO pushTokenDAO;
 
     @Autowired
@@ -24,16 +26,21 @@ public class PushServiceImpl implements PushService {
         this.pushTokenDAO = pushTokenDAO;
     }
 
-
     @Override
-    public void pushChatMessage(ChatMessageDTO chatMessageDTO) {
+    public void pushChatMessage(ChatMessageDTO chatMessageDTO, Locale locale) {
         PushToken pushToken = pushTokenDAO.findRecent(chatMessageDTO.getRecipientId());
         if (pushToken == null) return;
-
+        if (pushToken.getType() == PushTokenType.APS) apnsService.sendChatMessage(chatMessageDTO, locale);
+        else if (pushToken.getType() == PushTokenType.FCM) fcmService.sendChatMessage(chatMessageDTO, pushToken.getToken(), locale);
     }
 
     @Override
-    public void pushMatch(MatchDTO matchDTO) {
-
+    public void pushMatch(MatchDTO matchDTO, Locale locale) {
+        fcmService.sendMatch(matchDTO, "pushToken.getToken()", locale);
+//        if (matchDTO == null || matchDTO.getSwiperId() == null) return;
+//        PushToken pushToken = pushTokenDAO.findRecent(matchDTO.getSwiperId());
+//        if (pushToken == null) return;
+//        if (pushToken.getType() == PushTokenType.APS) apnsService.sendMatch(matchDTO, locale);
+//        else if (pushToken.getType() == PushTokenType.FCM) fcmService.sendMatch(matchDTO, pushToken.getToken(), locale);
     }
 }

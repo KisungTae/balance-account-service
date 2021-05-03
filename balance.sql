@@ -76,9 +76,9 @@ begin
                     while inner_count <= max_duplicate
                         loop
 
-                            varchar_date := concat(round((random() * (2003 - 1970)) + 1970)::varchar, '/',
-                                                   round((random() * (12 - 1)) + 1)::varchar, '/',
-                                                   round((random() * (27 - 1)) + 1)::varchar);
+                            varchar_date :=
+                                    concat(round((random() * (2003 - 1970)) + 1970)::varchar, '/', round((random() * (12 - 1)) + 1)::varchar,
+                                           '/', round((random() * (27 - 1)) + 1)::varchar);
 
                             random_gender := round((random() * (1 - 0)) + 0);
 
@@ -146,6 +146,7 @@ drop table chat;
 drop table login;
 drop table push_token;
 drop table profile;
+drop table report;
 drop table account;
 
 
@@ -207,13 +208,15 @@ create table push_token
 (
     account_id uuid         not null,
     type       int          not null,
-    key        varchar(500) not null,
+    token      varchar(500) not null,
     created_at timestamptz  not null,
     updated_at timestamptz  not null,
 
     primary key (account_id, type),
     constraint push_notification_account_id_fk foreign key (account_id) references account (id)
 );
+
+-- insert into push_token values ('136d4f5e-469c-4fc0-9d7d-d04c895bf99d', 0, 'testtoken', current_timestamp, current_timestamp);
 
 
 create table chat
@@ -278,8 +281,8 @@ create table login
 create table match
 (
     version    int         not null,
-    matcher_id uuid        not null,
-    matched_id uuid        not null,
+    swiper_id uuid        not null,
+    swiped_id uuid        not null,
     chat_id    bigint      not null,
     unmatched  boolean     not null,
     unmatcher  boolean     not null,
@@ -288,15 +291,15 @@ create table match
     created_at timestamptz not null,
     updated_at timestamptz not null,
 
-    primary key (matcher_id, matched_id),
-    constraint match_matcher_id_fk foreign key (matcher_id) references account (id),
-    constraint match_matched_id_fk foreign key (matched_id) references account (id),
+    primary key (swiper_id, swiped_id),
+    constraint match_swiper_id_fk foreign key (swiper_id) references account (id),
+    constraint match_swiped_id_fk foreign key (swiped_id) references account (id),
     constraint match_chat_id_fk foreign key (chat_id) references chat (id)
 );
 
-create index match_matcher_id_idx on match (matcher_id);
-create index match_matched_id_idx on match (matched_id);
-create index match_matcher_id_matched_id_chat_id on match (matcher_id, matched_id, chat_id);
+create index match_swiper_id_idx on match (swiper_id);
+create index match_swiped_id_idx on match (swiped_id);
+create index match_swiper_id_swiped_id_chat_id on match (swiper_id, swiped_id, chat_id);
 
 
 create table photo
@@ -357,8 +360,8 @@ create index swipe_swiper_id_idx on swipe (swiper_id);
 create index swipe_swiped_id_idx on swipe (swiped_id);
 
 
-drop table report;
-drop table report_reason;
+
+
 
 create table report_reason
 (
@@ -397,17 +400,17 @@ create table report
 -------------------------------------- Query Start ------------------------------------------
 ---------------------------------------------------------------------------------------------
 
-select matcher_id, count(matcher_id)
+select swiper_id, count(swiper_id)
 from match
-group by matcher_id
-order by count(matcher_id) desc;
+group by swiper_id
+order by count(swiper_id) desc;
 
 
 select *
 from swipe
 where matched = false
-and clicked = true
-and swiped_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb';
+  and clicked = true
+  and swiped_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb';
 
 
 select *
@@ -419,16 +422,20 @@ from question;
 
 
 
-delete from match
-where (matcher_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and matched_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe')
-    or (matched_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and matcher_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe');
+delete
+from match
+where (swiper_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and swiped_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe')
+   or (swiped_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and swiper_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe');
 
 
-update swipe set matched = false, clicked = false
+update swipe
+set matched = false,
+    clicked = false
 where (swiper_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and swiped_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe');
 
 
-update swipe set matched = false
+update swipe
+set matched = false
 where (swiped_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and swiper_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe');
 
 
@@ -513,22 +520,6 @@ create table chat_message_back_up
     account_id uuid        not null,
     created_at timestamptz not null
 );
-
-
-select *
-from account
-where id = '562b9e01-611c-4e2a-b5ee-a15a0224e211';
-
-select matched_id, count(*)
-from match
-group by matched_id
-order by count(*) desc;
-
-select *
-from match
-where matcher_id = '562b9e01-611c-4e2a-b5ee-a15a0224e211'
-  and chat_id = 14;
-
 
 
 

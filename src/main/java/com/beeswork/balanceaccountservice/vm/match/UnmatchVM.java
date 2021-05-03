@@ -14,6 +14,6 @@ import java.util.UUID;
 public class UnmatchVM extends AccountIdentityVM {
 
     @ValidUUID
-    private UUID unmatchedId;
+    private UUID swipedId;
 
 }

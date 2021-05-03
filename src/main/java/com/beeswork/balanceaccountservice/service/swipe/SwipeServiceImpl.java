@@ -1,6 +1,6 @@
 package com.beeswork.balanceaccountservice.service.swipe;
 
-import com.beeswork.balanceaccountservice.constant.ClickResult;
+import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
@@ -78,26 +78,14 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         swipe.setCount((swipe.getCount() + 1));
         swipeDAO.persist(swipe);
-        return modelMapper.map(questions, new TypeToken<List<QuestionDTO>>() {
-        }.getType());
+        return modelMapper.map(questions, new TypeToken<List<QuestionDTO>>() {}.getType());
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public ListSwipesDTO listSwipes(UUID accountId, UUID identityToken, Date fetchedAt) {
         validateAccount(accountDAO.findById(accountId), identityToken);
-        return listSwipes(swipeDAO.findSwipes(accountId, fetchedAt), fetchedAt);
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public ListSwipesDTO listClicks(UUID accountId, UUID identityToken, Date fetchedAt) {
-        validateAccount(accountDAO.findById(accountId), identityToken);
-        return listSwipes(swipeDAO.findClicks(accountId, fetchedAt), fetchedAt);
-    }
-
-    private ListSwipesDTO listSwipes(List<SwipeDTO> swipeDTOs, Date fetchedAt) {
-        ListSwipesDTO listSwipesDTO = new ListSwipesDTO(swipeDTOs, fetchedAt);
+        ListSwipesDTO listSwipesDTO = new ListSwipesDTO(swipeDAO.findSwipes(accountId, fetchedAt), fetchedAt);
         for (SwipeDTO swipeDTO : listSwipesDTO.getSwipeDTOs()) {
             Date updatedAt = swipeDTO.getUpdatedAt();
             if (updatedAt != null && updatedAt.after(listSwipesDTO.getFetchedAt()))
@@ -105,6 +93,13 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             swipeDTO.setUpdatedAt(null);
         }
         return listSwipesDTO;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public List<SwipeDTO> listClicks(UUID accountId, UUID identityToken, Date fetchedAt) {
+        validateAccount(accountDAO.findById(accountId), identityToken);
+        return swipeDAO.findClicks(accountId, fetchedAt);
     }
 
     @Override
@@ -134,7 +129,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         ClickDTO clickDTO = new ClickDTO();
         if (accountQuestionDAO.countAllByAnswers(swipedId, answers) != answers.size()) {
-            clickDTO.setSubMatchDTO(new MatchDTO(ClickResult.MISSED));
+            clickDTO.setSubMatchDTO(new MatchDTO(PushType.MISSED));
             return clickDTO;
         }
 
@@ -143,8 +138,13 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         subSwipe.setUpdatedAt(updatedAt);
 
         if (objSwipe == null || !objSwipe.isClicked()) {
-            clickDTO.setSubMatchDTO(new MatchDTO(ClickResult.CLICKED));
-            clickDTO.setObjMatchDTO(new MatchDTO(ClickResult.CLICKED, swiped.getId(), swiper.getId(), swiper.getRepPhotoKey()));
+            clickDTO.setSubMatchDTO(new MatchDTO(PushType.CLICKED));
+            MatchDTO objMatchDTO = new MatchDTO(PushType.CLICKED);
+            objMatchDTO.setSwiperId(swiped.getId());
+            objMatchDTO.setSwipedId(swiper.getId());
+            objMatchDTO.setRepPhotoKey(swiper.getRepPhotoKey());
+            objMatchDTO.setUpdatedAt(updatedAt);
+            clickDTO.setObjMatchDTO(objMatchDTO);
         } else {
             Chat chat = new Chat();
             chatDAO.persist(chat);
@@ -158,15 +158,15 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             objSwipe.setMatched(true);
 
             MatchDTO subMatchDTO = modelMapper.map(subMatch, MatchDTO.class);
-            subMatchDTO.setClickResult(ClickResult.MATCHED);
+            subMatchDTO.setPushType(PushType.MATCHED);
             subMatchDTO.setName(swiped.getName());
             subMatchDTO.setRepPhotoKey(swiped.getRepPhotoKey());
             subMatchDTO.setChatId(chat.getId());
             clickDTO.setSubMatchDTO(subMatchDTO);
 
             MatchDTO objMatchDTO = modelMapper.map(objMatch, MatchDTO.class);
-            objMatchDTO.setMatcherId(swiped.getId());
-            objMatchDTO.setClickResult(ClickResult.MATCHED);
+            objMatchDTO.setSwiperId(swiped.getId());
+            objMatchDTO.setPushType(PushType.MATCHED);
             objMatchDTO.setName(swiper.getName());
             objMatchDTO.setRepPhotoKey(swiper.getRepPhotoKey());
             objMatchDTO.setChatId(chat.getId());

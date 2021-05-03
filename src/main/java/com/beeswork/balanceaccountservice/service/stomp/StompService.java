@@ -11,6 +11,5 @@ import java.util.Locale;
 public interface StompService {
 
     void sendChatMessage(ChatMessageDTO chatMessageDTO, MessageHeaders messageHeaders);
-    void sendMatch(MatchDTO matchDTO);
-    void sendPush(Push push, Locale locale);
+    void sendMatch(MatchDTO matchDTO, Locale locale);
 }

@@ -53,16 +53,16 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
         Match match = matchDAO.findById(accountId, recipientId);
         if (match == null) return null;
-        validateAccount(match.getMatcher(), identityToken);
-        Account matched = match.getMatched();
+        validateAccount(match.getSwiper(), identityToken);
+        Account swiped = match.getSwiped();
         Chat chat = match.getChat();
-        if (matched == null || chat == null || chat.getId() != chatId) return null;
-        if (match.isUnmatched() || match.getMatched().isDeleted()) return UNMATCHED;
+        if (swiped == null || chat == null || chat.getId() != chatId) return null;
+        if (match.isUnmatched() || match.getSwiped().isDeleted()) return UNMATCHED;
 
         SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(key);
         if (sentChatMessage == null) {
-            ChatMessage chatMessage = new ChatMessage(chat, matched, body, createdAt);
-            sentChatMessage = new SentChatMessage(chatMessage, match.getMatcher(), key, createdAt);
+            ChatMessage chatMessage = new ChatMessage(chat, swiped, body, createdAt);
+            sentChatMessage = new SentChatMessage(chatMessage, match.getSwiper(), key, createdAt);
             chatMessageDAO.persist(chatMessage);
             sentChatMessageDAO.persist(sentChatMessage);
         }

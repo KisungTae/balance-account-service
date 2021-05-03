@@ -32,13 +32,13 @@ public class PushTokenServiceImpl extends BaseServiceImpl implements PushTokenSe
 
     @Override
     @Transactional
-    public void savePushToken(UUID accountId, UUID identityToken, String key, PushTokenType type) {
+    public void savePushToken(UUID accountId, UUID identityToken, String token, PushTokenType type) {
         Account account = validateAccount(accountDAO.findById(accountId), identityToken);
         PushToken pushToken = pushTokenDAO.findById(new PushTokenId(accountId, type));
         if (pushToken == null)
-            pushToken = new PushToken(account, type, key, new Date());
+            pushToken = new PushToken(account, type, token, new Date());
         else {
-            pushToken.setKey(key);
+            pushToken.setToken(token);
             pushToken.setUpdatedAt(new Date());
         }
         pushTokenDAO.persist(pushToken);

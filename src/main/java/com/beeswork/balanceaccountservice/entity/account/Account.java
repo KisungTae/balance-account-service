@@ -75,7 +75,7 @@ public class Account {
                orphanRemoval = true)
     private List<AccountQuestion> accountQuestions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "matcher",
+    @OneToMany(mappedBy = "swiper",
                fetch = FetchType.LAZY,
                cascade = CascadeType.ALL,
                orphanRemoval = true)

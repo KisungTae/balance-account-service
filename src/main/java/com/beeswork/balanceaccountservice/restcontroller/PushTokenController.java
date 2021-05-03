@@ -40,7 +40,7 @@ public class PushTokenController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         pushTokenService.savePushToken(savePushTokenVM.getAccountId(),
                                      savePushTokenVM.getIdentityToken(),
-                                     savePushTokenVM.getKey(),
+                                     savePushTokenVM.getToken(),
                                      PushTokenType.FCM);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
@@ -52,7 +52,7 @@ public class PushTokenController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         pushTokenService.savePushToken(savePushTokenVM.getAccountId(),
                                      savePushTokenVM.getIdentityToken(),
-                                     savePushTokenVM.getKey(),
+                                     savePushTokenVM.getToken(),
                                      PushTokenType.APS);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }

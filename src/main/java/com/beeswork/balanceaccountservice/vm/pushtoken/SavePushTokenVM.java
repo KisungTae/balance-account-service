@@ -11,5 +11,5 @@ import javax.validation.constraints.NotEmpty;
 public class SavePushTokenVM extends AccountIdentityVM {
 
     @NotEmpty
-    private String key;
+    private String token;
 }

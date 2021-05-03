@@ -318,6 +318,7 @@ public class BalanceAccountServiceApplication {
 
 // TODO			93. click() should return matchDTO? and then there no rabbit queue for user then make it push and push it through FCM
 
+// TODO			94. swipe_point should be from database not from static variable so that I can easily change it without rebooting accountservice
 
 
 // TODO			Chat Business rules

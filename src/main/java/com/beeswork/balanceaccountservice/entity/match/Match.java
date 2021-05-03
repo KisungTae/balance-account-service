@@ -28,15 +28,15 @@ public class Match {
     private MatchId matchId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("matcherId")
-    private Account matcher;
+    @MapsId("swiperId")
+    private Account swiper;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("matchedId")
-    private Account matched;
+    @MapsId("swipedId")
+    private Account swiped;
 
-    @Column(name = "matched_id", insertable = false, updatable = false)
-    private UUID matchedId;
+    @Column(name = "swiped_id", insertable = false, updatable = false)
+    private UUID swipedId;
 
     @Column(name = "chat_id", insertable = false, updatable = false)
     private long chatId;
@@ -65,21 +65,21 @@ public class Match {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public Match(Account matcher, Account matched, Chat chat, Date createdAt) {
-        this.matchId = new MatchId(matcher.getId(), matched.getId());
+    public Match(Account swiper, Account swiped, Chat chat, Date createdAt) {
+        this.matchId = new MatchId(swiper.getId(), swiped.getId());
         this.chat = chat;
-        this.matcher = matcher;
-        this.matched = matched;
+        this.swiper = swiper;
+        this.swiped = swiped;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
     }
 
-    public UUID getMatcherId() {
-        return matchId.getMatcherId();
+    public UUID getSwiperId() {
+        return matchId.getSwiperId();
     }
 
-    public UUID getMatchedId() {
-        return matchId.getMatchedId();
+    public UUID getSwipedId() {
+        return matchId.getSwipedId();
     }
 
     public void setupAsUnmatcher(Date updatedAt) {

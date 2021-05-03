@@ -24,8 +24,8 @@ public class PushToken {
     @MapsId("accountId")
     private Account account;
 
-    @Column(name = "key")
-    private String key;
+    @Column(name = "token")
+    private String token;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -35,10 +35,10 @@ public class PushToken {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public PushToken(Account account, PushTokenType type, String key, Date createdAt) {
+    public PushToken(Account account, PushTokenType type, String token, Date createdAt) {
         this.pushTokenId = new PushTokenId(account.getId(), type);
         this.account = account;
-        this.key = key;
+        this.token = token;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
     }

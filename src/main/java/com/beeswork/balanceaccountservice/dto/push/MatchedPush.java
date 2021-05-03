@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.dto.push;
 import com.beeswork.balanceaccountservice.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.MessageSource;
@@ -47,6 +48,11 @@ public class MatchedPush extends AbstractPush {
                                    String fcmToken,
                                    Locale locale) {
         setFCMNotification(messageBuilder, messageSource, locale, PUSH_BODY_CODE, null);
+
+//        String body = messageSource.getMessage(pushBodyCode, pushBodyArguments, locale);
+//        String title = messageSource.getMessage(PUSH_TITLE_CODE, null, locale);
+//        messageBuilder.setNotification(Notification.builder().setTitle(title).setBody(body).build());
+        messageBuilder.putData(PUSH_TYPE, type.toString());
         messageBuilder.setToken(fcmToken);
         messageBuilder.putData(CHAT_ID, String.valueOf(chatId));
         messageBuilder.putData(MATCHED_ID, matchedId.toString());

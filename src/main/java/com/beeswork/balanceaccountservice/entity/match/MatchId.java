@@ -18,6 +18,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MatchId implements Serializable {
 
-    private UUID matcherId;
-    private UUID matchedId;
+    private UUID swiperId;
+    private UUID swipedId;
 }

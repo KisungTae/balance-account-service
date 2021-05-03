@@ -2,19 +2,13 @@ package com.beeswork.balanceaccountservice.service.stomp;
 
 import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
-import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
-import com.beeswork.balanceaccountservice.dto.push.Push;
 import com.beeswork.balanceaccountservice.exception.stomp.QueueNotFoundException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import com.beeswork.balanceaccountservice.service.push.PushService;
-import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.QueueInformation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -46,23 +40,9 @@ public class StompServiceImpl implements StompService {
         String queue = getQueue(chatMessageDTO.getRecipientId());
         if (queue != null) {
             MessageHeaders outHeaders = sendingHeaders(PushType.CHAT_MESSAGE, chatMessageDTO.getId().toString());
+            chatMessageDTO.setRecipientId(null);
             simpMessagingTemplate.convertAndSend(queue, chatMessageDTO, outHeaders);
-        } else pushService.pushChatMessage(chatMessageDTO, StompHeader.getLocaleFromAcceptLanguageHeader(messageHeaders));
-
-//        String queue = chatMessageDTO.getRecipientId() + StompHeader.QUEUE_SEPARATOR + chatMessageDTO.getChatId();
-//        QueueInformation queueInformation = amqpAdmin.getQueueInfo(queue);
-//        if (queueInformation == null || queueInformation.getConsumerCount() <= 0) {
-//            Account account = accountDAO.findById(UUID.fromString(chatMessageDTO.getAccountId()));
-//            firebaseService.sendNotification(new MessageNotificationDTO(account.getName(),
-//                                                                        account.getFcmToken()),
-//                                             getLocaleFromMessageHeaders(messageHeaders));
-//        } else simpMessagingTemplate.convertAndSend(StompHeader.QUEUE_PREFIX + queue, chatMessageDTO);
-//        messageHeaders.put("test-header", "");
-//        Map<String, Object> headers = new HashMap<>();
-//        headers.put(StompHeader.PUSH_TYPE, PushType.CHAT_MESSAGE);
-//        headers.put("message-id", chatMessageVM.getId());
-//
-//        simpMessagingTemplate.convertAndSend("/queue/136d4f5e-469c-4fc0-9d7d-d04c895bf99d", chatMessageVM);
+        } else pushService.pushChatMessage(chatMessageDTO, StompHeader.getLocaleFromMessageHeaders(messageHeaders));
     }
 
     private MessageHeaders sendingHeaders(PushType pushType, String messageId) {
@@ -78,22 +58,14 @@ public class StompServiceImpl implements StompService {
 
     @Override
     @Async("processExecutor")
-    public void sendMatch(MatchDTO matchDTO) {
+    public void sendMatch(MatchDTO matchDTO, Locale locale) {
         if (matchDTO == null) return;
-        String queue = getQueue(matchDTO.getMatcherId());
+        String queue = getQueue(matchDTO.getSwiperId());
+        matchDTO.setSwiperId(null);
         if (queue != null) {
-            MessageHeaders outHeaders = sendingHeaders(PushType.MATCH, matchDTO.getChatId().toString());
+            MessageHeaders outHeaders = sendingHeaders(matchDTO.getPushType(), matchDTO.getChatId().toString());
             simpMessagingTemplate.convertAndSend(queue, matchDTO, outHeaders);
-        } else pushService.pushMatch(matchDTO);
-    }
-
-    @Override
-    @Async("processExecutor")
-    public void sendPush(Push push, Locale locale) {
-//        if (push == null) return;
-//        String queue = push.getAccountId().toString();
-//        if (queueExists(queue)) simpMessagingTemplate.convertAndSend(queue, push);
-//        else fcmService.sendPush(push, locale);
+        } else pushService.pushMatch(matchDTO, locale);
     }
 
     private String getQueue(UUID queue) {

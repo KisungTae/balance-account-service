@@ -11,6 +11,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MatchDAO extends BaseDAO<Match> {
-    List<MatchDTO> findAllAfter(UUID matcherId, Date matchFetchedAt);
-    Match findById(UUID matcherId, UUID matchedId);
+    Match findById(UUID swiperId, UUID swipedId);
+    List<MatchDTO> findAllAfter(UUID swipedId, Date matchFetchedAt);
 }

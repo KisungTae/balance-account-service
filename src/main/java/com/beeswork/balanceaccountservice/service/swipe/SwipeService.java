@@ -19,5 +19,5 @@ public interface SwipeService {
     ClickDTO click(UUID accountId, UUID identityToken, UUID swipedId, Map<Integer, Boolean> answers);
 
     ListSwipesDTO listSwipes(UUID accountId, UUID identityToken, Date fetchedAt);
-    ListSwipesDTO listClicks(UUID accountId, UUID identityToken, Date fetchedAt);
+    List<SwipeDTO> listClicks(UUID accountId, UUID identityToken, Date fetchedAt);
 }

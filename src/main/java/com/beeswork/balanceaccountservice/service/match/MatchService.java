@@ -12,6 +12,6 @@ public interface MatchService {
     ListMatchesDTO listMatches(UUID accountId, UUID identityToken, Date fetchedAt);
 
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-    void unmatch(UUID accountId, UUID identityToken, UUID unmatchedId);
+    void unmatch(UUID accountId, UUID identityToken, UUID swipedId);
 
 }

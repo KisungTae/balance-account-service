@@ -139,8 +139,8 @@ public class DummyController {
                 if (random.nextBoolean()) {
                     innerCount++;
                     boolean who = random.nextBoolean();
-                    Account sender = who ? match.getMatcher() : match.getMatched();
-                    Account receiver = who ? match.getMatched() : match.getMatcher();
+                    Account sender = who ? match.getSwiper() : match.getSwiped();
+                    Account receiver = who ? match.getSwiped() : match.getSwiper();
                     ChatMessage chatMessage = new ChatMessage(match.getChat(),
                                                               receiver,
                                                               "message-" + random.nextFloat(),
@@ -359,8 +359,8 @@ public class DummyController {
 
             Match newMatch = new Match();
             newMatch.setChat(chat);
-            newMatch.setMatcher(swipe.getSwiper());
-            newMatch.setMatched(swipe.getSwiped());
+            newMatch.setSwiper(swipe.getSwiper());
+            newMatch.setSwiped(swipe.getSwiped());
             newMatch.setUnmatcher(false);
 
             newMatch.setCreatedAt(date);
@@ -434,8 +434,8 @@ public class DummyController {
                 if (random.nextBoolean()) {
                     innerCount++;
                     boolean who = random.nextBoolean();
-                    Account sender = who ? match.getMatcher() : match.getMatched();
-                    Account receiver = who ? match.getMatched() : match.getMatcher();
+                    Account sender = who ? match.getSwiper() : match.getSwiped();
+                    Account receiver = who ? match.getSwiped() : match.getSwiper();
                     ChatMessage chatMessage = new ChatMessage(match.getChat(),
                                                               receiver,
                                                               "message-" + random.nextFloat(),

@@ -9,5 +9,5 @@ import java.util.Locale;
 public interface PushService {
 
     void pushChatMessage(ChatMessageDTO chatMessageDTO, Locale locale);
-    void pushMatch(MatchDTO matchDTO, Local local);
+    void pushMatch(MatchDTO matchDTO, Locale locale);
 }

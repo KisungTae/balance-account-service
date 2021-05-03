@@ -1,7 +1,7 @@
 package com.beeswork.balanceaccountservice.dto.match;
 
-import com.beeswork.balanceaccountservice.constant.ClickResult;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import com.beeswork.balanceaccountservice.constant.PushType;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,10 +14,10 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class MatchDTO {
-    private ClickResult clickResult;
-    private Long chatId;
-    private UUID matcherId;
-    private UUID matchedId;
+    private PushType pushType;
+    private Long     chatId;
+    private UUID    swiperId;
+    private UUID    swipedId;
     private Boolean active;
     private Boolean unmatched;
     private String name;
@@ -26,20 +26,20 @@ public class MatchDTO {
     private Date createdAt;
     private Date updatedAt;
 
-    public MatchDTO(ClickResult clickResult) {
-        this.clickResult = clickResult;
+    public MatchDTO(PushType pushType) {
+        this.pushType = pushType;
     }
 
-    public MatchDTO(ClickResult clickResult, UUID matcherId, UUID matchedId, String repPhotoKey) {
-        this.matcherId = matcherId;
-        this.clickResult = clickResult;
-        this.matchedId = matchedId;
+    public MatchDTO(PushType pushType, UUID swiperId, UUID swipedId, String repPhotoKey) {
+        this.swiperId = swiperId;
+        this.pushType = pushType;
+        this.swipedId = swipedId;
         this.repPhotoKey = repPhotoKey;
     }
 
     @QueryProjection
     public MatchDTO(Long chatId,
-                    UUID matchedId,
+                    UUID swipedId,
                     boolean unmatched,
                     String name,
                     String repPhotoKey,
@@ -48,7 +48,7 @@ public class MatchDTO {
                     Date createdAt,
                     Date updatedAt) {
         this.chatId = chatId;
-        this.matchedId = matchedId;
+        this.swipedId = swipedId;
         this.unmatched = unmatched;
         this.name = name;
         this.repPhotoKey = repPhotoKey;

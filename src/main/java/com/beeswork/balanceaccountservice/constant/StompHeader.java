@@ -40,7 +40,7 @@ public class StompHeader {
 
 
     @SuppressWarnings("unchecked")
-    public static Locale getLocaleFromAcceptLanguageHeader(MessageHeaders messageHeaders) {
+    public static Locale getLocaleFromMessageHeaders(MessageHeaders messageHeaders) {
         if (messageHeaders == null) return WebConfig.defaultLocale();
         MultiValueMap<String, String> nativeHeaders =
                 messageHeaders.get(StompHeaderAccessor.NATIVE_HEADERS, MultiValueMap.class);
