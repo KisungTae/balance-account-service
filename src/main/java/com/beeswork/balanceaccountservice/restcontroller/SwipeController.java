@@ -90,7 +90,7 @@ public class SwipeController extends BaseController {
         matchDTO.setSwiperId(clickVM.getAccountId());
         matchDTO.setSwipedId(UUID.randomUUID());
         matchDTO.setChatId(1L);
-        matchDTO.setPushType(PushType.MATCHED);
+        matchDTO.setPushType(PushType.CLICKED);
         matchDTO.setName("testname");
         matchDTO.setRepPhotoKey("testrepphotokey");
         matchDTO.setCreatedAt(new Date());

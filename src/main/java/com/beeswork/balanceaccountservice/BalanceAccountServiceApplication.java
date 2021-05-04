@@ -310,6 +310,7 @@ public class BalanceAccountServiceApplication {
 // TODO			89. deletePhotosAsync() in S3Service throws one or more objects could not be dleted eexception
 
 // TODO			90. when create chatMessage, create sentChatMessage as well
+//					--> implemented
 
 // TODO			91. consider offsetTime = milliseconds otherwise listMatches() in android will keep increasing rowId of the same match
 
@@ -317,8 +318,13 @@ public class BalanceAccountServiceApplication {
 //					--> implemented, android also updated accordingly
 
 // TODO			93. click() should return matchDTO? and then there no rabbit queue for user then make it push and push it through FCM
+//					--> click returns clickDTO which contains matchDTO for matcher and matched
 
 // TODO			94. swipe_point should be from database not from static variable so that I can easily change it without rebooting accountservice
+//					-->
+
+// TODO			95. separte point related fields from Account to Point or soemthing table
+//					-->
 
 
 // TODO			Chat Business rules

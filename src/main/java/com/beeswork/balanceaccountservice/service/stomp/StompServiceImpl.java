@@ -41,6 +41,7 @@ public class StompServiceImpl implements StompService {
         if (queue != null) {
             MessageHeaders outHeaders = sendingHeaders(PushType.CHAT_MESSAGE, chatMessageDTO.getId().toString());
             chatMessageDTO.setRecipientId(null);
+            chatMessageDTO.setAccountId(null);
             simpMessagingTemplate.convertAndSend(queue, chatMessageDTO, outHeaders);
         } else pushService.pushChatMessage(chatMessageDTO, StompHeader.getLocaleFromMessageHeaders(messageHeaders));
     }

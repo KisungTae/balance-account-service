@@ -42,18 +42,18 @@ public class Account {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "point")
-    private int point;
+//    @Column(name = "point")
+//    private int point;
 
     @Column(name = "rep_photo_key")
     private String repPhotoKey;
 
-    @Column(name = "free_swipe")
-    private int freeSwipe;
-
-    @Column(name = "free_swipe_updated_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date freeSwipeUpdatedAt;
+//    @Column(name = "free_swipe")
+//    private int freeSwipe;
+//
+//    @Column(name = "free_swipe_updated_at")
+//    @Temporal(TemporalType.TIMESTAMP)
+//    private Date freeSwipeUpdatedAt;
 
     @Column(name = "blocked")
     private boolean blocked;
@@ -68,6 +68,9 @@ public class Account {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
+    @OneToOne(mappedBy = "account")
+    private Wallet wallet;
 
     @OneToMany(mappedBy = "account",
                fetch = FetchType.LAZY,

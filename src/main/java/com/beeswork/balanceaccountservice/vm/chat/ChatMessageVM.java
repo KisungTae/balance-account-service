@@ -12,6 +12,7 @@ public class ChatMessageVM {
     private Long id;
     private String body;
     private Long chatId;
+    private UUID accountId;
     private UUID recipientId;
     private Date createdAt = new Date();
 }

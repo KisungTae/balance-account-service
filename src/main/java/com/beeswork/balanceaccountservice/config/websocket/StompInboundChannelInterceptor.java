@@ -86,10 +86,9 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
         ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
         if (chatMessageVM == null) throw new BadRequestException();
 
-        UUID accountId = Convert.toUUIDOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.ACCOUNT_ID), badRequestException);
         UUID identityToken = Convert.toUUIDOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN), badRequestException);
         long receipt = Convert.toLongOrThrow(stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECEIPT), badRequestException);
-        Long chatMessageId = chatService.saveChatMessage(accountId,
+        Long chatMessageId = chatService.saveChatMessage(chatMessageVM.getAccountId(),
                                                          identityToken,
                                                          chatMessageVM.getChatId(),
                                                          chatMessageVM.getRecipientId(),

@@ -25,7 +25,7 @@ public class StompHeader {
     public static final String ACCEPT_LANGUAGE = "accept-language";
     public static final String ERROR = "error";
     public static final String RECEIPT = "receipt";
-    public static final String PUSH_TYPE = "push-type";
+    public static final String PUSH_TYPE = "pushType";
     public static final String ACK = "ack";
     public static final String MESSAGE_ID = "message-id";
     public static final String PRIVATE_QUEUE_SUBSCRIPTION_ID = "0";

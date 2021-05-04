@@ -150,6 +150,7 @@ drop table report;
 drop table account;
 
 
+
 -- TODO: 2020-09-14 execute these
 
 CREATE EXTENSION if not exists postgis;
@@ -161,19 +162,28 @@ create extension if not exists "uuid-ossp";
 -- liked count will be reset on every night
 create table account
 (
-    version               int         not null,
-    id                    uuid primary key,
-    identity_token        uuid        not null,
-    name                  varchar(15) not null,
-    point                 int         not null,
-    rep_photo_key         varchar(30) not null,
-    free_swipe            int         not null,
-    free_swipe_updated_at timestamptz not null,
-    blocked               boolean     not null,
-    deleted               boolean     not null,
-    created_at            timestamptz not null,
-    updated_at            timestamptz not null
+    version        int         not null,
+    id             uuid primary key,
+    identity_token uuid        not null,
+    name           varchar(15) not null,
+    rep_photo_key  varchar(30) not null,
+    blocked        boolean     not null,
+    deleted        boolean     not null,
+    created_at     timestamptz not null,
+    updated_at     timestamptz not null
 );
+
+create table wallet
+(
+    account_id              uuid primary key,
+    point                   int         not null,
+    free_swipe              int         not null,
+    free_swipe_recharged_at timestamptz not null,
+
+    constraint wallet_account_id_fk foreign key (account_id) references account (id)
+);
+
+
 
 create table question
 (
@@ -281,8 +291,8 @@ create table login
 create table match
 (
     version    int         not null,
-    swiper_id uuid        not null,
-    swiped_id uuid        not null,
+    swiper_id  uuid        not null,
+    swiped_id  uuid        not null,
     chat_id    bigint      not null,
     unmatched  boolean     not null,
     unmatcher  boolean     not null,
@@ -360,9 +370,6 @@ create index swipe_swiper_id_idx on swipe (swiper_id);
 create index swipe_swiped_id_idx on swipe (swiped_id);
 
 
-
-
-
 create table report_reason
 (
     id   serial primary key,
@@ -380,6 +387,7 @@ values (default, 'user is underage');
 insert into report_reason
 values (default, 'other');
 
+
 create table report
 (
     id               serial primary key,
@@ -393,6 +401,20 @@ create table report
     constraint report_reported_id_fk foreign key (reported_id) references account (id),
     constraint report_report_reason_id_fk foreign key (report_reason_id) references report_reason (id)
 );
+
+
+create table swipe_meta
+(
+    id                serial primary key,
+    swipe_point       int         not null,
+    super_swipe_point int         not null,
+    free_swipe_period bigint         not null,
+    max_free_swipe    int         not null,
+    created_at        timestamptz not null,
+    updated_at        timestamptz not null
+);
+
+insert into swipe_meta values (default, 200, 300, 43200000, 10, current_timestamp, current_timestamp);
 
 
 

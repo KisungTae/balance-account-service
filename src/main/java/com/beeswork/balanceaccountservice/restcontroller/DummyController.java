@@ -197,9 +197,9 @@ public class DummyController {
         String name = "user-" + count;
         account.setIdentityToken(UUID.randomUUID());
         account.setName(name);
-        account.setPoint(50000);
-        account.setFreeSwipe(2000);
-        account.setFreeSwipeUpdatedAt(now);
+//        account.setPoint(50000);
+//        account.setFreeSwipe(2000);
+//        account.setFreeSwipeUpdatedAt(now);
         account.setRepPhotoKey("");
         account.setCreatedAt(now);
         account.setUpdatedAt(now);

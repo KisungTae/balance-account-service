@@ -13,6 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ChatMessageDTO {
     private Long id;
+    private UUID accountId;
     private UUID recipientId;
     private String body;
     private Long key;
