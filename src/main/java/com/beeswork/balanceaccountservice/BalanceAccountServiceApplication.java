@@ -321,10 +321,10 @@ public class BalanceAccountServiceApplication {
 //					--> click returns clickDTO which contains matchDTO for matcher and matched
 
 // TODO			94. swipe_point should be from database not from static variable so that I can easily change it without rebooting accountservice
-//					-->
+//					--> implemented
 
 // TODO			95. separte point related fields from Account to Point or soemthing table
-//					-->
+//					--> implemented
 
 
 // TODO			Chat Business rules

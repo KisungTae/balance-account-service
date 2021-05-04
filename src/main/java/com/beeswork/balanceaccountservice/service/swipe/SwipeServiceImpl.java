@@ -5,6 +5,7 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
+import com.beeswork.balanceaccountservice.dao.swipe.SwipeMetaDAO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
@@ -17,10 +18,12 @@ import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeId;
+import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
 import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeMatchedExistsException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipeMetaNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
@@ -36,25 +39,25 @@ import java.util.*;
 @Service
 public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
-    private static final int SWIPE_POINT = 200;
-    private static final int FREE_SWIPE_A_DAY = 2000;
-
     private final AccountDAO accountDAO;
     private final SwipeDAO swipeDAO;
     private final ChatDAO chatDAO;
     private final AccountQuestionDAO accountQuestionDAO;
+    private final SwipeMetaDAO swipeMetaDAO;
 
     @Autowired
     public SwipeServiceImpl(ModelMapper modelMapper,
                             AccountDAO accountDAO,
                             SwipeDAO swipeDAO,
                             ChatDAO chatDAO,
-                            AccountQuestionDAO accountQuestionDAO) {
+                            AccountQuestionDAO accountQuestionDAO,
+                            SwipeMetaDAO swipeMetaDAO) {
         super(modelMapper);
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
         this.chatDAO = chatDAO;
         this.accountQuestionDAO = accountQuestionDAO;
+        this.swipeMetaDAO = swipeMetaDAO;
     }
 
     @Override
@@ -63,9 +66,12 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         Account swiper = validateAccount(accountDAO.findById(accountId), identityToken);
         Account swiped = validateSwiped(accountDAO.findById(swipedId));
 
-//        rechargeFreeSwipe(swiper);
-//        if (swiper.getFreeSwipe() < SWIPE_POINT && swiper.getPoint() < SWIPE_POINT)
-//            throw new AccountShortOfPointException();
+        Wallet wallet = swiper.getWallet();
+        SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
+        rechargeFreeSwipe(wallet, swipeMeta);
+
+        if (wallet.getFreeSwipe() < swipeMeta.getSwipePoint() && wallet.getPoint() < swipeMeta.getSwipePoint())
+            throw new AccountShortOfPointException();
 
         List<Question> questions = accountQuestionDAO.findAllQuestionsSelected(swipedId);
         if (questions == null || questions.size() <= 0)
@@ -121,12 +127,14 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         Account swiper = validateAccount(subSwipe.getSwiper(), identityToken);
         Account swiped = validateSwiped(subSwipe.getSwiped());
+        Wallet wallet = swiper.getWallet();
+        SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
 
-//        if (swiper.getFreeSwipe() >= SWIPE_POINT)
-//            swiper.setFreeSwipe((swiper.getFreeSwipe() - SWIPE_POINT));
-//        else if (swiper.getPoint() < SWIPE_POINT)
-//            throw new AccountShortOfPointException();
-//        else swiper.setPoint((swiper.getPoint() - SWIPE_POINT));
+        if (wallet.getFreeSwipe() >= swipeMeta.getSwipePoint())
+            wallet.setFreeSwipe((wallet.getFreeSwipe() - swipeMeta.getSwipePoint()));
+        else if (wallet.getPoint() < swipeMeta.getSwipePoint())
+            throw new AccountShortOfPointException();
+        else wallet.setPoint((wallet.getPoint() - swipeMeta.getSwipePoint()));
 
         ClickDTO clickDTO = new ClickDTO();
         if (accountQuestionDAO.countAllByAnswers(swipedId, answers) != answers.size()) {
@@ -176,13 +184,12 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         return clickDTO;
     }
 
-    private void rechargeFreeSwipe(Wallet wallet) {
-//        Date today = new Date();
-//        long elapsedTime = today.getTime() - swiper.getFreeSwipeUpdatedAt().getTime();
-//        long rechargePeriod = 12 * 60 * 60 * 1000;
-//        if (elapsedTime > rechargePeriod) {
-//            swiper.setFreeSwipe(FREE_SWIPE_A_DAY);
-//            swiper.setFreeSwipeUpdatedAt(today);
-//        }
+    private void rechargeFreeSwipe(Wallet wallet, SwipeMeta swipeMeta) {
+        Date now = new Date();
+        long elapsedTime = now.getTime() - wallet.getFreeSwipeRechargedAt().getTime();
+        if (elapsedTime > swipeMeta.getFreeSwipePeriod()) {
+            wallet.setFreeSwipe(swipeMeta.getMaxFreeSwipe());
+            wallet.setFreeSwipeRechargedAt(now);
+        }
     }
 }

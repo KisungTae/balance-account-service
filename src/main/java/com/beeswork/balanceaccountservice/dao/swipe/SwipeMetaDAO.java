@@ -5,4 +5,5 @@ import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
 
 public interface SwipeMetaDAO extends BaseDAO<SwipeMeta> {
+    SwipeMeta findFirst();
 }

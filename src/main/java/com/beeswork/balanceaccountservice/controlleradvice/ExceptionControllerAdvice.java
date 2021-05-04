@@ -17,10 +17,7 @@ import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedE
 import com.beeswork.balanceaccountservice.exception.report.ReportReasonNotFoundException;
 import com.beeswork.balanceaccountservice.exception.report.ReportedNotFoundException;
 import com.beeswork.balanceaccountservice.exception.stomp.QueueNotFoundException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
+import com.beeswork.balanceaccountservice.exception.swipe.*;
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
 import com.beeswork.balanceaccountservice.exception.login.EmailDuplicateException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -41,11 +38,11 @@ import java.util.Locale;
 public class ExceptionControllerAdvice {
 
     private static final String INTERNAL_SERVER_EXCEPTION = "internal.server.exception";
-    private static final String QUERY_EXCEPTION = "query.exception";
-    private static final String PERSISTENCE_EXCEPTION = "persistence.exception";
+    private static final String QUERY_EXCEPTION           = "query.exception";
+    private static final String PERSISTENCE_EXCEPTION     = "persistence.exception";
 
     private final MessageSource messageSource;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper  objectMapper;
 
     @Autowired
     public ExceptionControllerAdvice(MessageSource messageSource, ObjectMapper objectMapper) {
@@ -56,8 +53,9 @@ public class ExceptionControllerAdvice {
     //  TEST 1. if exception is thrown inside handleNotFoundException, then it will throw handleNotFoundException not route to General Exception handler
     @ExceptionHandler({AccountNotFoundException.class, QuestionNotFoundException.class, SwipeNotFoundException.class,
                        PhotoNotFoundException.class, AccountQuestionNotFoundException.class,
-                       LoginNotFoundException.class, ProfileNotFoundException.class, MatchNotFoundException.class, ReportReasonNotFoundException.class,
-                       ReportedNotFoundException.class, QueueNotFoundException.class})
+                       LoginNotFoundException.class, ProfileNotFoundException.class, MatchNotFoundException.class,
+                       ReportReasonNotFoundException.class, ReportedNotFoundException.class, QueueNotFoundException.class,
+                       SwipeMetaNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)
     throws Exception {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
