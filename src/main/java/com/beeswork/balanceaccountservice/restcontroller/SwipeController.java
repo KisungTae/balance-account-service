@@ -20,10 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 public class SwipeController extends BaseController {
@@ -89,8 +86,8 @@ public class SwipeController extends BaseController {
         MatchDTO matchDTO = new MatchDTO();
         matchDTO.setSwiperId(clickVM.getAccountId());
         matchDTO.setSwipedId(UUID.randomUUID());
-        matchDTO.setChatId(1L);
-        matchDTO.setPushType(PushType.CLICKED);
+        matchDTO.setChatId(new Random().nextLong());
+        matchDTO.setPushType(PushType.MATCHED);
         matchDTO.setName("testname");
         matchDTO.setProfilePhotoKey("testrepphotokey");
         matchDTO.setCreatedAt(new Date());

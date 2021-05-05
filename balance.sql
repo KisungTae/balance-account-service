@@ -428,24 +428,37 @@ from match
 group by swiper_id
 order by count(swiper_id) desc;
 
-select *
-from chat_message;
+
+delete from sent_chat_message;
+delete from chat_message;
 
 select *
-from sent_chat_message;
+from chat_message
+where body like '%주%';
+
+
+select *
+from chat_message
+order by id;
+
+select *
+from sent_chat_message
+order by chat_message_id;
 
 select *
 from push_token;
 
+select *
+from account
+where id = '698f2eb6-3fef-4ee3-9c7d-3e527740548e';
 
 select *
 from account
-where id = '09e14ca0-7786-479e-a712-a46101ad7660';
-
+where id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860';
 
 select *
 from match
-where swiper_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f';
+where swiper_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860';
 
 
 select *

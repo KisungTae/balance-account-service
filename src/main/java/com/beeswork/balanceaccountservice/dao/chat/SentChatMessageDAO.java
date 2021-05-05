@@ -10,6 +10,6 @@ import java.util.UUID;
 public interface SentChatMessageDAO extends BaseDAO<SentChatMessage> {
 
     List<ChatMessageDTO> findAllUnfetched(UUID accountId);
-    SentChatMessage findByKey(long key);
+    SentChatMessage findByKey(UUID accountId, long key);
     List<SentChatMessage> findAllIn(List<Long> chatMessageIds);
 }

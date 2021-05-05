@@ -34,7 +34,6 @@ public class StompServiceImpl implements StompService {
 
     //  NOTE 1. convertAndSend to not existing queue, it creates a new queue under the queue desitination
     @Override
-    @Async("processExecutor")
     public void sendChatMessage(ChatMessageDTO chatMessageDTO, MessageHeaders messageHeaders) {
         if (chatMessageDTO.getId() == null) return;
         String queue = getQueue(chatMessageDTO.getRecipientId());
@@ -52,7 +51,7 @@ public class StompServiceImpl implements StompService {
         headers.put(StompHeader.EXCLUSIVE, false);
         headers.put(StompHeader.DURABLE, true);
         headers.put(StompHeader.PUSH_TYPE, pushType);
-        headers.put(StompHeader.MESSAGE_ID, messageId);
+//        headers.put(StompHeader.MESSAGE_ID, messageId);
         headers.put(StompHeader.SUBSCRIPTION, StompHeader.PRIVATE_QUEUE_SUBSCRIPTION_ID);
         return new MessageHeaders(headers);
     }

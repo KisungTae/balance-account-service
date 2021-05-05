@@ -36,9 +36,9 @@ public class SentChatMessageDAOImpl extends BaseDAOImpl<SentChatMessage> impleme
     }
 
     @Override
-    public SentChatMessage findByKey(long key) {
+    public SentChatMessage findByKey(UUID accountId, long key) {
         return jpaQueryFactory.selectFrom(qSentChatMessage)
-                              .where(qSentChatMessage.key.eq(key))
+                              .where(qSentChatMessage.account.id.eq(accountId).and(qSentChatMessage.key.eq(key)))
                               .fetchFirst();
     }
 

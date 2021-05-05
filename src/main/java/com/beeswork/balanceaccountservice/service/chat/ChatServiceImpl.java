@@ -59,7 +59,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         if (swiped == null || chat == null || chat.getId() != chatId) return null;
         if (match.isUnmatched() || match.getSwiped().isDeleted()) return UNMATCHED;
 
-        SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(key);
+        SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(accountId, key);
         if (sentChatMessage == null) {
             ChatMessage chatMessage = new ChatMessage(chat, swiped, body, createdAt);
             sentChatMessage = new SentChatMessage(chatMessage, match.getSwiper(), key, createdAt);
@@ -86,7 +86,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     @Transactional
     public void fetchedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
         validateAccount(accountDAO.findById(accountId), identityToken);
-        SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(chatMessageId);
+        SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(accountId, chatMessageId);
         sentChatMessage.setFetched(true);
     }
 
