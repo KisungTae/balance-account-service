@@ -1,7 +1,6 @@
 package com.beeswork.balanceaccountservice.config.websocket;
 
 import com.beeswork.balanceaccountservice.constant.StompHeader;
-import com.beeswork.balanceaccountservice.dto.push.ChatMessagePush;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;

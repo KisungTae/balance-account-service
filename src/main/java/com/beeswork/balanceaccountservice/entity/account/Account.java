@@ -42,18 +42,8 @@ public class Account {
     @Column(name = "name")
     private String name;
 
-//    @Column(name = "point")
-//    private int point;
-
-    @Column(name = "rep_photo_key")
-    private String repPhotoKey;
-
-//    @Column(name = "free_swipe")
-//    private int freeSwipe;
-//
-//    @Column(name = "free_swipe_updated_at")
-//    @Temporal(TemporalType.TIMESTAMP)
-//    private Date freeSwipeUpdatedAt;
+    @Column(name = "profile_photo_key")
+    private String profilePhotoKey;
 
     @Column(name = "blocked")
     private boolean blocked;

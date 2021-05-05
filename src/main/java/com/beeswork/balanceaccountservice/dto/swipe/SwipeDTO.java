@@ -15,7 +15,7 @@ import java.util.UUID;
 public class SwipeDTO {
     private UUID swiperId;
     private UUID swipedId;
-    private String repPhotoKey;
+    private String profilePhotoKey;
     private Boolean deleted;
     private Date updatedAt;
 
@@ -26,9 +26,9 @@ public class SwipeDTO {
     }
 
     @QueryProjection
-    public SwipeDTO(UUID swiperId, String repPhotoKey, Boolean deleted, Date updatedAt) {
+    public SwipeDTO(UUID swiperId, String profilePhotoKey, Boolean deleted, Date updatedAt) {
         this.swiperId = swiperId;
-        this.repPhotoKey = repPhotoKey;
+        this.profilePhotoKey = profilePhotoKey;
         this.deleted = deleted;
         this.updatedAt = updatedAt;
     }

@@ -92,7 +92,7 @@ public class SwipeController extends BaseController {
         matchDTO.setChatId(1L);
         matchDTO.setPushType(PushType.CLICKED);
         matchDTO.setName("testname");
-        matchDTO.setRepPhotoKey("testrepphotokey");
+        matchDTO.setProfilePhotoKey("testrepphotokey");
         matchDTO.setCreatedAt(new Date());
 
 //        stompService.sendMatch(clickDTO.getObjMatchDTO(), locale);

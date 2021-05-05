@@ -200,9 +200,15 @@ public class DummyController {
 //        account.setPoint(50000);
 //        account.setFreeSwipe(2000);
 //        account.setFreeSwipeUpdatedAt(now);
-        account.setRepPhotoKey("");
+        account.setProfilePhotoKey("");
         account.setCreatedAt(now);
         account.setUpdatedAt(now);
+        Wallet wallet = new Wallet();
+        wallet.setAccount(account);
+        wallet.setPoint(50000);
+        wallet.setFreeSwipe(2000);
+        wallet.setFreeSwipeRechargedAt(now);
+        account.setWallet(wallet);
 
 
         Point point = geometryFactory.createPoint(new Coordinate(lon, lat));
@@ -229,7 +235,7 @@ public class DummyController {
             photo.setPhotoId(new PhotoId(account.getId(), photoKeyDate.toString()));
 
             if (p == 0) {
-                account.setRepPhotoKey(photoKeyDate.toString());
+                account.setProfilePhotoKey(photoKeyDate.toString());
                 account.setUpdatedAt(photoKeyDate);
             }
             photo.setSequence(count);
@@ -239,6 +245,8 @@ public class DummyController {
 
         entityManager.persist(account);
         entityManager.persist(profile);
+        entityManager.persist(wallet);
+
     }
 
     private Date randomBirth() {

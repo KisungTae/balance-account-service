@@ -7,7 +7,6 @@ import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.entity.match.Match;
-import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
@@ -53,7 +52,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
         if (matchDTOs != null) {
             for (MatchDTO matchDTO : matchDTOs) {
                 if (matchDTO.getUnmatched() || matchDTO.getDeleted()) {
-                    matchDTO.setRepPhotoKey(null);
+                    matchDTO.setProfilePhotoKey(null);
                     matchDTO.setCreatedAt(null);
                     matchDTO.setActive(true);
                     matchDTO.setUnmatched(true);

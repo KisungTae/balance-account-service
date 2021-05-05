@@ -57,7 +57,7 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
                                                           .otherwise(qAccount.updatedAt);
 
         return jpaQueryFactory.select(new QSwipeDTO(qSwipe.swipeId.swiperId,
-                                                    qAccount.repPhotoKey,
+                                                    qAccount.profilePhotoKey,
                                                     qAccount.deleted,
                                                     updatedAtCase))
                               .from(qSwipe)

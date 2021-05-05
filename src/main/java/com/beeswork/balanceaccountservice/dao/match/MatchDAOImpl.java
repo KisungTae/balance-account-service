@@ -51,7 +51,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                                                     qMatch.swiped.id,
                                                     qMatch.unmatched,
                                                     qAccount.name,
-                                                    qAccount.repPhotoKey,
+                                                    qAccount.profilePhotoKey,
                                                     qAccount.deleted,
                                                     qMatch.active,
                                                     qMatch.createdAt,

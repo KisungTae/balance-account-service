@@ -8,7 +8,6 @@ import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteExce
 import com.beeswork.balanceaccountservice.exception.photo.PhotoNotFoundException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoNumReachedMaxException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
-import net.sf.ehcache.CacheManager;
 import org.modelmapper.ModelMapper;
 
 import org.modelmapper.TypeToken;
@@ -49,7 +48,7 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
 
         if (photo == null) photos.add(new Photo(account, photoKey, sequence));
         else photo.setSequence(sequence);
-        resetRepPhoto(account, photos);
+        resetProfilePhoto(account, photos);
         accountDAO.persist(account);
     }
 
@@ -75,16 +74,16 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
 
         if (photos.size() <= 1) throw new PhotoInvalidDeleteException();
         photos.remove(photo);
-        resetRepPhoto(account, photos);
+        resetProfilePhoto(account, photos);
     }
 
-    private void resetRepPhoto(Account account, List<Photo> photos) {
+    private void resetProfilePhoto(Account account, List<Photo> photos) {
         if (photos.size() <= 0) return;
         Collections.sort(photos);
-        Photo repPhoto = photos.get(0);
+        Photo profilePhoto = photos.get(0);
 
-        if (!repPhoto.getPhotoId().getKey().equals(account.getRepPhotoKey())) {
-            account.setRepPhotoKey(repPhoto.getPhotoId().getKey());
+        if (!profilePhoto.getPhotoId().getKey().equals(account.getProfilePhotoKey())) {
+            account.setProfilePhotoKey(profilePhoto.getPhotoId().getKey());
             account.setUpdatedAt(new Date());
         }
     }
@@ -98,6 +97,6 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
             if (photoOrders.containsKey(photo.getPhotoId().getKey()))
                 photo.setSequence(photoOrders.get(photo.getPhotoId().getKey()));
         }
-        resetRepPhoto(account, photos);
+        resetProfilePhoto(account, photos);
     }
 }

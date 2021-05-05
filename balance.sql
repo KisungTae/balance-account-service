@@ -147,8 +147,8 @@ drop table login;
 drop table push_token;
 drop table profile;
 drop table report;
+drop table wallet;
 drop table account;
-
 
 
 -- TODO: 2020-09-14 execute these
@@ -162,15 +162,15 @@ create extension if not exists "uuid-ossp";
 -- liked count will be reset on every night
 create table account
 (
-    version        int         not null,
-    id             uuid primary key,
-    identity_token uuid        not null,
-    name           varchar(15) not null,
-    rep_photo_key  varchar(30) not null,
-    blocked        boolean     not null,
-    deleted        boolean     not null,
-    created_at     timestamptz not null,
-    updated_at     timestamptz not null
+    version           int         not null,
+    id                uuid primary key,
+    identity_token    uuid        not null,
+    name              varchar(15) not null,
+    profile_photo_key varchar(30) not null,
+    blocked           boolean     not null,
+    deleted           boolean     not null,
+    created_at        timestamptz not null,
+    updated_at        timestamptz not null
 );
 
 create table wallet
@@ -408,13 +408,14 @@ create table swipe_meta
     id                serial primary key,
     swipe_point       int         not null,
     super_swipe_point int         not null,
-    free_swipe_period bigint         not null,
+    free_swipe_period bigint      not null,
     max_free_swipe    int         not null,
     created_at        timestamptz not null,
     updated_at        timestamptz not null
 );
 
-insert into swipe_meta values (default, 200, 300, 43200000, 10, current_timestamp, current_timestamp);
+insert into swipe_meta
+values (default, 200, 300, 43200000, 10, current_timestamp, current_timestamp);
 
 
 
@@ -426,6 +427,25 @@ select swiper_id, count(swiper_id)
 from match
 group by swiper_id
 order by count(swiper_id) desc;
+
+select *
+from chat_message;
+
+select *
+from sent_chat_message;
+
+select *
+from push_token;
+
+
+select *
+from account
+where id = '09e14ca0-7786-479e-a712-a46101ad7660';
+
+
+select *
+from match
+where swiper_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f';
 
 
 select *

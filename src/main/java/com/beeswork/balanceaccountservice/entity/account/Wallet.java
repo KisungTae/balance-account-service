@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -18,7 +19,7 @@ import java.util.Date;
 public class Wallet {
 
     @Id
-    private long accountId;
+    private UUID accountId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")

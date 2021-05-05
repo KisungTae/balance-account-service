@@ -21,7 +21,7 @@ public class MatchDTO {
     private Boolean active;
     private Boolean unmatched;
     private String name;
-    private String repPhotoKey;
+    private String profilePhotoKey;
     private Boolean deleted;
     private Date createdAt;
     private Date updatedAt;
@@ -30,11 +30,11 @@ public class MatchDTO {
         this.pushType = pushType;
     }
 
-    public MatchDTO(PushType pushType, UUID swiperId, UUID swipedId, String repPhotoKey) {
+    public MatchDTO(PushType pushType, UUID swiperId, UUID swipedId, String profilePhotoKey) {
         this.swiperId = swiperId;
         this.pushType = pushType;
         this.swipedId = swipedId;
-        this.repPhotoKey = repPhotoKey;
+        this.profilePhotoKey = profilePhotoKey;
     }
 
     @QueryProjection
@@ -42,7 +42,7 @@ public class MatchDTO {
                     UUID swipedId,
                     boolean unmatched,
                     String name,
-                    String repPhotoKey,
+                    String profilePhotoKey,
                     boolean deleted,
                     boolean active,
                     Date createdAt,
@@ -51,7 +51,7 @@ public class MatchDTO {
         this.swipedId = swipedId;
         this.unmatched = unmatched;
         this.name = name;
-        this.repPhotoKey = repPhotoKey;
+        this.profilePhotoKey = profilePhotoKey;
         this.deleted = deleted;
         this.active = active;
         this.createdAt = createdAt;
