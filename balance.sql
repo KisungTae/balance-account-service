@@ -454,18 +454,13 @@ where id = '698f2eb6-3fef-4ee3-9c7d-3e527740548e';
 
 select *
 from account
-where id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860';
+where id = '5b4525ba-b325-4752-ae0e-00ece9201d3b';
 
 select *
 from match
-where swiper_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860';
+where swiper_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f';
 
 
-select *
-from swipe
-where matched = false
-  and clicked = true
-  and swiped_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb';
 
 
 select *
@@ -476,31 +471,66 @@ select *
 from question;
 
 
+select *
+from swipe_meta;
+
+select *
+from swipe
+where matched = false
+  and clicked = true
+  and swiped_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f';
+
+select *
+from account
+where id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f';
+
+select *
+from wallet
+where account_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f';
+
+update wallet set free_swipe_recharged_at = '2021-05-03 01:12:44.823000' where account_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f';
+update wallet set free_swipe = 0 where account_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f';
+
+select *
+from swipe
+where (swiper_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b')
+   or (swiped_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiper_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b');
+
+
+select *
+from match
+where (swiper_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b')
+   or (swiped_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiper_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b');
 
 delete
 from match
-where (swiper_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and swiped_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe')
-   or (swiped_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and swiper_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe');
+where (swiper_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b')
+   or (swiped_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiper_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b');
 
 
 update swipe
 set matched = false,
     clicked = false
-where (swiper_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and swiped_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe');
+where (swiper_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b');
 
 
 update swipe
 set matched = false
-where (swiped_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and swiper_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe');
+where (swiped_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiper_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b');
 
+
+select swiped_id, name
+from match
+inner join account a on a.id = match.swiped_id
+where swiper_id =  '5b4525ba-b325-4752-ae0e-00ece9201d3b';
 
 
 select *
-from swipe
-where (swiper_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and swiped_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe')
-   or (swiped_id = '9c280698-25f0-4cef-94a2-4a79c363e1eb' and swiper_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe');
+from push_token
+where account_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b';
 
 
+--fJc6q3e8RlWco4FXSlx6jk:APA91bFX7qRE3P9Jd5fHpdr_h8UbIA988QZ-DuVE4qYI91L7IyqkDwwvwJF1KnHTI2Ek8W-QjN7Y7ch6g5Mf0JYh6-clqsYhCnYu69rf3jSQpJlbfUbHr1gpaUxD67Wwc2OtP5a1kgKc
 
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query End --------------------------------------------

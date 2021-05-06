@@ -1,8 +1,8 @@
 package com.beeswork.balanceaccountservice.constant;
 
 public enum PushType {
-    CHAT_MESSAGE,
-    MATCHED,
+    MISSED,
     CLICKED,
-    MISSED
+    MATCHED,
+    CHAT_MESSAGE
 }

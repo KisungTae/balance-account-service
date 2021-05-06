@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
@@ -91,12 +92,15 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public ListSwipesDTO listSwipes(UUID accountId, UUID identityToken, Date fetchedAt) {
         validateAccount(accountDAO.findById(accountId), identityToken);
-        ListSwipesDTO listSwipesDTO = new ListSwipesDTO(swipeDAO.findSwipes(accountId, fetchedAt), fetchedAt);
-        for (SwipeDTO swipeDTO : listSwipesDTO.getSwipeDTOs()) {
+        List<SwipeDTO> swipeDTOs = swipeDAO.findSwipes(accountId, fetchedAt);
+        ListSwipesDTO listSwipesDTO = new ListSwipesDTO(fetchedAt);
+        if (swipeDTOs == null) return listSwipesDTO;
+        List<UUID> swipedIds = swipeDTOs.stream().map(SwipeDTO::getSwipedId).collect(Collectors.toList());
+        listSwipesDTO.setSwipedIds(swipedIds);
+        for (SwipeDTO swipeDTO : swipeDTOs) {
             Date updatedAt = swipeDTO.getUpdatedAt();
             if (updatedAt != null && updatedAt.after(listSwipesDTO.getFetchedAt()))
                 listSwipesDTO.setFetchedAt(swipeDTO.getUpdatedAt());
-            swipeDTO.setUpdatedAt(null);
         }
         return listSwipesDTO;
     }

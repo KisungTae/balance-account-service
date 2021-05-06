@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.restcontroller;
 import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ListSwipesDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
@@ -78,23 +79,23 @@ public class SwipeController extends BaseController {
                                         Locale locale)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-//        ClickDTO clickDTO = swipeService.click(clickVM.getAccountId(),
-//                                               clickVM.getIdentityToken(),
-//                                               clickVM.getSwipedId(),
-//                                               clickVM.getAnswers());
+        ClickDTO clickDTO = swipeService.click(clickVM.getAccountId(),
+                                               clickVM.getIdentityToken(),
+                                               clickVM.getSwipedId(),
+                                               clickVM.getAnswers());
 
-        MatchDTO matchDTO = new MatchDTO();
+/*        MatchDTO matchDTO = new MatchDTO();
         matchDTO.setSwiperId(clickVM.getAccountId());
         matchDTO.setSwipedId(UUID.randomUUID());
         matchDTO.setChatId(new Random().nextLong());
         matchDTO.setPushType(PushType.MATCHED);
         matchDTO.setName("testname");
         matchDTO.setProfilePhotoKey("testrepphotokey");
-        matchDTO.setCreatedAt(new Date());
+        matchDTO.setCreatedAt(new Date());*/
 
-//        stompService.sendMatch(clickDTO.getObjMatchDTO(), locale);
-        stompService.sendMatch(matchDTO, locale);
-//        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO.getSubMatchDTO()));
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+        stompService.sendMatch(clickDTO.getObjMatchDTO(), locale);
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO.getSubMatchDTO()));
+//        stompService.sendMatch(matchDTO, locale);
+//        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 }
