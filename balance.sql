@@ -429,6 +429,20 @@ group by swiper_id
 order by count(swiper_id) desc;
 
 
+select *
+from swipe where swiped_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860' and clicked = true and matched = false;
+
+update swipe set matched = true where swiped_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860'
+and swiper_id in (select match.swiper_id from match where swiped_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860');
+
+select * from match
+where swiper_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860';
+
+select *
+from swipe
+where swiped_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860'
+and clicked = true and matched = false;
+
 delete from sent_chat_message;
 delete from chat_message;
 

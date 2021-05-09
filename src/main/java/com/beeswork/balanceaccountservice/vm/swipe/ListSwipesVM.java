@@ -10,7 +10,8 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class ListSwipesVM extends AccountIdentityVM {
+public class
+ListSwipesVM extends AccountIdentityVM {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date fetchedAt = new Date();
