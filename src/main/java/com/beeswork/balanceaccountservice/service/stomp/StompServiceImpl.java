@@ -38,21 +38,20 @@ public class StompServiceImpl implements StompService {
         if (chatMessageDTO.getId() == null) return;
         String queue = getQueue(chatMessageDTO.getRecipientId());
         if (queue != null) {
-            MessageHeaders outHeaders = sendingHeaders(PushType.CHAT_MESSAGE, chatMessageDTO.getId().toString());
+            MessageHeaders outHeaders = sendingHeaders(PushType.CHAT_MESSAGE);
             chatMessageDTO.setRecipientId(null);
             chatMessageDTO.setAccountId(null);
             simpMessagingTemplate.convertAndSend(queue, chatMessageDTO, outHeaders);
         } else pushService.pushChatMessage(chatMessageDTO, StompHeader.getLocaleFromMessageHeaders(messageHeaders));
     }
 
-    private MessageHeaders sendingHeaders(PushType pushType, String messageId) {
+    private MessageHeaders sendingHeaders(PushType pushType) {
         Map<String, Object> headers = new HashMap<>();
         headers.put(StompHeader.AUTO_DELETE, true);
         headers.put(StompHeader.EXCLUSIVE, false);
         headers.put(StompHeader.DURABLE, true);
         headers.put(StompHeader.PUSH_TYPE, pushType);
-//        headers.put(StompHeader.MESSAGE_ID, messageId);
-        headers.put(StompHeader.SUBSCRIPTION, StompHeader.PRIVATE_QUEUE_SUBSCRIPTION_ID);
+//        headers.put(StompHeader.SUBSCRIPTION, StompHeader.PRIVATE_QUEUE_SUBSCRIPTION_ID);
         return new MessageHeaders(headers);
     }
 
@@ -60,9 +59,10 @@ public class StompServiceImpl implements StompService {
     @Async("processExecutor")
     public void sendMatch(MatchDTO matchDTO, Locale locale) {
         if (matchDTO == null) return;
-        String queue = getQueue(matchDTO.getSwiperId());
+        String queue = getQueue(matchDTO.getSwipedId());
         if (queue != null) {
-            MessageHeaders outHeaders = sendingHeaders(matchDTO.getPushType(), matchDTO.getChatId().toString());
+            MessageHeaders outHeaders = sendingHeaders(matchDTO.getPushType());
+            matchDTO.setSwipedId(null);
             simpMessagingTemplate.convertAndSend(queue, matchDTO, outHeaders);
         } else pushService.pushMatch(matchDTO, locale);
     }

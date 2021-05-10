@@ -152,8 +152,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         if (objSwipe == null || !objSwipe.isClicked()) {
             clickDTO.setSubMatchDTO(new MatchDTO(PushType.CLICKED));
             MatchDTO objMatchDTO = new MatchDTO(PushType.CLICKED);
-            objMatchDTO.setSwiperId(swiped.getId());
-            objMatchDTO.setSwipedId(swiper.getId());
+            objMatchDTO.setSwiperId(swiper.getId());
+            objMatchDTO.setSwipedId(swiped.getId());
             objMatchDTO.setProfilePhotoKey(swiper.getProfilePhotoKey());
             objMatchDTO.setUpdatedAt(updatedAt);
             clickDTO.setObjMatchDTO(objMatchDTO);
@@ -176,8 +176,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             subMatchDTO.setChatId(chat.getId());
             clickDTO.setSubMatchDTO(subMatchDTO);
 
-            MatchDTO objMatchDTO = modelMapper.map(objMatch, MatchDTO.class);
-            objMatchDTO.setSwiperId(swiped.getId());
+            MatchDTO objMatchDTO = modelMapper.map(subMatch, MatchDTO.class);
+//            objMatchDTO.setSwiperId(swiped.getId());
             objMatchDTO.setPushType(PushType.MATCHED);
             objMatchDTO.setName(swiper.getName());
             objMatchDTO.setProfilePhotoKey(swiper.getProfilePhotoKey());

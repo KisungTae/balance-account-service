@@ -83,19 +83,7 @@ public class SwipeController extends BaseController {
                                                clickVM.getIdentityToken(),
                                                clickVM.getSwipedId(),
                                                clickVM.getAnswers());
-
-/*        MatchDTO matchDTO = new MatchDTO();
-        matchDTO.setSwiperId(clickVM.getAccountId());
-        matchDTO.setSwipedId(UUID.randomUUID());
-        matchDTO.setChatId(new Random().nextLong());
-        matchDTO.setPushType(PushType.MATCHED);
-        matchDTO.setName("testname");
-        matchDTO.setProfilePhotoKey("testrepphotokey");
-        matchDTO.setCreatedAt(new Date());*/
-
         stompService.sendMatch(clickDTO.getObjMatchDTO(), locale);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO.getSubMatchDTO()));
-//        stompService.sendMatch(matchDTO, locale);
-//        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 }

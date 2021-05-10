@@ -430,6 +430,43 @@ order by count(swiper_id) desc;
 
 
 select *
+from account
+where id = '6e612f2b-90c8-4ba2-be5a-54c312b7e02f';
+
+select *
+from account_question
+where account_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b';
+
+
+update swipe set clicked = false where swiper_id = '6e612f2b-90c8-4ba2-be5a-54c312b7e02f' and swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b';
+
+select *
+from swipe
+where swiper_id = '6e612f2b-90c8-4ba2-be5a-54c312b7e02f' and swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b';
+
+select *
+from push_token;
+
+
+select *
+from swipe
+where swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b'
+and clicked = false;
+
+
+select *
+from swipe
+where swiper_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b'
+  and clicked = false and matched = false;
+
+-- 6e612f2b-90c8-4ba2-be5a-54c312b7e02f //
+-- 039ddaa0-b861-457b-ab47-e4e3978ccc2f
+-- 500615aa-1046-47dd-91ba-3151b3b88d75
+
+
+
+
+select *
 from swipe where swiped_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860' and clicked = true and matched = false;
 
 update swipe set matched = true where swiped_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860'
