@@ -429,140 +429,20 @@ group by swiper_id
 order by count(swiper_id) desc;
 
 
-select *
-from account
-where id = 'c2e68bd9-586b-487a-8d90-a6690516cdcd';
-
-
-select *
-from match
-where swiper_id = 'c2e68bd9-586b-487a-8d90-a6690516cdcd';
-
-
-select *
+select chat_id, body, 0, null, null, key
 from chat_message
-where recipient_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b';
-
-
-select *
-from account_question
-where account_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b';
-
-
-update swipe set clicked = false where swiper_id = '6e612f2b-90c8-4ba2-be5a-54c312b7e02f' and swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b';
-
-select *
-from swipe
-where swiper_id = '6e612f2b-90c8-4ba2-be5a-54c312b7e02f' and swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b';
-
-select *
-from push_token;
-
-
-select *
-from swipe
-where swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b'
-and clicked = false;
-
-
-select *
-from swipe
-where swiper_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b'
-  and clicked = false and matched = false;
-
--- 6e612f2b-90c8-4ba2-be5a-54c312b7e02f //
--- 039ddaa0-b861-457b-ab47-e4e3978ccc2f
--- 500615aa-1046-47dd-91ba-3151b3b88d75
-
-
-
-
-select *
-from swipe where swiped_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860' and clicked = true and matched = false;
-
-update swipe set matched = true where swiped_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860'
-and swiper_id in (select match.swiper_id from match where swiped_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860');
-
-select * from match
-where swiper_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860';
-
-select *
-from swipe
-where swiped_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860'
-and clicked = true and matched = false;
+inner join sent_chat_message scm on chat_message.id = scm.chat_message_id
+where id in (select chat_message_id from sent_chat_message);
 
 delete from sent_chat_message;
 delete from chat_message;
 
-select *
-from chat_message
-where body like '%주%';
-
-
-select *
-from chat_message
-order by id;
-
-select *
-from sent_chat_message
-order by chat_message_id;
-
-select *
-from push_token;
-
-select *
-from account
-where id = '698f2eb6-3fef-4ee3-9c7d-3e527740548e';
-
-select *
-from account
-where id = '5b4525ba-b325-4752-ae0e-00ece9201d3b';
-
-select *
-from match
-where swiper_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f';
-
-
-
-
-select *
-from account_question
-where account_id = 'a22850e9-c520-4695-ab1f-106a54dc8ebe';
-
-select *
-from question;
-
-
-select *
-from swipe_meta;
-
-select *
-from swipe
-where matched = false
-  and clicked = true
-  and swiped_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f';
-
-select *
-from account
-where id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f';
-
-select *
-from wallet
-where account_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f';
-
-update wallet set free_swipe_recharged_at = '2021-05-03 01:12:44.823000' where account_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f';
-update wallet set free_swipe = 0 where account_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f';
 
 select *
 from swipe
 where (swiper_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b')
    or (swiped_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiper_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b');
 
-
-select *
-from match
-where (swiper_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b')
-   or (swiped_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiper_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b');
 
 delete
 from match
@@ -580,19 +460,6 @@ update swipe
 set matched = false
 where (swiped_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiper_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b');
 
-
-select swiped_id, name
-from match
-inner join account a on a.id = match.swiped_id
-where swiper_id =  '5b4525ba-b325-4752-ae0e-00ece9201d3b';
-
-
-select *
-from push_token
-where account_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b';
-
-
---fJc6q3e8RlWco4FXSlx6jk:APA91bFX7qRE3P9Jd5fHpdr_h8UbIA988QZ-DuVE4qYI91L7IyqkDwwvwJF1KnHTI2Ek8W-QjN7Y7ch6g5Mf0JYh6-clqsYhCnYu69rf3jSQpJlbfUbHr1gpaUxD67Wwc2OtP5a1kgKc
 
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query End --------------------------------------------
@@ -667,6 +534,42 @@ create table chat_message_back_up
     account_id uuid        not null,
     created_at timestamptz not null
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

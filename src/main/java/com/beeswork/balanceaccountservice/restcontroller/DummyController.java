@@ -133,7 +133,7 @@ public class DummyController {
         int innerCount = seed;
         Date date = new Date();
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 10; i++) {
             date = DateUtils.addSeconds(date, 30);
             for (Match match : account.getMatches()) {
                 if (random.nextBoolean()) {
@@ -151,10 +151,6 @@ public class DummyController {
                         SentChatMessage sentChatMessage = new SentChatMessage(chatMessage, sender, innerCount, date);
                         sentChatMessageDAO.persist(sentChatMessage);
                     }
-
-
-
-
                 }
             }
         }
@@ -436,7 +432,6 @@ public class DummyController {
         int innerCount = 0;
         for (int i = 0; i < 20; i++) {
             date = DateUtils.addSeconds(date, 30);
-
 
             for (Match match : matches) {
                 if (random.nextBoolean()) {
