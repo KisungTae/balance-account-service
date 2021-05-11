@@ -1,18 +1,14 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.beeswork.balanceaccountservice.vm.chat.SyncChatMessagesVM;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -51,23 +47,6 @@ public class ChatController {
                                      syncChatMessagesVM.getIdentityToken(),
                                      syncChatMessagesVM.getSentChatMessageIds(),
                                      syncChatMessagesVM.getReceivedChatMessageIds());
-    }
-
-    //  TODO: remove me
-    @PostMapping("/message/save")
-    public ResponseEntity<String> saveChatMessage(@RequestBody ChatMessageVM chatMessageVM)
-    throws JsonProcessingException {
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new SwipeDTO()));
-//        ChatMessageDTO chatMessageDTO = chatService.saveChatMessage(chatMessageVM.getAccountId(),
-//                                                                    chatMessageVM.getAccountId(),
-//                                                                    chatMessageVM.getRecipientId(),
-//                                                                    chatMessageVM.getChatId(),
-//                                                                    chatMessageVM.getMessageId(),
-//                                                                    chatMessageVM.getBody(),
-//                                                                    chatMessageVM.getCreatedAt());
-//        System.out.println("chat message created");
-//        System.out.println(chatMessageDTO.getId());
-//        System.out.println(chatMessageDTO.getCreatedAt());
     }
 
 }

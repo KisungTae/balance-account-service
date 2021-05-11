@@ -431,7 +431,18 @@ order by count(swiper_id) desc;
 
 select *
 from account
-where id = '6e612f2b-90c8-4ba2-be5a-54c312b7e02f';
+where id = 'c2e68bd9-586b-487a-8d90-a6690516cdcd';
+
+
+select *
+from match
+where swiper_id = 'c2e68bd9-586b-487a-8d90-a6690516cdcd';
+
+
+select *
+from chat_message
+where recipient_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b';
+
 
 select *
 from account_question

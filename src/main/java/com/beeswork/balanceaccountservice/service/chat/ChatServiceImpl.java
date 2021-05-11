@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.service.chat;
 
+import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
@@ -9,8 +10,6 @@ import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.chat.SentChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
-import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
-import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,10 +42,6 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         this.sentChatMessageDAO = sentChatMessageDAO;
     }
 
-    private void validateMatch(Match match, UUID identityToken, long chatId) {
-
-    }
-
     @Override
     @Transactional
     public Long saveChatMessage(UUID accountId, UUID identityToken, long chatId, UUID recipientId, long key, String body, Date createdAt) {
@@ -57,7 +52,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         Account swiped = match.getSwiped();
         Chat chat = match.getChat();
         if (swiped == null || chat == null || chat.getId() != chatId) return null;
-        if (match.isUnmatched() || match.getSwiped().isDeleted()) return UNMATCHED;
+        if (match.isUnmatched() || match.getSwiped().isDeleted()) return StompHeader.UNMATCHED_RECEIPT_ID;
 
         SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(accountId, key);
         if (sentChatMessage == null) {
@@ -76,27 +71,11 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
 
     @Override
     @Transactional
-    public void receivedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
-        validateAccount(accountDAO.findById(accountId), identityToken);
-        ChatMessage chatMessage = chatMessageDAO.findById(chatMessageId);
-        chatMessage.setReceived(true);
-    }
-
-    @Override
-    @Transactional
-    public void fetchedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
-        validateAccount(accountDAO.findById(accountId), identityToken);
-        SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(accountId, chatMessageId);
-        sentChatMessage.setFetched(true);
-    }
-
-    @Override
-    @Transactional
     public void syncChatMessages(UUID accountId,
                                  UUID identityToken,
                                  List<Long> sentChatMessageIds,
                                  List<Long> receivedChatMessageIds) {
-//        validateAccount(accountDAO.findById(accountId), identityToken);
+        validateAccount(accountDAO.findById(accountId), identityToken);
         List<ChatMessage> receivedChatMessages = chatMessageDAO.findAllIn(receivedChatMessageIds);
         Date now = new Date();
         for (ChatMessage chatMessage : receivedChatMessages) {
@@ -109,4 +88,22 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
             sentChatMessage.setUpdatedAt(now);
         }
     }
+
+
+
+    //    @Override
+//    @Transactional
+//    public void receivedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
+//        validateAccount(accountDAO.findById(accountId), identityToken);
+//        ChatMessage chatMessage = chatMessageDAO.findById(chatMessageId);
+//        chatMessage.setReceived(true);
+//    }
+//
+//    @Override
+//    @Transactional
+//    public void fetchedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
+//        validateAccount(accountDAO.findById(accountId), identityToken);
+//        SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(accountId, chatMessageId);
+//        sentChatMessage.setFetched(true);
+//    }
 }

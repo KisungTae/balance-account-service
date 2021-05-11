@@ -57,4 +57,11 @@ public class MatchDTO {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public void swapOnMatched() {
+        if (this.getPushType() == PushType.MATCHED) {
+            this.setSwipedId(this.getSwiperId());
+            this.setSwiperId(null);
+        }
+    }
 }

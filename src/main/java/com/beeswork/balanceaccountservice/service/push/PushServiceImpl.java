@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.service.push;
 
 import com.beeswork.balanceaccountservice.constant.PushTokenType;
+import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.pushtoken.PushTokenDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
@@ -47,8 +48,9 @@ public class PushServiceImpl implements PushService {
     public void pushMatch(MatchDTO matchDTO, Locale locale) {
         if (matchDTO == null || matchDTO.getSwiperId() == null) return;
         PushToken pushToken = pushTokenDAO.findRecent(matchDTO.getSwiperId());
-        matchDTO.setSwipedId(null);
         if (pushToken == null) return;
+        matchDTO.setSwipedId(null);
+        matchDTO.swapOnMatched();
         if (pushToken.getType() == PushTokenType.APS) apnsService.sendMatch(matchDTO, locale);
         else if (pushToken.getType() == PushTokenType.FCM) fcmService.sendMatch(matchDTO, pushToken.getToken(), locale);
     }

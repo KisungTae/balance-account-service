@@ -63,6 +63,7 @@ public class StompServiceImpl implements StompService {
         if (queue != null) {
             MessageHeaders outHeaders = sendingHeaders(matchDTO.getPushType());
             matchDTO.setSwipedId(null);
+            matchDTO.swapOnMatched();
             simpMessagingTemplate.convertAndSend(queue, matchDTO, outHeaders);
         } else pushService.pushMatch(matchDTO, locale);
     }

@@ -102,7 +102,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                     if (chatMessageVM.getId() == null) {
                         chatMessageVM.setCreatedAt(null);
                         chatMessageVM.setBody(messageSource.getMessage(BadRequestException.BAD_REQUEST_EXCEPTION, null, locale));
-                    } else if (chatMessageVM.getId() == ChatService.UNMATCHED) {
+                    } else if (chatMessageVM.getId() == StompHeader.UNMATCHED_RECEIPT_ID) {
                         chatMessageVM.setCreatedAt(null);
                     }
                     byte[] payload = objectMapper.writeValueAsString(chatMessageVM).getBytes();
