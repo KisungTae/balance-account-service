@@ -429,13 +429,30 @@ group by swiper_id
 order by count(swiper_id) desc;
 
 
-select chat_id, body, 0, null, null, key
+select chat_id, body, 0 as status, '2020-05-10T11:00:25.000Z' as createdAt, null as id, key
 from chat_message
 inner join sent_chat_message scm on chat_message.id = scm.chat_message_id
 where id in (select chat_message_id from sent_chat_message);
 
 delete from sent_chat_message;
 delete from chat_message;
+
+
+select cm.chat_id, max(id)
+from match
+left join chat_message cm on match.chat_id = cm.chat_id
+where swiper_id = 'c2e68bd9-586b-487a-8d90-a6690516cdcd'
+group by cm.chat_id;
+
+select *
+from chat_message
+where id in (51, 55, 49);
+
+
+select *
+from account
+where id = 'c2e68bd9-586b-487a-8d90-a6690516cdcd';
+
 
 
 select *
@@ -460,6 +477,29 @@ update swipe
 set matched = false
 where (swiped_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiper_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b');
 
+
+
+-- INSERT INTO chatMessage(chatId, body, status, createdAt, id, `key`) VALUES (16, 'message-0.7434187', 0, '2020-05-10T11:00:25.000Z', 500, 1)
+-- ,(9, 'message-0.652893', 0, '2020-05-10T11:00:25.000Z', 500, 2)
+-- ,(13, 'message-0.06879985', 0, '2020-05-10T11:00:25.000Z', 500, 5)
+-- ,(9, 'message-0.74623305', 0, '2020-05-10T11:00:25.000Z', 500, 9)
+-- ,(13, 'message-0.54579514', 0, '2020-05-10T11:00:25.000Z', 500, 10)
+-- ,(13, 'message-0.7319095', 0, '2020-05-10T11:00:25.000Z', 500, 13)
+-- ,(9, 'message-0.1794886', 0, '2020-05-10T11:00:25.000Z', 500, 15)
+-- ,(9, 'message-0.42126995', 0, '2020-05-10T11:00:25.000Z', 500, 104)
+-- ,(13, 'message-0.98997843', 0, '2020-05-10T11:00:25.000Z', 500, 105)
+-- ,(16, 'message-0.21632624', 0, '2020-05-10T11:00:25.000Z', 500, 106)
+-- ,(13, 'message-0.32013148', 0, '2020-05-10T11:00:25.000Z', 500, 111)
+-- ,(16, 'message-0.77129996', 0, '2020-05-10T11:00:25.000Z', 500, 112)
+-- ,(9, 'message-0.76887953', 0, '2020-05-10T11:00:25.000Z', 500, 114)
+-- ,(13, 'message-0.022788346', 0, '2020-05-10T11:00:25.000Z', 500, 115)
+-- ,(13, 'message-0.23047078', 0, '2020-05-10T11:00:25.000Z', 500, 201)
+-- ,(16, 'message-0.44347847', 0, '2020-05-10T11:00:25.000Z', 500, 202)
+-- ,(9, 'message-0.47565937', 0, '2020-05-10T11:00:25.000Z', 500, 203)
+-- ,(9, 'message-0.005681753', 0, '2020-05-10T11:00:25.000Z', 500, 205)
+-- ,(9, 'message-0.844118', 0, '2020-05-10T11:00:25.000Z', 500, 211)
+-- ,(13, 'message-0.6427493', 0, '2020-05-10T11:00:25.000Z', 500, 212)
+-- ,(13, 'message-0.8734683', 0, '2020-05-10T11:00:25.000Z', 500, 215)
 
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query End --------------------------------------------
