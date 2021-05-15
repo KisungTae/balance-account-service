@@ -58,7 +58,7 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                                                int offset,
                                                Point pivot) {
         List<Object[]> rows = entityManager.createNativeQuery(
-                "select cast(b.account_id as varchar), b.name, b.birth_year, b.gender, b.height, b.about, st_distance(b.location, :pivot), p.key " +
+                "select cast(b.account_id as varchar), b.name, b.birth_year, b.height, b.about, st_distance(b.location, :pivot), p.key " +
                 "from (select * " +
                 "      from profile  " +
                 "      where st_dwithin(location, :pivot, :distance) " +

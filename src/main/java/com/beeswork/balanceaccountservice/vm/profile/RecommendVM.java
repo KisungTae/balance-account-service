@@ -28,6 +28,4 @@ public class RecommendVM extends AccountIdentityVM {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date locationUpdatedAt;
-
-    private boolean reset;
 }

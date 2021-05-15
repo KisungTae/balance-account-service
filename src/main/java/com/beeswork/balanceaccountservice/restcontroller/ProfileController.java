@@ -96,19 +96,16 @@ public class ProfileController extends BaseController {
                                             BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        PreRecommendDTO preRecommendDTO = profileService.preRecommend(recommendVM.getAccountId(),
-                                                                      recommendVM.getIdentityToken(),
-                                                                      recommendVM.getLatitude(),
-                                                                      recommendVM.getLongitude(),
-                                                                      recommendVM.getLocationUpdatedAt(),
-                                                                      recommendVM.isReset());
-
-        List<CardDTO> cardDTOs = profileService.recommend(recommendVM.getDistance(),
+        List<CardDTO> cardDTOs = profileService.recommend(recommendVM.getAccountId(),
+                                                          recommendVM.getIdentityToken(),
+                                                          recommendVM.getLatitude(),
+                                                          recommendVM.getLongitude(),
+                                                          recommendVM.getLocationUpdatedAt(),
+                                                          recommendVM.getDistance(),
                                                           recommendVM.getMinAge(),
                                                           recommendVM.getMaxAge(),
-                                                          recommendVM.isGender(),
-                                                          preRecommendDTO.getLocation(),
-                                                          preRecommendDTO.getPageIndex());
+                                                          recommendVM.isGender());
+        profileService.postRecommend(null, null, null, 0);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(cardDTOs));
     }
 }

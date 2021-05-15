@@ -5,8 +5,10 @@ import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
 import com.beeswork.balanceaccountservice.dto.profile.PreRecommendDTO;
 import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
+import com.beeswork.balanceaccountservice.dto.profile.RecommendDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
+import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.profile.ProfileNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import com.beeswork.balanceaccountservice.util.DateUtil;
@@ -15,6 +17,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -32,11 +35,11 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     private static final int MAX_DISTANCE = 10000;
     private static final int MIN_DISTANCE = 1000;
 
-    private static final double DEFAULT_LATITUDE = 37.504508;
+    private static final double DEFAULT_LATITUDE  = 37.504508;
     private static final double DEFAULT_LONGITUDE = 127.048992;
 
-    private final AccountDAO accountDAO;
-    private final ProfileDAO profileDAO;
+    private final AccountDAO      accountDAO;
+    private final ProfileDAO      profileDAO;
     private final GeometryFactory geometryFactory;
 
     @Autowired
@@ -117,20 +120,19 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
                                         UUID identityToken,
                                         Double latitude,
                                         Double longitude,
-                                        Date locationUpdatedAt,
-                                        boolean reset) {
+                                        Date locationUpdatedAt) {
         Profile profile = findValidProfile(accountId, identityToken);
         PreRecommendDTO preRecommendDTO = new PreRecommendDTO();
-        preRecommendDTO.setPageIndex((reset ? 0 : profile.getPageIndex()));
-        profile.setPageIndex((preRecommendDTO.getPageIndex() + 1));
-
-        if (latitude != null &&
-            longitude != null &&
-            locationUpdatedAt != null &&
-            locationUpdatedAt.after(profile.getLocationUpdatedAt()))
-            saveLocation(profile, latitude, longitude, locationUpdatedAt);
-
-        preRecommendDTO.setLocation(profile.getLocation());
+//        preRecommendDTO.setPageIndex((reset ? 0 : profile.getPageIndex()));
+//        profile.setPageIndex((preRecommendDTO.getPageIndex() + 1));
+//
+//        if (latitude != null &&
+//            longitude != null &&
+//            locationUpdatedAt != null &&
+//            locationUpdatedAt.after(profile.getLocationUpdatedAt()))
+//            saveLocation(profile, latitude, longitude, locationUpdatedAt);
+//
+//        preRecommendDTO.setLocation(profile.getLocation());
         return preRecommendDTO;
     }
 
@@ -138,21 +140,67 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     // TEST 1. matches are mapped by matcher_id not matched_id
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<CardDTO> recommend(int distance,
-                                   int minAge,
-                                   int maxAge,
-                                   boolean gender,
-                                   Point location,
-                                   int pageIndex) {
+    public RecommendDTO recommend(UUID accountId,
+                                  UUID identityToken,
+                                  Double latitude,
+                                  Double longitude,
+                                  Date locationUpdatedAt,
+                                  int distance,
+                                  int minAge,
+                                  int maxAge,
+                                  boolean gender) {
+        Profile profile = findValidProfile(accountId, identityToken);
+
+        RecommendDTO recommendDTO = new RecommendDTO();
+
+        Point location = profile.getLocation();
+        if (locationUpdatedAt != null
+            && locationUpdatedAt.after(profile.getLocationUpdatedAt())
+            && latitude != null
+            && longitude != null) {
+            location = getLocation(latitude, longitude);
+            recommendDTO.setLocation(location);
+        }
+
         if (distance < MIN_DISTANCE) distance = MIN_DISTANCE;
         else if (distance > MAX_DISTANCE) distance = MAX_DISTANCE;
+
+        int pageIndex = profile.getPageIndex();
         int offset = pageIndex * PAGE_LIMIT;
-        return profileDAO.findAllCardDTOsWithin(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, location);
+
+        List<CardDTO> cardDTOs = profileDAO.findAllCardDTOsWithin(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, location);
+        if (cardDTOs.size() == 0 && pageIndex != 0) {
+            pageIndex = 0;
+            cardDTOs = profileDAO.findAllCardDTOsWithin(distance, minAge, maxAge, gender, PAGE_LIMIT, pageIndex, location);
+        }
+
+        recommendDTO.setCardDTOs(cardDTOs);
+        recommendDTO.setPageIndex(pageIndex);
+        return recommendDTO;
+//        return profileDAO.findAllCardDTOsWithin(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, location);
+    }
+
+    @Async("processExecutor")
+    @Transactional
+    public void postRecommend(UUID accountId,
+                              UUID identityToken,
+                              Double latitude,
+                              Double longitude,
+                              Date locationUpdatedAt,
+                              int pageIndex) {
+        try {
+            Thread.sleep(10000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("postRecommend!!!!!!!!!!!!!!!!!!!");
+//        profile.setAbout("postRecommend save profile");
+//        profileDAO.persist(profile);
     }
 
     private Profile findValidProfile(UUID accountId, UUID identityToken) {
         Profile profile = profileDAO.findById(accountId);
-        if (profile == null) throw new ProfileNotFoundException();
+        if (profile == null) throw new AccountNotFoundException();
         validateAccount(profile.getAccount(), identityToken);
         return profile;
     }

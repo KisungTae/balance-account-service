@@ -15,24 +15,20 @@ public class CardDTO {
     private String accountId;
     private String name;
     private int birthYear;
-    private boolean gender;
     private int height;
     private String about;
     private int distance;
-
     private List<String> photoKeys = new ArrayList<>();
 
     public CardDTO(String accountId,
                    String name,
                    int birthYear,
-                   boolean gender,
                    int height,
                    String about,
                    int distance) {
         this.accountId = accountId;
         this.name = name;
         this.birthYear = birthYear;
-        this.gender = gender;
         this.height = height;
         this.about = about;
         this.distance = distance;

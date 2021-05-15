@@ -4,6 +4,8 @@ import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
 import com.beeswork.balanceaccountservice.dto.profile.PreRecommendDTO;
 import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
+import com.beeswork.balanceaccountservice.dto.profile.RecommendDTO;
+import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import org.locationtech.jts.geom.Point;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
@@ -16,6 +18,7 @@ import java.util.UUID;
 public interface ProfileService {
 
     ProfileDTO getProfile(UUID accountId, UUID identityToken);
+
     CardDTO getCard(UUID accountId, UUID identityToken, UUID swipedId);
 
     // delay = 0 then default to 1 second
@@ -39,10 +42,23 @@ public interface ProfileService {
                                  UUID identityToken,
                                  Double latitude,
                                  Double longitude,
-                                 Date locationUpdatedAt,
-                                 boolean reset);
+                                 Date locationUpdatedAt);
 
-    List<CardDTO> recommend(int distance, int minAge, int maxAge, boolean gender, Point location, int pageIndex);
+    RecommendDTO recommend(UUID accountId,
+                           UUID identityToken,
+                           Double latitude,
+                           Double longitude,
+                           Date locationUpdatedAt,
+                           int distance,
+                           int minAge,
+                           int maxAge,
+                           boolean gender);
 
+    void postRecommend(UUID accountId,
+                       UUID identityToken,
+                       Double latitude,
+                       Double longitude,
+                       Date locationUpdatedAt,
+                       int pageIndex);
 
 }
