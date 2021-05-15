@@ -11,7 +11,8 @@ import java.util.UUID;
 
 public interface ProfileDAO extends BaseDAO<Profile> {
     Profile findById(UUID accountId);
+    Profile findByIdWithLock(UUID accountId);
     CardDTO findCardDTO(UUID swipedId, Point pivot);
     boolean existsById(UUID accountId);
-    List<CardDTO> findAllCardDTOsWithin(int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point pivot);
+    List<CardDTO> findCardDTOs(int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point pivot);
 }

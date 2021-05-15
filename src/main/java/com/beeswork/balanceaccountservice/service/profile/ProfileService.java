@@ -37,13 +37,6 @@ public interface ProfileService {
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
     void saveLocation(UUID accountId, UUID identityToken, double latitude, double longitude, Date updatedAt);
 
-    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-    PreRecommendDTO preRecommend(UUID accountId,
-                                 UUID identityToken,
-                                 Double latitude,
-                                 Double longitude,
-                                 Date locationUpdatedAt);
-
     RecommendDTO recommend(UUID accountId,
                            UUID identityToken,
                            Double latitude,
@@ -54,11 +47,6 @@ public interface ProfileService {
                            int maxAge,
                            boolean gender);
 
-    void postRecommend(UUID accountId,
-                       UUID identityToken,
-                       Double latitude,
-                       Double longitude,
-                       Date locationUpdatedAt,
-                       int pageIndex);
+    void postRecommend(UUID accountId, Point location, Date locationUpdatedAt, int pageIndex);
 
 }

@@ -8,10 +8,10 @@ public class CardDTOResultTransformer {
     private static final int ID = 0;
     private static final int NAME = 1;
     private static final int BIRTH_YEAR = 2;
-    private static final int HEIGHT = 4;
-    private static final int ABOUT = 5;
-    private static final int DISTANCE = 6;
-    private static final int PHOTO_KEY = 7;
+    private static final int HEIGHT = 3;
+    private static final int ABOUT = 4;
+    private static final int DISTANCE = 5;
+    private static final int PHOTO_KEY = 6;
 
     public static CardDTO map(List<Object[]> rows) {
         List<CardDTO> cardDTOs = mapList(rows);

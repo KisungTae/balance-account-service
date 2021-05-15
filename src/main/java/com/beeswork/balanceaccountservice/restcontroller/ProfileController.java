@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.restcontroller;
 import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
 import com.beeswork.balanceaccountservice.dto.profile.PreRecommendDTO;
 import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
+import com.beeswork.balanceaccountservice.dto.profile.RecommendDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.profile.ProfileService;
@@ -96,16 +97,19 @@ public class ProfileController extends BaseController {
                                             BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<CardDTO> cardDTOs = profileService.recommend(recommendVM.getAccountId(),
-                                                          recommendVM.getIdentityToken(),
-                                                          recommendVM.getLatitude(),
-                                                          recommendVM.getLongitude(),
-                                                          recommendVM.getLocationUpdatedAt(),
-                                                          recommendVM.getDistance(),
-                                                          recommendVM.getMinAge(),
-                                                          recommendVM.getMaxAge(),
-                                                          recommendVM.isGender());
-        profileService.postRecommend(null, null, null, 0);
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(cardDTOs));
+        RecommendDTO recommendDTO = profileService.recommend(recommendVM.getAccountId(),
+                                                             recommendVM.getIdentityToken(),
+                                                             recommendVM.getLatitude(),
+                                                             recommendVM.getLongitude(),
+                                                             recommendVM.getLocationUpdatedAt(),
+                                                             recommendVM.getDistance(),
+                                                             recommendVM.getMinAge(),
+                                                             recommendVM.getMaxAge(),
+                                                             recommendVM.isGender());
+        profileService.postRecommend(recommendVM.getAccountId(),
+                                     recommendDTO.getLocation(),
+                                     recommendVM.getLocationUpdatedAt(),
+                                     recommendDTO.getPageIndex());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(recommendDTO.getCardDTOs()));
     }
 }

@@ -114,29 +114,6 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         return point;
     }
 
-    @Override
-    @Transactional
-    public PreRecommendDTO preRecommend(UUID accountId,
-                                        UUID identityToken,
-                                        Double latitude,
-                                        Double longitude,
-                                        Date locationUpdatedAt) {
-        Profile profile = findValidProfile(accountId, identityToken);
-        PreRecommendDTO preRecommendDTO = new PreRecommendDTO();
-//        preRecommendDTO.setPageIndex((reset ? 0 : profile.getPageIndex()));
-//        profile.setPageIndex((preRecommendDTO.getPageIndex() + 1));
-//
-//        if (latitude != null &&
-//            longitude != null &&
-//            locationUpdatedAt != null &&
-//            locationUpdatedAt.after(profile.getLocationUpdatedAt()))
-//            saveLocation(profile, latitude, longitude, locationUpdatedAt);
-//
-//        preRecommendDTO.setLocation(profile.getLocation());
-        return preRecommendDTO;
-    }
-
-
     // TEST 1. matches are mapped by matcher_id not matched_id
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
@@ -152,7 +129,6 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         Profile profile = findValidProfile(accountId, identityToken);
 
         RecommendDTO recommendDTO = new RecommendDTO();
-
         Point location = profile.getLocation();
         if (locationUpdatedAt != null
             && locationUpdatedAt.after(profile.getLocationUpdatedAt())
@@ -161,41 +137,32 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
             location = getLocation(latitude, longitude);
             recommendDTO.setLocation(location);
         }
-
         if (distance < MIN_DISTANCE) distance = MIN_DISTANCE;
         else if (distance > MAX_DISTANCE) distance = MAX_DISTANCE;
 
         int pageIndex = profile.getPageIndex();
         int offset = pageIndex * PAGE_LIMIT;
 
-        List<CardDTO> cardDTOs = profileDAO.findAllCardDTOsWithin(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, location);
-        if (cardDTOs.size() == 0 && pageIndex != 0) {
+        List<CardDTO> cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, location);
+        if (cardDTOs.size() == 0 && pageIndex > 0) {
             pageIndex = 0;
-            cardDTOs = profileDAO.findAllCardDTOsWithin(distance, minAge, maxAge, gender, PAGE_LIMIT, pageIndex, location);
+            cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, pageIndex, location);
         }
-
         recommendDTO.setCardDTOs(cardDTOs);
         recommendDTO.setPageIndex(pageIndex);
         return recommendDTO;
-//        return profileDAO.findAllCardDTOsWithin(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, location);
     }
 
     @Async("processExecutor")
     @Transactional
-    public void postRecommend(UUID accountId,
-                              UUID identityToken,
-                              Double latitude,
-                              Double longitude,
-                              Date locationUpdatedAt,
-                              int pageIndex) {
-        try {
-            Thread.sleep(10000);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void postRecommend(UUID accountId, Point location, Date locationUpdatedAt, int pageIndex) {
+        Profile profile = profileDAO.findByIdWithLock(accountId);
+        pageIndex++;
+        profile.setPageIndex(pageIndex);
+        if (location != null) {
+            profile.setLocation(location);
+            profile.setLocationUpdatedAt(locationUpdatedAt);
         }
-        System.out.println("postRecommend!!!!!!!!!!!!!!!!!!!");
-//        profile.setAbout("postRecommend save profile");
-//        profileDAO.persist(profile);
     }
 
     private Profile findValidProfile(UUID accountId, UUID identityToken) {
@@ -206,3 +173,6 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     }
 
 }
+
+//TODO: when swipe, check if first time, then findProfile with lock and then score++
+//TODO: chekc join photh or profile first and then query photo

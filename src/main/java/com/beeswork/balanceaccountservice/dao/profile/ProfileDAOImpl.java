@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +31,11 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
     }
 
     @Override
+    public Profile findByIdWithLock(UUID accountId) {
+        return entityManager.find(Profile.class, accountId, LockModeType.PESSIMISTIC_WRITE);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public CardDTO findCardDTO(UUID swipedId, Point pivot) {
         List<Object[]> rows = entityManager.createNativeQuery(
@@ -37,9 +43,9 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                 "from profile pr " +
                 "left join photo ph on pr.account_id = ph.account_id " +
                 "where pr.account_id = :swipedId ")
-                                         .setParameter("swipedId", swipedId)
-                                         .setParameter("pivot", pivot)
-                                         .getResultList();
+                                           .setParameter("swipedId", swipedId)
+                                           .setParameter("pivot", pivot)
+                                           .getResultList();
         return CardDTOResultTransformer.map(rows);
     }
 
@@ -50,13 +56,7 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<CardDTO> findAllCardDTOsWithin(int distance,
-                                               int minAge,
-                                               int maxAge,
-                                               boolean gender,
-                                               int limit,
-                                               int offset,
-                                               Point pivot) {
+    public List<CardDTO> findCardDTOs(int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point pivot) {
         List<Object[]> rows = entityManager.createNativeQuery(
                 "select cast(b.account_id as varchar), b.name, b.birth_year, b.height, b.about, st_distance(b.location, :pivot), p.key " +
                 "from (select * " +

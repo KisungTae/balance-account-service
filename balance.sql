@@ -428,10 +428,25 @@ from match
 group by swiper_id
 order by count(swiper_id) desc;
 
+select *
+from account;
+
+select *
+from profile;
+
 
 select *
 from account
 where id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860';
+
+select *
+from profile
+where account_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860';
+
+
+
+
+
 
 select chat_id, body, 0 as status, '2020-05-10T11:00:25.000Z' as createdAt, null as id, key
 from chat_message
