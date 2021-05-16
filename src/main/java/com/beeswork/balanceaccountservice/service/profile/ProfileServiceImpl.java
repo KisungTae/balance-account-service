@@ -3,7 +3,6 @@ package com.beeswork.balanceaccountservice.service.profile;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
-import com.beeswork.balanceaccountservice.dto.profile.PreRecommendDTO;
 import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
 import com.beeswork.balanceaccountservice.dto.profile.RecommendDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
@@ -17,7 +16,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -37,6 +35,8 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
 
     private static final double DEFAULT_LATITUDE  = 37.504508;
     private static final double DEFAULT_LONGITUDE = 127.048992;
+
+    private static final int DEFAULT_OFFSET = 0;
 
     private final AccountDAO      accountDAO;
     private final ProfileDAO      profileDAO;
@@ -59,6 +59,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public CardDTO getCard(UUID accountId, UUID identityToken, UUID swipedId) {
         Profile profile = findValidProfile(accountId, identityToken);
         CardDTO cardDTO = profileDAO.findCardDTO(swipedId, profile.getLocation());
@@ -92,7 +93,8 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     @Override
     @Transactional
     public void saveAbout(UUID accountId, UUID identityToken, String about, Integer height) {
-        Profile profile = findValidProfile(accountId, identityToken);
+        Profile profile = profileDAO.findByIdWithLock(accountId);
+        validateAccount(profile.getAccount());
         profile.setAbout(about);
         profile.setHeight(height);
     }
@@ -100,12 +102,12 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     @Override
     @Transactional
     public void saveLocation(UUID accountId, UUID identityToken, double latitude, double longitude, Date updatedAt) {
-        saveLocation(findValidProfile(accountId, identityToken), latitude, longitude, updatedAt);
-    }
-
-    private void saveLocation(Profile profile, double latitude, double longitude, Date updatedAt) {
-        profile.setLocation(getLocation(latitude, longitude));
-        profile.setLocationUpdatedAt(updatedAt);
+        Profile profile = profileDAO.findByIdWithLock(accountId);
+        validateAccount(profile.getAccount());
+        if (updatedAt.after(profile.getLocationUpdatedAt())) {
+            profile.setLocation(getLocation(latitude, longitude));
+            profile.setLocationUpdatedAt(updatedAt);
+        }
     }
 
     private Point getLocation(double latitude, double longitude) {
@@ -117,52 +119,21 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     // TEST 1. matches are mapped by matcher_id not matched_id
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public RecommendDTO recommend(UUID accountId,
-                                  UUID identityToken,
-                                  Double latitude,
-                                  Double longitude,
-                                  Date locationUpdatedAt,
-                                  int distance,
-                                  int minAge,
-                                  int maxAge,
-                                  boolean gender) {
+    public RecommendDTO recommend(UUID accountId, UUID identityToken, int distance, int minAge, int maxAge, boolean gender, int pageIndex) {
         Profile profile = findValidProfile(accountId, identityToken);
-
         RecommendDTO recommendDTO = new RecommendDTO();
-        Point location = profile.getLocation();
-        if (locationUpdatedAt != null
-            && locationUpdatedAt.after(profile.getLocationUpdatedAt())
-            && latitude != null
-            && longitude != null) {
-            location = getLocation(latitude, longitude);
-            recommendDTO.setLocation(location);
-        }
+
         if (distance < MIN_DISTANCE) distance = MIN_DISTANCE;
         else if (distance > MAX_DISTANCE) distance = MAX_DISTANCE;
-
-        int pageIndex = profile.getPageIndex();
         int offset = pageIndex * PAGE_LIMIT;
 
-        List<CardDTO> cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, location);
+        List<CardDTO> cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, profile.getLocation());
         if (cardDTOs.size() == 0 && pageIndex > 0) {
-            pageIndex = 0;
-            cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, pageIndex, location);
+            cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, DEFAULT_OFFSET, profile.getLocation());
+            recommendDTO.setReset(true);
         }
         recommendDTO.setCardDTOs(cardDTOs);
-        recommendDTO.setPageIndex(pageIndex);
         return recommendDTO;
-    }
-
-    @Async("processExecutor")
-    @Transactional
-    public void postRecommend(UUID accountId, Point location, Date locationUpdatedAt, int pageIndex) {
-        Profile profile = profileDAO.findByIdWithLock(accountId);
-        pageIndex++;
-        profile.setPageIndex(pageIndex);
-        if (location != null) {
-            profile.setLocation(location);
-            profile.setLocationUpdatedAt(locationUpdatedAt);
-        }
     }
 
     private Profile findValidProfile(UUID accountId, UUID identityToken) {
@@ -176,3 +147,4 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
 
 //TODO: when swipe, check if first time, then findProfile with lock and then score++
 //TODO: chekc join photh or profile first and then query photo
+//TODO: save about location

@@ -11,6 +11,5 @@ import java.util.List;
 @Setter
 public class RecommendDTO {
     private List<CardDTO> cardDTOs = new ArrayList<>();
-    private Point         location;
-    private int           pageIndex;
+    private boolean reset;
 }
