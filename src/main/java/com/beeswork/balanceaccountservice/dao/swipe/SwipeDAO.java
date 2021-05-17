@@ -12,7 +12,8 @@ import java.util.UUID;
 
 public interface SwipeDAO extends BaseDAO<Swipe> {
 
-    Swipe findById(SwipeId swipeId, boolean writeLock);
+    Swipe findById(SwipeId swipeId);
+    Swipe findByIdWithLock(SwipeId swipeId);
     List<SwipeDTO> findSwipes(UUID accountId, Date fetchedAt);
     List<SwipeDTO> findClicks(UUID accountId, Date fetchedAt);
 }

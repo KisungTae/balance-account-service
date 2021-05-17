@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
+import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeMetaDAO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
@@ -15,6 +16,7 @@ import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.Wallet;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
+import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeId;
@@ -43,6 +45,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     private final SwipeDAO swipeDAO;
     private final ChatDAO chatDAO;
     private final AccountQuestionDAO accountQuestionDAO;
+    private final ProfileDAO profileDAO;
     private final SwipeMetaDAO swipeMetaDAO;
 
     @Autowired
@@ -51,12 +54,13 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
                             SwipeDAO swipeDAO,
                             ChatDAO chatDAO,
                             AccountQuestionDAO accountQuestionDAO,
-                            SwipeMetaDAO swipeMetaDAO) {
+                            ProfileDAO profileDAO, SwipeMetaDAO swipeMetaDAO) {
         super(modelMapper);
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
         this.chatDAO = chatDAO;
         this.accountQuestionDAO = accountQuestionDAO;
+        this.profileDAO = profileDAO;
         this.swipeMetaDAO = swipeMetaDAO;
     }
 
@@ -77,10 +81,13 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         if (questions == null || questions.size() <= 0)
             throw new AccountQuestionNotFoundException();
 
-        Swipe swipe = swipeDAO.findById(new SwipeId(accountId, swipedId), true);
+        Swipe swipe = swipeDAO.findByIdWithLock(new SwipeId(accountId, swipedId));
         Date updatedAt = new Date();
-        if (swipe == null) swipe = new Swipe(swiper, swiped, updatedAt);
-        else if (swipe.isMatched()) throw new SwipeMatchedExistsException();
+        if (swipe == null) {
+            swipe = new Swipe(swiper, swiped, updatedAt);
+            Profile profile = profileDAO.findByIdWithLock(swiped.getId());
+            if (profile != null) profile.incrementScore();
+        } else if (swipe.isMatched()) throw new SwipeMatchedExistsException();
         else if (swipe.isClicked()) throw new SwipeClickedExistsException();
 
         swipe.setCount((swipe.getCount() + 1));
@@ -117,11 +124,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     public ClickDTO click(UUID accountId, UUID identityToken, UUID swipedId, Map<Integer, Boolean> answers) {
         Swipe subSwipe, objSwipe;
         if (accountId.compareTo(swipedId) > 0) {
-            subSwipe = swipeDAO.findById(new SwipeId(accountId, swipedId), true);
-            objSwipe = swipeDAO.findById(new SwipeId(swipedId, accountId), true);
+            subSwipe = swipeDAO.findByIdWithLock(new SwipeId(accountId, swipedId));
+            objSwipe = swipeDAO.findByIdWithLock(new SwipeId(swipedId, accountId));
         } else {
-            objSwipe = swipeDAO.findById(new SwipeId(swipedId, accountId), true);
-            subSwipe = swipeDAO.findById(new SwipeId(accountId, swipedId), true);
+            objSwipe = swipeDAO.findByIdWithLock(new SwipeId(swipedId, accountId));
+            subSwipe = swipeDAO.findByIdWithLock(new SwipeId(accountId, swipedId));
         }
 
         if (subSwipe == null) throw new SwipeNotFoundException();

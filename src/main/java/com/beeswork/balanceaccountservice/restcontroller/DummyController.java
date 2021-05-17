@@ -234,7 +234,7 @@ public class DummyController {
                 account.setProfilePhotoKey(photoKeyDate.toString());
                 account.setUpdatedAt(photoKeyDate);
             }
-            photo.setSequence(count);
+            photo.setSequence(p);
             photo.setAccount(account);
             account.getPhotos().add(photo);
         }

@@ -127,11 +127,16 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         else if (distance > MAX_DISTANCE) distance = MAX_DISTANCE;
         int offset = pageIndex * PAGE_LIMIT;
 
+        long startTime = System.currentTimeMillis();
         List<CardDTO> cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, profile.getLocation());
-        if (cardDTOs.size() == 0 && pageIndex > 0) {
-            cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, DEFAULT_OFFSET, profile.getLocation());
-            recommendDTO.setReset(true);
-        }
+//        if (cardDTOs.size() == 0 && pageIndex > 0) {
+//            cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, DEFAULT_OFFSET, profile.getLocation());
+//            recommendDTO.setReset(true);
+//        }
+
+        long estimatedTime = System.currentTimeMillis() - startTime;
+        System.out.println("estimatedTime: " + estimatedTime);
+
         recommendDTO.setCardDTOs(cardDTOs);
         return recommendDTO;
     }
@@ -145,6 +150,4 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
 
 }
 
-//TODO: when swipe, check if first time, then findProfile with lock and then score++
 //TODO: chekc join photh or profile first and then query photo
-//TODO: save about location

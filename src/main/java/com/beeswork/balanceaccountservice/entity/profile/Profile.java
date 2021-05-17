@@ -96,4 +96,8 @@ public class Profile {
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
     }
+
+    public void incrementScore() {
+        this.score = this.score + 1;
+    }
 }

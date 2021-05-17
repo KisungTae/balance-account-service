@@ -428,8 +428,39 @@ from match
 group by swiper_id
 order by count(swiper_id) desc;
 
+
+
+select a.id, p.key, min(p.sequence)
+from account a
+         left join photo p on a.id = p.account_id
+where a.id in ('4cc54bea-655d-4abc-bb03-5b7e1c3c0202', 'd4c09af6-086f-426c-b704-66ebb3ddb8a8')
+group by a.id, p.key, p.sequence
+order by min(p.sequence);
+
+
+select account_id, key, sequence
+from photo
+where account_id in ('4cc54bea-655d-4abc-bb03-5b7e1c3c0202', 'd4c09af6-086f-426c-b704-66ebb3ddb8a8')
+order by account_id, sequence;
+
+
+update photo
+set sequence = 4
+where key = 'Mon May 17 17:36:48 AEST 2021';
+
 select *
-from account;
+from account
+where id = '89bc520c-fa42-40a4-b4f4-d50ebc3778d6';
+
+select *
+from profile
+where account_id = 'bf8510c8-453d-4795-9678-be7b7fe361f1';
+
+-- bf8510c8-453d-4795-9678-be7b7fe361f1
+select *
+from swipe
+where swiper_id = '89bc520c-fa42-40a4-b4f4-d50ebc3778d6';
+
 
 select *
 from profile;
@@ -445,21 +476,20 @@ where account_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860';
 
 
 
-
-
-
 select chat_id, body, 0 as status, '2020-05-10T11:00:25.000Z' as createdAt, null as id, key
 from chat_message
-inner join sent_chat_message scm on chat_message.id = scm.chat_message_id
+         inner join sent_chat_message scm on chat_message.id = scm.chat_message_id
 where id in (select chat_message_id from sent_chat_message);
 
-delete from sent_chat_message;
-delete from chat_message;
+delete
+from sent_chat_message;
+delete
+from chat_message;
 
 
 select cm.chat_id, max(id)
 from match
-left join chat_message cm on match.chat_id = cm.chat_id
+         left join chat_message cm on match.chat_id = cm.chat_id
 where swiper_id = 'c2e68bd9-586b-487a-8d90-a6690516cdcd'
 group by cm.chat_id;
 

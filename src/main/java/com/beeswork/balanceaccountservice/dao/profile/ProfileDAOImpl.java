@@ -66,10 +66,12 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                 "        and birth_year <= :minAge " +
                 "        and birth_year >= :maxAge " +
                 "        and enabled = true " +
+                "        order by score " +
                 "       limit :limit " +
                 "       offset :offset) as b " +
                 "left join photo as p " +
-                "on p.account_id = b.account_id")
+                "on p.account_id = b.account_id " +
+                "order by ")
                                            .setParameter("pivot", pivot)
                                            .setParameter("distance", distance)
                                            .setParameter("gender", gender)

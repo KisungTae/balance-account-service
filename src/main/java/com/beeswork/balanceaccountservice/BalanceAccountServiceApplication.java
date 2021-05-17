@@ -326,6 +326,8 @@ public class BalanceAccountServiceApplication {
 // TODO			95. separte point related fields from Account to Point or soemthing table
 //					--> implemented
 
+// TODO			96. make max age = 0 when it is 80 which is max age, calculate (current year - max age year) and if == 80 then max year = 0 in recommend()
+
 
 // TODO			Chat Business rules
 //				1. 	send, receipt and ack || receive and ack
