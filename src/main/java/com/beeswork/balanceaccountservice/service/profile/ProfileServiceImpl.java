@@ -123,6 +123,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         Profile profile = findValidProfile(accountId, identityToken);
         RecommendDTO recommendDTO = new RecommendDTO();
 
+        distance *= MIN_DISTANCE;
         if (distance < MIN_DISTANCE) distance = MIN_DISTANCE;
         else if (distance > MAX_DISTANCE) distance = MAX_DISTANCE;
         int offset = pageIndex * PAGE_LIMIT;

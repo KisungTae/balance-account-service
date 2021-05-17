@@ -444,6 +444,8 @@ where account_id in ('4cc54bea-655d-4abc-bb03-5b7e1c3c0202', 'd4c09af6-086f-426c
 order by account_id, sequence;
 
 
+select * from account;
+
 update photo
 set sequence = 4
 where key = 'Mon May 17 17:36:48 AEST 2021';
