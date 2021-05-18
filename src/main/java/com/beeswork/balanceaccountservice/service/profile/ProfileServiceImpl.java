@@ -123,21 +123,15 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         Profile profile = findValidProfile(accountId, identityToken);
         RecommendDTO recommendDTO = new RecommendDTO();
 
-        distance *= MIN_DISTANCE;
         if (distance < MIN_DISTANCE) distance = MIN_DISTANCE;
         else if (distance > MAX_DISTANCE) distance = MAX_DISTANCE;
         int offset = pageIndex * PAGE_LIMIT;
 
-        long startTime = System.currentTimeMillis();
         List<CardDTO> cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, profile.getLocation());
-//        if (cardDTOs.size() == 0 && pageIndex > 0) {
-//            cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, DEFAULT_OFFSET, profile.getLocation());
-//            recommendDTO.setReset(true);
-//        }
-
-        long estimatedTime = System.currentTimeMillis() - startTime;
-        System.out.println("estimatedTime: " + estimatedTime);
-
+        if (cardDTOs.size() == 0 && pageIndex > 0) {
+            cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, DEFAULT_OFFSET, profile.getLocation());
+            recommendDTO.setReset(true);
+        }
         recommendDTO.setCardDTOs(cardDTOs);
         return recommendDTO;
     }

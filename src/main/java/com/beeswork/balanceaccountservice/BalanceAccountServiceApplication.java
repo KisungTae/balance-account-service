@@ -273,6 +273,7 @@ public class BalanceAccountServiceApplication {
 
 // TODO			76. before saving chatMessage to database, check if there is a duplicate for sent message then if exists,
 //  				then just return the created_at and Id
+//					--> implemented
 
 // TODO			78. back up chatMessages, create a table for back-up and encrypt and compress at client side and upload it to s3,
 //  				then delete back-up that is not used for 15 days based on the table
@@ -327,7 +328,7 @@ public class BalanceAccountServiceApplication {
 //					--> implemented
 
 // TODO			96. make max age = 0 when it is 80 which is max age, calculate (current year - max age year) and if == 80 then max year = 0 in recommend()
-
+//					--> client side will implement
 
 // TODO			Chat Business rules
 //				1. 	send, receipt and ack || receive and ack

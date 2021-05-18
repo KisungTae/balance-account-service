@@ -58,7 +58,7 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
     @SuppressWarnings("unchecked")
     public List<CardDTO> findCardDTOs(int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point pivot) {
         List<Object[]> rows = entityManager.createNativeQuery(
-                "select cast(b.account_id as varchar), b.name, b.birth_year, b.height, b.about, st_distance(b.location, :pivot), p.key " +
+                "select cast(b.account_id as varchar) as id, b.name, b.birth_year, b.height, b.about, st_distance(b.location, :pivot), p.key " +
                 "from (select * " +
                 "      from profile  " +
                 "      where st_dwithin(location, :pivot, :distance) " +
@@ -71,7 +71,7 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                 "       offset :offset) as b " +
                 "left join photo as p " +
                 "on p.account_id = b.account_id " +
-                "order by ")
+                "order by id, p.sequence")
                                            .setParameter("pivot", pivot)
                                            .setParameter("distance", distance)
                                            .setParameter("gender", gender)
