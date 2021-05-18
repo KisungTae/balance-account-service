@@ -30,7 +30,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
 
     private static final int SRID = 4326;
 
-    private static final int MAX_DISTANCE = 10000;
+    private static final int MAX_DISTANCE = 30000;
     private static final int MIN_DISTANCE = 1000;
 
     private static final double DEFAULT_LATITUDE  = 37.504508;

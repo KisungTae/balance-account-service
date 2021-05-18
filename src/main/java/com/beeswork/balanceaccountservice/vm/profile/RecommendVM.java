@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.vm.profile;
 
+import com.beeswork.balanceaccountservice.constant.Gender;
 import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +16,7 @@ public class RecommendVM extends AccountIdentityVM {
 
     private int     distance;
     private int     minAge;
-    private int     maxAge;
+    private int    maxAge;
     private boolean gender;
-    private int     pageIndex;
+    private int    pageIndex;
 }

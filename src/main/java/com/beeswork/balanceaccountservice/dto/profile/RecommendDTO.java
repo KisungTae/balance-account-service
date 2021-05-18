@@ -10,6 +10,6 @@ import java.util.List;
 @Getter
 @Setter
 public class RecommendDTO {
-    private List<CardDTO> cardDTOs = new ArrayList<>();
+    private List<CardDTO> cardDTOs;
     private boolean reset;
 }

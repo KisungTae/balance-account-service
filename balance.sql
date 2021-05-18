@@ -437,6 +437,8 @@ where a.id in ('4cc54bea-655d-4abc-bb03-5b7e1c3c0202', 'd4c09af6-086f-426c-b704-
 group by a.id, p.key, p.sequence
 order by min(p.sequence);
 
+select *
+from account;
 
 select account_id, key, sequence
 from photo

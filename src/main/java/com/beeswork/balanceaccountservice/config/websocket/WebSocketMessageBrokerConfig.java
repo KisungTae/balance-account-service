@@ -45,6 +45,8 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     private MessageChannel outChannel;
 
+    private static final int MAX_STOMP_MESSAGE_BODY = 500;
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
 //        config.enableSimpleBroker("/queue");
@@ -57,11 +59,11 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
               .setClientPasscode("guest");
     }
 
-//    @Override
-//    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
-//        registry.setMessageSizeLimit(1);
-//        registry.setSendBufferSizeLimit(1);
-//    }
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
+        registry.setMessageSizeLimit(MAX_STOMP_MESSAGE_BODY);
+        registry.setSendBufferSizeLimit(MAX_STOMP_MESSAGE_BODY);
+    }
 
     @Bean
     public StompInboundChannelInterceptor stompInboundChannelInterceptor() {
