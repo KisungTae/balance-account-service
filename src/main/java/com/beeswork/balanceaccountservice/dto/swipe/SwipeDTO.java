@@ -13,11 +13,12 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class SwipeDTO {
-    private UUID swiperId;
-    private UUID swipedId;
-    private String profilePhotoKey;
+    private UUID    swiperId;
+    private UUID    swipedId;
+    private String  name;
+    private String  profilePhotoKey;
     private Boolean deleted;
-    private Date updatedAt;
+    private Date    updatedAt;
 
     @QueryProjection
     public SwipeDTO(UUID swipedId, Date updatedAt) {
@@ -26,8 +27,9 @@ public class SwipeDTO {
     }
 
     @QueryProjection
-    public SwipeDTO(UUID swiperId, String profilePhotoKey, Boolean deleted, Date updatedAt) {
+    public SwipeDTO(UUID swiperId, String name, String profilePhotoKey, Boolean deleted, Date updatedAt) {
         this.swiperId = swiperId;
+        this.name = name;
         this.profilePhotoKey = profilePhotoKey;
         this.deleted = deleted;
         this.updatedAt = updatedAt;

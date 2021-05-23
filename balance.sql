@@ -429,6 +429,7 @@ group by swiper_id
 order by count(swiper_id) desc;
 
 
+select * from account;
 
 select a.id, p.key, min(p.sequence)
 from account a
