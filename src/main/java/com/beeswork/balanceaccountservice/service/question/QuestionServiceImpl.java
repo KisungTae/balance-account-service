@@ -22,13 +22,13 @@ import java.util.Random;
 public class QuestionServiceImpl extends BaseServiceImpl implements QuestionService {
 
     private final QuestionDAO questionDAO;
-
+    private final ModelMapper modelMapper;
     private static final int MIN_NUM_OF_QUESTIONS = 3;
 
     @Autowired
     public QuestionServiceImpl(QuestionDAO questionDAO,
                                ModelMapper modelMapper) {
-        super(modelMapper);
+        this.modelMapper = modelMapper;
         this.questionDAO = questionDAO;
     }
 

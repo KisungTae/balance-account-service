@@ -9,6 +9,7 @@ import com.beeswork.balanceaccountservice.exception.account.*;
 import com.beeswork.balanceaccountservice.exception.login.EmailNotMutableException;
 import com.beeswork.balanceaccountservice.exception.login.LoginNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
+import com.beeswork.balanceaccountservice.exception.photo.PhotoAlreadyExistsException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoNotFoundException;
 import com.beeswork.balanceaccountservice.exception.profile.ProfileNotFoundException;
@@ -68,7 +69,7 @@ public class ExceptionControllerAdvice {
                        SwipedBlockedException.class, SwipedNotFoundException.class,
                        QuestionSetChangedException.class, EmailNotMutableException.class,
                        EmailDuplicateException.class, PhotoInvalidDeleteException.class,
-                       AccountDeletedException.class})
+                       AccountDeletedException.class, PhotoAlreadyExistsException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

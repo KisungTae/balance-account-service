@@ -20,8 +20,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     private final LoginDAO loginDAO;
 
     @Autowired
-    public LoginServiceImpl(ModelMapper modelMapper, LoginDAO loginDAO) {
-        super(modelMapper);
+    public LoginServiceImpl(LoginDAO loginDAO) {
         this.loginDAO = loginDAO;
     }
 

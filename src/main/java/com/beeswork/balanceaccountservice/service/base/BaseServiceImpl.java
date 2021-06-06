@@ -14,13 +14,7 @@ import java.util.UUID;
 
 public abstract class BaseServiceImpl {
 
-    protected final ModelMapper modelMapper;
     private static final int FETCH_OFFSET_IN_MINUTES = -5;
-
-
-    public BaseServiceImpl(ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
-    }
 
     protected Account validateAccount(Account account, UUID identityToken) {
         validateAccount(account);

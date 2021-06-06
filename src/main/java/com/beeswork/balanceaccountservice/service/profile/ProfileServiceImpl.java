@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.ModelMap;
 
 import java.util.*;
 
@@ -41,12 +42,13 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     private final AccountDAO      accountDAO;
     private final ProfileDAO      profileDAO;
     private final GeometryFactory geometryFactory;
+    private final ModelMapper     modelMapper;
 
     @Autowired
     public ProfileServiceImpl(ModelMapper modelMapper,
                               GeometryFactory geometryFactory, AccountDAO accountDAO,
                               ProfileDAO profileDAO) {
-        super(modelMapper);
+        this.modelMapper = modelMapper;
         this.geometryFactory = geometryFactory;
         this.accountDAO = accountDAO;
         this.profileDAO = profileDAO;
@@ -87,6 +89,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         if (profileDAO.existsById(accountId)) return;
         int birthYear = DateUtil.getYearFrom(birth);
         Point location = getLocation(DEFAULT_LONGITUDE, DEFAULT_LATITUDE);
+        if (about == null) about = "";
         profileDAO.persist(new Profile(account, name, birthYear, birth, gender, height, about, location, new Date()));
     }
 
@@ -95,6 +98,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     public void saveAbout(UUID accountId, UUID identityToken, String about, Integer height) {
         Profile profile = profileDAO.findByIdWithLock(accountId);
         validateAccount(profile.getAccount());
+        if (about == null) about = "";
         profile.setAbout(about);
         profile.setHeight(height);
     }

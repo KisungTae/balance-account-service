@@ -5,8 +5,12 @@ import com.amazonaws.regions.DefaultAwsRegionProviderChain;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
+import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
+import com.beeswork.balanceaccountservice.dao.photo.PhotoDAO;
 import com.beeswork.balanceaccountservice.dto.s3.PreSignedUrl;
-import com.beeswork.balanceaccountservice.entity.photo.Photo;
+import com.beeswork.balanceaccountservice.entity.account.Account;
+import com.beeswork.balanceaccountservice.exception.photo.PhotoAlreadyExistsException;
+import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.HmacAlgorithms;
@@ -14,6 +18,9 @@ import org.apache.commons.codec.digest.HmacUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -24,24 +31,30 @@ import java.util.UUID;
 
 
 @Service
-public class S3ServiceImpl implements S3Service {
+public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
 
     private final DefaultAwsRegionProviderChain      defaultAwsRegionProviderChain;
     private final DefaultAWSCredentialsProviderChain defaultAWSCredentialsProviderChain;
     private final ObjectMapper                       objectMapper;
     private final AmazonS3                           amazonS3;
+    private final AccountDAO                         accountDAO;
+    private final PhotoDAO                           photoDAO;
 
-    private final static String BALANCE_PHOTO_BUCKET = "balance-photo-bucket";
+    private final static String BALANCE_PHOTO_BUCKET = "test-balance-photo-bucket";
     private final static String S3_URL               = "https://s3.%s.amazonaws.com/%s";
 
     @Autowired
     public S3ServiceImpl(DefaultAwsRegionProviderChain defaultAwsRegionProviderChain,
                          DefaultAWSCredentialsProviderChain defaultAWSCredentialsProviderChain,
-                         ObjectMapper objectMapper, AmazonS3 amazonS3) {
+                         ObjectMapper objectMapper,
+                         AmazonS3 amazonS3,
+                         AccountDAO accountDAO, PhotoDAO photoDAO) {
         this.defaultAwsRegionProviderChain = defaultAwsRegionProviderChain;
         this.defaultAWSCredentialsProviderChain = defaultAWSCredentialsProviderChain;
         this.objectMapper = objectMapper;
         this.amazonS3 = amazonS3;
+        this.accountDAO = accountDAO;
+        this.photoDAO = photoDAO;
     }
 
     @Override
@@ -52,8 +65,13 @@ public class S3ServiceImpl implements S3Service {
     }
 
     @Override
-    public PreSignedUrl preSignedUrl(String accountId, String photoKey) throws JsonProcessingException {
-        String key = generateKey(accountId, photoKey);
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public PreSignedUrl generatePreSignedUrl(UUID accountId, UUID identityToken, String photoKey) throws JsonProcessingException {
+        Account account = accountDAO.findById(accountId);
+        validateAccount(account, identityToken);
+        if (photoDAO.existsByKey(accountId, photoKey)) throw new PhotoAlreadyExistsException();
+
+        String key = generateKey(accountId.toString(), photoKey.toString());
         String region = defaultAwsRegionProviderChain.getRegion();
         String accessKeyId = defaultAWSCredentialsProviderChain.getCredentials().getAWSAccessKeyId();
         String secretKey = defaultAWSCredentialsProviderChain.getCredentials().getAWSSecretKey();
@@ -76,8 +94,7 @@ public class S3ServiceImpl implements S3Service {
             keys.add(new DeleteObjectsRequest.KeyVersion(stringAccountId + "/" + photoKey));
 
         if (!keys.isEmpty()) {
-            DeleteObjectsRequest request = new DeleteObjectsRequest(BALANCE_PHOTO_BUCKET).withKeys(keys)
-                                                                                         .withQuiet(true);
+            DeleteObjectsRequest request = new DeleteObjectsRequest(BALANCE_PHOTO_BUCKET).withKeys(keys).withQuiet(true);
             amazonS3.deleteObjects(request);
         }
     }

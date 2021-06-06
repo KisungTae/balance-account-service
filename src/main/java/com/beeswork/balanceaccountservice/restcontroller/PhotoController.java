@@ -7,8 +7,9 @@ import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.photo.PhotoService;
 import com.beeswork.balanceaccountservice.service.s3.S3Service;
 import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
-import com.beeswork.balanceaccountservice.vm.photo.AddPhotoVM;
+import com.beeswork.balanceaccountservice.vm.photo.SavePhotoVM;
 import com.beeswork.balanceaccountservice.vm.photo.DeletePhotoVM;
+import com.beeswork.balanceaccountservice.vm.photo.GeneratePreSignedURLVM;
 import com.beeswork.balanceaccountservice.vm.photo.ReorderPhotosVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +28,7 @@ import java.util.List;
 public class PhotoController extends BaseController {
 
     private final PhotoService photoService;
-    private final S3Service s3Service;
+    private final S3Service    s3Service;
 
     @Autowired
     public PhotoController(ObjectMapper objectMapper, ModelMapper modelMapper, PhotoService photoService,
@@ -37,21 +38,26 @@ public class PhotoController extends BaseController {
         this.s3Service = s3Service;
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<String> addPhoto(@Valid @RequestBody AddPhotoVM addPhotoVM,
+    @GetMapping("/sign")
+    public ResponseEntity<String> generatePreSignedURL(@Valid @ModelAttribute GeneratePreSignedURLVM generatePreSignedURLVM,
+                                                       BindingResult bindingResult) throws JsonProcessingException {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        PreSignedUrl preSignedUrl = s3Service.generatePreSignedUrl(generatePreSignedURLVM.getAccountId(),
+                                                                   generatePreSignedURLVM.getIdentityToken(),
+                                                                   generatePreSignedURLVM.getPhotoKey());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(preSignedUrl));
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<String> savePhoto(@Valid @RequestBody SavePhotoVM savePhotoVM,
                                            BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        photoService.addPhoto(addPhotoVM.getAccountId(),
-                              addPhotoVM.getIdentityToken(),
-                              addPhotoVM.getPhotoKey(),
-                              addPhotoVM.getSequence());
-
-        PreSignedUrl preSignedUrl = s3Service.preSignedUrl(addPhotoVM.getAccountId().toString(),
-                                                           addPhotoVM.getPhotoKey());
-
-        return ResponseEntity.status(HttpStatus.OK)
-                             .body(objectMapper.writeValueAsString(preSignedUrl));
+        photoService.savePhoto(savePhotoVM.getAccountId(),
+                               savePhotoVM.getIdentityToken(),
+                               savePhotoVM.getPhotoKey(),
+                               savePhotoVM.getSequence());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
     @GetMapping("/list")

@@ -23,16 +23,16 @@ import java.util.UUID;
 @Service
 public class ReportServiceImpl extends BaseServiceImpl implements ReportService {
 
-    private final ReportDAO reportDAO;
+    private final ReportDAO       reportDAO;
     private final ReportReasonDAO reportReasonDAO;
-    private final AccountDAO accountDAO;
-    private final MatchDAO matchDAO;
+    private final AccountDAO      accountDAO;
+    private final MatchDAO        matchDAO;
 
     @Autowired
-    public ReportServiceImpl(ModelMapper modelMapper,
-                             ReportDAO reportDAO,
-                             ReportReasonDAO reportReasonDAO, AccountDAO accountDAO, MatchDAO matchDAO) {
-        super(modelMapper);
+    public ReportServiceImpl(ReportDAO reportDAO,
+                             ReportReasonDAO reportReasonDAO,
+                             AccountDAO accountDAO,
+                             MatchDAO matchDAO) {
         this.reportDAO = reportDAO;
         this.reportReasonDAO = reportReasonDAO;
         this.accountDAO = accountDAO;

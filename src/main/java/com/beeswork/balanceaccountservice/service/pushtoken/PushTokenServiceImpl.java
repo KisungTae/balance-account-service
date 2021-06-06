@@ -19,13 +19,11 @@ import java.util.UUID;
 public class PushTokenServiceImpl extends BaseServiceImpl implements PushTokenService {
 
     private final PushTokenDAO pushTokenDAO;
-    private final AccountDAO accountDAO;
+    private final AccountDAO   accountDAO;
 
     @Autowired
-    public PushTokenServiceImpl(ModelMapper modelMapper,
-                                PushTokenDAO pushTokenDAO,
+    public PushTokenServiceImpl(PushTokenDAO pushTokenDAO,
                                 AccountDAO accountDAO) {
-        super(modelMapper);
         this.pushTokenDAO = pushTokenDAO;
         this.accountDAO = accountDAO;
     }

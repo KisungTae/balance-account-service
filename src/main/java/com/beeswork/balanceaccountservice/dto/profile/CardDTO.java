@@ -7,17 +7,18 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class CardDTO {
-    private String accountId;
-    private String name;
-    private int birthYear;
-    private int height;
-    private String about;
-    private int distance;
+    private String     accountId;
+    private String     name;
+    private int        birthYear;
+    private int        height;
+    private String     about;
+    private int        distance;
     private List<String> photoKeys = new ArrayList<>();
 
     public CardDTO(String accountId,

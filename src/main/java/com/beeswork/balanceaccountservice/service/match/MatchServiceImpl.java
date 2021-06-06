@@ -23,18 +23,16 @@ import java.util.UUID;
 
 @Service
 public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
-    private final AccountDAO accountDAO;
-    private final MatchDAO matchDAO;
-    private final ChatMessageDAO chatMessageDAO;
+    private final AccountDAO         accountDAO;
+    private final MatchDAO           matchDAO;
+    private final ChatMessageDAO     chatMessageDAO;
     private final SentChatMessageDAO sentChatMessageDAO;
 
     @Autowired
-    public MatchServiceImpl(ModelMapper modelMapper,
-                            AccountDAO accountDAO,
+    public MatchServiceImpl(AccountDAO accountDAO,
                             MatchDAO matchDAO,
                             ChatMessageDAO chatMessageDAO,
                             SentChatMessageDAO sentChatMessageDAO) {
-        super(modelMapper);
         this.accountDAO = accountDAO;
         this.matchDAO = matchDAO;
         this.chatMessageDAO = chatMessageDAO;

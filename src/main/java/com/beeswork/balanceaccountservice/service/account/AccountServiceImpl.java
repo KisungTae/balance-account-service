@@ -43,12 +43,10 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Autowired
     public AccountServiceImpl(AccountDAO accountDAO,
-                              ModelMapper modelMapper,
                               QuestionDAO questionDAO,
                               AccountQuestionDAO accountQuestionDAO,
                               ProfileDAO profileDAO,
                               LoginDAO loginDAO) {
-        super(modelMapper);
         this.accountDAO = accountDAO;
         this.questionDAO = questionDAO;
         this.accountQuestionDAO = accountQuestionDAO;

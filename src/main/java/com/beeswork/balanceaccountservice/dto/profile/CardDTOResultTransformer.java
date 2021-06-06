@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.dto.profile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class CardDTOResultTransformer {
 

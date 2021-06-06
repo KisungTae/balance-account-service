@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.service.photo;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
+import com.beeswork.balanceaccountservice.dao.photo.PhotoDAO;
 import com.beeswork.balanceaccountservice.dto.photo.PhotoDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
@@ -23,19 +24,22 @@ import java.util.*;
 public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
 
     private final AccountDAO accountDAO;
+    private final ModelMapper modelMapper;
+    private final PhotoDAO photoDAO;
 
     private static final int MAX_NUM_OF_PHOTOS = 6;
 
     @Autowired
     public PhotoServiceImpl(ModelMapper modelMapper,
-                            AccountDAO accountDAO) {
-        super(modelMapper);
+                            AccountDAO accountDAO, PhotoDAO photoDAO) {
         this.accountDAO = accountDAO;
+        this.modelMapper = modelMapper;
+        this.photoDAO = photoDAO;
     }
 
     @Override
     @Transactional
-    public void addPhoto(UUID accountId, UUID identityToken, String photoKey, int sequence) {
+    public void savePhoto(UUID accountId, UUID identityToken, String photoKey, int sequence) {
         Account account = validateAccount(accountDAO.findById(accountId), identityToken);
         List<Photo> photos = account.getPhotos();
         if (photos.size() >= MAX_NUM_OF_PHOTOS)

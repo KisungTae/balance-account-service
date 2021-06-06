@@ -32,10 +32,8 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     @Autowired
     public ChatServiceImpl(MatchDAO matchDAO,
                            ChatMessageDAO chatMessageDAO,
-                           ModelMapper modelMapper,
                            AccountDAO accountDAO,
                            SentChatMessageDAO sentChatMessageDAO) {
-        super(modelMapper);
         this.matchDAO = matchDAO;
         this.chatMessageDAO = chatMessageDAO;
         this.accountDAO = accountDAO;

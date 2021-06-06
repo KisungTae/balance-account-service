@@ -47,6 +47,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     private final AccountQuestionDAO accountQuestionDAO;
     private final ProfileDAO profileDAO;
     private final SwipeMetaDAO swipeMetaDAO;
+    private final ModelMapper modelMapper;
 
     @Autowired
     public SwipeServiceImpl(ModelMapper modelMapper,
@@ -55,7 +56,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
                             ChatDAO chatDAO,
                             AccountQuestionDAO accountQuestionDAO,
                             ProfileDAO profileDAO, SwipeMetaDAO swipeMetaDAO) {
-        super(modelMapper);
+        this.modelMapper = modelMapper;
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
         this.chatDAO = chatDAO;

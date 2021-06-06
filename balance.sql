@@ -166,7 +166,7 @@ create table account
     id                uuid primary key,
     identity_token    uuid        not null,
     name              varchar(15) not null,
-    profile_photo_key varchar(30) not null,
+    profile_photo_key varchar(40) not null,
     blocked           boolean     not null,
     deleted           boolean     not null,
     created_at        timestamptz not null,
@@ -312,11 +312,15 @@ create index match_swiped_id_idx on match (swiped_id);
 create index match_swiper_id_swiped_id_chat_id on match (swiper_id, swiped_id, chat_id);
 
 
+-- TODO: refactor Photo object and table
+
 create table photo
 (
-    key        varchar(30) not null,
+    key        varchar(40) not null,
     account_id uuid        not null,
     sequence   int         not null,
+    created_at timestamptz not null,
+    updated_at timestamptz not null,
 
     primary key (account_id, key),
     constraint photo_account_id_fk foreign key (account_id) references account (id)
@@ -429,11 +433,19 @@ group by swiper_id
 order by count(swiper_id) desc;
 
 
-select * from account;
+select *
+from photo
+where account_id = '3bfbeedd-67f0-4b6b-95b0-2dd7e6d809b3';
+
+select *
+from account;
+
+select *
+from account_question;
 
 select a.id, p.key, min(p.sequence)
 from account a
-         left join photo p on a.id = p.account_id
+left join photo p on a.id = p.account_id
 where a.id in ('4cc54bea-655d-4abc-bb03-5b7e1c3c0202', 'd4c09af6-086f-426c-b704-66ebb3ddb8a8')
 group by a.id, p.key, p.sequence
 order by min(p.sequence);
@@ -445,6 +457,14 @@ select account_id, key, sequence
 from photo
 where account_id in ('4cc54bea-655d-4abc-bb03-5b7e1c3c0202', 'd4c09af6-086f-426c-b704-66ebb3ddb8a8')
 order by account_id, sequence;
+
+select *
+from swipe;
+
+-- insert into swipe values ('f0c49c14-e528-49f8-9f6f-e3cc6c0efb51', '1fe26957-f9c5-49f3-a03f-4ec36f10f0c5', true, false, 5, false, current_timestamp, current_timestamp);
+insert into swipe
+values ('81ae6ee5-230b-44d3-b7d5-13c3dd7dc352', '1fe26957-f9c5-49f3-a03f-4ec36f10f0c5', true, false, 5, false, current_timestamp,
+        current_timestamp);
 
 
 select *
@@ -484,7 +504,7 @@ where account_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860';
 
 select chat_id, body, 0 as status, '2020-05-10T11:00:25.000Z' as createdAt, null as id, key
 from chat_message
-         inner join sent_chat_message scm on chat_message.id = scm.chat_message_id
+inner join sent_chat_message scm on chat_message.id = scm.chat_message_id
 where id in (select chat_message_id from sent_chat_message);
 
 delete
@@ -495,7 +515,7 @@ from chat_message;
 
 select cm.chat_id, max(id)
 from match
-         left join chat_message cm on match.chat_id = cm.chat_id
+left join chat_message cm on match.chat_id = cm.chat_id
 where swiper_id = 'c2e68bd9-586b-487a-8d90-a6690516cdcd'
 group by cm.chat_id;
 
@@ -533,7 +553,19 @@ set matched = false
 where (swiped_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiper_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b');
 
 
+select *
+from photo
+where account_id = '1fe26957-f9c5-49f3-a03f-4ec36f10f0c5';
 
+
+select *
+from profile
+where account_id = '1fe26957-f9c5-49f3-a03f-4ec36f10f0c5';
+
+
+select *
+from account_question
+where account_id = '1fe26957-f9c5-49f3-a03f-4ec36f10f0c5';
 
 
 ---------------------------------------------------------------------------------------------

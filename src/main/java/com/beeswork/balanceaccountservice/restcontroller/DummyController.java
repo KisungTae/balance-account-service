@@ -196,7 +196,7 @@ public class DummyController {
 //        account.setPoint(50000);
 //        account.setFreeSwipe(2000);
 //        account.setFreeSwipeUpdatedAt(now);
-        account.setProfilePhotoKey("");
+        account.setProfilePhotoKey(UUID.randomUUID().toString() + ".jpg");
         account.setCreatedAt(now);
         account.setUpdatedAt(now);
         Wallet wallet = new Wallet();
@@ -224,18 +224,14 @@ public class DummyController {
         profile.setEnabled(true);
 
         // photo
-        Date photoKeyDate = now;
+
         for (int p = 0; p < 5; p++) {
             Photo photo = new Photo();
-            photoKeyDate = DateUtils.addMinutes(photoKeyDate, 1);
-            photo.setPhotoId(new PhotoId(account.getId(), photoKeyDate.toString()));
-
-            if (p == 0) {
-                account.setProfilePhotoKey(photoKeyDate.toString());
-                account.setUpdatedAt(photoKeyDate);
-            }
+            photo.setPhotoId(new PhotoId(account.getId(), UUID.randomUUID().toString() + ".jpg"));
             photo.setSequence(p);
             photo.setAccount(account);
+            photo.setCreatedAt(new Date());
+            photo.setUpdatedAt(new Date());
             account.getPhotos().add(photo);
         }
 

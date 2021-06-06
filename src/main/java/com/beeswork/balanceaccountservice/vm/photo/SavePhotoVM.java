@@ -6,10 +6,11 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 @Getter
 @Setter
-public class AddPhotoVM extends AccountIdentityVM {
+public class SavePhotoVM extends AccountIdentityVM {
 
     @NotEmpty
     private String photoKey;
