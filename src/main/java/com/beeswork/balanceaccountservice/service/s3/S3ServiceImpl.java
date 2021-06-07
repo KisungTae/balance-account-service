@@ -71,7 +71,7 @@ public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
         validateAccount(account, identityToken);
         if (photoDAO.existsByKey(accountId, photoKey)) throw new PhotoAlreadyExistsException();
 
-        String key = generateKey(accountId.toString(), photoKey.toString());
+        String key = generateKey(accountId.toString(), photoKey);
         String region = defaultAwsRegionProviderChain.getRegion();
         String accessKeyId = defaultAWSCredentialsProviderChain.getCredentials().getAWSAccessKeyId();
         String secretKey = defaultAWSCredentialsProviderChain.getCredentials().getAWSSecretKey();

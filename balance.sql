@@ -435,7 +435,10 @@ order by count(swiper_id) desc;
 
 select *
 from photo
-where account_id = '3bfbeedd-67f0-4b6b-95b0-2dd7e6d809b3';
+where account_id = 'ec16330d-908f-4987-9e3f-a58b4ceebffd';
+
+delete from photo
+where account_id = 'ec16330d-908f-4987-9e3f-a58b4ceebffd';
 
 select *
 from account;

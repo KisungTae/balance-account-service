@@ -42,15 +42,14 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     public void savePhoto(UUID accountId, UUID identityToken, String photoKey, int sequence) {
         Account account = validateAccount(accountDAO.findById(accountId), identityToken);
         List<Photo> photos = account.getPhotos();
-        if (photos.size() >= MAX_NUM_OF_PHOTOS)
-            throw new PhotoNumReachedMaxException();
+        if (photos.size() >= MAX_NUM_OF_PHOTOS) throw new PhotoNumReachedMaxException();
 
         Photo photo = photos.stream()
                             .filter(p -> p.getPhotoId().getKey().equals(photoKey))
                             .findAny()
                             .orElse(null);
 
-        if (photo == null) photos.add(new Photo(account, photoKey, sequence));
+        if (photo == null) photos.add(new Photo(account, photoKey, sequence, new Date()));
         else photo.setSequence(sequence);
         resetProfilePhoto(account, photos);
         accountDAO.persist(account);
@@ -97,9 +96,12 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     public void reorderPhotos(UUID accountId, UUID identityToken, Map<String, Integer> photoOrders) {
         Account account = validateAccount(accountDAO.findById(accountId), identityToken);
         List<Photo> photos = account.getPhotos();
+        Date updatedAt = new Date();
         for (Photo photo : photos) {
-            if (photoOrders.containsKey(photo.getPhotoId().getKey()))
+            if (photoOrders.containsKey(photo.getPhotoId().getKey())) {
                 photo.setSequence(photoOrders.get(photo.getPhotoId().getKey()));
+                photo.setUpdatedAt(updatedAt);
+            }
         }
         resetProfilePhoto(account, photos);
     }

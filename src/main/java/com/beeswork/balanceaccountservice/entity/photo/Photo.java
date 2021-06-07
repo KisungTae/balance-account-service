@@ -38,10 +38,12 @@ public class Photo implements Comparable<Photo> {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public Photo(Account account, String key, int sequence) {
+    public Photo(Account account, String key, int sequence, Date createdAt) {
         this.photoId = new PhotoId(account.getId(), key);
         this.sequence = sequence;
         this.account = account;
+        this.createdAt = createdAt;
+        this.updatedAt = createdAt;
     }
 
     public String getKey() {

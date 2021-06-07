@@ -349,7 +349,10 @@ public class BalanceAccountServiceApplication {
 //				10. match's created_at will be assigned at client side, so listMatch does not return updated_at field
 //				11.
 
-
-
-
 // TODO add to android: when swipeclicked exists exception is thrown then you should add it to the click list in Adnroid app, fetchedat not stored in shared preference but just query clicked, matched, click and get the latest one
+
+
+
+
+// TODO AWS ===================================================
+// TODO: 1. check CORS on S3 for presigned url upload and read
