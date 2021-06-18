@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.service.photo;
 
+import com.beeswork.balanceaccountservice.constant.PhotoConstant;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.photo.PhotoDAO;
 import com.beeswork.balanceaccountservice.dto.photo.PhotoDTO;
@@ -7,7 +8,7 @@ import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoNotFoundException;
-import com.beeswork.balanceaccountservice.exception.photo.PhotoNumReachedMaxException;
+import com.beeswork.balanceaccountservice.exception.photo.PhotoExceededMaxException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 
@@ -27,8 +28,6 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     private final ModelMapper modelMapper;
     private final PhotoDAO photoDAO;
 
-    private static final int MAX_NUM_OF_PHOTOS = 6;
-
     @Autowired
     public PhotoServiceImpl(ModelMapper modelMapper,
                             AccountDAO accountDAO, PhotoDAO photoDAO) {
@@ -42,7 +41,7 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     public void savePhoto(UUID accountId, UUID identityToken, String photoKey, int sequence) {
         Account account = validateAccount(accountDAO.findById(accountId), identityToken);
         List<Photo> photos = account.getPhotos();
-        if (photos.size() >= MAX_NUM_OF_PHOTOS) throw new PhotoNumReachedMaxException();
+        if ( photos.size() >= PhotoConstant.MAX_NUM_OF_PHOTOS) throw new PhotoExceededMaxException();
 
         Photo photo = photos.stream()
                             .filter(p -> p.getPhotoId().getKey().equals(photoKey))

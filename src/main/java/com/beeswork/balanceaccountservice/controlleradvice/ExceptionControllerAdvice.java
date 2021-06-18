@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.controlleradvice;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
+import com.beeswork.balanceaccountservice.constant.PhotoConstant;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 import com.beeswork.balanceaccountservice.exception.account.*;
@@ -10,6 +11,7 @@ import com.beeswork.balanceaccountservice.exception.login.EmailNotMutableExcepti
 import com.beeswork.balanceaccountservice.exception.login.LoginNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoAlreadyExistsException;
+import com.beeswork.balanceaccountservice.exception.photo.PhotoExceededMaxException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoNotFoundException;
 import com.beeswork.balanceaccountservice.exception.profile.ProfileNotFoundException;
@@ -52,16 +54,18 @@ public class ExceptionControllerAdvice {
     }
 
     //  TEST 1. if exception is thrown inside handleNotFoundException, then it will throw handleNotFoundException not route to General Exception handler
-    @ExceptionHandler({AccountNotFoundException.class, QuestionNotFoundException.class, SwipeNotFoundException.class,
-                       PhotoNotFoundException.class, AccountQuestionNotFoundException.class,
-                       LoginNotFoundException.class, ProfileNotFoundException.class, MatchNotFoundException.class,
-                       ReportReasonNotFoundException.class, ReportedNotFoundException.class, QueueNotFoundException.class,
-                       SwipeMetaNotFoundException.class})
+    @ExceptionHandler({AccountNotFoundException.class, QuestionNotFoundException.class,
+                       SwipeNotFoundException.class, PhotoNotFoundException.class,
+                       AccountQuestionNotFoundException.class, LoginNotFoundException.class,
+                       ProfileNotFoundException.class, MatchNotFoundException.class,
+                       ReportReasonNotFoundException.class, ReportedNotFoundException.class,
+                       QueueNotFoundException.class, SwipeMetaNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)
     throws Exception {
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(exceptionResponse(exception.getExceptionCode(), locale));
+                             .body(exceptionResponse(exception.getExceptionCode(), null, locale));
     }
 
     @ExceptionHandler({AccountShortOfPointException.class, AccountBlockedException.class,
@@ -69,12 +73,17 @@ public class ExceptionControllerAdvice {
                        SwipedBlockedException.class, SwipedNotFoundException.class,
                        QuestionSetChangedException.class, EmailNotMutableException.class,
                        EmailDuplicateException.class, PhotoInvalidDeleteException.class,
-                       AccountDeletedException.class, PhotoAlreadyExistsException.class})
+                       AccountDeletedException.class, PhotoAlreadyExistsException.class,
+                       PhotoExceededMaxException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {
+        Object[] arguments = null;
+        if (exception instanceof PhotoExceededMaxException)
+            arguments = new Object[] {PhotoConstant.MAX_NUM_OF_PHOTOS};
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(exceptionResponse(exception.getExceptionCode(), locale));
+                             .body(exceptionResponse(exception.getExceptionCode(), arguments, locale));
     }
 
     @MessageExceptionHandler(Exception.class)
@@ -114,8 +123,8 @@ public class ExceptionControllerAdvice {
 //                             .body(exceptionResponse(INTERNAL_SERVER_EXCEPTION, locale));
 //    }
 
-    private String exceptionResponse(String exceptionCode, Locale locale) throws JsonProcessingException {
-        String exceptionMessage = messageSource.getMessage(exceptionCode, null, locale);
+    private String exceptionResponse(String exceptionCode, Object[] object, Locale locale) throws JsonProcessingException {
+        String exceptionMessage = messageSource.getMessage(exceptionCode, object, locale);
         ExceptionResponse exceptionResponse = new ExceptionResponse(exceptionCode, exceptionMessage, null);
         return objectMapper.writeValueAsString(exceptionResponse);
     }
