@@ -98,7 +98,6 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     public void saveAbout(UUID accountId, UUID identityToken, String about, Integer height) {
         Profile profile = profileDAO.findByIdWithLock(accountId);
         validateAccount(profile.getAccount());
-        if (about == null) about = "";
         profile.setAbout(about);
         profile.setHeight(height);
     }

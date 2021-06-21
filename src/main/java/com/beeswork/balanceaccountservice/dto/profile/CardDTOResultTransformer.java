@@ -34,8 +34,8 @@ public class CardDTOResultTransformer {
                 previousId = id;
                 String name = row[NAME].toString();
                 int birthYear = Integer.parseInt(row[BIRTH_YEAR].toString());
-                int height = (int) row[HEIGHT];
-                String about = row[ABOUT].toString();
+                Integer height = row[HEIGHT] == null ? null : (Integer) row[HEIGHT];
+                String about = row[ABOUT] == null ? null : row[ABOUT].toString();
                 int distance = (int) ((double) row[DISTANCE]);
                 cardDTO = new CardDTO(id, name, birthYear, height, about, distance);
             }

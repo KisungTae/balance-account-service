@@ -4,10 +4,12 @@ import com.beeswork.balanceaccountservice.constant.PushTokenType;
 import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.pushtoken.PushTokenDAO;
+import com.beeswork.balanceaccountservice.dao.setting.SettingDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
+import com.beeswork.balanceaccountservice.entity.setting.Setting;
 import com.beeswork.balanceaccountservice.service.apns.APNSService;
 import com.beeswork.balanceaccountservice.service.fcm.FCMService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,22 +24,28 @@ public class PushServiceImpl implements PushService {
     private final APNSService apnsService;
     private final PushTokenDAO pushTokenDAO;
     private final AccountDAO accountDAO;
+    private final SettingDAO settingDAO;
 
     @Autowired
     public PushServiceImpl(FCMService fcmService,
                            APNSService apnsService,
                            PushTokenDAO pushTokenDAO,
-                           AccountDAO accountDAO) {
+                           AccountDAO accountDAO, SettingDAO settingDAO) {
         this.fcmService = fcmService;
         this.apnsService = apnsService;
         this.pushTokenDAO = pushTokenDAO;
         this.accountDAO = accountDAO;
+        this.settingDAO = settingDAO;
     }
 
     @Override
     public void pushChatMessage(ChatMessageDTO chatMessageDTO, Locale locale) {
         PushToken pushToken = pushTokenDAO.findRecent(chatMessageDTO.getRecipientId());
         if (pushToken == null) return;
+
+        Setting setting = settingDAO.findById(chatMessageDTO.getRecipientId());
+        if (setting != null && !setting.isChatMessagePush()) return;
+
         Account sender = accountDAO.findById(chatMessageDTO.getAccountId());
         if (sender == null) return;
         if (pushToken.getType() == PushTokenType.APS) apnsService.sendChatMessage(chatMessageDTO, locale);
@@ -49,6 +57,13 @@ public class PushServiceImpl implements PushService {
         if (matchDTO == null || matchDTO.getSwipedId() == null) return;
         PushToken pushToken = pushTokenDAO.findRecent(matchDTO.getSwipedId());
         if (pushToken == null) return;
+
+        Setting setting = settingDAO.findById(matchDTO.getSwipedId());
+        if (setting != null) {
+            if (matchDTO.getPushType() == PushType.CLICKED && !setting.isClickedPush()) return;
+            if (matchDTO.getPushType() == PushType.MATCHED && !setting.isMatchPush()) return;
+        }
+
         matchDTO.setSwipedId(null);
         matchDTO.swapOnMatched();
         if (pushToken.getType() == PushTokenType.APS) apnsService.sendMatch(matchDTO, locale);

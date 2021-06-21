@@ -19,6 +19,7 @@ import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundExc
 import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
 import com.beeswork.balanceaccountservice.exception.report.ReportReasonNotFoundException;
 import com.beeswork.balanceaccountservice.exception.report.ReportedNotFoundException;
+import com.beeswork.balanceaccountservice.exception.setting.SettingNotFoundException;
 import com.beeswork.balanceaccountservice.exception.stomp.QueueNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.*;
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
@@ -59,7 +60,8 @@ public class ExceptionControllerAdvice {
                        AccountQuestionNotFoundException.class, LoginNotFoundException.class,
                        ProfileNotFoundException.class, MatchNotFoundException.class,
                        ReportReasonNotFoundException.class, ReportedNotFoundException.class,
-                       QueueNotFoundException.class, SwipeMetaNotFoundException.class})
+                       QueueNotFoundException.class, SwipeMetaNotFoundException.class,
+                       SettingNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)
     throws Exception {
 

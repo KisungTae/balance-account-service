@@ -46,7 +46,7 @@ public class Profile {
     private boolean gender;
 
     @Column(name = "height")
-    private int height;
+    private Integer height;
 
     @Column(name = "about")
     private String about;

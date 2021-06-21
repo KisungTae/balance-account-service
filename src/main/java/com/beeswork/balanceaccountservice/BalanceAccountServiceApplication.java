@@ -330,6 +330,8 @@ public class BalanceAccountServiceApplication {
 // TODO			96. make max age = 0 when it is 80 which is max age, calculate (current year - max age year) and if == 80 then max year = 0 in recommend()
 //					--> client side will implement
 
+// TODO			97. test push in regards to setting matchPUsh, clickedPUsh etc..
+
 // TODO			Chat Business rules
 //				1. 	send, receipt and ack || receive and ack
 //				2. 	listMatches retrieve only the chatMessages that are not received or synced

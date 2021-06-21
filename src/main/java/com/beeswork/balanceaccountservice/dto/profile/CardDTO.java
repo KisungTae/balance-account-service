@@ -13,18 +13,18 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class CardDTO {
-    private String     accountId;
-    private String     name;
-    private int        birthYear;
-    private int        height;
-    private String     about;
-    private int        distance;
+    private String       accountId;
+    private String       name;
+    private int          birthYear;
+    private Integer      height;
+    private String       about;
+    private int          distance;
     private List<String> photoKeys = new ArrayList<>();
 
     public CardDTO(String accountId,
                    String name,
                    int birthYear,
-                   int height,
+                   Integer height,
                    String about,
                    int distance) {
         this.accountId = accountId;

@@ -406,6 +406,16 @@ create table report
     constraint report_report_reason_id_fk foreign key (report_reason_id) references report_reason (id)
 );
 
+create table setting
+(
+    account_id        uuid primary key,
+    match_push        bool not null,
+    clicked_push      bool not null,
+    chat_message_push bool not null,
+
+    constraint setting_account_id_fk foreign key (account_id) references account (id)
+);
+
 
 create table swipe_meta
 (
@@ -432,12 +442,30 @@ from match
 group by swiper_id
 order by count(swiper_id) desc;
 
+select *
+from login;
+
+select *
+from account;
+
+select *
+from setting;
+
+insert into login
+values ('default', 0, '86a91d16-c378-4c0d-bbb5-24177cfeb31b', 'test@naver.com', '', false, current_timestamp, current_timestamp);
+
+update login
+set type = 1;
+
+select *
+from account;
 
 select *
 from photo
 where account_id = 'ec16330d-908f-4987-9e3f-a58b4ceebffd';
 
-delete from photo
+delete
+from photo
 where account_id = 'ec16330d-908f-4987-9e3f-a58b4ceebffd';
 
 select *

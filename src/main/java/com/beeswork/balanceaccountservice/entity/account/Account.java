@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.report.Report;
+import com.beeswork.balanceaccountservice.entity.setting.Setting;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -61,6 +62,9 @@ public class Account {
 
     @OneToOne(mappedBy = "account")
     private Wallet wallet;
+
+    @OneToOne(mappedBy = "account")
+    private Setting setting;
 
     @OneToMany(mappedBy = "account",
                fetch = FetchType.LAZY,

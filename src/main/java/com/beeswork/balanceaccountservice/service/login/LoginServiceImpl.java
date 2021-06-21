@@ -41,4 +41,12 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
             login.setEmail(email);
         }
     }
+
+    @Override
+    public String getEmail(UUID accountId, UUID identityToken) {
+        Login login = loginDAO.findByAccountId(accountId);
+        if (login == null) throw new LoginNotFoundException();
+        validateAccount(login.getAccount(), identityToken);
+        return login.getEmail();
+    }
 }
