@@ -448,11 +448,18 @@ from login;
 select *
 from account;
 
+
 select *
 from setting;
 
+select *
+from login;
+
 insert into login
-values ('default', 0, '86a91d16-c378-4c0d-bbb5-24177cfeb31b', 'test@naver.com', '', false, current_timestamp, current_timestamp);
+values ('default', 0, '6754cf08-0211-4470-a5bb-a9853316a3f1', 'test@naver.com', '', false, current_timestamp, current_timestamp);
+
+update login set type = 1;
+
 
 update login
 set type = 1;

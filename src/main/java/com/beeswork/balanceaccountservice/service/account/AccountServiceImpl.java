@@ -132,17 +132,19 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         Profile profile = profileDAO.findById(accountId);
         if (profile != null) profileDAO.remove(profile);
 
-        account.getPushTokens().clear();
-        account.getAccountQuestions().clear();
-        account.setDeleted(true);
-        account.setUpdatedAt(new Date());
-
-        List<Photo> photos = account.getPhotos();
         DeleteAccountDTO deleteAccountDTO = new DeleteAccountDTO();
-        deleteAccountDTO.setAccountId(accountId);
-        deleteAccountDTO.setPhotoKeys(photos.stream().map(Photo::getKey).collect(Collectors.toList()));
-        photos.clear();
 
+        if (account != null) {
+            account.getPushTokens().clear();
+            account.getAccountQuestions().clear();
+            account.setDeleted(true);
+            account.setUpdatedAt(new Date());
+
+            List<Photo> photos = account.getPhotos();
+            deleteAccountDTO.setAccountId(accountId);
+            deleteAccountDTO.setPhotoKeys(photos.stream().map(Photo::getKey).collect(Collectors.toList()));
+            photos.clear();
+        }
         return deleteAccountDTO;
     }
 
