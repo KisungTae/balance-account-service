@@ -19,7 +19,7 @@ public class SettingDAOImpl extends BaseDAOImpl<Setting> implements SettingDAO {
     }
 
     @Override
-    public Setting findById(UUID accountId) {
+    public Setting findByAccountId(UUID accountId) {
         return jpaQueryFactory.selectFrom(qSetting).where(qSetting.accountId.eq(accountId)).fetchFirst();
     }
 }

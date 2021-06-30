@@ -43,7 +43,7 @@ public class PushServiceImpl implements PushService {
         PushToken pushToken = pushTokenDAO.findRecent(chatMessageDTO.getRecipientId());
         if (pushToken == null) return;
 
-        Setting setting = settingDAO.findById(chatMessageDTO.getRecipientId());
+        Setting setting = settingDAO.findByAccountId(chatMessageDTO.getRecipientId());
         if (setting != null && !setting.isChatMessagePush()) return;
 
         Account sender = accountDAO.findById(chatMessageDTO.getAccountId());
@@ -58,7 +58,7 @@ public class PushServiceImpl implements PushService {
         PushToken pushToken = pushTokenDAO.findRecent(matchDTO.getSwipedId());
         if (pushToken == null) return;
 
-        Setting setting = settingDAO.findById(matchDTO.getSwipedId());
+        Setting setting = settingDAO.findByAccountId(matchDTO.getSwipedId());
         if (setting != null) {
             if (matchDTO.getPushType() == PushType.CLICKED && !setting.isClickedPush()) return;
             if (matchDTO.getPushType() == PushType.MATCHED && !setting.isMatchPush()) return;

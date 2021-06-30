@@ -28,7 +28,7 @@ public class SettingServiceImpl extends BaseServiceImpl implements SettingServic
     public void savePushSettings(UUID accountId, UUID identityToken, Boolean matchPush, Boolean clickedPush, Boolean chatMessagePush) {
         Account account = accountDAO.findById(accountId);
         validateAccount(account, identityToken);
-        Setting setting = account.getSetting();
+        Setting setting = settingDAO.findByAccountId(account.getId());
         if (setting == null) setting = new Setting(account);
 
         if (matchPush != null) setting.setMatchPush(matchPush);

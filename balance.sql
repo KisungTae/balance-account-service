@@ -267,19 +267,37 @@ create table sent_chat_message
 
 );
 
+
 create table login
 (
-    id         varchar(100) not null,
+    id         varchar(100) primary key,
     type       int          not null,
     account_id uuid unique  not null,
     email      varchar(256),
     password   varchar(50),
     blocked    boolean      not null,
-    created_at timestamptz  not null,
-    updated_at timestamptz  not null,
 
-    primary key (id, type),
     constraint login_account_id_fk foreign key (account_id) references account (id)
+);
+
+create table role
+(
+    id serial primary key,
+    name varchar(30) not null
+);
+
+insert into role values (default, 'ADMIN');
+insert into role values (default, 'USER');
+
+
+create table login_role
+(
+    login_id varchar(100) not null,
+    role_id int not null,
+
+    primary key (login_id, role_id),
+    constraint login_role_login_id_fk foreign key (login_id) references login (id),
+    constraint login_role_role_id_fk foreign key (role_id) references role (id)
 );
 
 
@@ -443,7 +461,35 @@ group by swiper_id
 order by count(swiper_id) desc;
 
 select *
+from account;
+
+select *
 from login;
+
+select *
+from login_role;
+
+select *
+from role;
+
+insert into role values (default, 'ADMIN');
+insert into role values (default, 'USER');
+
+insert into login values ('807d813d-f8e6-4235-962d-f4b9cee77a52', 1, '807d813d-f8e6-4235-962d-f4b9cee77a52', '', '', false);
+
+insert into login_role values ('807d813d-f8e6-4235-962d-f4b9cee77a52', 3);
+insert into login_role values ('807d813d-f8e6-4235-962d-f4b9cee77a52', 4);
+
+
+
+select *
+from login;
+
+select *
+from login_role;
+
+select *
+from role;
 
 select *
 from account;

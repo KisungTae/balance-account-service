@@ -7,6 +7,7 @@ import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeMetaDAO;
+import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
@@ -47,6 +48,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     private final AccountQuestionDAO accountQuestionDAO;
     private final ProfileDAO profileDAO;
     private final SwipeMetaDAO swipeMetaDAO;
+    private final WalletDAO walletDAO;
     private final ModelMapper modelMapper;
 
     @Autowired
@@ -55,7 +57,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
                             SwipeDAO swipeDAO,
                             ChatDAO chatDAO,
                             AccountQuestionDAO accountQuestionDAO,
-                            ProfileDAO profileDAO, SwipeMetaDAO swipeMetaDAO) {
+                            ProfileDAO profileDAO, SwipeMetaDAO swipeMetaDAO,
+                            WalletDAO walletDAO) {
         this.modelMapper = modelMapper;
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
@@ -63,6 +66,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         this.accountQuestionDAO = accountQuestionDAO;
         this.profileDAO = profileDAO;
         this.swipeMetaDAO = swipeMetaDAO;
+        this.walletDAO = walletDAO;
     }
 
     @Override
@@ -71,7 +75,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         Account swiper = validateAccount(accountDAO.findById(accountId), identityToken);
         Account swiped = validateSwiped(accountDAO.findById(swipedId));
 
-        Wallet wallet = swiper.getWallet();
+        Wallet wallet = walletDAO.findByAccountId(swiper.getId());
         SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
         rechargeFreeSwipe(wallet, swipeMeta);
 
@@ -138,7 +142,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         Account swiper = validateAccount(subSwipe.getSwiper(), identityToken);
         Account swiped = validateSwiped(subSwipe.getSwiped());
-        Wallet wallet = swiper.getWallet();
+        Wallet wallet = walletDAO.findByAccountId(swiper.getId());
         SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
 
         if (wallet.getFreeSwipe() >= swipeMeta.getSwipePoint())

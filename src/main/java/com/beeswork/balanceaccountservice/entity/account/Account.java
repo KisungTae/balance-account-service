@@ -1,10 +1,9 @@
 package com.beeswork.balanceaccountservice.entity.account;
 
+import com.beeswork.balanceaccountservice.entity.login.Role;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.match.Match;
-import com.beeswork.balanceaccountservice.entity.report.Report;
-import com.beeswork.balanceaccountservice.entity.setting.Setting;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -60,12 +59,6 @@ public class Account {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    @OneToOne(mappedBy = "account")
-    private Wallet wallet;
-
-    @OneToOne(mappedBy = "account")
-    private Setting setting;
-
     @OneToMany(mappedBy = "account",
                fetch = FetchType.LAZY,
                cascade = CascadeType.ALL,
@@ -89,4 +82,6 @@ public class Account {
                cascade = CascadeType.ALL,
                orphanRemoval = true)
     private List<PushToken> pushTokens = new ArrayList<>();
+
+
 }

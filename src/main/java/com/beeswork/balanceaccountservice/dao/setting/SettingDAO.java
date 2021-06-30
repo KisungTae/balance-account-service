@@ -7,5 +7,5 @@ import com.beeswork.balanceaccountservice.entity.setting.Setting;
 import java.util.UUID;
 
 public interface SettingDAO extends BaseDAO<Setting> {
-    Setting findById(UUID accountId);
+    Setting findByAccountId(UUID accountId);
 }

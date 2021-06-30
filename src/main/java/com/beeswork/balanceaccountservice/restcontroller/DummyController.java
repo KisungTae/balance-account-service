@@ -4,7 +4,8 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
-import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.beeswork.balanceaccountservice.dao.setting.SettingDAO;
+import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
@@ -17,6 +18,7 @@ import com.beeswork.balanceaccountservice.entity.photo.PhotoId;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.question.QQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
+import com.beeswork.balanceaccountservice.entity.setting.Setting;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeId;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
@@ -54,6 +56,8 @@ public class DummyController {
     private final AccountDAO   accountDAO;
     private final ChatDAO chatDAO;
     private final SentChatMessageDAO sentChatMessageDAO;
+    private final WalletDAO walletDAO;
+    private final SettingDAO settingDAO;
     private final GeometryFactory geometryFactory;
 
     @Autowired
@@ -63,6 +67,8 @@ public class DummyController {
                            AccountDAO accountDAO,
                            ChatDAO chatDAO,
                            SentChatMessageDAO sentChatMessageDAO,
+                           WalletDAO walletDAO,
+                           SettingDAO settingDAO,
                            GeometryFactory geometryFactory) {
         this.matchDAO = matchDAO;
         this.objectMapper = objectMapper;
@@ -70,6 +76,8 @@ public class DummyController {
         this.accountDAO = accountDAO;
         this.chatDAO = chatDAO;
         this.sentChatMessageDAO = sentChatMessageDAO;
+        this.walletDAO = walletDAO;
+        this.settingDAO = settingDAO;
         this.geometryFactory = geometryFactory;
     }
 
@@ -204,7 +212,9 @@ public class DummyController {
         wallet.setPoint(50000);
         wallet.setFreeSwipe(2000);
         wallet.setFreeSwipeRechargedAt(now);
-        account.setWallet(wallet);
+//        account.setWallet(wallet);
+//        walletDAO.persist(wallet);
+
 
 
         Point point = geometryFactory.createPoint(new Coordinate(lon, lat));
@@ -235,9 +245,15 @@ public class DummyController {
             account.getPhotos().add(photo);
         }
 
+        Setting setting = new Setting();
+        setting.setMatchPush(true);
+        setting.setClickedPush(true);
+        setting.setChatMessagePush(true);
+
         entityManager.persist(account);
         entityManager.persist(profile);
         entityManager.persist(wallet);
+        entityManager.persist(setting);
 
     }
 

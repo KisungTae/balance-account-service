@@ -23,6 +23,11 @@ public class LoginDAOImpl extends BaseDAOImpl<Login> implements LoginDAO {
     }
 
     @Override
+    public Login findById(String id) {
+        return entityManager.find(Login.class, id);
+    }
+
+    @Override
     public Login findByAccountId(UUID accountId) {
         return jpaQueryFactory.selectFrom(qLogin)
                               .where(qLogin.account.id.eq(accountId))

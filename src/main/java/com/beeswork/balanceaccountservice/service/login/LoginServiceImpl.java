@@ -31,7 +31,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         if (login == null) throw new LoginNotFoundException();
         validateAccount(login.getAccount(), identityToken);
 
-        LoginType loginType = login.getLoginId().getType();
+        LoginType loginType = login.getType();
         if (loginType == LoginType.NAVER || loginType == LoginType.GOOGLE)
             throw new EmailNotMutableException();
 
