@@ -32,6 +32,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -64,10 +65,17 @@ public class ExceptionControllerAdvice {
                        SettingNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)
     throws Exception {
-
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(exceptionResponse(exception.getExceptionCode(), null, locale));
+    }
+
+    @ExceptionHandler({UsernameNotFoundException.class})
+    public ResponseEntity<String> handleUserNameNotFoundException(UsernameNotFoundException exception, Locale locale)
+    throws Exception {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(exceptionResponse("user.name.not.found.exception", null, locale));
     }
 
     @ExceptionHandler({AccountShortOfPointException.class, AccountBlockedException.class,

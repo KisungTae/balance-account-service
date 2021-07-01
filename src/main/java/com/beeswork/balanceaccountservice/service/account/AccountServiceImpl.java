@@ -124,32 +124,27 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public DeleteAccountDTO deleteAccount(UUID accountId, UUID identityToken) {
-        Login login = loginDAO.findById("807d813d-f8e6-4235-962d-f4b9cee77a52");
-//        System.out.println("size: " + login.getRoles().size() + " !!!!!!!!!!!!!!!!!!!");
+        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
 
-        loginDAO.remove(login);
+        Login login = loginDAO.findByAccountId(accountId);
+        if (login != null) loginDAO.remove(login);
 
-//        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
-//
-//        Login login = loginDAO.findByAccountId(accountId);
-//        if (login != null) loginDAO.remove(login);
-//
-//        Profile profile = profileDAO.findById(accountId);
-//        if (profile != null) profileDAO.remove(profile);
+        Profile profile = profileDAO.findById(accountId);
+        if (profile != null) profileDAO.remove(profile);
 
         DeleteAccountDTO deleteAccountDTO = new DeleteAccountDTO();
 
-//        if (account != null) {
-//            account.getPushTokens().clear();
-//            account.getAccountQuestions().clear();
-//            account.setDeleted(true);
-//            account.setUpdatedAt(new Date());
-//
-//            List<Photo> photos = account.getPhotos();
-//            deleteAccountDTO.setAccountId(accountId);
-//            deleteAccountDTO.setPhotoKeys(photos.stream().map(Photo::getKey).collect(Collectors.toList()));
-//            photos.clear();
-//        }
+        if (account != null) {
+            account.getPushTokens().clear();
+            account.getAccountQuestions().clear();
+            account.setDeleted(true);
+            account.setUpdatedAt(new Date());
+
+            List<Photo> photos = account.getPhotos();
+            deleteAccountDTO.setAccountId(accountId);
+            deleteAccountDTO.setPhotoKeys(photos.stream().map(Photo::getKey).collect(Collectors.toList()));
+            photos.clear();
+        }
         return deleteAccountDTO;
     }
 

@@ -5,9 +5,10 @@ import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
+import com.beeswork.balanceaccountservice.service.login.LoginService;
 import com.beeswork.balanceaccountservice.service.s3.S3Service;
 import com.beeswork.balanceaccountservice.vm.account.*;
-import com.beeswork.balanceaccountservice.vm.report.ReportVM;
+import com.beeswork.balanceaccountservice.vm.login.SaveEmailVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
@@ -25,15 +26,17 @@ import java.util.List;
 public class AccountController extends BaseController {
 
     private final AccountService accountService;
+    private final LoginService loginService;
     private final S3Service s3Service;
 
     @Autowired
     public AccountController(ObjectMapper objectMapper,
                              ModelMapper modelMapper,
                              AccountService accountService,
-                             S3Service s3Service) {
+                             LoginService loginService, S3Service s3Service) {
         super(objectMapper, modelMapper);
         this.accountService = accountService;
+        this.loginService = loginService;
         this.s3Service = s3Service;
     }
 
@@ -65,5 +68,21 @@ public class AccountController extends BaseController {
                                                                          accountIdentityVM.getIdentityToken());
 //        s3Service.deletePhotosAsync(deleteAccountDTO.getAccountId(), deleteAccountDTO.getPhotoKeys());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+    }
+
+    @PostMapping("/email")
+    public ResponseEntity<String> saveEmail(@Valid @RequestBody SaveEmailVM saveEmailVM,
+                                            BindingResult bindingResult) throws JsonProcessingException {
+        if (bindingResult.hasErrors()) super.fieldExceptionResponse(bindingResult);
+        loginService.saveEmail(saveEmailVM.getAccountId(), saveEmailVM.getIdentityToken(), saveEmailVM.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+    }
+
+    @GetMapping("/email")
+    public ResponseEntity<String> getEmail(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
+                                           BindingResult bindingResult) throws JsonProcessingException {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        String email = loginService.getEmail(accountIdentityVM.getAccountId(), accountIdentityVM.getIdentityToken());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(email));
     }
 }

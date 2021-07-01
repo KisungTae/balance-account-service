@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/login")
 public class LoginController extends BaseController {
 
     private final LoginService loginService;
@@ -30,19 +29,16 @@ public class LoginController extends BaseController {
         this.loginService = loginService;
     }
 
-    @PostMapping("/email")
-    public ResponseEntity<String> saveEmail(@Valid @RequestBody SaveEmailVM saveEmailVM,
-                                            BindingResult bindingResult) throws JsonProcessingException {
-        if (bindingResult.hasErrors()) super.fieldExceptionResponse(bindingResult);
-        loginService.saveEmail(saveEmailVM.getAccountId(), saveEmailVM.getIdentityToken(), saveEmailVM.getEmail());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+    @PostMapping("/join")
+    public ResponseEntity<String> join() {
+
+
+        return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
-    @GetMapping("/email")
-    public ResponseEntity<String> getEmail(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
-                                           BindingResult bindingResult) throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        String email = loginService.getEmail(accountIdentityVM.getAccountId(), accountIdentityVM.getIdentityToken());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(email));
+    @PostMapping("/login/google")
+    public ResponseEntity<String> loginWithGoogle(String idToken) {
+
+        return ResponseEntity.status(HttpStatus.OK).body("");
     }
 }
