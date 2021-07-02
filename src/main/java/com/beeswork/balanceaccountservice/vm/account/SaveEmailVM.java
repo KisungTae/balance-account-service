@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.vm.login;
+package com.beeswork.balanceaccountservice.vm.account;
 
 import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import lombok.Getter;
