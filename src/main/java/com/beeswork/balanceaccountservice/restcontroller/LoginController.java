@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.constant.LoginType;
+import com.beeswork.balanceaccountservice.dto.login.CreateLoginDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.login.GoogleLoginService;
@@ -63,10 +64,13 @@ public class LoginController extends BaseController {
                                               BindingResult bindingResult)
     throws GeneralSecurityException, IOException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        String loginId;
+        String loginId = "";
         switch (socialLoginVM.getLoginType()) {
-            case GOOGLE: loginId = googleLoginService.validate(socialLoginVM.getLoginId(), socialLoginVM.getIdToken());
+            case GOOGLE:
+                loginId = googleLoginService.validate(socialLoginVM.getLoginId(), socialLoginVM.getIdToken());
         }
+        CreateLoginDTO createLoginDTO = loginService.createLogin(loginId, socialLoginVM.getLoginType());
+
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
 

@@ -267,16 +267,19 @@ create table sent_chat_message
 
 );
 
+drop table login;
+drop table login_role;
 
 create table login
 (
-    id         varchar(100) primary key,
+    id         varchar(100) not null,
     type       int          not null,
     account_id uuid unique  not null,
     email      varchar(256),
     password   varchar(50),
     blocked    boolean      not null,
 
+    primary key (id, type),
     constraint login_account_id_fk foreign key (account_id) references account (id)
 );
 
@@ -293,10 +296,11 @@ insert into role values (default, 'USER');
 create table login_role
 (
     login_id varchar(100) not null,
+    login_type int not null,
     role_id int not null,
 
-    primary key (login_id, role_id),
-    constraint login_role_login_id_fk foreign key (login_id) references login (id),
+    primary key (login_id, login_type, role_id),
+    constraint login_role_login_id_type_fk foreign key (login_id, login_type) references login (id, type),
     constraint login_role_role_id_fk foreign key (role_id) references role (id)
 );
 

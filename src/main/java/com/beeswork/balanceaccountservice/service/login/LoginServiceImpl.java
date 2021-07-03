@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.service.login;
 
 import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.dao.login.LoginDAO;
+import com.beeswork.balanceaccountservice.dto.login.CreateLoginDTO;
 import com.beeswork.balanceaccountservice.entity.login.Login;
 import com.beeswork.balanceaccountservice.exception.login.EmailDuplicateException;
 import com.beeswork.balanceaccountservice.exception.login.EmailNotMutableException;
@@ -22,6 +23,12 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     @Autowired
     public LoginServiceImpl(LoginDAO loginDAO) {
         this.loginDAO = loginDAO;
+    }
+
+    @Override
+    public CreateLoginDTO createLogin(String loginId, LoginType loginType) {
+
+        return null;
     }
 
     @Override
