@@ -173,6 +173,29 @@ create table account
     updated_at        timestamptz not null
 );
 
+create table role
+(
+    id   serial primary key,
+    name varchar(30) not null
+);
+
+insert into role
+values (default, 'ADMIN');
+-- insert into role
+-- values (default, 'USER');
+
+
+
+create table account_role
+(
+    account_id uuid not null,
+    role_id    int  not null,
+
+    primary key (account_id, role_id),
+    constraint account_role_account_id_fk foreign key (account_id) references account (id),
+    constraint account_role_role_id_fk foreign key (role_id) references role (id)
+);
+
 create table wallet
 (
     account_id              uuid primary key,
@@ -267,14 +290,12 @@ create table sent_chat_message
 
 );
 
-drop table login;
-drop table login_role;
 
 create table login
 (
     id         varchar(100) not null,
     type       int          not null,
-    account_id uuid unique  not null,
+    account_id uuid         not null,
     email      varchar(256),
     password   varchar(50),
     blocked    boolean      not null,
@@ -283,26 +304,6 @@ create table login
     constraint login_account_id_fk foreign key (account_id) references account (id)
 );
 
-create table role
-(
-    id serial primary key,
-    name varchar(30) not null
-);
-
-insert into role values (default, 'ADMIN');
-insert into role values (default, 'USER');
-
-
-create table login_role
-(
-    login_id varchar(100) not null,
-    login_type int not null,
-    role_id int not null,
-
-    primary key (login_id, login_type, role_id),
-    constraint login_role_login_id_type_fk foreign key (login_id, login_type) references login (id, type),
-    constraint login_role_role_id_fk foreign key (role_id) references role (id)
-);
 
 
 -- if match between 1 and 2 then
@@ -471,18 +472,23 @@ select *
 from login;
 
 select *
-from login_role;
+from account_role;
 
 select *
 from role;
 
-insert into role values (default, 'ADMIN');
-insert into role values (default, 'USER');
+insert into role
+values (default, 'ADMIN');
+insert into role
+values (default, 'USER');
 
-insert into login values ('807d813d-f8e6-4235-962d-f4b9cee77a52', 1, '807d813d-f8e6-4235-962d-f4b9cee77a52', '', '', false);
+insert into login
+values ('807d813d-f8e6-4235-962d-f4b9cee77a52', 1, '807d813d-f8e6-4235-962d-f4b9cee77a52', '', '', false);
 
-insert into login_role values ('807d813d-f8e6-4235-962d-f4b9cee77a52', 3);
-insert into login_role values ('807d813d-f8e6-4235-962d-f4b9cee77a52', 4);
+insert into account_role
+values ('807d813d-f8e6-4235-962d-f4b9cee77a52', 3);
+insert into account_role
+values ('807d813d-f8e6-4235-962d-f4b9cee77a52', 4);
 
 
 
@@ -490,7 +496,7 @@ select *
 from login;
 
 select *
-from login_role;
+from account_role;
 
 select *
 from role;
@@ -508,7 +514,8 @@ from login;
 insert into login
 values ('default', 0, '6754cf08-0211-4470-a5bb-a9853316a3f1', 'test@naver.com', '', false, current_timestamp, current_timestamp);
 
-update login set type = 1;
+update login
+set type = 1;
 
 
 update login
@@ -588,7 +595,11 @@ select *
 from profile
 where account_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860';
 
+select *
+from swipe_meta;
 
+select *
+from wallet;
 
 select chat_id, body, 0 as status, '2020-05-10T11:00:25.000Z' as createdAt, null as id, key
 from chat_message

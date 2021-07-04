@@ -34,5 +34,8 @@ public class Setting {
 
     public Setting(Account account) {
         this.account = account;
+        this.matchPush = true;
+        this.clickedPush = true;
+        this.chatMessagePush = true;
     }
 }

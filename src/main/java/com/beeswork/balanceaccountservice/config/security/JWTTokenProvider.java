@@ -25,8 +25,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JWTTokenProvider {
 
-    private String secretKey = "a8300909-ece3-4cc5-ac66-12883a8eb452";
-    private long tokenValidTime = 2 * 60 * 1000L;
+    private       String             secretKey      = "a8300909-ece3-4cc5-ac66-12883a8eb452";
+    private       long               tokenValidTime = 2 * 60 * 1000L;
     private final UserDetailsService userDetailsService;
 
     @PostConstruct
@@ -39,16 +39,16 @@ public class JWTTokenProvider {
         claims.put("roles", roles);
         Date now = new Date();
         return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + tokenValidTime))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
+                   .setClaims(claims)
+                   .setIssuedAt(now)
+                   .setExpiration(new Date(now.getTime() + tokenValidTime))
+                   .signWith(SignatureAlgorithm.HS256, secretKey)
+                   .compact();
     }
 
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(getUserName(token));
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
     }
 
     public String getUserName(String token) {

@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.constant.LoginType;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -12,6 +13,8 @@ public class SocialLoginVM {
 
     private String    idToken;
     private String    accessToken;
+
+    @NotEmpty
     private String    loginId;
 
     @NotNull

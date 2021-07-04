@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.security.GeneralSecurityException;
 import java.util.Locale;
 
 @RestControllerAdvice(annotations = RestController.class)
@@ -77,6 +78,14 @@ public class ExceptionControllerAdvice {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(exceptionResponse("user.name.not.found.exception", null, locale));
+    }
+
+    @ExceptionHandler({GeneralSecurityException.class})
+    public ResponseEntity<String> handleGeneralSecurityException(GeneralSecurityException exception, Locale locale)
+    throws Exception {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(exceptionResponse("general.security.exception", null, locale));
     }
 
     @ExceptionHandler({AccountShortOfPointException.class, AccountBlockedException.class,

@@ -11,10 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -22,16 +19,13 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Entity
 @Table(name = "login")
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class Login implements UserDetails {
+public class Login {
 
-    @Id
-    @Column(name = "id")
-    private String id;
+    @EmbeddedId
+    private LoginId loginId;
 
-    @Enumerated
-    private LoginType type;
+    @Column(name = "account_id", insertable = false, updatable = false)
+    private UUID accountId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
@@ -46,42 +40,13 @@ public class Login implements UserDetails {
     @Column(name = "blocked")
     private boolean blocked;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JoinTable(
-            name = "login_role",
-            joinColumns = {@JoinColumn(name = "login_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id")}
-    )
-    private List<Role> roles = new ArrayList<>();
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(p -> new SimpleGrantedAuthority(p.getName())).collect(Collectors.toList());
+    public Login(String id, LoginType type, Account account, String email) {
+        this.loginId = new LoginId(id, type);
+        this.account = account;
+        this.email = email;
     }
 
-    @Override
-    public String getUsername() {
-        return id;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return blocked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+    public LoginType getType() {
+        return this.loginId.getType();
     }
 }

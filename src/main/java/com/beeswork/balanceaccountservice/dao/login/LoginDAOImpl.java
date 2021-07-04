@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.dao.login;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.entity.login.Login;
+import com.beeswork.balanceaccountservice.entity.login.LoginId;
 import com.beeswork.balanceaccountservice.entity.login.QLogin;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,8 @@ public class LoginDAOImpl extends BaseDAOImpl<Login> implements LoginDAO {
     }
 
     @Override
-    public Login findById(String id) {
-        return entityManager.find(Login.class, id);
+    public Login findById(LoginId loginId) {
+        return jpaQueryFactory.selectFrom(qLogin).where(qLogin.loginId.eq(loginId)).fetchFirst();
     }
 
     @Override

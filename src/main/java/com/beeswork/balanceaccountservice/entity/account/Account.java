@@ -8,12 +8,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Getter
@@ -23,7 +27,7 @@ import java.util.*;
 @Table(name = "account")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class Account {
+public class Account implements UserDetails {
 
     @Version
     private int version;
@@ -83,5 +87,58 @@ public class Account {
                orphanRemoval = true)
     private List<PushToken> pushTokens = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JoinTable(
+            name = "account_role",
+            joinColumns = {@JoinColumn(name = "account_id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id")}
+    )
+    private List<Role> roles = new ArrayList<>();
 
+    public Account(UUID id, UUID identityToken, String name, String profilePhotoKey, Date createdAt, Date updatedAt) {
+        this.id = id;
+        this.identityToken = identityToken;
+        this.name = name;
+        this.profilePhotoKey = profilePhotoKey;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public List<String> getRoleNames() {
+        return roles.stream().map(Role::getName).collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream().map(p -> new SimpleGrantedAuthority(p.getName())).collect(Collectors.toList());
+    }
+
+    @Override
+    public String getPassword() {
+        return "";
+    }
+
+    @Override
+    public String getUsername() { return id.toString(); }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return blocked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

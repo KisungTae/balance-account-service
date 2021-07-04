@@ -37,4 +37,10 @@ public class Wallet {
     @Column(name = "free_swipe_recharged_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date freeSwipeRechargedAt;
+
+    public Wallet(Account account, int freeSwipe, Date freeSwipeRechargedAt) {
+        this.account = account;
+        this.freeSwipe = freeSwipe;
+        this.freeSwipeRechargedAt = freeSwipeRechargedAt;
+    }
 }

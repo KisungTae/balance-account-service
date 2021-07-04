@@ -1,7 +1,7 @@
 package com.beeswork.balanceaccountservice.service.login;
 
 import com.beeswork.balanceaccountservice.config.properties.GoogleLoginProperties;
-import com.beeswork.balanceaccountservice.constant.LoginType;
+import com.beeswork.balanceaccountservice.dto.login.VerifyLoginDTO;
 import com.beeswork.balanceaccountservice.exception.login.InvalidSocialLoginException;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -17,26 +17,23 @@ import java.util.Collections;
 @Service
 public class GoogleLoginServiceImpl implements GoogleLoginService {
 
-    private final GoogleLoginProperties googleLoginProperties;
+    private final GoogleIdTokenVerifier googleIdTokenVerifier;
 
     @Autowired
-    public GoogleLoginServiceImpl(GoogleLoginProperties googleLoginProperties) {
-        this.googleLoginProperties = googleLoginProperties;
+    public GoogleLoginServiceImpl(GoogleIdTokenVerifier googleIdTokenVerifier) {
+        this.googleIdTokenVerifier = googleIdTokenVerifier;
     }
 
     @Override
-    public String validate(String loginId, String idToken) throws GeneralSecurityException, IOException {
+    public VerifyLoginDTO verifyLogin(String loginId, String idToken) throws GeneralSecurityException, IOException {
         if (loginId.isEmpty() || idToken.isEmpty()) throw new InvalidSocialLoginException();
 
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                .setAudience(Collections.singletonList(googleLoginProperties.getClientId())).build();
-
-        GoogleIdToken googleIdToken = verifier.verify(idToken);
+        GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
         if (googleIdToken == null) throw new InvalidSocialLoginException();
-        else {
-            String subject = googleIdToken.getPayload().getSubject();
-            if (!loginId.equals(subject)) throw new InvalidSocialLoginException();
-            return googleIdToken.getPayload().getSubject();
-        }
+
+        String subject = googleIdToken.getPayload().getSubject();
+        String email = googleIdToken.getPayload().getEmail();
+        if (!loginId.equals(subject)) throw new InvalidSocialLoginException();
+        return new VerifyLoginDTO(subject, email);
     }
 }

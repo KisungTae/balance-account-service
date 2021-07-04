@@ -84,6 +84,8 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
                             String about,
                             int height,
                             boolean gender) {
+//        TODO: save name to account as well
+
         Account account = accountDAO.findById(accountId);
         validateAccount(account, identityToken);
         if (profileDAO.existsById(accountId)) return;

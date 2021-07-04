@@ -1,11 +1,12 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.constant.LoginType;
-import com.beeswork.balanceaccountservice.dto.login.CreateLoginDTO;
+import com.beeswork.balanceaccountservice.config.security.JWTTokenProvider;
+import com.beeswork.balanceaccountservice.dto.login.LoginDTO;
+import com.beeswork.balanceaccountservice.dto.login.VerifyLoginDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
+import com.beeswork.balanceaccountservice.exception.login.InvalidSocialLoginException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
-import com.beeswork.balanceaccountservice.service.login.GoogleLoginService;
-import com.beeswork.balanceaccountservice.service.login.LoginService;
+import com.beeswork.balanceaccountservice.service.login.*;
 import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import com.beeswork.balanceaccountservice.vm.account.SaveEmailVM;
 import com.beeswork.balanceaccountservice.vm.login.LoginVM;
@@ -26,16 +27,29 @@ import java.security.GeneralSecurityException;
 @RestController
 public class LoginController extends BaseController {
 
-    private final LoginService       loginService;
-    private final GoogleLoginService googleLoginService;
+    private final LoginService         loginService;
+    private final GoogleLoginService   googleLoginService;
+    private final KakaoLoginService    kakaoLoginService;
+    private final NaverLoginService    naverLoginService;
+    private final FacebookLoginService facebookLoginService;
+    private final JWTTokenProvider     jwtTokenProvider;
 
     @Autowired
     public LoginController(ObjectMapper objectMapper,
                            ModelMapper modelMapper,
-                           LoginService loginService, GoogleLoginService googleLoginService) {
+                           LoginService loginService,
+                           GoogleLoginService googleLoginService,
+                           KakaoLoginService kakaoLoginService,
+                           NaverLoginService naverLoginService,
+                           FacebookLoginService facebookLoginService,
+                           JWTTokenProvider jwtTokenProvider) {
         super(objectMapper, modelMapper);
         this.loginService = loginService;
         this.googleLoginService = googleLoginService;
+        this.kakaoLoginService = kakaoLoginService;
+        this.naverLoginService = naverLoginService;
+        this.facebookLoginService = facebookLoginService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @PostMapping("/login/email")
@@ -64,14 +78,27 @@ public class LoginController extends BaseController {
                                               BindingResult bindingResult)
     throws GeneralSecurityException, IOException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        String loginId = "";
+        VerifyLoginDTO verifyLoginDTO = null;
+
         switch (socialLoginVM.getLoginType()) {
             case GOOGLE:
-                loginId = googleLoginService.validate(socialLoginVM.getLoginId(), socialLoginVM.getIdToken());
+                verifyLoginDTO = googleLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getIdToken());
+                break;
+            case KAKAO:
+                verifyLoginDTO = kakaoLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+                break;
+            case NAVER:
+                verifyLoginDTO = naverLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+                break;
+            case FACEBOOK:
+                verifyLoginDTO = facebookLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+                break;
         }
-        CreateLoginDTO createLoginDTO = loginService.createLogin(loginId, socialLoginVM.getLoginType());
-
-        return ResponseEntity.status(HttpStatus.OK).body("");
+        if (verifyLoginDTO == null) throw new InvalidSocialLoginException();
+        LoginDTO loginDTO = loginService.socialLogin(verifyLoginDTO.getLoginId(),
+                                                     verifyLoginDTO.getEmail(),
+                                                     socialLoginVM.getLoginType());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
     }
 
     @PostMapping("/login")
