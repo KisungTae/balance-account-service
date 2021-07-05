@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.config.security.JWTTokenProvider;
+import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.dto.login.LoginDTO;
 import com.beeswork.balanceaccountservice.dto.login.VerifyLoginDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
@@ -80,20 +81,15 @@ public class LoginController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         VerifyLoginDTO verifyLoginDTO = null;
 
-        switch (socialLoginVM.getLoginType()) {
-            case GOOGLE:
-                verifyLoginDTO = googleLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getIdToken());
-                break;
-            case KAKAO:
-                verifyLoginDTO = kakaoLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
-                break;
-            case NAVER:
-                verifyLoginDTO = naverLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
-                break;
-            case FACEBOOK:
-                verifyLoginDTO = facebookLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
-                break;
-        }
+        if (socialLoginVM.getLoginType() == LoginType.GOOGLE)
+            verifyLoginDTO = googleLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+        else if (socialLoginVM.getLoginType() == LoginType.KAKAO)
+            verifyLoginDTO = kakaoLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+        else if (socialLoginVM.getLoginType() == LoginType.NAVER)
+            verifyLoginDTO = naverLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+        else if (socialLoginVM.getLoginType() == LoginType.FACEBOOK)
+            verifyLoginDTO = facebookLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+
         if (verifyLoginDTO == null) throw new InvalidSocialLoginException();
         LoginDTO loginDTO = loginService.socialLogin(verifyLoginDTO.getLoginId(),
                                                      verifyLoginDTO.getEmail(),

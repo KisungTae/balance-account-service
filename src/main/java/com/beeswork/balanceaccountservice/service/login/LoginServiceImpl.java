@@ -72,6 +72,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     }
 
     @Override
+    @Transactional
     public LoginDTO socialLogin(String loginId, String email, LoginType loginType) {
         if (loginId.isEmpty()) throw new InvalidSocialLoginException();
         Login login = loginDAO.findById(new LoginId(loginId, loginType));
@@ -79,7 +80,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         if (login == null) {
             Date now = new Date();
             SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
-            Account account = new Account(UUID.randomUUID(), UUID.randomUUID(), "", "", now, now);
+            Account account = new Account(now);
             login = new Login(loginId, loginType, account, email);
             Wallet wallet = new Wallet(account, swipeMeta.getMaxFreeSwipe() * swipeMeta.getSwipePoint(), now);
             Setting setting = new Setting(account);

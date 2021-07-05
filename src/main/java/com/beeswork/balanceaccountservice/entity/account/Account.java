@@ -96,13 +96,12 @@ public class Account implements UserDetails {
     )
     private List<Role> roles = new ArrayList<>();
 
-    public Account(UUID id, UUID identityToken, String name, String profilePhotoKey, Date createdAt, Date updatedAt) {
-        this.id = id;
-        this.identityToken = identityToken;
-        this.name = name;
-        this.profilePhotoKey = profilePhotoKey;
+    public Account(Date createdAt) {
+        this.identityToken = UUID.randomUUID();
+        this.name = "";
+        this.profilePhotoKey = "";
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.updatedAt = createdAt;
     }
 
     public List<String> getRoleNames() {

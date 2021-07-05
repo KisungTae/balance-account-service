@@ -148,6 +148,8 @@ drop table push_token;
 drop table profile;
 drop table report;
 drop table wallet;
+drop table account_role;
+drop table setting;
 drop table account;
 
 
@@ -455,7 +457,6 @@ insert into swipe_meta
 values (default, 200, 300, 43200000, 10, current_timestamp, current_timestamp);
 
 
-
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query Start ------------------------------------------
 ---------------------------------------------------------------------------------------------
@@ -465,206 +466,24 @@ from match
 group by swiper_id
 order by count(swiper_id) desc;
 
+
+delete from wallet;
+delete from setting;
+delete from login;
+delete from account;
+
 select *
 from account;
 
 select *
 from login;
-
-select *
-from account_role;
-
-select *
-from role;
-
-insert into role
-values (default, 'ADMIN');
-insert into role
-values (default, 'USER');
-
-insert into login
-values ('807d813d-f8e6-4235-962d-f4b9cee77a52', 1, '807d813d-f8e6-4235-962d-f4b9cee77a52', '', '', false);
-
-insert into account_role
-values ('807d813d-f8e6-4235-962d-f4b9cee77a52', 3);
-insert into account_role
-values ('807d813d-f8e6-4235-962d-f4b9cee77a52', 4);
-
-
-
-select *
-from login;
-
-select *
-from account_role;
-
-select *
-from role;
-
-select *
-from account;
-
 
 select *
 from setting;
 
 select *
-from login;
-
-insert into login
-values ('default', 0, '6754cf08-0211-4470-a5bb-a9853316a3f1', 'test@naver.com', '', false, current_timestamp, current_timestamp);
-
-update login
-set type = 1;
-
-
-update login
-set type = 1;
-
-select *
-from account;
-
-select *
-from photo
-where account_id = 'ec16330d-908f-4987-9e3f-a58b4ceebffd';
-
-delete
-from photo
-where account_id = 'ec16330d-908f-4987-9e3f-a58b4ceebffd';
-
-select *
-from account;
-
-select *
-from account_question;
-
-select a.id, p.key, min(p.sequence)
-from account a
-left join photo p on a.id = p.account_id
-where a.id in ('4cc54bea-655d-4abc-bb03-5b7e1c3c0202', 'd4c09af6-086f-426c-b704-66ebb3ddb8a8')
-group by a.id, p.key, p.sequence
-order by min(p.sequence);
-
-select *
-from account;
-
-select account_id, key, sequence
-from photo
-where account_id in ('4cc54bea-655d-4abc-bb03-5b7e1c3c0202', 'd4c09af6-086f-426c-b704-66ebb3ddb8a8')
-order by account_id, sequence;
-
-select *
-from swipe;
-
--- insert into swipe values ('f0c49c14-e528-49f8-9f6f-e3cc6c0efb51', '1fe26957-f9c5-49f3-a03f-4ec36f10f0c5', true, false, 5, false, current_timestamp, current_timestamp);
-insert into swipe
-values ('81ae6ee5-230b-44d3-b7d5-13c3dd7dc352', '1fe26957-f9c5-49f3-a03f-4ec36f10f0c5', true, false, 5, false, current_timestamp,
-        current_timestamp);
-
-
-select *
-from account;
-
-update photo
-set sequence = 4
-where key = 'Mon May 17 17:36:48 AEST 2021';
-
-select *
-from account
-where id = '89bc520c-fa42-40a4-b4f4-d50ebc3778d6';
-
-select *
-from profile
-where account_id = 'bf8510c8-453d-4795-9678-be7b7fe361f1';
-
--- bf8510c8-453d-4795-9678-be7b7fe361f1
-select *
-from swipe
-where swiper_id = '89bc520c-fa42-40a4-b4f4-d50ebc3778d6';
-
-
-select *
-from profile;
-
-
-select *
-from account
-where id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860';
-
-select *
-from profile
-where account_id = 'fbd1b88f-1499-41f0-8d20-0c31a7d73860';
-
-select *
-from swipe_meta;
-
-select *
 from wallet;
 
-select chat_id, body, 0 as status, '2020-05-10T11:00:25.000Z' as createdAt, null as id, key
-from chat_message
-inner join sent_chat_message scm on chat_message.id = scm.chat_message_id
-where id in (select chat_message_id from sent_chat_message);
-
-delete
-from sent_chat_message;
-delete
-from chat_message;
-
-
-select cm.chat_id, max(id)
-from match
-left join chat_message cm on match.chat_id = cm.chat_id
-where swiper_id = 'c2e68bd9-586b-487a-8d90-a6690516cdcd'
-group by cm.chat_id;
-
-select *
-from chat_message
-where id in (51, 55, 49);
-
-
-select *
-from account
-where id = 'c2e68bd9-586b-487a-8d90-a6690516cdcd';
-
-
-
-select *
-from swipe
-where (swiper_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b')
-   or (swiped_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiper_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b');
-
-
-delete
-from match
-where (swiper_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b')
-   or (swiped_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiper_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b');
-
-
-update swipe
-set matched = false,
-    clicked = false
-where (swiper_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiped_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b');
-
-
-update swipe
-set matched = false
-where (swiped_id = '039ddaa0-b861-457b-ab47-e4e3978ccc2f' and swiper_id = '5b4525ba-b325-4752-ae0e-00ece9201d3b');
-
-
-select *
-from photo
-where account_id = '1fe26957-f9c5-49f3-a03f-4ec36f10f0c5';
-
-
-select *
-from profile
-where account_id = '1fe26957-f9c5-49f3-a03f-4ec36f10f0c5';
-
-
-select *
-from account_question
-where account_id = '1fe26957-f9c5-49f3-a03f-4ec36f10f0c5';
 
 
 ---------------------------------------------------------------------------------------------

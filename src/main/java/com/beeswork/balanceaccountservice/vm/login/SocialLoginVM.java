@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class SocialLoginVM {
 
-    private String    idToken;
+    @NotEmpty
     private String    accessToken;
 
     @NotEmpty

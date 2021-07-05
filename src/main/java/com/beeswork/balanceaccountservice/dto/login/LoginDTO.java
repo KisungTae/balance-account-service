@@ -13,8 +13,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginDTO {
-    private UUID         accountId;
-    private UUID         identityToken;
-    private boolean      profileExists;
-    private String       jwtToken;
+    private UUID    accountId;
+    private UUID    identityToken;
+    private boolean profileExists;
+    private String  accessToken;
 }
