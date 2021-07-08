@@ -63,9 +63,8 @@ public class PushServiceImpl implements PushService {
             if (matchDTO.getPushType() == PushType.CLICKED && !setting.isClickedPush()) return;
             if (matchDTO.getPushType() == PushType.MATCHED && !setting.isMatchPush()) return;
         }
+        if (matchDTO.getPushType() == PushType.MATCHED) matchDTO.swapIds();
 
-        matchDTO.setSwipedId(null);
-        matchDTO.swapOnMatched();
         if (pushToken.getType() == PushTokenType.APS) apnsService.sendMatch(matchDTO, locale);
         else if (pushToken.getType() == PushTokenType.FCM) fcmService.sendMatch(matchDTO, pushToken.getToken(), locale);
     }

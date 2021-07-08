@@ -162,7 +162,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         subSwipe.setUpdatedAt(updatedAt);
 
         if (objSwipe == null || !objSwipe.isClicked()) {
-            clickDTO.setSubMatchDTO(new MatchDTO(PushType.CLICKED));
+            MatchDTO subMatchDTO = new MatchDTO(PushType.CLICKED);
+            subMatchDTO.setSwiperId(swiper.getId());
+            subMatchDTO.setSwipedId(swiped.getId());
+            clickDTO.setSubMatchDTO(subMatchDTO);
+
             MatchDTO objMatchDTO = new MatchDTO(PushType.CLICKED);
             objMatchDTO.setSwiperId(swiper.getId());
             objMatchDTO.setSwipedId(swiped.getId());
@@ -184,14 +188,12 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
             MatchDTO subMatchDTO = modelMapper.map(subMatch, MatchDTO.class);
             subMatchDTO.setPushType(PushType.MATCHED);
-//            subMatchDTO.setSwipedId(null);
             subMatchDTO.setName(swiped.getName());
             subMatchDTO.setProfilePhotoKey(swiped.getProfilePhotoKey());
             subMatchDTO.setChatId(chat.getId());
             clickDTO.setSubMatchDTO(subMatchDTO);
 
             MatchDTO objMatchDTO = modelMapper.map(subMatch, MatchDTO.class);
-//            objMatchDTO.setSwiperId(swiped.getId());
             objMatchDTO.setPushType(PushType.MATCHED);
             objMatchDTO.setName(swiper.getName());
             objMatchDTO.setProfilePhotoKey(swiper.getProfilePhotoKey());
