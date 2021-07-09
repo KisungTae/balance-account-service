@@ -27,6 +27,9 @@ public class PushToken {
     @Column(name = "token")
     private String token;
 
+    @Column(name = "login")
+    private boolean login;
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

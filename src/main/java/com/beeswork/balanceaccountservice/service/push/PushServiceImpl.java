@@ -55,8 +55,9 @@ public class PushServiceImpl implements PushService {
     @Override
     public void pushMatch(MatchDTO matchDTO, Locale locale) {
         if (matchDTO == null || matchDTO.getSwipedId() == null) return;
+
         PushToken pushToken = pushTokenDAO.findRecent(matchDTO.getSwipedId());
-        if (pushToken == null) return;
+        if (pushToken == null || !pushToken.isLogin()) return;
 
         Setting setting = settingDAO.findByAccountId(matchDTO.getSwipedId());
         if (setting != null) {

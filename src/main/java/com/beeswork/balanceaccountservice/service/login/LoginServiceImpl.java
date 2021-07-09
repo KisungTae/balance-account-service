@@ -5,6 +5,7 @@ import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.login.LoginDAO;
 import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
+import com.beeswork.balanceaccountservice.dao.pushtoken.PushTokenDAO;
 import com.beeswork.balanceaccountservice.dao.setting.SettingDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeMetaDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
@@ -14,6 +15,7 @@ import com.beeswork.balanceaccountservice.entity.account.Wallet;
 import com.beeswork.balanceaccountservice.entity.login.Login;
 import com.beeswork.balanceaccountservice.entity.login.LoginId;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
+import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.setting.Setting;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
 import com.beeswork.balanceaccountservice.exception.login.EmailDuplicateException;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -34,6 +37,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     private final LoginDAO         loginDAO;
     private final AccountDAO       accountDAO;
     private final SwipeMetaDAO     swipeMetaDAO;
+    private final PushTokenDAO     pushTokenDAO;
     private final WalletDAO        walletDAO;
     private final SettingDAO       settingDAO;
     private final ProfileDAO       profileDAO;
@@ -44,13 +48,14 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     public LoginServiceImpl(LoginDAO loginDAO,
                             AccountDAO accountDAO,
                             SwipeMetaDAO swipeMetaDAO,
-                            WalletDAO walletDAO,
+                            PushTokenDAO pushTokenDAO, WalletDAO walletDAO,
                             SettingDAO settingDAO,
                             ProfileDAO profileDAO,
                             JWTTokenProvider jwtTokenProvider) {
         this.loginDAO = loginDAO;
         this.accountDAO = accountDAO;
         this.swipeMetaDAO = swipeMetaDAO;
+        this.pushTokenDAO = pushTokenDAO;
         this.walletDAO = walletDAO;
         this.settingDAO = settingDAO;
         this.profileDAO = profileDAO;
@@ -97,6 +102,16 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
             validateAccount(account);
             Profile profile = profileDAO.findById(account.getId());
             boolean profileExists = profile != null && profile.isEnabled();
+
+            PushToken pushToken = pushTokenDAO.findRecent(account.getId());
+            if (pushToken != null) {
+                List<PushToken> pushTokens = pushTokenDAO.findAllByToken(pushToken.getToken());
+                for (PushToken otherPushToken : pushTokens) {
+                    if (pushToken != otherPushToken) otherPushToken.setLogin(false);
+                }
+                pushToken.setLogin(true);
+            }
+
             String jwtToken = jwtTokenProvider.createToken(account.getId().toString(), account.getRoleNames());
             return new LoginDTO(account.getId(), account.getIdentityToken(), profileExists, jwtToken);
         }

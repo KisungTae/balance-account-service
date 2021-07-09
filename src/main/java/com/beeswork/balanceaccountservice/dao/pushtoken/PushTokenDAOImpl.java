@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -34,5 +35,10 @@ public class PushTokenDAOImpl extends BaseDAOImpl<PushToken> implements PushToke
                               .orderBy(qPushToken.updatedAt.desc())
                               .limit(1)
                               .fetchFirst();
+    }
+
+    @Override
+    public List<PushToken> findAllByToken(String token) {
+        return jpaQueryFactory.selectFrom(qPushToken).where(qPushToken.token.eq(token)).fetch();
     }
 }

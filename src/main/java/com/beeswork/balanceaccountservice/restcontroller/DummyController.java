@@ -249,6 +249,7 @@ public class DummyController {
         setting.setMatchPush(true);
         setting.setClickedPush(true);
         setting.setChatMessagePush(true);
+        setting.setAccount(account);
 
         entityManager.persist(account);
         entityManager.persist(profile);

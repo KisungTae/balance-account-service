@@ -187,7 +187,6 @@ values (default, 'ADMIN');
 -- values (default, 'USER');
 
 
-
 create table account_role
 (
     account_id uuid not null,
@@ -243,6 +242,7 @@ create table push_token
 (
     account_id uuid         not null,
     type       int          not null,
+    login      boolean      not null,
     token      varchar(500) not null,
     created_at timestamptz  not null,
     updated_at timestamptz  not null,
@@ -250,6 +250,10 @@ create table push_token
     primary key (account_id, type),
     constraint push_notification_account_id_fk foreign key (account_id) references account (id)
 );
+
+create index push_token_token_idx on push_token (token);
+
+
 
 -- insert into push_token values ('136d4f5e-469c-4fc0-9d7d-d04c895bf99d', 0, 'testtoken', current_timestamp, current_timestamp);
 
@@ -467,10 +471,23 @@ group by swiper_id
 order by count(swiper_id) desc;
 
 
-delete from wallet;
-delete from setting;
-delete from login;
-delete from account;
+select swiped_id, count(swiped_id)
+from swipe
+group by swiped_id
+order by count(swiped_id) desc;
+
+select *
+from account
+where id = 'd9f94a99-9972-4e46-8e0e-26caf113e70e';
+
+delete
+from wallet;
+delete
+from setting;
+delete
+from login;
+delete
+from account;
 
 select *
 from account;
