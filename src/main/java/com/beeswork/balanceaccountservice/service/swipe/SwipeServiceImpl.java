@@ -173,6 +173,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             objMatchDTO.setName(swiper.getName());
             objMatchDTO.setProfilePhotoKey(swiper.getProfilePhotoKey());
             objMatchDTO.setUpdatedAt(updatedAt);
+            objMatchDTO.setDeleted(false);
             clickDTO.setObjMatchDTO(objMatchDTO);
         } else {
             Chat chat = new Chat();
@@ -198,6 +199,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             objMatchDTO.setName(swiper.getName());
             objMatchDTO.setProfilePhotoKey(swiper.getProfilePhotoKey());
             objMatchDTO.setChatId(chat.getId());
+            objMatchDTO.setDeleted(false);
             clickDTO.setObjMatchDTO(objMatchDTO);
         }
         return clickDTO;

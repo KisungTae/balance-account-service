@@ -478,7 +478,37 @@ order by count(swiped_id) desc;
 
 select *
 from account
-where id = 'd9f94a99-9972-4e46-8e0e-26caf113e70e';
+where id = 'fbd7f7a6-b6da-41cc-a18c-caaa9fac9623';
+
+select *
+from swipe
+where swiped_id = 'd9f94a99-9972-4e46-8e0e-26caf113e70e'
+and clicked = false;
+
+
+delete from swipe;
+
+update swipe set clicked = false;
+
+select *
+from match;
+
+
+update account set deleted = true, updated_at = current_timestamp where id = 'afca4719-2277-4b31-bd8a-ee0135b7faa9';
+
+select *
+from account_question
+where account_id = 'd9f94a99-9972-4e46-8e0e-26caf113e70e';
+
+select *
+from account
+where id = 'afca4719-2277-4b31-bd8a-ee0135b7faa9';
+
+
+
+select *
+from push_token
+where account_id = 'd9f94a99-9972-4e46-8e0e-26caf113e70e';
 
 delete
 from wallet;

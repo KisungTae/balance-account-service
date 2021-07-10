@@ -30,13 +30,6 @@ public class MatchDTO {
         this.pushType = pushType;
     }
 
-    public MatchDTO(PushType pushType, UUID swiperId, UUID swipedId, String profilePhotoKey) {
-        this.swiperId = swiperId;
-        this.pushType = pushType;
-        this.swipedId = swipedId;
-        this.profilePhotoKey = profilePhotoKey;
-    }
-
     @QueryProjection
     public MatchDTO(Long chatId,
                     UUID swipedId,
