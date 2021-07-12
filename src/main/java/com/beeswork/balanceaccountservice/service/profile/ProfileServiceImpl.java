@@ -31,8 +31,12 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
 
     private static final int SRID = 4326;
 
-    private static final int MAX_DISTANCE = 30000;
-    private static final int MIN_DISTANCE = 1000;
+    private static final int MAX_DISTANCE  = 30;
+    private static final int MIN_DISTANCE  = 1;
+    private static final int DISTANCE_UNIT = 1000;
+
+    private static final int MIN_AGE = 20;
+    private static final int MAX_AGE = 80;
 
     private static final double DEFAULT_LATITUDE  = 37.504508;
     private static final double DEFAULT_LONGITUDE = 127.048992;
@@ -130,7 +134,15 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
 
         if (distance < MIN_DISTANCE) distance = MIN_DISTANCE;
         else if (distance > MAX_DISTANCE) distance = MAX_DISTANCE;
+        distance = distance * DISTANCE_UNIT;
         int offset = pageIndex * PAGE_LIMIT;
+
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        if (minAge < MIN_AGE) minAge = MIN_AGE;
+        minAge = currentYear - minAge + 1;
+
+        if (maxAge >= MAX_AGE) maxAge = 0;
+        else maxAge = currentYear - maxAge + 1;
 
         List<CardDTO> cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, profile.getLocation());
         if (cardDTOs.size() == 0 && pageIndex > 0) {

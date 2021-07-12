@@ -254,7 +254,6 @@ create table push_token
 create index push_token_token_idx on push_token (token);
 
 
-
 -- insert into push_token values ('136d4f5e-469c-4fc0-9d7d-d04c895bf99d', 0, 'testtoken', current_timestamp, current_timestamp);
 
 
@@ -471,6 +470,8 @@ group by swiper_id
 order by count(swiper_id) desc;
 
 
+
+
 select swiped_id, count(swiped_id)
 from swipe
 group by swiped_id
@@ -478,23 +479,55 @@ order by count(swiped_id) desc;
 
 select *
 from account
-where id = 'fbd7f7a6-b6da-41cc-a18c-caaa9fac9623';
+where id = 'b40cc821-b81e-4eab-b510-118a24ae3297';
 
 select *
 from swipe
 where swiped_id = 'd9f94a99-9972-4e46-8e0e-26caf113e70e'
-and clicked = false;
+  and clicked = false;
 
 
-delete from swipe;
+delete
+from swipe;
 
-update swipe set clicked = false;
+update swipe
+set clicked = false;
 
 select *
 from match;
 
+select *
+from swipe;
 
-update account set deleted = true, updated_at = current_timestamp where id = 'afca4719-2277-4b31-bd8a-ee0135b7faa9';
+select *
+from account;
+
+insert into swipe
+values ('d9f94a99-9972-4e46-8e0e-26caf113e70e', 'fbd7f7a6-b6da-41cc-a18c-caaa9fac9623', true, false, 1, false, current_timestamp,
+        current_timestamp);
+
+insert into swipe
+values ('fbd7f7a6-b6da-41cc-a18c-caaa9fac9623', 'd9f94a99-9972-4e46-8e0e-26caf113e70e', false, false, 1, false, current_timestamp,
+        current_timestamp);
+
+select *
+from swipe
+where swiped_id = 'd9f94a99-9972-4e46-8e0e-26caf113e70e';
+
+select *
+from match
+where swiper_id = 'd9f94a99-9972-4e46-8e0e-26caf113e70e';
+
+delete from swipe;
+delete from match;
+delete from sent_chat_message;
+delete from chat_message;
+
+
+update account
+set deleted    = true,
+    updated_at = current_timestamp
+where id = 'afca4719-2277-4b31-bd8a-ee0135b7faa9';
 
 select *
 from account_question
