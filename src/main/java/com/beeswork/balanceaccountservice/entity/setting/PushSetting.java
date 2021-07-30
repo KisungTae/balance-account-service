@@ -12,8 +12,8 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "setting")
-public class Setting {
+@Table(name = "push_setting")
+public class PushSetting {
 
     @Id
     private UUID accountId;
@@ -32,7 +32,10 @@ public class Setting {
     @Column(name = "chat_message_push")
     private boolean chatMessagePush;
 
-    public Setting(Account account) {
+    @Column(name = "email_push")
+    private boolean emailPush;
+
+    public PushSetting(Account account) {
         this.account = account;
         this.matchPush = true;
         this.clickedPush = true;

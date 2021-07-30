@@ -62,8 +62,6 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
             }
         }
         listMatchesDTO.setMatchDTOs(matchDTOs);
-        listMatchesDTO.setReceivedChatMessageDTOs(chatMessageDAO.findAllUnreceived(accountId));
-        listMatchesDTO.setSentChatMessageDTOs(sentChatMessageDAO.findAllUnfetched(accountId));
         return listMatchesDTO;
     }
 

@@ -5,6 +5,7 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
+import com.beeswork.balanceaccountservice.dto.chat.ListChatMessagesDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
@@ -87,6 +88,13 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         }
     }
 
+    @Override
+    public ListChatMessagesDTO listChatMessages(UUID accountId, UUID identityToken) {
+        ListChatMessagesDTO listChatMessagesDTO = new ListChatMessagesDTO();
+        listChatMessagesDTO.setReceivedChatMessageDTOs(chatMessageDAO.findAllUnreceived(accountId));
+        listChatMessagesDTO.setSentChatMessageDTOs(sentChatMessageDAO.findAllUnfetched(accountId));
+        return listChatMessagesDTO;
+    }
 
 
     //    @Override

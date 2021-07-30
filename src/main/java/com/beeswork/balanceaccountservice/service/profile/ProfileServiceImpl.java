@@ -155,7 +155,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
 
     private Profile findValidProfile(UUID accountId, UUID identityToken) {
         Profile profile = profileDAO.findById(accountId);
-        if (profile == null) throw new AccountNotFoundException();
+        if (profile == null) throw new ProfileNotFoundException();
         validateAccount(profile.getAccount(), identityToken);
         return profile;
     }

@@ -6,7 +6,7 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.login.LoginDAO;
 import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dao.pushtoken.PushTokenDAO;
-import com.beeswork.balanceaccountservice.dao.setting.SettingDAO;
+import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeMetaDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.dto.login.LoginDTO;
@@ -16,7 +16,7 @@ import com.beeswork.balanceaccountservice.entity.login.Login;
 import com.beeswork.balanceaccountservice.entity.login.LoginId;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
-import com.beeswork.balanceaccountservice.entity.setting.Setting;
+import com.beeswork.balanceaccountservice.entity.setting.PushSetting;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
 import com.beeswork.balanceaccountservice.exception.login.EmailDuplicateException;
 import com.beeswork.balanceaccountservice.exception.login.EmailNotMutableException;
@@ -38,9 +38,9 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     private final AccountDAO       accountDAO;
     private final SwipeMetaDAO     swipeMetaDAO;
     private final PushTokenDAO     pushTokenDAO;
-    private final WalletDAO        walletDAO;
-    private final SettingDAO       settingDAO;
-    private final ProfileDAO       profileDAO;
+    private final WalletDAO      walletDAO;
+    private final PushSettingDAO pushSettingDAO;
+    private final ProfileDAO     profileDAO;
     private final JWTTokenProvider jwtTokenProvider;
 
 
@@ -49,7 +49,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
                             AccountDAO accountDAO,
                             SwipeMetaDAO swipeMetaDAO,
                             PushTokenDAO pushTokenDAO, WalletDAO walletDAO,
-                            SettingDAO settingDAO,
+                            PushSettingDAO pushSettingDAO,
                             ProfileDAO profileDAO,
                             JWTTokenProvider jwtTokenProvider) {
         this.loginDAO = loginDAO;
@@ -57,7 +57,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         this.swipeMetaDAO = swipeMetaDAO;
         this.pushTokenDAO = pushTokenDAO;
         this.walletDAO = walletDAO;
-        this.settingDAO = settingDAO;
+        this.pushSettingDAO = pushSettingDAO;
         this.profileDAO = profileDAO;
         this.jwtTokenProvider = jwtTokenProvider;
     }
@@ -88,12 +88,12 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
             Account account = new Account(now);
             login = new Login(loginId, loginType, account, email);
             Wallet wallet = new Wallet(account, swipeMeta.getMaxFreeSwipe() * swipeMeta.getSwipePoint(), now);
-            Setting setting = new Setting(account);
+            PushSetting pushSetting = new PushSetting(account);
 
             accountDAO.persist(account);
             loginDAO.persist(login);
             walletDAO.persist(wallet);
-            settingDAO.persist(setting);
+            pushSettingDAO.persist(pushSetting);
 
             String jwtToken = jwtTokenProvider.createToken(account.getId().toString(), account.getRoleNames());
             return new LoginDTO(account.getId(), account.getIdentityToken(), false, jwtToken);

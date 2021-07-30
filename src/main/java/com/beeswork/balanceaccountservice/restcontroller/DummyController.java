@@ -4,7 +4,7 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
-import com.beeswork.balanceaccountservice.dao.setting.SettingDAO;
+import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
@@ -18,7 +18,7 @@ import com.beeswork.balanceaccountservice.entity.photo.PhotoId;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.question.QQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
-import com.beeswork.balanceaccountservice.entity.setting.Setting;
+import com.beeswork.balanceaccountservice.entity.setting.PushSetting;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeId;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
@@ -56,8 +56,8 @@ public class DummyController {
     private final AccountDAO   accountDAO;
     private final ChatDAO chatDAO;
     private final SentChatMessageDAO sentChatMessageDAO;
-    private final WalletDAO walletDAO;
-    private final SettingDAO settingDAO;
+    private final WalletDAO       walletDAO;
+    private final PushSettingDAO  pushSettingDAO;
     private final GeometryFactory geometryFactory;
 
     @Autowired
@@ -68,7 +68,7 @@ public class DummyController {
                            ChatDAO chatDAO,
                            SentChatMessageDAO sentChatMessageDAO,
                            WalletDAO walletDAO,
-                           SettingDAO settingDAO,
+                           PushSettingDAO pushSettingDAO,
                            GeometryFactory geometryFactory) {
         this.matchDAO = matchDAO;
         this.objectMapper = objectMapper;
@@ -77,7 +77,7 @@ public class DummyController {
         this.chatDAO = chatDAO;
         this.sentChatMessageDAO = sentChatMessageDAO;
         this.walletDAO = walletDAO;
-        this.settingDAO = settingDAO;
+        this.pushSettingDAO = pushSettingDAO;
         this.geometryFactory = geometryFactory;
     }
 
@@ -245,16 +245,16 @@ public class DummyController {
             account.getPhotos().add(photo);
         }
 
-        Setting setting = new Setting();
-        setting.setMatchPush(true);
-        setting.setClickedPush(true);
-        setting.setChatMessagePush(true);
-        setting.setAccount(account);
+        PushSetting pushSetting = new PushSetting();
+        pushSetting.setMatchPush(true);
+        pushSetting.setClickedPush(true);
+        pushSetting.setChatMessagePush(true);
+        pushSetting.setAccount(account);
 
         entityManager.persist(account);
         entityManager.persist(profile);
         entityManager.persist(wallet);
-        entityManager.persist(setting);
+        entityManager.persist(pushSetting);
 
     }
 

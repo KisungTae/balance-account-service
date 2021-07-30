@@ -35,11 +35,11 @@ public class MatchController extends BaseController {
     @GetMapping("/list")
     public ResponseEntity<String> listMatches(@Valid @ModelAttribute ListMatchesVM listMatchesVM,
                                               BindingResult bindingResult)
-    throws JsonProcessingException {
+    throws JsonProcessingException, InterruptedException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         ListMatchesDTO listMatchesDTO = matchService.listMatches(listMatchesVM.getAccountId(),
-                                                            listMatchesVM.getIdentityToken(),
-                                                            listMatchesVM.getFetchedAt());
+                                                                 listMatchesVM.getIdentityToken(),
+                                                                 listMatchesVM.getFetchedAt());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listMatchesDTO));
     }
 

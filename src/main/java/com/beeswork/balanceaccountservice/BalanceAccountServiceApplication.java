@@ -334,6 +334,8 @@ public class BalanceAccountServiceApplication {
 
 // TODO			97. test push in regards to setting matchPUsh, clickedPUsh etc..
 
+// TODO			98. when logged, and profile does not exists or enabled = false, then send profile and photos as well so that users can continie with profile set up 
+
 // TODO			Chat Business rules
 //				1. 	send, receipt and ack || receive and ack
 //				2. 	listMatches retrieve only the chatMessages that are not received or synced

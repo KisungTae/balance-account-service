@@ -39,9 +39,12 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     @Override
     @Transactional
     public void savePhoto(UUID accountId, UUID identityToken, String photoKey, int sequence) {
+        //TODO: check getPhotos 
+
+
         Account account = validateAccount(accountDAO.findById(accountId), identityToken);
         List<Photo> photos = account.getPhotos();
-        if ( photos.size() >= PhotoConstant.MAX_NUM_OF_PHOTOS) throw new PhotoExceededMaxException();
+        if (photos.size() >= PhotoConstant.MAX_NUM_OF_PHOTOS) throw new PhotoExceededMaxException();
 
         Photo photo = photos.stream()
                             .filter(p -> p.getPhotoId().getKey().equals(photoKey))

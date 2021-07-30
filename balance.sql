@@ -1,6 +1,6 @@
 -- instagram connect --> token and api call
 -- picture max 5
--- user, liked, setting, user_picture,
+-- user, liked, pushSetting, user_picture,
 
 
 -- find srid of column
@@ -122,7 +122,7 @@ call populate_user();
 -- BALANCE-TALK DATABASE
 
 
--- setting: distance, age, gender will be included in query from front end, dont have to create a table for settings
+-- pushSetting: distance, age, gender will be included in query from front end, dont have to create a table for settings
 -- normal like does not cost, heart like costs, watch ad every 15 user cards, change question costs, add question does not costs
 
 
@@ -149,7 +149,7 @@ drop table profile;
 drop table report;
 drop table wallet;
 drop table account_role;
-drop table setting;
+drop table pushSetting;
 drop table account;
 
 
@@ -434,15 +434,19 @@ create table report
     constraint report_report_reason_id_fk foreign key (report_reason_id) references report_reason (id)
 );
 
-create table setting
+create table push_setting
 (
     account_id        uuid primary key,
     match_push        bool not null,
     clicked_push      bool not null,
     chat_message_push bool not null,
+    email_push        bool not null,
 
     constraint setting_account_id_fk foreign key (account_id) references account (id)
 );
+
+
+
 
 
 create table swipe_meta
@@ -470,7 +474,10 @@ group by swiper_id
 order by count(swiper_id) desc;
 
 
-
+delete
+from swipe;
+delete
+from match;
 
 select swiped_id, count(swiped_id)
 from swipe
@@ -480,6 +487,15 @@ order by count(swiped_id) desc;
 select *
 from account
 where id = 'b40cc821-b81e-4eab-b510-118a24ae3297';
+
+select *
+from login
+where account_id = 'b40cc821-b81e-4eab-b510-118a24ae3297';
+
+insert into login values ('default', 1, 'b40cc821-b81e-4eab-b510-118a24ae3297', 'empty', '', false);
+
+select *
+from account_question;
 
 select *
 from swipe
@@ -518,10 +534,14 @@ select *
 from match
 where swiper_id = 'd9f94a99-9972-4e46-8e0e-26caf113e70e';
 
-delete from swipe;
-delete from match;
-delete from sent_chat_message;
-delete from chat_message;
+delete
+from swipe;
+delete
+from match;
+delete
+from sent_chat_message;
+delete
+from chat_message;
 
 
 update account
@@ -546,7 +566,7 @@ where account_id = 'd9f94a99-9972-4e46-8e0e-26caf113e70e';
 delete
 from wallet;
 delete
-from setting;
+from pushSetting;
 delete
 from login;
 delete
@@ -559,7 +579,7 @@ select *
 from login;
 
 select *
-from setting;
+from pushSetting;
 
 select *
 from wallet;
