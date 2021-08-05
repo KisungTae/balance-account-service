@@ -6,6 +6,7 @@ import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
+import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
@@ -50,15 +51,15 @@ public class DummyController {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private final MatchDAO matchDAO;
-    private final ObjectMapper objectMapper;
-    private final FCMService   FCMService;
-    private final AccountDAO   accountDAO;
-    private final ChatDAO chatDAO;
+    private final MatchDAO           matchDAO;
+    private final ObjectMapper       objectMapper;
+    private final FCMService         fcmService;
+    private final AccountDAO         accountDAO;
+    private final ChatDAO            chatDAO;
     private final SentChatMessageDAO sentChatMessageDAO;
-    private final WalletDAO       walletDAO;
-    private final PushSettingDAO  pushSettingDAO;
-    private final GeometryFactory geometryFactory;
+    private final WalletDAO          walletDAO;
+    private final PushSettingDAO     pushSettingDAO;
+    private final GeometryFactory    geometryFactory;
 
     @Autowired
     public DummyController(MatchDAO matchDAO,
@@ -72,7 +73,7 @@ public class DummyController {
                            GeometryFactory geometryFactory) {
         this.matchDAO = matchDAO;
         this.objectMapper = objectMapper;
-        this.FCMService = FCMService;
+        this.fcmService = FCMService;
         this.accountDAO = accountDAO;
         this.chatDAO = chatDAO;
         this.sentChatMessageDAO = sentChatMessageDAO;
@@ -80,7 +81,6 @@ public class DummyController {
         this.pushSettingDAO = pushSettingDAO;
         this.geometryFactory = geometryFactory;
     }
-
 
 
     @Transactional
@@ -214,7 +214,6 @@ public class DummyController {
         wallet.setFreeSwipeRechargedAt(now);
 //        account.setWallet(wallet);
 //        walletDAO.persist(wallet);
-
 
 
         Point point = geometryFactory.createPoint(new Coordinate(lon, lat));
@@ -467,8 +466,6 @@ public class DummyController {
         }
 
 
-
-
 //        Random random = new Random();
 //        for (Match match : matches) {
 //            int messageCount = random.nextInt(20);
@@ -508,7 +505,6 @@ public class DummyController {
     }
 
 
-
     @GetMapping("/send/notification/clicked")
     public void sendDummyClickedNotification(@RequestParam("clickedId") String clickedId)
     throws AccountNotFoundException, FirebaseMessagingException {
@@ -542,6 +538,15 @@ public class DummyController {
 //
 //        fcmService.sendNotifications(notificationDTOs);
 
+    }
+
+    @GetMapping("/send/chat/message")
+    public void sendDummyChatMessageToFCM() {
+        ChatMessageDTO chatMessageDTO = new ChatMessageDTO(1L, "test chat message", 12L, new Date());
+        fcmService.sendChatMessage(chatMessageDTO,
+                                   "fCp0GYuvRkG5odyx2j3dqj:APA91bEyYyTTd2FB2gZVk2WiYs0G1lxrq3KXRsd8SKHlc5JxtmTy0bT8ceFPVCWNEhsUVyDWedangAxuS0AVAkx-sYN0v-SNgF9GFkLUXfpDyd_VeCgPAmmTnoSg_w0vQWvk0dYs3md0",
+                                   "michael",
+                                   Locale.getDefault());
     }
 
 

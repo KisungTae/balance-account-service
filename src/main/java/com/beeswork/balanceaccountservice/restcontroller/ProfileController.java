@@ -33,8 +33,7 @@ public class ProfileController extends BaseController {
 
     @GetMapping
     public ResponseEntity<String> getProfile(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
-                                             BindingResult bindingResult)
-    throws JsonProcessingException {
+                                             BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         ProfileDTO profileDTO = profileService.getProfile(accountIdentityVM.getAccountId(),
                                                           accountIdentityVM.getIdentityToken());

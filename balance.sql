@@ -474,6 +474,9 @@ group by swiper_id
 order by count(swiper_id) desc;
 
 
+select *
+from push_token;
+
 delete
 from swipe;
 delete
@@ -493,6 +496,22 @@ from login
 where account_id = 'b40cc821-b81e-4eab-b510-118a24ae3297';
 
 insert into login values ('default', 1, 'b40cc821-b81e-4eab-b510-118a24ae3297', 'empty', '', false);
+
+select * from profile
+where account_id = 'b40cc821-b81e-4eab-b510-118a24ae3297';
+
+select *
+from push_setting;
+
+select *
+from photo
+where account_id = 'b40cc821-b81e-4eab-b510-118a24ae3297';
+
+delete from photo where account_id = 'b40cc821-b81e-4eab-b510-118a24ae3297';
+
+
+
+insert into push_setting values ('b40cc821-b81e-4eab-b510-118a24ae3297', true, true, true, true);
 
 select *
 from account_question;
@@ -557,6 +576,8 @@ select *
 from account
 where id = 'afca4719-2277-4b31-bd8a-ee0135b7faa9';
 
+
+insert into push_setting values ()
 
 
 select *
