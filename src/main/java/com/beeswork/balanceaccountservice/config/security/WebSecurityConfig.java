@@ -38,13 +38,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-//      TODO: remove /** permit all
-
+//      TODO: remove /dummy/**
         http.httpBasic().disable()
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and().authorizeRequests()
-            .antMatchers("/**").permitAll()
             .antMatchers("/login", "/login/social", "/join", "/dummy/**").permitAll()
             .antMatchers("/admin").hasRole("ADMIN")
             .anyRequest().authenticated()

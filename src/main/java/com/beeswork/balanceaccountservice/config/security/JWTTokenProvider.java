@@ -26,12 +26,25 @@ import java.util.List;
 public class JWTTokenProvider {
 
     private       String             secretKey      = "a8300909-ece3-4cc5-ac66-12883a8eb452";
-    private       long               tokenValidTime = 2 * 60 * 1000L;
+    private final long ACCESS_TOKEN_VALID_TIME = 5 * 60 * 60 * 1000L;
+    private final long REFRESH_TOKEN_VALID_TIME =  14 * 24 * 60 * 60 * 1000L;
     private final UserDetailsService userDetailsService;
 
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+    }
+
+    public String createRefreshToken(String userName, String value) {
+        Claims claims = Jwts.claims().setSubject(userName);
+        claims.put("value", value);
+        Date now = new Date();
+        return Jwts.builder()
+                   .setClaims(claims)
+                   .setIssuedAt(now)
+                   .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_VALID_TIME))
+                   .signWith(SignatureAlgorithm.HS256, secretKey)
+                   .compact();
     }
 
     public String createToken(String userName, List<String> roles) {
@@ -41,7 +54,7 @@ public class JWTTokenProvider {
         return Jwts.builder()
                    .setClaims(claims)
                    .setIssuedAt(now)
-                   .setExpiration(new Date(now.getTime() + tokenValidTime))
+                   .setExpiration(new Date(now.getTime() + ACCESS_TOKEN_VALID_TIME))
                    .signWith(SignatureAlgorithm.HS256, secretKey)
                    .compact();
     }
@@ -57,6 +70,10 @@ public class JWTTokenProvider {
 
     public String resolveToken(HttpServletRequest httpServletRequest) {
         return httpServletRequest.getHeader("X-AUTH-TOKEN");
+    }
+
+    public String resolveRefreshToken(HttpServletRequest httpServletRequest) {
+        return httpServletRequest.getHeader("X-AUTH-REFRESH-TOKEN");
     }
 
     public boolean validateToken(String token) {

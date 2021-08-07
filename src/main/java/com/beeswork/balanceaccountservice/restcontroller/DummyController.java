@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
@@ -7,6 +8,7 @@ import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
@@ -544,9 +546,32 @@ public class DummyController {
     public void sendDummyChatMessageToFCM() {
         ChatMessageDTO chatMessageDTO = new ChatMessageDTO(1L, "test chat message", 12L, new Date());
         fcmService.sendChatMessage(chatMessageDTO,
-                                   "fCp0GYuvRkG5odyx2j3dqj:APA91bEyYyTTd2FB2gZVk2WiYs0G1lxrq3KXRsd8SKHlc5JxtmTy0bT8ceFPVCWNEhsUVyDWedangAxuS0AVAkx-sYN0v-SNgF9GFkLUXfpDyd_VeCgPAmmTnoSg_w0vQWvk0dYs3md0",
+                                   "dNx-ay3rS0qnIITWvS2ue7:APA91bHTsw7heoTkdZXiIQTvIovZEQBcLIw-hIdlv-Ti141OeUjEjW860r2WlfzVtKGqX0gYhymGJ2b_VDbNY2Ao5SbCzeTjquIPmSYb3QunGgdRuqqU8scU3QGxtXTxV9FeKFdLKsEE",
                                    "michael",
                                    Locale.getDefault());
+    }
+
+    @GetMapping("/send/match")
+    public void sendDummyMatch() {
+        MatchDTO matchDTO = new MatchDTO(1L, UUID.randomUUID(), false, "Michael", "profilephotoeky", false, true, new Date(), new Date());
+        matchDTO.setPushType(PushType.MATCHED);
+        fcmService.sendMatch(matchDTO,
+                             "dNx-ay3rS0qnIITWvS2ue7:APA91bHTsw7heoTkdZXiIQTvIovZEQBcLIw-hIdlv-Ti141OeUjEjW860r2WlfzVtKGqX0gYhymGJ2b_VDbNY2Ao5SbCzeTjquIPmSYb3QunGgdRuqqU8scU3QGxtXTxV9FeKFdLKsEE",
+                             Locale.getDefault());
+    }
+
+    @GetMapping("/send/click")
+    public void sendDummyClick() {
+        MatchDTO matchDTO = new MatchDTO(PushType.CLICKED);
+        matchDTO.setSwiperId(UUID.randomUUID());
+        matchDTO.setSwipedId(UUID.randomUUID());
+        matchDTO.setName("Michael");
+        matchDTO.setProfilePhotoKey("profile key");
+        matchDTO.setUpdatedAt(new Date());
+        matchDTO.setDeleted(false);
+        fcmService.sendMatch(matchDTO,
+                             "dNx-ay3rS0qnIITWvS2ue7:APA91bHTsw7heoTkdZXiIQTvIovZEQBcLIw-hIdlv-Ti141OeUjEjW860r2WlfzVtKGqX0gYhymGJ2b_VDbNY2Ao5SbCzeTjquIPmSYb3QunGgdRuqqU8scU3QGxtXTxV9FeKFdLKsEE",
+                             Locale.getDefault());
     }
 
 

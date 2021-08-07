@@ -1,5 +1,7 @@
 package com.beeswork.balanceaccountservice.dto.chat;
 
+import com.beeswork.balanceaccountservice.constant.PushType;
+import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class ChatMessageDTO {
+    private PushType pushType = PushType.CHAT_MESSAGE;
     private Long id;
     private UUID accountId;
     private UUID recipientId;

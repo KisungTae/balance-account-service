@@ -12,6 +12,7 @@ import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import com.beeswork.balanceaccountservice.vm.account.SaveEmailVM;
 import com.beeswork.balanceaccountservice.vm.login.LoginVM;
 import com.beeswork.balanceaccountservice.vm.login.SocialLoginVM;
+import com.beeswork.balanceaccountservice.vm.login.RefreshJwtTokenVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
@@ -104,5 +105,13 @@ public class LoginController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
 
         return ResponseEntity.status(HttpStatus.OK).body("");
+    }
+
+    @PostMapping("/login/token/refresh")
+    public ResponseEntity<String> refreshJwtToken(@Valid @RequestBody RefreshJwtTokenVM refreshJwtTokenVM,
+                                                  BindingResult bindingResult) throws JsonProcessingException {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        LoginDTO loginDTO = loginService.refreshToken(refreshJwtTokenVM.getJwtToken(), refreshJwtTokenVM.getRefreshToken());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
     }
 }

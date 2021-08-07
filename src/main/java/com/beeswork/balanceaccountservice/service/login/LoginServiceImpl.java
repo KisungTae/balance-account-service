@@ -142,4 +142,10 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         validateAccount(login.getAccount(), identityToken);
         return login.getEmail();
     }
+
+    @Override
+    public LoginDTO refreshToken(String jwtToken, String refreshToken) {
+
+        return null;
+    }
 }
