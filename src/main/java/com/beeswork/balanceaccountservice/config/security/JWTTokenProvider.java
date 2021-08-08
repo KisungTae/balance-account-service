@@ -47,7 +47,7 @@ public class JWTTokenProvider {
                    .compact();
     }
 
-    public String createToken(String userName, List<String> roles) {
+    public String createAccessToken(String userName, List<String> roles) {
         Claims claims = Jwts.claims().setSubject(userName);
         claims.put("roles", roles);
         Date now = new Date();
@@ -68,7 +68,7 @@ public class JWTTokenProvider {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public String resolveToken(HttpServletRequest httpServletRequest) {
+    public String resolveAccessToken(HttpServletRequest httpServletRequest) {
         return httpServletRequest.getHeader("X-AUTH-TOKEN");
     }
 

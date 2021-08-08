@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.config.security.JWTTokenProvider;
 import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.login.LoginDAO;
+import com.beeswork.balanceaccountservice.dao.login.RefreshTokenDAO;
 import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dao.pushtoken.PushTokenDAO;
 import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
@@ -18,6 +19,7 @@ import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.setting.PushSetting;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
+import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.login.EmailDuplicateException;
 import com.beeswork.balanceaccountservice.exception.login.EmailNotMutableException;
 import com.beeswork.balanceaccountservice.exception.login.InvalidSocialLoginException;
@@ -41,6 +43,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     private final WalletDAO      walletDAO;
     private final PushSettingDAO pushSettingDAO;
     private final ProfileDAO     profileDAO;
+    private final RefreshTokenDAO refreshTokenDAO;
     private final JWTTokenProvider jwtTokenProvider;
 
 
@@ -51,7 +54,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
                             PushTokenDAO pushTokenDAO, WalletDAO walletDAO,
                             PushSettingDAO pushSettingDAO,
                             ProfileDAO profileDAO,
-                            JWTTokenProvider jwtTokenProvider) {
+                            RefreshTokenDAO refreshTokenDAO, JWTTokenProvider jwtTokenProvider) {
         this.loginDAO = loginDAO;
         this.accountDAO = accountDAO;
         this.swipeMetaDAO = swipeMetaDAO;
@@ -59,6 +62,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         this.walletDAO = walletDAO;
         this.pushSettingDAO = pushSettingDAO;
         this.profileDAO = profileDAO;
+        this.refreshTokenDAO = refreshTokenDAO;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
@@ -95,8 +99,9 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
             walletDAO.persist(wallet);
             pushSettingDAO.persist(pushSetting);
 
-            String jwtToken = jwtTokenProvider.createToken(account.getId().toString(), account.getRoleNames());
-            return new LoginDTO(account.getId(), account.getIdentityToken(), false, jwtToken);
+            String jwtToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
+            String refreshToken = jwtTokenProvider.createRefreshToken(account.getId().toString(), UUID.randomUUID().toString());
+            return new LoginDTO(account.getId(), account.getIdentityToken(), false, jwtToken, refreshToken);
         } else {
             Account account = accountDAO.findById(login.getAccountId());
             validateAccount(account);
@@ -112,8 +117,9 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
                 pushToken.setLogin(true);
             }
 
-            String jwtToken = jwtTokenProvider.createToken(account.getId().toString(), account.getRoleNames());
-            return new LoginDTO(account.getId(), account.getIdentityToken(), profileExists, jwtToken);
+            String jwtToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
+            String refreshToken = jwtTokenProvider.createRefreshToken(account.getId().toString(), UUID.randomUUID().toString());
+            return new LoginDTO(account.getId(), account.getIdentityToken(), profileExists, jwtToken, refreshToken);
         }
     }
 
@@ -144,7 +150,32 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     }
 
     @Override
-    public LoginDTO refreshToken(String jwtToken, String refreshToken) {
+    public LoginDTO refreshToken(String refreshToken) {
+
+        return null;
+    }
+
+    @Override
+    public LoginDTO validateLogin(String accessToken, String refreshToken) {
+        String userName = jwtTokenProvider.getUserName(accessToken);
+        if (!userName.equals(jwtTokenProvider.getUserName(refreshToken))) throw new BadRequestException();
+        if (!jwtTokenProvider.validateToken(refreshToken)) throw new BadRequestException();
+
+        Account account = accountDAO.findById(UUID.fromString(userName));
+        if (account == null || account.isBlocked() || account.isDeleted()) throw new BadRequestException();
+
+
+
+
+
+        // check if account id is same from access toekn and refresh token
+        // check refresh token expiration date
+        // account delted blockd check
+        // refresh create save
+        // check rpofile,
+        //
+
+
 
         return null;
     }

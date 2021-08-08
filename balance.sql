@@ -149,7 +149,7 @@ drop table profile;
 drop table report;
 drop table wallet;
 drop table account_role;
-drop table pushSetting;
+-- drop table pushSetting;
 drop table account;
 
 
@@ -185,6 +185,20 @@ insert into role
 values (default, 'ADMIN');
 -- insert into role
 -- values (default, 'USER');
+
+create table refresh_token
+(
+    id         bigserial primary key,
+    account_id uuid         not null,
+    key      varchar(100) not null,
+    updated_at timestamptz  not null,
+
+    constraint refresh_token_account_id_fk foreign key (account_id) references account (id)
+);
+
+
+
+drop table refresh_token;
 
 
 create table account_role
@@ -447,8 +461,6 @@ create table push_setting
 
 
 
-
-
 create table swipe_meta
 (
     id                serial primary key,
@@ -495,9 +507,11 @@ select *
 from login
 where account_id = 'b40cc821-b81e-4eab-b510-118a24ae3297';
 
-insert into login values ('default', 1, 'b40cc821-b81e-4eab-b510-118a24ae3297', 'empty', '', false);
+insert into login
+values ('default', 1, 'b40cc821-b81e-4eab-b510-118a24ae3297', 'empty', '', false);
 
-select * from profile
+select *
+from profile
 where account_id = 'b40cc821-b81e-4eab-b510-118a24ae3297';
 
 select *
@@ -507,11 +521,14 @@ select *
 from photo
 where account_id = 'b40cc821-b81e-4eab-b510-118a24ae3297';
 
-delete from photo where account_id = 'b40cc821-b81e-4eab-b510-118a24ae3297';
+delete
+from photo
+where account_id = 'b40cc821-b81e-4eab-b510-118a24ae3297';
 
 
 
-insert into push_setting values ('b40cc821-b81e-4eab-b510-118a24ae3297', true, true, true, true);
+insert into push_setting
+values ('b40cc821-b81e-4eab-b510-118a24ae3297', true, true, true, true);
 
 select *
 from account_question;
@@ -577,7 +594,8 @@ from account
 where id = 'afca4719-2277-4b31-bd8a-ee0135b7faa9';
 
 
-insert into push_setting values ()
+insert into push_setting
+values ()
 
 
 select *

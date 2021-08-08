@@ -17,4 +17,5 @@ public class LoginDTO {
     private UUID    identityToken;
     private boolean profileExists;
     private String  jwtToken;
+    private String  refreshToken;
 }

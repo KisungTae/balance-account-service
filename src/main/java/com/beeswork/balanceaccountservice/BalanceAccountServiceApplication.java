@@ -336,6 +336,10 @@ public class BalanceAccountServiceApplication {
 
 // TODO			98. when logged, and profile does not exists or enabled = false, then send profile and photos as well so that users can continie with profile set up 
 
+// TODO			99. check how it works, isAccountNonExpired in Account, should I use for delete, check delete fun
+
+// TODO			100. validateAccount should be in security check not each service?
+
 // TODO			Chat Business rules
 //				1. 	send, receipt and ack || receive and ack
 //				2. 	listMatches retrieve only the chatMessages that are not received or synced
