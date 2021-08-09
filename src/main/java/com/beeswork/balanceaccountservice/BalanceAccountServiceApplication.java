@@ -340,6 +340,7 @@ public class BalanceAccountServiceApplication {
 
 // TODO			100. validateAccount should be in security check not each service?
 
+
 // TODO			Chat Business rules
 //				1. 	send, receipt and ack || receive and ack
 //				2. 	listMatches retrieve only the chatMessages that are not received or synced

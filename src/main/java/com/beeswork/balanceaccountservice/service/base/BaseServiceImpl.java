@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountDeletedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipedBlockedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedDeletedException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import org.apache.commons.lang3.time.DateUtils;
@@ -31,6 +32,7 @@ public abstract class BaseServiceImpl {
     protected Account validateSwiped(Account account) {
         if (account == null) throw new SwipedNotFoundException();
         if (account.isDeleted()) throw new SwipedDeletedException();
+        if (account.isBlocked()) throw new SwipedBlockedException();
         return account;
     }
 

@@ -190,7 +190,7 @@ create table refresh_token
 (
     id         bigserial primary key,
     account_id uuid         not null,
-    key      varchar(100) not null,
+    key      uuid not null,
     updated_at timestamptz  not null,
 
     constraint refresh_token_account_id_fk foreign key (account_id) references account (id)

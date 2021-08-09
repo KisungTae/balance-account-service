@@ -28,12 +28,16 @@ public class RefreshToken {
     private Account account;
 
     @Column(name = "key")
-    private String key;
+    private UUID key;
 
     @Column(name = "account_id", insertable = false, updatable = false)
-    private UUID acountId;
+    private UUID accountId;
 
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
+    public RefreshToken(Account account) {
+        this.account = account;
+    }
 }

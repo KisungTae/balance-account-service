@@ -24,9 +24,9 @@ import java.util.UUID;
 @Service
 public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
 
-    private final MatchDAO matchDAO;
-    private final ChatMessageDAO chatMessageDAO;
-    private final AccountDAO accountDAO;
+    private final MatchDAO           matchDAO;
+    private final ChatMessageDAO     chatMessageDAO;
+    private final AccountDAO         accountDAO;
     private final SentChatMessageDAO sentChatMessageDAO;
 
 
@@ -51,7 +51,8 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         Account swiped = match.getSwiped();
         Chat chat = match.getChat();
         if (swiped == null || chat == null || chat.getId() != chatId) return null;
-        if (match.isUnmatched() || match.getSwiped().isDeleted()) return StompHeader.UNMATCHED_RECEIPT_ID;
+        if (match.isUnmatched() || match.getSwiped().isDeleted() || match.getSwiped().isBlocked())
+            return StompHeader.UNMATCHED_RECEIPT_ID;
 
         SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(accountId, key);
         if (sentChatMessage == null) {

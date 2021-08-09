@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.chat.ListChatMessagesDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
@@ -41,7 +42,8 @@ public class ChatController {
 
     @MessageMapping("/chat/send")
     public void send(@Payload ChatMessageVM chatMessageVM, MessageHeaders messageHeaders) {
-        stompService.sendChatMessage(modelMapper.map(chatMessageVM, ChatMessageDTO.class), messageHeaders);
+        if (chatMessageVM.getId() != null && chatMessageVM.getId() != StompHeader.UNMATCHED_RECEIPT_ID)
+            stompService.sendChatMessage(modelMapper.map(chatMessageVM, ChatMessageDTO.class), messageHeaders);
     }
 
     @PostMapping("/message/sync")

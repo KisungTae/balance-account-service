@@ -22,6 +22,6 @@ public class RefreshTokenDAOImpl extends BaseDAOImpl<RefreshToken> implements Re
 
     @Override
     public RefreshToken findByAccountId(UUID accountId) {
-        return jpaQueryFactory.selectFrom(qRefreshToken).where(qRefreshToken.acountId.eq(accountId)).fetchFirst();
+        return jpaQueryFactory.selectFrom(qRefreshToken).where(qRefreshToken.accountId.eq(accountId)).fetchFirst();
     }
 }

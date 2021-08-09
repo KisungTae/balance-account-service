@@ -12,8 +12,7 @@ import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import com.beeswork.balanceaccountservice.vm.account.SaveEmailVM;
 import com.beeswork.balanceaccountservice.vm.login.LoginVM;
 import com.beeswork.balanceaccountservice.vm.login.SocialLoginVM;
-import com.beeswork.balanceaccountservice.vm.login.RefreshJwtTokenVM;
-import com.beeswork.balanceaccountservice.vm.login.ValidateLoginVM;
+import com.beeswork.balanceaccountservice.vm.login.RefreshAccessToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
@@ -108,19 +107,19 @@ public class LoginController extends BaseController {
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
-    @PostMapping("/login/validate")
-    public ResponseEntity<String> validateLogin(@Valid @RequestBody ValidateLoginVM validateLoginVM,
-                                                BindingResult bindingResult) throws JsonProcessingException {
+    @PostMapping("/login/refresh-token")
+    public ResponseEntity<String> loginWithRefreshToken(@Valid @RequestBody RefreshAccessToken refreshAccessToken,
+                                                        BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        LoginDTO loginDTO = loginService.validateLogin(validateLoginVM.getAccessToken(), validateLoginVM.getRefreshToken());
+        LoginDTO loginDTO = loginService.loginWithRefreshToken(refreshAccessToken.getAccessToken(), refreshAccessToken.getRefreshToken());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
     }
 
-    @PostMapping("/login/token/refresh")
-    public ResponseEntity<String> refreshJwtToken(@Valid @RequestBody RefreshJwtTokenVM refreshJwtTokenVM,
-                                                  BindingResult bindingResult) throws JsonProcessingException {
+    @PostMapping("/login/access-token/refresh")
+    public ResponseEntity<String> refreshAccessToken(@Valid @RequestBody RefreshAccessToken refreshAccessToken,
+                                                     BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        LoginDTO loginDTO = loginService.refreshToken(refreshJwtTokenVM.getRefreshToken());
+        LoginDTO loginDTO = loginService.refreshAccessToken(refreshAccessToken.getRefreshToken());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
     }
 }

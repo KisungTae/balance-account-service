@@ -3,9 +3,15 @@ package com.beeswork.balanceaccountservice.vm.login;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotEmpty;
+
 @Getter
 @Setter
-public class RefreshJwtTokenVM {
-    private String jwtToken;
+public class RefreshAccessToken {
+
+    @NotEmpty
+    private String accessToken;
+
+    @NotEmpty
     private String refreshToken;
 }

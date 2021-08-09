@@ -10,6 +10,6 @@ public interface LoginService {
     LoginDTO socialLogin(String loginId, String email, LoginType loginType);
     void saveEmail(UUID accountId, UUID identityToken, String email);
     String getEmail(UUID accountId, UUID identityToken);
-    LoginDTO refreshToken(String refreshToken);
-    LoginDTO validateLogin(String accessToken, String refreshToken);
+    LoginDTO refreshAccessToken(String refreshToken);
+    LoginDTO loginWithRefreshToken(String accessToken, String refreshToken);
 }
