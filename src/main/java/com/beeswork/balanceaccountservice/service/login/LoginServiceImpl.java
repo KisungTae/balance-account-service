@@ -158,10 +158,9 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
 
     @Override
     @Transactional
-    public LoginDTO loginWithRefreshToken(String accessToken, String refreshToken) {
-        String userName = jwtTokenProvider.getUserName(accessToken);
-        if (!userName.equals(jwtTokenProvider.getUserName(refreshToken))) throw new BadRequestException();
+    public LoginDTO loginWithRefreshToken(String refreshToken) {
         if (!jwtTokenProvider.validateToken(refreshToken)) throw new RefreshTokenExpiredException();
+        String userName = jwtTokenProvider.getUserName(refreshToken);
 
         Account account = accountDAO.findById(UUID.fromString(userName));
         if (account == null) throw new AccountNotFoundException();
@@ -169,7 +168,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         else if (account.isDeleted()) throw new AccountDeletedException();
 
         RefreshToken accountRefreshToken = refreshTokenDAO.findByAccountId(UUID.fromString(userName));
-        if (accessToken == null) throw new RefreshTokenNotFoundException();
+        if (accountRefreshToken == null) throw new RefreshTokenNotFoundException();
 
         LoginDTO loginDTO = new LoginDTO();
         loginDTO.setAccountId(account.getId());

@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -111,8 +112,8 @@ public class LoginController extends BaseController {
     public ResponseEntity<String> loginWithRefreshToken(@Valid @RequestBody RefreshAccessToken refreshAccessToken,
                                                         BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        LoginDTO loginDTO = loginService.loginWithRefreshToken(refreshAccessToken.getAccessToken(), refreshAccessToken.getRefreshToken());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
+        LoginDTO loginDTO = loginService.loginWithRefreshToken(refreshAccessToken.getRefreshToken());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
     @PostMapping("/login/access-token/refresh")

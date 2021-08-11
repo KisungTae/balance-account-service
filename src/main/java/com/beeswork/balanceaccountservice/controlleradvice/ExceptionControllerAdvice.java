@@ -7,9 +7,7 @@ import com.beeswork.balanceaccountservice.constant.PhotoConstant;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 import com.beeswork.balanceaccountservice.exception.account.*;
-import com.beeswork.balanceaccountservice.exception.login.EmailNotMutableException;
-import com.beeswork.balanceaccountservice.exception.login.InvalidSocialLoginException;
-import com.beeswork.balanceaccountservice.exception.login.LoginNotFoundException;
+import com.beeswork.balanceaccountservice.exception.login.*;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoAlreadyExistsException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoExceededMaxException;
@@ -24,7 +22,6 @@ import com.beeswork.balanceaccountservice.exception.setting.SettingNotFoundExcep
 import com.beeswork.balanceaccountservice.exception.stomp.QueueNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.*;
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
-import com.beeswork.balanceaccountservice.exception.login.EmailDuplicateException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +91,8 @@ public class ExceptionControllerAdvice {
                        QuestionSetChangedException.class, EmailNotMutableException.class,
                        EmailDuplicateException.class, PhotoInvalidDeleteException.class,
                        AccountDeletedException.class, PhotoAlreadyExistsException.class,
-                       PhotoExceededMaxException.class, InvalidSocialLoginException.class})
+                       PhotoExceededMaxException.class, InvalidSocialLoginException.class,
+                       RefreshTokenExpiredException.class, RefreshTokenNotFoundException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {
         Object[] arguments = null;

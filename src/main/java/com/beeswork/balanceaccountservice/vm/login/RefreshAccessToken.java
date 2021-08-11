@@ -10,8 +10,5 @@ import javax.validation.constraints.NotEmpty;
 public class RefreshAccessToken {
 
     @NotEmpty
-    private String accessToken;
-
-    @NotEmpty
     private String refreshToken;
 }

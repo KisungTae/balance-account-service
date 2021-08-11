@@ -28,6 +28,7 @@ public class JWTTokenProvider {
     private       String             secretKey      = "a8300909-ece3-4cc5-ac66-12883a8eb452";
     private final long ACCESS_TOKEN_VALID_TIME = 5 * 60 * 60 * 1000L;
     private final long REFRESH_TOKEN_VALID_TIME =  14 * 24 * 60 * 60 * 1000L;
+    private final String ACCESS_TOKEN = "ACCESS-TOKEN";
     private final UserDetailsService userDetailsService;
 
     @PostConstruct
@@ -69,11 +70,7 @@ public class JWTTokenProvider {
     }
 
     public String resolveAccessToken(HttpServletRequest httpServletRequest) {
-        return httpServletRequest.getHeader("X-AUTH-TOKEN");
-    }
-
-    public String resolveRefreshToken(HttpServletRequest httpServletRequest) {
-        return httpServletRequest.getHeader("X-AUTH-REFRESH-TOKEN");
+        return httpServletRequest.getHeader(ACCESS_TOKEN);
     }
 
     public boolean validateToken(String token) {
@@ -81,6 +78,7 @@ public class JWTTokenProvider {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
+            System.out.println("excepiton validate token: " + e.getLocalizedMessage());
             return false;
         }
     }

@@ -11,5 +11,5 @@ public interface LoginService {
     void saveEmail(UUID accountId, UUID identityToken, String email);
     String getEmail(UUID accountId, UUID identityToken);
     LoginDTO refreshAccessToken(String refreshToken);
-    LoginDTO loginWithRefreshToken(String accessToken, String refreshToken);
+    LoginDTO loginWithRefreshToken(String refreshToken);
 }

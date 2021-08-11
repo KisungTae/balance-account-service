@@ -12,10 +12,10 @@ import javax.validation.constraints.NotNull;
 public class SocialLoginVM {
 
     @NotEmpty
-    private String    accessToken;
+    private String accessToken;
 
     @NotEmpty
-    private String    loginId;
+    private String loginId;
 
     @NotNull
     private LoginType loginType;
