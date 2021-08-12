@@ -10,6 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VerifyLoginDTO {
-    private String loginId;
+    private String socialLoginId;
     private String email;
 }

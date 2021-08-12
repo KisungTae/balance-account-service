@@ -22,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -80,21 +79,25 @@ public class LoginController extends BaseController {
     public ResponseEntity<String> socialLogin(@Valid @RequestBody SocialLoginVM socialLoginVM,
                                               BindingResult bindingResult)
     throws GeneralSecurityException, IOException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        VerifyLoginDTO verifyLoginDTO = null;
+//        if (bindingResult.hasErrors()) throw new BadRequestException();
+//        VerifyLoginDTO verifyLoginDTO = null;
+//
+//        if (socialLoginVM.getLoginType() == LoginType.GOOGLE)
+//            verifyLoginDTO = googleLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+//        else if (socialLoginVM.getLoginType() == LoginType.KAKAO)
+//            verifyLoginDTO = kakaoLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+//        else if (socialLoginVM.getLoginType() == LoginType.NAVER)
+//            verifyLoginDTO = naverLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+//        else if (socialLoginVM.getLoginType() == LoginType.FACEBOOK)
+//            verifyLoginDTO = facebookLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+//
+//        if (verifyLoginDTO == null) throw new InvalidSocialLoginException();
+//        LoginDTO loginDTO = loginService.socialLogin(verifyLoginDTO.getSocialLoginId(),
+//                                                     verifyLoginDTO.getEmail(),
+//                                                     socialLoginVM.getLoginType());
 
-        if (socialLoginVM.getLoginType() == LoginType.GOOGLE)
-            verifyLoginDTO = googleLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
-        else if (socialLoginVM.getLoginType() == LoginType.KAKAO)
-            verifyLoginDTO = kakaoLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
-        else if (socialLoginVM.getLoginType() == LoginType.NAVER)
-            verifyLoginDTO = naverLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
-        else if (socialLoginVM.getLoginType() == LoginType.FACEBOOK)
-            verifyLoginDTO = facebookLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
-
-        if (verifyLoginDTO == null) throw new InvalidSocialLoginException();
-        LoginDTO loginDTO = loginService.socialLogin(verifyLoginDTO.getLoginId(),
-                                                     verifyLoginDTO.getEmail(),
+        LoginDTO loginDTO = loginService.socialLogin("abcd",
+                                                     "abcd@gmail.com",
                                                      socialLoginVM.getLoginType());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
     }

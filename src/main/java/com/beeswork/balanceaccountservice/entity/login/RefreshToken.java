@@ -18,9 +18,7 @@ import java.util.UUID;
 public class RefreshToken {
 
     @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private UUID accountId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
@@ -29,9 +27,6 @@ public class RefreshToken {
 
     @Column(name = "key")
     private UUID key;
-
-    @Column(name = "account_id", insertable = false, updatable = false)
-    private UUID accountId;
 
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)

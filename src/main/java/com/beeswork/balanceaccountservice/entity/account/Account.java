@@ -96,8 +96,8 @@ public class Account implements UserDetails {
     )
     private List<Role> roles = new ArrayList<>();
 
-    public Account(Date createdAt) {
-        this.identityToken = UUID.randomUUID();
+    public Account(UUID identityToken, Date createdAt) {
+        this.identityToken = identityToken;
         this.name = "";
         this.profilePhotoKey = "";
         this.createdAt = createdAt;

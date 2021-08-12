@@ -18,4 +18,13 @@ public class LoginDTO {
     private boolean profileExists;
     private String  accessToken;
     private String  refreshToken;
+    private String  email;
+
+    public LoginDTO(UUID accountId, UUID identityToken, boolean profileExists, String accessToken, String refreshToken) {
+        this.accountId = accountId;
+        this.identityToken = identityToken;
+        this.profileExists = profileExists;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+    }
 }

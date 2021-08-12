@@ -150,6 +150,8 @@ drop table report;
 drop table wallet;
 drop table account_role;
 -- drop table pushSetting;
+drop table push_setting;
+drop table refresh_token;
 drop table account;
 
 
@@ -175,30 +177,14 @@ create table account
     updated_at        timestamptz not null
 );
 
-create table role
-(
-    id   serial primary key,
-    name varchar(30) not null
-);
-
-insert into role
-values (default, 'ADMIN');
--- insert into role
--- values (default, 'USER');
-
 create table refresh_token
 (
-    id         bigserial primary key,
-    account_id uuid         not null,
+    account_id uuid         primary key,
     key      uuid not null,
     updated_at timestamptz  not null,
 
     constraint refresh_token_account_id_fk foreign key (account_id) references account (id)
 );
-
-
-
-drop table refresh_token;
 
 
 create table account_role
@@ -416,22 +402,7 @@ create index swipe_swiper_id_idx on swipe (swiper_id);
 create index swipe_swiped_id_idx on swipe (swiped_id);
 
 
-create table report_reason
-(
-    id   serial primary key,
-    name varchar(50)
-);
 
-insert into report_reason
-values (default, 'inappropriate messages');
-insert into report_reason
-values (default, 'inappropriate photos');
-insert into report_reason
-values (default, 'feels like spam');
-insert into report_reason
-values (default, 'user is underage');
-insert into report_reason
-values (default, 'other');
 
 
 create table report
@@ -475,6 +446,36 @@ create table swipe_meta
 insert into swipe_meta
 values (default, 200, 300, 43200000, 10, current_timestamp, current_timestamp);
 
+
+
+
+create table role
+(
+    id   serial primary key,
+    name varchar(30) not null
+);
+
+insert into role
+values (default, 'ADMIN');
+-- insert into role
+-- values (default, 'USER');
+
+create table report_reason
+(
+    id   serial primary key,
+    name varchar(50)
+);
+
+insert into report_reason
+values (default, 'inappropriate messages');
+insert into report_reason
+values (default, 'inappropriate photos');
+insert into report_reason
+values (default, 'feels like spam');
+insert into report_reason
+values (default, 'user is underage');
+insert into report_reason
+values (default, 'other');
 
 ---------------------------------------------------------------------------------------------
 -------------------------------------- Query Start ------------------------------------------
