@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.config.security;
 
+import com.beeswork.balanceaccountservice.exception.login.RefreshTokenNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -29,6 +30,8 @@ public class JWTTokenProvider {
     private final long ACCESS_TOKEN_VALID_TIME = 5 * 60 * 60 * 1000L;
     private final long REFRESH_TOKEN_VALID_TIME =  14 * 24 * 60 * 60 * 1000L;
     private final String ACCESS_TOKEN = "ACCESS-TOKEN";
+    private final String REFRESH_TOKEN_KEY = "key";
+    private final String ACCESS_TOKEN_ROLES = "roles";
     private final UserDetailsService userDetailsService;
 
     @PostConstruct
@@ -36,9 +39,9 @@ public class JWTTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createRefreshToken(String userName, String value) {
+    public String createRefreshToken(String userName, String key) {
         Claims claims = Jwts.claims().setSubject(userName);
-        claims.put("value", value);
+        claims.put(REFRESH_TOKEN_KEY, key);
         Date now = new Date();
         return Jwts.builder()
                    .setClaims(claims)
@@ -50,7 +53,7 @@ public class JWTTokenProvider {
 
     public String createAccessToken(String userName, List<String> roles) {
         Claims claims = Jwts.claims().setSubject(userName);
-        claims.put("roles", roles);
+        claims.put(ACCESS_TOKEN_ROLES, roles);
         Date now = new Date();
         return Jwts.builder()
                    .setClaims(claims)
@@ -71,6 +74,12 @@ public class JWTTokenProvider {
 
     public String resolveAccessToken(HttpServletRequest httpServletRequest) {
         return httpServletRequest.getHeader(ACCESS_TOKEN);
+    }
+
+    public String getRefreshTokenKey(String token) {
+        Object refreshTokenKey = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get(REFRESH_TOKEN_KEY);
+        if (refreshTokenKey == null) throw new RefreshTokenNotFoundException();
+        return refreshTokenKey.toString();
     }
 
     public boolean validateToken(String token) {

@@ -1,18 +1,16 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.config.security.JWTTokenProvider;
-import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.dto.login.LoginDTO;
-import com.beeswork.balanceaccountservice.dto.login.VerifyLoginDTO;
+import com.beeswork.balanceaccountservice.dto.login.RefreshAccessTokenDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
-import com.beeswork.balanceaccountservice.exception.login.InvalidSocialLoginException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.login.*;
 import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import com.beeswork.balanceaccountservice.vm.account.SaveEmailVM;
 import com.beeswork.balanceaccountservice.vm.login.LoginVM;
 import com.beeswork.balanceaccountservice.vm.login.SocialLoginVM;
-import com.beeswork.balanceaccountservice.vm.login.RefreshAccessToken;
+import com.beeswork.balanceaccountservice.vm.login.RefreshAccessTokenVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
@@ -96,7 +94,7 @@ public class LoginController extends BaseController {
 //                                                     verifyLoginDTO.getEmail(),
 //                                                     socialLoginVM.getLoginType());
 
-        LoginDTO loginDTO = loginService.socialLogin("abcd",
+        LoginDTO loginDTO = loginService.socialLogin(socialLoginVM.getLoginId(),
                                                      "abcd@gmail.com",
                                                      socialLoginVM.getLoginType());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
@@ -112,18 +110,19 @@ public class LoginController extends BaseController {
     }
 
     @PostMapping("/login/refresh-token")
-    public ResponseEntity<String> loginWithRefreshToken(@Valid @RequestBody RefreshAccessToken refreshAccessToken,
+    public ResponseEntity<String> loginWithRefreshToken(@Valid @RequestBody RefreshAccessTokenVM refreshAccessTokenVM,
                                                         BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        LoginDTO loginDTO = loginService.loginWithRefreshToken(refreshAccessToken.getRefreshToken());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+        LoginDTO loginDTO = loginService.loginWithRefreshToken(refreshAccessTokenVM.getAccountId(), refreshAccessTokenVM.getRefreshToken());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
     }
 
     @PostMapping("/login/access-token/refresh")
-    public ResponseEntity<String> refreshAccessToken(@Valid @RequestBody RefreshAccessToken refreshAccessToken,
+    public ResponseEntity<String> refreshAccessToken(@Valid @RequestBody RefreshAccessTokenVM refreshAccessTokenVM,
                                                      BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        LoginDTO loginDTO = loginService.refreshAccessToken(refreshAccessToken.getRefreshToken());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
+        RefreshAccessTokenDTO refreshAccessTokenDTO = loginService.refreshAccessToken(refreshAccessTokenVM.getAccountId(),
+                                                                                      refreshAccessTokenVM.getRefreshToken());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(refreshAccessTokenDTO));
     }
 }

@@ -11,6 +11,7 @@ import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeMetaDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.dto.login.LoginDTO;
+import com.beeswork.balanceaccountservice.dto.login.RefreshAccessTokenDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.Wallet;
 import com.beeswork.balanceaccountservice.entity.login.Login;
@@ -20,9 +21,6 @@ import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.setting.PushSetting;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
-import com.beeswork.balanceaccountservice.exception.BadRequestException;
-import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
-import com.beeswork.balanceaccountservice.exception.account.AccountDeletedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.login.*;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
@@ -76,69 +74,59 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     @Transactional
     public LoginDTO socialLogin(String loginId, String email, LoginType loginType) {
         Login login = loginDAO.findById(new LoginId(loginId, loginType));
+        if (login == null) return loginWithNewAccount(loginId, email, loginType);
+        else return loginWithExistingAccount(login);
+    }
 
-        if (login == null) {
-            Date now = new Date();
-            SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
+    private LoginDTO loginWithNewAccount(String loginId, String email, LoginType loginType) {
+        Date now = new Date();
+        SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
 
-            Account account = new Account(UUID.randomUUID(), now);
-            login = new Login(loginId, loginType, account, email);
-            Wallet wallet = new Wallet(account, swipeMeta.getMaxFreeSwipe() * swipeMeta.getSwipePoint(), now);
-            PushSetting pushSetting = new PushSetting(account);
-            UUID refreshTokenKey = UUID.randomUUID();
-//            RefreshToken refreshToken = new RefreshToken(account, refreshTokenKey);
+        Account account = new Account(UUID.randomUUID(), now);
+        Login login = new Login(loginId, loginType, account, email);
+        Wallet wallet = new Wallet(account, swipeMeta.getMaxFreeSwipe() * swipeMeta.getSwipePoint(), now);
+        PushSetting pushSetting = new PushSetting(account);
 
-            accountDAO.persist(account);
-            loginDAO.persist(login);
-            walletDAO.persist(wallet);
-            pushSettingDAO.persist(pushSetting);
-//            refreshTokenDAO.persist(refreshToken);
+        accountDAO.persist(account);
+        loginDAO.persist(login);
+        walletDAO.persist(wallet);
+        pushSettingDAO.persist(pushSetting);
 
-            String accountId = account.getId().toString();
+        RefreshToken refreshToken = new RefreshToken(account);
+        String newRefreshToken = createNewRefreshToken(account, refreshToken);
+        String accessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
+        return new LoginDTO(account.getId(), account.getIdentityToken(), false, accessToken, newRefreshToken, email);
+    }
 
-            String jwtToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
-//            String refreshToken = jwtTokenProvider.createRefreshToken(account.getId().toString(), UUID.randomUUID().toString());
-            return new LoginDTO(account.getId(), account.getIdentityToken(), false, jwtToken, "refreshToken", login.getEmail());
-        } else {
-            Account account = accountDAO.findById(login.getAccountId());
-            validateAccount(account);
-            Profile profile = profileDAO.findById(account.getId());
-            boolean profileExists = profile != null && profile.isEnabled();
+    private LoginDTO loginWithExistingAccount(Login login) {
+        Account account = accountDAO.findById(login.getAccountId());
+        validateAccount(account);
+        updatePushToken(account.getId());
 
-            PushToken pushToken = pushTokenDAO.findRecent(account.getId());
-            if (pushToken != null) {
-                List<PushToken> pushTokens = pushTokenDAO.findAllByToken(pushToken.getToken());
-                for (PushToken otherPushToken : pushTokens) {
-                    if (pushToken != otherPushToken) otherPushToken.setLogin(false);
-                }
-                pushToken.setLogin(true);
+        RefreshToken refreshToken = refreshTokenDAO.findByAccountId(account.getId());
+        if (refreshToken == null)
+            refreshToken = new RefreshToken(account);
+
+        String newRefreshToken = createNewRefreshToken(account, refreshToken);
+        String accessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
+        boolean profileExists = profileExists(account.getId());
+        return new LoginDTO(account.getId(), account.getIdentityToken(), profileExists, accessToken, newRefreshToken, login.getEmail());
+    }
+
+    private void updatePushToken(UUID accountId) {
+        PushToken pushToken = pushTokenDAO.findRecent(accountId);
+        if (pushToken != null) {
+            List<PushToken> pushTokens = pushTokenDAO.findAllByToken(pushToken.getToken());
+            for (PushToken otherPushToken : pushTokens) {
+                if (pushToken != otherPushToken) otherPushToken.setLogin(false);
             }
-
-            String jwtToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
-            String refreshToken = jwtTokenProvider.createRefreshToken(account.getId().toString(), UUID.randomUUID().toString());
-            return new LoginDTO(account.getId(), account.getIdentityToken(), profileExists, jwtToken, refreshToken, login.getEmail());
+            pushToken.setLogin(true);
         }
     }
 
-    private LoginDTO createTokens(Account account, RefreshToken refreshToken) {
-//        RefreshToken refreshToken = refreshTokenDAO.findByAccountId(account.getId());
-        if (refreshToken == null) throw new RefreshTokenNotFoundException();
-
-        UUID refreshTokenKey = UUID.randomUUID();
-        refreshToken.setKey(refreshTokenKey);
-
-        LoginDTO loginDTO = new LoginDTO();
-        loginDTO.setAccountId(account.getId());
-        loginDTO.setIdentityToken(account.getIdentityToken());
-
-        String accountId = account.getId().toString();
-        loginDTO.setRefreshToken(jwtTokenProvider.createRefreshToken(accountId, refreshToken.toString()));
-        loginDTO.setAccessToken(jwtTokenProvider.createAccessToken(accountId, account.getRoleNames()));
-
-        Profile profile = profileDAO.findById(account.getId());
-        boolean profileExists = profile != null && profile.isEnabled();
-        loginDTO.setProfileExists(profileExists);
-        return new LoginDTO();
+    private boolean profileExists(UUID accountId) {
+        Profile profile = profileDAO.findById(accountId);
+        return profile != null && profile.isEnabled();
     }
 
     @Override
@@ -168,39 +156,52 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     }
 
     @Override
-    public LoginDTO refreshAccessToken(String refreshToken) {
-        // TODO: throw RefreshTokenExipriedException
-        return null;
+    @Transactional
+    public RefreshAccessTokenDTO refreshAccessToken(UUID accountId, String refreshToken) {
+        if (!jwtTokenProvider.validateToken(refreshToken)) throw new RefreshTokenExpiredException();
+        Account account = findValidAccountFromToken(accountId, refreshToken);
+        RefreshToken accountRefreshToken = findValidRefreshToken(accountId, refreshToken);
+        String newRefreshToken = createNewRefreshToken(account, accountRefreshToken);
+        String newAccessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
+        return new RefreshAccessTokenDTO(newAccessToken, newRefreshToken);
     }
 
     @Override
     @Transactional
-    public LoginDTO loginWithRefreshToken(String refreshToken) {
+    public LoginDTO loginWithRefreshToken(UUID accountId, String refreshToken) {
         if (!jwtTokenProvider.validateToken(refreshToken)) throw new RefreshTokenExpiredException();
-        String userName = jwtTokenProvider.getUserName(refreshToken);
+        Account account = findValidAccountFromToken(accountId, refreshToken);
+        RefreshToken accountRefreshToken = findValidRefreshToken(accountId, refreshToken);
+        boolean profileExists = profileExists(account.getId());
+        String newRefreshToken = createNewRefreshToken(account, accountRefreshToken);
+        String newAccessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
+        return new LoginDTO(account.getId(), account.getIdentityToken(), profileExists, newAccessToken, newRefreshToken);
+    }
 
-        Account account = accountDAO.findById(UUID.fromString(userName));
+    private Account findValidAccountFromToken(UUID accountId, String token) {
+        String userName = jwtTokenProvider.getUserName(token);
+        if (!accountId.equals(UUID.fromString(userName))) throw new AccountNotFoundException();
+        Account account = accountDAO.findById(accountId);
         validateAccount(account);
+        return account;
+    }
 
-        RefreshToken accountRefreshToken = refreshTokenDAO.findByAccountId(UUID.fromString(userName));
+    private RefreshToken findValidRefreshToken(UUID accountId, String refreshToken) {
+        RefreshToken accountRefreshToken = refreshTokenDAO.findByAccountId(accountId);
         if (accountRefreshToken == null) throw new RefreshTokenNotFoundException();
 
-        LoginDTO loginDTO = new LoginDTO();
-        loginDTO.setAccountId(account.getId());
-        loginDTO.setIdentityToken(account.getIdentityToken());
+        String refreshTokenKey = jwtTokenProvider.getRefreshTokenKey(refreshToken);
+        if (!accountRefreshToken.getKey().toString().equals(refreshTokenKey))
+            throw new RefreshTokenNotFoundException();
 
-        UUID newRefreshTokenKey = UUID.randomUUID();
-        accountRefreshToken.setKey(newRefreshTokenKey);
-        accountRefreshToken.setUpdatedAt(new Date());
+        return accountRefreshToken;
+    }
 
-        String accountId = account.getId().toString();
-        loginDTO.setRefreshToken(jwtTokenProvider.createRefreshToken(accountId, newRefreshTokenKey.toString()));
-        loginDTO.setAccessToken(jwtTokenProvider.createAccessToken(accountId, account.getRoleNames()));
-
-        Profile profile = profileDAO.findById(account.getId());
-        boolean profileExists = profile != null && profile.isEnabled();
-        loginDTO.setProfileExists(profileExists);
-
-        return loginDTO;
+    private String createNewRefreshToken(Account account, RefreshToken refreshToken) {
+        UUID refreshTokenKey = UUID.randomUUID();
+        refreshToken.setKey(refreshTokenKey);
+        refreshToken.setUpdatedAt(new Date());
+        refreshTokenDAO.persist(refreshToken);
+        return jwtTokenProvider.createRefreshToken(account.getId().toString(), refreshTokenKey.toString());
     }
 }

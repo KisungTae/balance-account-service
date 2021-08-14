@@ -486,6 +486,23 @@ from match
 group by swiper_id
 order by count(swiper_id) desc;
 
+delete from account;
+
+
+
+select * from login;
+select * from account;
+select * from wallet;
+select * from push_setting;
+select * from refresh_token;
+
+
+delete from login;
+delete from wallet;
+delete from push_setting;
+delete from refresh_token;
+delete from account;
+
 
 select *
 from push_token;

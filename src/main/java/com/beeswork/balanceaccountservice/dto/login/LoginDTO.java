@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.dto.login;
 
+import com.beeswork.balanceaccountservice.entity.account.Account;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,14 @@ public class LoginDTO {
     private String  accessToken;
     private String  refreshToken;
     private String  email;
+
+
+
+    public LoginDTO(UUID accountId, UUID identityToken, String email) {
+        this.accountId = accountId;
+        this.identityToken = identityToken;
+        this.email = email;
+    }
 
     public LoginDTO(UUID accountId, UUID identityToken, boolean profileExists, String accessToken, String refreshToken) {
         this.accountId = accountId;

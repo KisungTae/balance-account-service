@@ -2,7 +2,7 @@ package com.beeswork.balanceaccountservice.dao.setting;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.entity.setting.PushSetting;
-import com.beeswork.balanceaccountservice.entity.setting.QSetting;
+import com.beeswork.balanceaccountservice.entity.setting.QPushSetting;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
@@ -12,7 +12,7 @@ import java.util.UUID;
 @Repository
 public class PushSettingDAOImpl extends BaseDAOImpl<PushSetting> implements PushSettingDAO {
 
-    private final QSetting qSetting = QSetting.setting;
+    private final QPushSetting qPushSetting = QPushSetting.pushSetting;
 
     public PushSettingDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
         super(entityManager, jpaQueryFactory);
@@ -20,6 +20,6 @@ public class PushSettingDAOImpl extends BaseDAOImpl<PushSetting> implements Push
 
     @Override
     public PushSetting findByAccountId(UUID accountId) {
-        return jpaQueryFactory.selectFrom(qSetting).where(qSetting.accountId.eq(accountId)).fetchFirst();
+        return jpaQueryFactory.selectFrom(qPushSetting).where(qPushSetting.accountId.eq(accountId)).fetchFirst();
     }
 }

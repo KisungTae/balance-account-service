@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.service.login;
 
 import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.dto.login.LoginDTO;
+import com.beeswork.balanceaccountservice.dto.login.RefreshAccessTokenDTO;
 
 import java.util.UUID;
 
@@ -10,6 +11,6 @@ public interface LoginService {
     LoginDTO socialLogin(String loginId, String email, LoginType loginType);
     void saveEmail(UUID accountId, UUID identityToken, String email);
     String getEmail(UUID accountId, UUID identityToken);
-    LoginDTO refreshAccessToken(String refreshToken);
-    LoginDTO loginWithRefreshToken(String refreshToken);
+    RefreshAccessTokenDTO refreshAccessToken(UUID accountId, String refreshToken);
+    LoginDTO loginWithRefreshToken(UUID accountId, String refreshToken);
 }
