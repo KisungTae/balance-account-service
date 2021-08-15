@@ -39,9 +39,9 @@ public class PushTokenController extends BaseController {
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         pushTokenService.savePushToken(savePushTokenVM.getAccountId(),
-                                     savePushTokenVM.getIdentityToken(),
-                                     savePushTokenVM.getToken(),
-                                     PushTokenType.FCM);
+                                       savePushTokenVM.getIdentityToken(),
+                                       savePushTokenVM.getToken(),
+                                       PushTokenType.FCM);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
@@ -51,9 +51,9 @@ public class PushTokenController extends BaseController {
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         pushTokenService.savePushToken(savePushTokenVM.getAccountId(),
-                                     savePushTokenVM.getIdentityToken(),
-                                     savePushTokenVM.getToken(),
-                                     PushTokenType.APS);
+                                       savePushTokenVM.getIdentityToken(),
+                                       savePushTokenVM.getToken(),
+                                       PushTokenType.APS);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 

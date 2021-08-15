@@ -488,7 +488,8 @@ order by count(swiper_id) desc;
 
 delete from account;
 
-
+select *
+from role;
 
 select * from login;
 select * from account;
@@ -502,6 +503,7 @@ delete from wallet;
 delete from push_setting;
 delete from refresh_token;
 delete from account;
+delete from push_token;
 
 
 select *

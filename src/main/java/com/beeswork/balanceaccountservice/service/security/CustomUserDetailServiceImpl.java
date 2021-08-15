@@ -27,6 +27,7 @@ public class CustomUserDetailServiceImpl extends BaseServiceImpl implements User
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         Account account = accountDAO.findById(UUID.fromString(userName));
         validateAccount(account);
+//        account.getAuthorities();
         return account;
     }
 }

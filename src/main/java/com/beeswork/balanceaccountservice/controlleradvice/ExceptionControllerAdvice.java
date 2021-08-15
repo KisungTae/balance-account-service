@@ -26,19 +26,24 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.security.GeneralSecurityException;
 import java.util.Locale;
 
-@RestControllerAdvice(annotations = RestController.class)
+@Order(Ordered.HIGHEST_PRECEDENCE)
+//@RestControllerAdvice(annotations = RestController.class)
+@RestControllerAdvice
 public class ExceptionControllerAdvice {
 
     private static final String INTERNAL_SERVER_EXCEPTION = "internal.server.exception";
@@ -64,6 +69,7 @@ public class ExceptionControllerAdvice {
                        SettingNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)
     throws Exception {
+        System.out.println("public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)");
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(exceptionResponse(exception.getExceptionCode(), null, locale));
@@ -97,7 +103,7 @@ public class ExceptionControllerAdvice {
     throws JsonProcessingException {
         Object[] arguments = null;
         if (exception instanceof PhotoExceededMaxException)
-            arguments = new Object[] {PhotoConstant.MAX_NUM_OF_PHOTOS};
+            arguments = new Object[]{PhotoConstant.MAX_NUM_OF_PHOTOS};
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                              .contentType(MediaType.APPLICATION_JSON)
@@ -120,7 +126,7 @@ public class ExceptionControllerAdvice {
                              .body(messageSource.getMessage(QUERY_EXCEPTION, null, locale));
     }
 
-//    @ExceptionHandler({PersistenceException.class})
+    //    @ExceptionHandler({PersistenceException.class})
 //    public ResponseEntity<String> handlePersistenceException(PersistenceException exception, Locale locale) {
 //        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 //                             .contentType(MediaType.APPLICATION_JSON)
@@ -134,12 +140,14 @@ public class ExceptionControllerAdvice {
 //                             .body(messageSource.getMessage(QUERY_EXCEPTION, null, locale));
 //    }
 //
-//    @ExceptionHandler({Exception.class})
-//    public ResponseEntity<String> handleException(Locale locale) throws JsonProcessingException {
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                             .contentType(MediaType.APPLICATION_JSON)
-//                             .body(exceptionResponse(INTERNAL_SERVER_EXCEPTION, locale));
-//    }
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<String> handleException(Locale locale) throws JsonProcessingException {
+        System.out.println("@ExceptionHandler({Exception.class})");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(exceptionResponse(INTERNAL_SERVER_EXCEPTION, null, locale));
+    }
+
 
     private String exceptionResponse(String exceptionCode, Object[] object, Locale locale) throws JsonProcessingException {
         String exceptionMessage = messageSource.getMessage(exceptionCode, object, locale);

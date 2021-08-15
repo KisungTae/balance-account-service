@@ -4,7 +4,7 @@ import com.beeswork.balanceaccountservice.config.properties.GoogleLoginPropertie
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,16 +14,22 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 import java.util.Collections;
 
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final JWTTokenProvider      jwtTokenProvider;
     private final GoogleLoginProperties googleLoginProperties;
+    private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
+    @Autowired
+    public WebSecurityConfig(GoogleLoginProperties googleLoginProperties,
+                             JWTAuthenticationFilter jwtAuthenticationFilter) {
+        this.googleLoginProperties = googleLoginProperties;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -46,7 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/login", "/login/social", "/login/refresh-token", "/login/access-token/refresh", "/dummy/**").permitAll()
             .antMatchers("/admin").hasRole("ADMIN")
             .anyRequest().authenticated()
-            .and().addFilterBefore(new JWTAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+            .and().addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean
