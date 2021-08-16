@@ -87,7 +87,7 @@ public class Account implements UserDetails {
                orphanRemoval = true)
     private List<PushToken> pushTokens = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JoinTable(
             name = "account_role",
@@ -128,7 +128,7 @@ public class Account implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return blocked;
+        return true;
     }
 
     @Override
@@ -138,6 +138,6 @@ public class Account implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return deleted;
+        return true;
     }
 }

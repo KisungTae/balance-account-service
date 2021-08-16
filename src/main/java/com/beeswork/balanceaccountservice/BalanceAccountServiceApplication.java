@@ -338,7 +338,9 @@ public class BalanceAccountServiceApplication {
 
 // TODO			99. check how it works, isAccountNonExpired in Account, should I use for delete, check delete fun
 
-// TODO			100. validateAccount should be in security check not each service?
+// TODO			100. validateAccount should be in security check not each service? yes and check remove validateAccount only check identityToken
+
+//
 
 
 // TODO			Chat Business rules

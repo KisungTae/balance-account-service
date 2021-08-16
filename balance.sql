@@ -498,6 +498,10 @@ select * from push_setting;
 select * from refresh_token;
 
 
+
+
+
+
 delete from login;
 delete from wallet;
 delete from push_setting;

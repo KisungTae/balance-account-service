@@ -10,6 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -24,10 +27,10 @@ public class CustomUserDetailServiceImpl extends BaseServiceImpl implements User
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         Account account = accountDAO.findById(UUID.fromString(userName));
         validateAccount(account);
-//        account.getAuthorities();
         return account;
     }
 }

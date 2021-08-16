@@ -24,6 +24,8 @@ import java.util.UUID;
 @Repository
 public class AccountDAOImpl extends BaseDAOImpl<Account> implements AccountDAO {
 
+    private QAccount qAccount = QAccount.account;
+
     @Autowired
     public AccountDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
         super(entityManager, jpaQueryFactory);
