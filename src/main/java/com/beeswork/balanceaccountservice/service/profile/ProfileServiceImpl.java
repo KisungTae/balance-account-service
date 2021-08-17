@@ -1,13 +1,18 @@
 package com.beeswork.balanceaccountservice.service.profile;
 
+import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
+import com.beeswork.balanceaccountservice.dao.login.LoginDAO;
 import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
 import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
 import com.beeswork.balanceaccountservice.dto.profile.RecommendDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
+import com.beeswork.balanceaccountservice.entity.login.Login;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
-import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
+import com.beeswork.balanceaccountservice.exception.login.EmailDuplicateException;
+import com.beeswork.balanceaccountservice.exception.login.EmailNotMutableException;
+import com.beeswork.balanceaccountservice.exception.login.LoginNotFoundException;
 import com.beeswork.balanceaccountservice.exception.profile.ProfileNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import com.beeswork.balanceaccountservice.util.DateUtil;
@@ -20,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.ModelMap;
 
 import java.util.*;
 
@@ -45,17 +49,19 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
 
     private final AccountDAO      accountDAO;
     private final ProfileDAO      profileDAO;
+    private final LoginDAO        loginDAO;
     private final GeometryFactory geometryFactory;
     private final ModelMapper     modelMapper;
 
     @Autowired
     public ProfileServiceImpl(ModelMapper modelMapper,
                               GeometryFactory geometryFactory, AccountDAO accountDAO,
-                              ProfileDAO profileDAO) {
+                              ProfileDAO profileDAO, LoginDAO loginDAO) {
         this.modelMapper = modelMapper;
         this.geometryFactory = geometryFactory;
         this.accountDAO = accountDAO;
         this.profileDAO = profileDAO;
+        this.loginDAO = loginDAO;
     }
 
     @Override
@@ -158,6 +164,33 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         if (profile == null) throw new ProfileNotFoundException();
         validateAccount(profile.getAccount(), identityToken);
         return profile;
+    }
+
+    @Override
+    @Transactional
+    public void saveEmail(UUID accountId, UUID identityToken, String email) {
+        Login login = loginDAO.findByAccountId(accountId);
+        if (login == null) throw new LoginNotFoundException();
+        validateAccount(login.getAccount(), identityToken);
+
+        LoginType loginType = login.getType();
+        if (loginType == LoginType.NAVER || loginType == LoginType.GOOGLE)
+            throw new EmailNotMutableException();
+
+        if (!login.getEmail().equals(email)) {
+            if (loginDAO.existsByEmail(email))
+                throw new EmailDuplicateException();
+            login.setEmail(email);
+        }
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public String getEmail(UUID accountId, UUID identityToken) {
+        Login login = loginDAO.findByAccountId(accountId);
+        if (login == null) throw new LoginNotFoundException();
+        validateAccount(login.getAccount(), identityToken);
+        return login.getEmail();
     }
 
 }

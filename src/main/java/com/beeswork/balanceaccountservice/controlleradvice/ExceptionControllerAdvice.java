@@ -24,6 +24,7 @@ import com.beeswork.balanceaccountservice.exception.swipe.*;
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.Ordered;
@@ -32,6 +33,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -67,9 +70,7 @@ public class ExceptionControllerAdvice {
                        ReportReasonNotFoundException.class, ReportedNotFoundException.class,
                        QueueNotFoundException.class, SwipeMetaNotFoundException.class,
                        SettingNotFoundException.class})
-    public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)
-    throws Exception {
-        System.out.println("public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale)");
+    public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale) throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(exceptionResponse(exception.getExceptionCode(), null, locale));
@@ -77,7 +78,7 @@ public class ExceptionControllerAdvice {
 
     @ExceptionHandler({UsernameNotFoundException.class})
     public ResponseEntity<String> handleUserNameNotFoundException(UsernameNotFoundException exception, Locale locale)
-    throws Exception {
+    throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(exceptionResponse("user.name.not.found.exception", null, locale));
@@ -85,10 +86,34 @@ public class ExceptionControllerAdvice {
 
     @ExceptionHandler({GeneralSecurityException.class})
     public ResponseEntity<String> handleGeneralSecurityException(GeneralSecurityException exception, Locale locale)
-    throws Exception {
+    throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(exceptionResponse("general.security.exception", null, locale));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<String> handleAuthenticationException(AuthenticationException exception, Locale locale)
+    throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(exceptionResponse("authentication.exception", null, locale));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<String> handleAuthenticationException(AccessDeniedException exception, Locale locale)
+    throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(exceptionResponse("access.denied.exception", null, locale));
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<String> handleExpiredJwtException(ExpiredJwtException exception, Locale locale)
+    throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(exceptionResponse("expired.jwt.exception", null, locale));
     }
 
     @ExceptionHandler({AccountShortOfPointException.class, AccountBlockedException.class,
@@ -110,21 +135,21 @@ public class ExceptionControllerAdvice {
                              .body(exceptionResponse(exception.getExceptionCode(), arguments, locale));
     }
 
-    @MessageExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleMessageException(Exception e) {
+//    @MessageExceptionHandler(Exception.class)
+//    public ResponseEntity<String> handleMessageException(Exception e) {
 //        TODO: log exception for later review
-        System.out.println("handleMessageException");
-        System.out.println(e.getLocalizedMessage());
+//        System.out.println("handleMessageException");
 //        System.out.println(e.getLocalizedMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("abc error ");
-    }
+//        System.out.println(e.getLocalizedMessage());
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("abc error ");
+//    }
 
-    @ExceptionHandler({AmazonServiceException.class, SdkClientException.class})
-    public ResponseEntity<String> handleAWSException(Exception exception, Locale locale) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                             .contentType(MediaType.APPLICATION_JSON)
-                             .body(messageSource.getMessage(QUERY_EXCEPTION, null, locale));
-    }
+//    @ExceptionHandler({AmazonServiceException.class, SdkClientException.class})
+//    public ResponseEntity<String> handleAWSException(Exception exception, Locale locale) {
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                             .contentType(MediaType.APPLICATION_JSON)
+//                             .body(messageSource.getMessage(QUERY_EXCEPTION, null, locale));
+//    }
 
     //    @ExceptionHandler({PersistenceException.class})
 //    public ResponseEntity<String> handlePersistenceException(PersistenceException exception, Locale locale) {
@@ -140,13 +165,12 @@ public class ExceptionControllerAdvice {
 //                             .body(messageSource.getMessage(QUERY_EXCEPTION, null, locale));
 //    }
 //
-    @ExceptionHandler({Exception.class})
-    public ResponseEntity<String> handleException(Locale locale) throws JsonProcessingException {
-        System.out.println("@ExceptionHandler({Exception.class})");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                             .contentType(MediaType.APPLICATION_JSON)
-                             .body(exceptionResponse(INTERNAL_SERVER_EXCEPTION, null, locale));
-    }
+//    @ExceptionHandler({Exception.class})
+//    public ResponseEntity<String> handleException(Locale locale) throws JsonProcessingException {
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                             .contentType(MediaType.APPLICATION_JSON)
+//                             .body(exceptionResponse(INTERNAL_SERVER_EXCEPTION, null, locale));
+//    }
 
 
     private String exceptionResponse(String exceptionCode, Object[] object, Locale locale) throws JsonProcessingException {

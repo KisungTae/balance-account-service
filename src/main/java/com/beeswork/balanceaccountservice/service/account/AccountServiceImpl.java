@@ -18,12 +18,17 @@ import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.report.Report;
 import com.beeswork.balanceaccountservice.entity.report.ReportReason;
+import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
+import com.beeswork.balanceaccountservice.exception.account.AccountDeletedException;
+import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.report.ReportReasonNotFoundException;
 import com.beeswork.balanceaccountservice.exception.report.ReportedNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
+import com.beeswork.balanceaccountservice.util.Convert;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -35,11 +40,11 @@ import java.util.stream.Collectors;
 @Service
 public class AccountServiceImpl extends BaseServiceImpl implements AccountService {
 
-    private final AccountDAO accountDAO;
-    private final QuestionDAO questionDAO;
+    private final AccountDAO         accountDAO;
+    private final QuestionDAO        questionDAO;
     private final AccountQuestionDAO accountQuestionDAO;
-    private final ProfileDAO profileDAO;
-    private final LoginDAO loginDAO;
+    private final ProfileDAO         profileDAO;
+    private final LoginDAO           loginDAO;
 
     @Autowired
     public AccountServiceImpl(AccountDAO accountDAO,
@@ -146,6 +151,20 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
             photos.clear();
         }
         return deleteAccountDTO;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public UserDetails loadUserByUsername(String userName, String identityToken) {
+        UUID userNameUUID = Convert.toUUIDOrThrow(userName, new AccountNotFoundException());
+        UUID identityTokenUUID = Convert.toUUIDOrThrow(identityToken, new AccountNotFoundException());
+        Account account = accountDAO.findById(userNameUUID);
+
+        if (account == null) throw new AccountNotFoundException();
+        if (account.isBlocked()) throw new AccountBlockedException();
+        if (account.isDeleted()) throw new AccountDeletedException();
+        if (account.getIdentityToken().equals(identityTokenUUID)) throw new AccountNotFoundException();
+        return account;
     }
 
 }

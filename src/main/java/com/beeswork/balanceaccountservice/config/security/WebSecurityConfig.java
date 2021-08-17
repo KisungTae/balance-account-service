@@ -14,21 +14,26 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 import java.util.Collections;
 
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final GoogleLoginProperties googleLoginProperties;
-    private final JWTAuthenticationFilter jwtAuthenticationFilter;
+    private final GoogleLoginProperties        googleLoginProperties;
+    private final JWTAuthenticationFilter      jwtAuthenticationFilter;
+    private final RestAccessDeniedHandler      restAccessDeniedHandler;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
     @Autowired
     public WebSecurityConfig(GoogleLoginProperties googleLoginProperties,
-                             JWTAuthenticationFilter jwtAuthenticationFilter) {
+                             JWTAuthenticationFilter jwtAuthenticationFilter,
+                             RestAccessDeniedHandler restAccessDeniedHandler,
+                             RestAuthenticationEntryPoint restAuthenticationEntryPoint) {
         this.googleLoginProperties = googleLoginProperties;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.restAccessDeniedHandler = restAccessDeniedHandler;
+        this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
     }
 
     @Bean
@@ -36,22 +41,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+//    @Bean
+//    @Override
+//    public AuthenticationManager authenticationManagerBean() throws Exception {
+//        return super.authenticationManagerBean();
+//    }
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-//      TODO: remove /dummy/**
+//      TODO: remove /dummy/** and question/random/list
+
         http.httpBasic().disable()
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and().authorizeRequests()
-            .antMatchers("/login", "/login/social", "/login/refresh-token", "/login/access-token/refresh", "/dummy/**").permitAll()
+            .antMatchers("/login/**", "/dummy/**").permitAll()
             .antMatchers("/admin").hasRole("ADMIN")
             .anyRequest().authenticated()
+            .and().exceptionHandling().accessDeniedHandler(restAccessDeniedHandler).authenticationEntryPoint(restAuthenticationEntryPoint)
             .and().addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 

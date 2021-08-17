@@ -24,6 +24,7 @@ import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.login.*;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
+import com.beeswork.balanceaccountservice.util.Convert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +54,8 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
                             PushTokenDAO pushTokenDAO, WalletDAO walletDAO,
                             PushSettingDAO pushSettingDAO,
                             ProfileDAO profileDAO,
-                            RefreshTokenDAO refreshTokenDAO, JWTTokenProvider jwtTokenProvider) {
+                            RefreshTokenDAO refreshTokenDAO,
+                            JWTTokenProvider jwtTokenProvider) {
         this.loginDAO = loginDAO;
         this.accountDAO = accountDAO;
         this.swipeMetaDAO = swipeMetaDAO;
@@ -131,34 +133,8 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
 
     @Override
     @Transactional
-    public void saveEmail(UUID accountId, UUID identityToken, String email) {
-        Login login = loginDAO.findByAccountId(accountId);
-        if (login == null) throw new LoginNotFoundException();
-        validateAccount(login.getAccount(), identityToken);
-
-        LoginType loginType = login.getType();
-        if (loginType == LoginType.NAVER || loginType == LoginType.GOOGLE)
-            throw new EmailNotMutableException();
-
-        if (!login.getEmail().equals(email)) {
-            if (loginDAO.existsByEmail(email))
-                throw new EmailDuplicateException();
-            login.setEmail(email);
-        }
-    }
-
-    @Override
-    public String getEmail(UUID accountId, UUID identityToken) {
-        Login login = loginDAO.findByAccountId(accountId);
-        if (login == null) throw new LoginNotFoundException();
-        validateAccount(login.getAccount(), identityToken);
-        return login.getEmail();
-    }
-
-    @Override
-    @Transactional
     public RefreshAccessTokenDTO refreshAccessToken(UUID accountId, String refreshToken) {
-        if (!jwtTokenProvider.validateToken(refreshToken)) throw new RefreshTokenExpiredException();
+        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) throw new RefreshTokenExpiredException();
         Account account = findValidAccountFromToken(accountId, refreshToken);
         RefreshToken accountRefreshToken = findValidRefreshToken(accountId, refreshToken);
         String newRefreshToken = createNewRefreshToken(account, accountRefreshToken);
@@ -169,7 +145,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     @Override
     @Transactional
     public LoginDTO loginWithRefreshToken(UUID accountId, String refreshToken) {
-        if (!jwtTokenProvider.validateToken(refreshToken)) throw new RefreshTokenExpiredException();
+        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) throw new RefreshTokenExpiredException();
         Account account = findValidAccountFromToken(accountId, refreshToken);
         RefreshToken accountRefreshToken = findValidRefreshToken(accountId, refreshToken);
         boolean profileExists = profileExists(account.getId());
@@ -180,7 +156,8 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
 
     private Account findValidAccountFromToken(UUID accountId, String token) {
         String userName = jwtTokenProvider.getUserName(token);
-        if (!accountId.equals(UUID.fromString(userName))) throw new AccountNotFoundException();
+        UUID userNameUUID = Convert.toUUIDOrThrow(userName, new AccountNotFoundException());
+        if (!accountId.equals(userNameUUID)) throw new AccountNotFoundException();
         Account account = accountDAO.findById(accountId);
         validateAccount(account);
         return account;

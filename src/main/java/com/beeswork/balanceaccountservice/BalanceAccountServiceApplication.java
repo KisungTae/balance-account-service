@@ -340,7 +340,7 @@ public class BalanceAccountServiceApplication {
 
 // TODO			100. validateAccount should be in security check not each service? yes and check remove validateAccount only check identityToken
 
-//
+// TODO			101. check identityToken check in stomp in regards to spring security
 
 
 // TODO			Chat Business rules

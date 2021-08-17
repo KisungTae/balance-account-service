@@ -38,4 +38,7 @@ public interface ProfileService {
     void saveLocation(UUID accountId, UUID identityToken, double latitude, double longitude, Date updatedAt);
 
     RecommendDTO recommend(UUID accountId, UUID identityToken, int distance, int minAge, int maxAge, boolean gender, int pageIndex);
+
+    void saveEmail(UUID accountId, UUID identityToken, String email);
+    String getEmail(UUID accountId, UUID identityToken);
 }

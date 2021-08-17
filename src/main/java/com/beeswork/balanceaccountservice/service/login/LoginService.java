@@ -9,8 +9,6 @@ import java.util.UUID;
 public interface LoginService {
     LoginDTO login(String loginId, LoginType loginType, String email, String password);
     LoginDTO socialLogin(String loginId, String email, LoginType loginType);
-    void saveEmail(UUID accountId, UUID identityToken, String email);
-    String getEmail(UUID accountId, UUID identityToken);
     RefreshAccessTokenDTO refreshAccessToken(UUID accountId, String refreshToken);
     LoginDTO loginWithRefreshToken(UUID accountId, String refreshToken);
 }

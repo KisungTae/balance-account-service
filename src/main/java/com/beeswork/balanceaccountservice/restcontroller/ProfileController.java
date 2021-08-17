@@ -102,4 +102,20 @@ public class ProfileController extends BaseController {
                                                              recommendVM.getPageIndex());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(recommendDTO));
     }
+
+    @PostMapping("/email")
+    public ResponseEntity<String> saveEmail(@Valid @RequestBody SaveEmailVM saveEmailVM,
+                                            BindingResult bindingResult) throws JsonProcessingException {
+        if (bindingResult.hasErrors()) super.fieldExceptionResponse(bindingResult);
+        profileService.saveEmail(saveEmailVM.getAccountId(), saveEmailVM.getIdentityToken(), saveEmailVM.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+    }
+
+    @GetMapping("/email")
+    public ResponseEntity<String> getEmail(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
+                                           BindingResult bindingResult) throws JsonProcessingException {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        String email = profileService.getEmail(accountIdentityVM.getAccountId(), accountIdentityVM.getIdentityToken());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(email));
+    }
 }
