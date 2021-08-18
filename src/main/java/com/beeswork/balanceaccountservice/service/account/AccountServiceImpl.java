@@ -60,12 +60,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     }
 
 
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public void validateAccount(UUID accountId, UUID identityToken) {
-        validateAccount(accountDAO.findById(accountId), identityToken);
-    }
-
+//    TODO: right away check if account is required
     //  TEST 1. save accountQuestionDTOs without setAccount() and setQuestion()
     //          --> Hibernate does not insert those objects, no exception thrown
     //  TEST 2. create new accountQuestionDTO with the same AccountQuestionId
@@ -74,8 +69,8 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     //          accountQuestions to check if it needs to remove or insert or update entities
     @Override
     @Transactional
-    public void saveQuestionAnswers(UUID accountId, UUID identityToken, Map<Integer, Boolean> answers) {
-        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
+    public void saveQuestionAnswers(UUID accountId, Map<Integer, Boolean> answers) {
+        Account account = accountDAO.findById(accountId);
         List<AccountQuestion> accountQuestions = accountQuestionDAO.findAllIn(accountId, answers.keySet());
 
         Map<Integer, Integer> sequences = new LinkedHashMap<>();
@@ -120,16 +115,15 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<QuestionDTO> listQuestions(UUID accountId, UUID identityToken) {
-        validateAccount(accountDAO.findById(accountId), identityToken);
+    public List<QuestionDTO> listQuestions(UUID accountId) {
         return accountQuestionDAO.findAllQuestionDTOsWithAnswer(accountId);
     }
 
 
     @Override
     @Transactional
-    public DeleteAccountDTO deleteAccount(UUID accountId, UUID identityToken) {
-        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
+    public DeleteAccountDTO deleteAccount(UUID accountId) {
+        Account account = accountDAO.findById(accountId);
 
         Login login = loginDAO.findByAccountId(accountId);
         if (login != null) loginDAO.remove(login);
@@ -153,18 +147,6 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         return deleteAccountDTO;
     }
 
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public UserDetails loadUserByUsername(String userName, String identityToken) {
-        UUID userNameUUID = Convert.toUUIDOrThrow(userName, new AccountNotFoundException());
-        UUID identityTokenUUID = Convert.toUUIDOrThrow(identityToken, new AccountNotFoundException());
-        Account account = accountDAO.findById(userNameUUID);
 
-        if (account == null) throw new AccountNotFoundException();
-        if (account.isBlocked()) throw new AccountBlockedException();
-        if (account.isDeleted()) throw new AccountDeletedException();
-        if (account.getIdentityToken().equals(identityTokenUUID)) throw new AccountNotFoundException();
-        return account;
-    }
 
 }

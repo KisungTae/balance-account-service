@@ -44,9 +44,7 @@ public class SwipeController extends BaseController {
     public ResponseEntity<String> swipe(@Valid @RequestBody LikeVM likeVM, BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<QuestionDTO> questionDTOs = swipeService.swipe(likeVM.getAccountId(),
-                                                            likeVM.getIdentityToken(),
-                                                            likeVM.getSwipedId());
+        List<QuestionDTO> questionDTOs = swipeService.swipe(likeVM.getAccountId(), likeVM.getSwipedId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
     }
 
@@ -55,9 +53,7 @@ public class SwipeController extends BaseController {
                                              BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ListSwipesDTO listSwipesDTO = swipeService.listSwipes(listSwipesVM.getAccountId(),
-                                                              listSwipesVM.getIdentityToken(),
-                                                              listSwipesVM.getFetchedAt());
+        ListSwipesDTO listSwipesDTO = swipeService.listSwipes(listSwipesVM.getAccountId(), listSwipesVM.getFetchedAt());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listSwipesDTO));
     }
 
@@ -66,9 +62,7 @@ public class SwipeController extends BaseController {
                                              BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<SwipeDTO> clicks = swipeService.listClicks(listSwipesVM.getAccountId(),
-                                                        listSwipesVM.getIdentityToken(),
-                                                        listSwipesVM.getFetchedAt());
+        List<SwipeDTO> clicks = swipeService.listClicks(listSwipesVM.getAccountId(), listSwipesVM.getFetchedAt());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clicks));
     }
 
@@ -79,10 +73,7 @@ public class SwipeController extends BaseController {
                                         Locale locale)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ClickDTO clickDTO = swipeService.click(clickVM.getAccountId(),
-                                               clickVM.getIdentityToken(),
-                                               clickVM.getSwipedId(),
-                                               clickVM.getAnswers());
+        ClickDTO clickDTO = swipeService.click(clickVM.getAccountId(), clickVM.getSwipedId(), clickVM.getAnswers());
         stompService.sendMatch(clickDTO.getObjMatchDTO(), locale);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO.getSubMatchDTO()));
     }

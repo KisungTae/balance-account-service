@@ -42,14 +42,14 @@ public class ReportServiceImpl extends BaseServiceImpl implements ReportService 
 
     @Override
     @Transactional
-    public void reportProfile(UUID accountId, UUID identityToken, UUID reportedId, int reportReasonId, String description) {
-        createReport(accountId, identityToken, reportedId, reportReasonId, description);
+    public void reportProfile(UUID accountId, UUID reportedId, int reportReasonId, String description) {
+        createReport(accountId, reportedId, reportReasonId, description);
     }
 
     @Override
     @Transactional
-    public void reportMatch(UUID accountId, UUID identityToken, UUID reportedId, int reportReasonId, String description) {
-        createReport(accountId, identityToken, reportedId, reportReasonId, description);
+    public void reportMatch(UUID accountId, UUID reportedId, int reportReasonId, String description) {
+        createReport(accountId, reportedId, reportReasonId, description);
         Match reporterMatch = matchDAO.findById(accountId, reportedId);
         Match reportedMatch = matchDAO.findById(reportedId, accountId);
 
@@ -60,13 +60,11 @@ public class ReportServiceImpl extends BaseServiceImpl implements ReportService 
         reportedMatch.setupAsUnmatched(updatedAt);
     }
 
-    private void createReport(UUID accountId, UUID identityToken, UUID reportedId, int reportReasonId, String description) {
+    private void createReport(UUID accountId, UUID reportedId, int reportReasonId, String description) {
         ReportReason reportReason = reportReasonDAO.findById(reportReasonId);
         if (reportReason == null) throw new ReportReasonNotFoundException();
 
         Account reporter = accountDAO.findById(accountId);
-        validateAccount(reporter, identityToken);
-
         Account reported = accountDAO.findById(reportedId);
         if (reported == null) throw new ReportedNotFoundException();
 

@@ -13,7 +13,4 @@ public class AccountIdentityVM {
 
     @ValidUUID
     protected UUID accountId;
-
-    @ValidUUID
-    protected UUID identityToken;
 }

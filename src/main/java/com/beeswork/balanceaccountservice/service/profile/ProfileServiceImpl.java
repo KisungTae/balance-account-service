@@ -66,14 +66,14 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public ProfileDTO getProfile(UUID accountId, UUID identityToken) {
-        return modelMapper.map(findValidProfile(accountId, identityToken), ProfileDTO.class);
+    public ProfileDTO getProfile(UUID accountId) {
+        return modelMapper.map(findValidProfile(accountId), ProfileDTO.class);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public CardDTO getCard(UUID accountId, UUID identityToken, UUID swipedId) {
-        Profile profile = findValidProfile(accountId, identityToken);
+    public CardDTO getCard(UUID accountId, UUID swipedId) {
+        Profile profile = findValidProfile(accountId);
         CardDTO cardDTO = profileDAO.findCardDTO(swipedId, profile.getLocation());
         if (cardDTO == null) throw new ProfileNotFoundException();
         return cardDTO;
@@ -87,38 +87,30 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     //          then Hibernate won't delete accountQuestions even if their size = 0
     @Override
     @Transactional
-    public void saveProfile(UUID accountId,
-                            UUID identityToken,
-                            String name,
-                            Date birth,
-                            String about,
-                            int height,
-                            boolean gender) {
-//        TODO: save name to account as well
-
+    public void saveProfile(UUID accountId, String name, Date birth, String about, int height, boolean gender) {
         Account account = accountDAO.findById(accountId);
-        validateAccount(account, identityToken);
+        account.setName(name);
         if (profileDAO.existsById(accountId)) return;
         int birthYear = DateUtil.getYearFrom(birth);
         Point location = getLocation(DEFAULT_LONGITUDE, DEFAULT_LATITUDE);
         if (about == null) about = "";
-        profileDAO.persist(new Profile(account, name, birthYear, birth, gender, height, about, location, new Date()));
+        accountDAO.persist(account);
+        Profile profile = new Profile(account, name, birthYear, birth, gender, height, about, location, new Date());
+        profileDAO.persist(profile);
     }
 
     @Override
     @Transactional
-    public void saveAbout(UUID accountId, UUID identityToken, String about, Integer height) {
+    public void saveAbout(UUID accountId, String about, Integer height) {
         Profile profile = profileDAO.findByIdWithLock(accountId);
-        validateAccount(profile.getAccount());
         profile.setAbout(about);
         profile.setHeight(height);
     }
 
     @Override
     @Transactional
-    public void saveLocation(UUID accountId, UUID identityToken, double latitude, double longitude, Date updatedAt) {
+    public void saveLocation(UUID accountId, double latitude, double longitude, Date updatedAt) {
         Profile profile = profileDAO.findByIdWithLock(accountId);
-        validateAccount(profile.getAccount());
         if (updatedAt.after(profile.getLocationUpdatedAt())) {
             profile.setLocation(getLocation(latitude, longitude));
             profile.setLocationUpdatedAt(updatedAt);
@@ -134,8 +126,8 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     // TEST 1. matches are mapped by matcher_id not matched_id
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public RecommendDTO recommend(UUID accountId, UUID identityToken, int distance, int minAge, int maxAge, boolean gender, int pageIndex) {
-        Profile profile = findValidProfile(accountId, identityToken);
+    public RecommendDTO recommend(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int pageIndex) {
+        Profile profile = findValidProfile(accountId);
         RecommendDTO recommendDTO = new RecommendDTO();
 
         if (distance < MIN_DISTANCE) distance = MIN_DISTANCE;
@@ -159,19 +151,17 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         return recommendDTO;
     }
 
-    private Profile findValidProfile(UUID accountId, UUID identityToken) {
+    private Profile findValidProfile(UUID accountId) {
         Profile profile = profileDAO.findById(accountId);
         if (profile == null) throw new ProfileNotFoundException();
-        validateAccount(profile.getAccount(), identityToken);
         return profile;
     }
 
     @Override
     @Transactional
-    public void saveEmail(UUID accountId, UUID identityToken, String email) {
+    public void saveEmail(UUID accountId, String email) {
         Login login = loginDAO.findByAccountId(accountId);
         if (login == null) throw new LoginNotFoundException();
-        validateAccount(login.getAccount(), identityToken);
 
         LoginType loginType = login.getType();
         if (loginType == LoginType.NAVER || loginType == LoginType.GOOGLE)
@@ -186,10 +176,9 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public String getEmail(UUID accountId, UUID identityToken) {
+    public String getEmail(UUID accountId) {
         Login login = loginDAO.findByAccountId(accountId);
         if (login == null) throw new LoginNotFoundException();
-        validateAccount(login.getAccount(), identityToken);
         return login.getEmail();
     }
 

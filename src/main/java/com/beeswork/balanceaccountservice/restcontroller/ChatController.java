@@ -47,21 +47,16 @@ public class ChatController {
     }
 
     @PostMapping("/message/sync")
-    public void syncChatMessages(@Valid @RequestBody SyncChatMessagesVM syncChatMessagesVM,
-                                 BindingResult bindingResult) {
+    public void syncChatMessages(@Valid @RequestBody SyncChatMessagesVM syncChatMessagesVM, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        chatService.syncChatMessages(syncChatMessagesVM.getAccountId(),
-                                     syncChatMessagesVM.getIdentityToken(),
-                                     syncChatMessagesVM.getSentChatMessageIds(),
-                                     syncChatMessagesVM.getReceivedChatMessageIds());
+        chatService.syncChatMessages(syncChatMessagesVM.getSentChatMessageIds(), syncChatMessagesVM.getReceivedChatMessageIds());
     }
 
     @GetMapping("/message/list")
-    public ResponseEntity<String> listChatMessages(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
-                                                   BindingResult bindingResult) throws JsonProcessingException {
+    public ResponseEntity<String> listChatMessages(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM, BindingResult bindingResult)
+    throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ListChatMessagesDTO listChatMessagesDTO = chatService.listChatMessages(accountIdentityVM.getAccountId(),
-                                                                               accountIdentityVM.getIdentityToken());
+        ListChatMessagesDTO listChatMessagesDTO = chatService.listChatMessages(accountIdentityVM.getAccountId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listChatMessagesDTO));
     }
 

@@ -15,9 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface AccountService {
-    void validateAccount(UUID accountId, UUID identityToken);
-    void saveQuestionAnswers(UUID accountId, UUID identityToken, Map<Integer, Boolean> answers);
-    List<QuestionDTO> listQuestions(UUID accountId, UUID identityToken);
-    DeleteAccountDTO deleteAccount(UUID accountId, UUID identityToken);
-    UserDetails loadUserByUsername(String userName, String identityToken);
+    void saveQuestionAnswers(UUID accountId, Map<Integer, Boolean> answers);
+    List<QuestionDTO> listQuestions(UUID accountId);
+    DeleteAccountDTO deleteAccount(UUID accountId);
 }

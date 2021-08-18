@@ -2,17 +2,13 @@ package com.beeswork.balanceaccountservice.config.security;
 
 import com.beeswork.balanceaccountservice.constant.HttpHeader;
 import com.beeswork.balanceaccountservice.exception.login.RefreshTokenNotFoundException;
-import com.beeswork.balanceaccountservice.service.account.AccountService;
+import com.beeswork.balanceaccountservice.service.login.LoginService;
 import io.jsonwebtoken.*;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
-import reactor.netty.http.server.HttpServerRequest;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +18,6 @@ import java.util.List;
 
 
 @Component
-@RequiredArgsConstructor
 public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     //  TODO: secretkey should be from credential.yaml
@@ -32,8 +27,13 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
     private final long               REFRESH_TOKEN_VALID_TIME = 14 * 24 * 60 * 60 * 1000L;
     private final String             REFRESH_TOKEN_KEY        = "key";
     private final String             ACCESS_TOKEN_ROLES       = "roles";
-    private final UserDetailsService userDetailsService;
-    private final AccountService accountService;
+
+    private final LoginService loginService;
+
+    @Autowired
+    public JWTTokenProviderImpl(LoginService loginService) {
+        this.loginService = loginService;
+    }
 
     @PostConstruct
     protected void init() {
@@ -66,7 +66,7 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     public Authentication getAuthentication(String token, String identityToken) {
 //        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserName(token));
-        UserDetails userDetails = accountService.loadUserByUsername(getUserName(token), identityToken);
+        UserDetails userDetails = loginService.loadUserByUsername(getUserName(token), identityToken);
         return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
     }
 

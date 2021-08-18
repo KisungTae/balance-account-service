@@ -11,9 +11,9 @@ import java.util.UUID;
 
 public interface PhotoService {
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-    void savePhoto(UUID accountId, UUID identityToken, String photoKey, int sequence);
+    void savePhoto(UUID accountId, String photoKey, int sequence);
 
-    List<PhotoDTO> listPhotos(UUID accountId, UUID identityToken);
-    void deletePhoto(UUID accountId, UUID identityToken, String photoKey);
-    void reorderPhotos(UUID accountId, UUID identityToken, Map<String, Integer> photoOrders);
+    List<PhotoDTO> listPhotos(UUID accountId);
+    void deletePhoto(UUID accountId, String photoKey);
+    void reorderPhotos(UUID accountId, Map<String, Integer> photoOrders);
 }

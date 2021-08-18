@@ -42,8 +42,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public ListMatchesDTO listMatches(UUID accountId, UUID identityToken, Date fetchedAt) {
-        validateAccount(accountDAO.findById(accountId), identityToken);
+    public ListMatchesDTO listMatches(UUID accountId, Date fetchedAt) {
         ListMatchesDTO listMatchesDTO = new ListMatchesDTO(fetchedAt);
         List<MatchDTO> matchDTOs = matchDAO.findAllAfter(accountId, offsetFetchedAt(fetchedAt));
 
@@ -67,12 +66,11 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Override
     @Transactional
-    public void unmatch(UUID accountId, UUID identityToken, UUID swipedId) {
+    public void unmatch(UUID accountId, UUID swipedId) {
         Match swiperMatch = matchDAO.findById(accountId, swipedId);
         Match swipedMatch = matchDAO.findById(swipedId, accountId);
 
         if (swiperMatch == null || swipedMatch == null) throw new MatchNotFoundException();
-        validateAccount(swiperMatch.getSwiper(), identityToken);
 
         Date updatedAt = new Date();
         if (swiperMatch.isUnmatched()) {

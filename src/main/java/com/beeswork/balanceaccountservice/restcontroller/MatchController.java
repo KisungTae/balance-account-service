@@ -33,13 +33,10 @@ public class MatchController extends BaseController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<String> listMatches(@Valid @ModelAttribute ListMatchesVM listMatchesVM,
-                                              BindingResult bindingResult)
-    throws JsonProcessingException, InterruptedException {
+    public ResponseEntity<String> listMatches(@Valid @ModelAttribute ListMatchesVM listMatchesVM, BindingResult bindingResult)
+    throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ListMatchesDTO listMatchesDTO = matchService.listMatches(listMatchesVM.getAccountId(),
-                                                                 listMatchesVM.getIdentityToken(),
-                                                                 listMatchesVM.getFetchedAt());
+        ListMatchesDTO listMatchesDTO = matchService.listMatches(listMatchesVM.getAccountId(), listMatchesVM.getFetchedAt());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listMatchesDTO));
     }
 
@@ -47,7 +44,7 @@ public class MatchController extends BaseController {
     public ResponseEntity<String> unmatch(@Valid @RequestBody UnmatchVM unmatchVM, BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        matchService.unmatch(unmatchVM.getAccountId(), unmatchVM.getIdentityToken(), unmatchVM.getSwipedId());
+        matchService.unmatch(unmatchVM.getAccountId(), unmatchVM.getSwipedId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 

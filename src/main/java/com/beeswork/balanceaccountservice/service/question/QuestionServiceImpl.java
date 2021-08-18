@@ -45,7 +45,10 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<QuestionDTO> listRandomQuestions() {
-        int offset = new Random().nextInt((int) (questionDAO.count() - MIN_NUM_OF_QUESTIONS));
+        int questionCount = (int) questionDAO.count();
+        if (questionCount <= 0) throw new QuestionNotFoundException();
+
+        int offset = new Random().nextInt(questionCount - MIN_NUM_OF_QUESTIONS);
         List<Question> questions = questionDAO.findAll(MIN_NUM_OF_QUESTIONS, offset);
         return modelMapper.map(questions, new TypeToken<List<QuestionDTO>>() {}.getType());
     }

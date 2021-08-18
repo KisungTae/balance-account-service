@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MatchService {
-    ListMatchesDTO listMatches(UUID accountId, UUID identityToken, Date fetchedAt);
+    ListMatchesDTO listMatches(UUID accountId, Date fetchedAt);
 
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-    void unmatch(UUID accountId, UUID identityToken, UUID swipedId);
+    void unmatch(UUID accountId, UUID swipedId);
 
 }

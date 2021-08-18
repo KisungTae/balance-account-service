@@ -43,11 +43,10 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
 
     @Override
     @Transactional
-    public Long saveChatMessage(UUID accountId, UUID identityToken, long chatId, UUID recipientId, long key, String body, Date createdAt) {
+    public Long saveChatMessage(UUID accountId, long chatId, UUID recipientId, long key, String body, Date createdAt) {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
         Match match = matchDAO.findById(accountId, recipientId);
         if (match == null) return null;
-        validateAccount(match.getSwiper(), identityToken);
         Account swiped = match.getSwiped();
         Chat chat = match.getChat();
         if (swiped == null || chat == null || chat.getId() != chatId) return null;
@@ -71,11 +70,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
 
     @Override
     @Transactional
-    public void syncChatMessages(UUID accountId,
-                                 UUID identityToken,
-                                 List<Long> sentChatMessageIds,
-                                 List<Long> receivedChatMessageIds) {
-        validateAccount(accountDAO.findById(accountId), identityToken);
+    public void syncChatMessages(List<Long> sentChatMessageIds, List<Long> receivedChatMessageIds) {
         List<ChatMessage> receivedChatMessages = chatMessageDAO.findAllIn(receivedChatMessageIds);
         Date now = new Date();
         for (ChatMessage chatMessage : receivedChatMessages) {
@@ -90,7 +85,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     }
 
     @Override
-    public ListChatMessagesDTO listChatMessages(UUID accountId, UUID identityToken) {
+    public ListChatMessagesDTO listChatMessages(UUID accountId) {
         ListChatMessagesDTO listChatMessagesDTO = new ListChatMessagesDTO();
         listChatMessagesDTO.setReceivedChatMessageDTOs(chatMessageDAO.findAllUnreceived(accountId));
         listChatMessagesDTO.setSentChatMessageDTOs(sentChatMessageDAO.findAllUnfetched(accountId));

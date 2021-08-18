@@ -28,18 +28,15 @@ public class SettingServiceImpl extends BaseServiceImpl implements SettingServic
     }
 
     @Override
-    public PushSettingDTO getPushSetting(UUID accountId, UUID identityToken) {
-        Account account = accountDAO.findById(accountId);
-        validateAccount(account, identityToken);
-        PushSetting pushSetting = pushSettingDAO.findByAccountId(account.getId());
+    public PushSettingDTO getPushSetting(UUID accountId) {
+        PushSetting pushSetting = pushSettingDAO.findByAccountId(accountId);
         return modelMapper.map(pushSetting, PushSettingDTO.class);
     }
 
     @Override
     @Transactional
-    public void savePushSettings(UUID accountId, UUID identityToken, Boolean matchPush, Boolean clickedPush, Boolean chatMessagePush) {
+    public void savePushSettings(UUID accountId, Boolean matchPush, Boolean clickedPush, Boolean chatMessagePush) {
         Account account = accountDAO.findById(accountId);
-        validateAccount(account, identityToken);
         PushSetting pushSetting = pushSettingDAO.findByAccountId(account.getId());
         if (pushSetting == null) pushSetting = new PushSetting(account);
 

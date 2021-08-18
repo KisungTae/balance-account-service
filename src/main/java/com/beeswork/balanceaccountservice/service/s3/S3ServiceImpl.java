@@ -59,16 +59,14 @@ public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
 
     @Override
     @Async("processExecutor")
-    public void deletePhoto(String accountId, String photoKey) {
-        String key = generateKey(accountId, photoKey);
+    public void deletePhoto(UUID accountId, String photoKey) {
+        String key = generateKey(accountId.toString(), photoKey);
         amazonS3.deleteObject(new DeleteObjectRequest(BALANCE_PHOTO_BUCKET, key));
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public PreSignedUrl generatePreSignedUrl(UUID accountId, UUID identityToken, String photoKey) throws JsonProcessingException {
-        Account account = accountDAO.findById(accountId);
-        validateAccount(account, identityToken);
+    public PreSignedUrl generatePreSignedUrl(UUID accountId, String photoKey) throws JsonProcessingException {
         if (photoDAO.existsByKey(accountId, photoKey)) throw new PhotoAlreadyExistsException();
 
         String key = generateKey(accountId.toString(), photoKey);
@@ -89,9 +87,8 @@ public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
     @Async("processExecutor")
     public void deletePhotosAsync(UUID accountId, List<String> photoKeys) {
         ArrayList<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<>();
-        String stringAccountId = accountId.toString();
         for (String photoKey : photoKeys)
-            keys.add(new DeleteObjectsRequest.KeyVersion(stringAccountId + "/" + photoKey));
+            keys.add(new DeleteObjectsRequest.KeyVersion(generateKey(accountId.toString(), photoKey)));
 
         if (!keys.isEmpty()) {
             DeleteObjectsRequest request = new DeleteObjectsRequest(BALANCE_PHOTO_BUCKET).withKeys(keys).withQuiet(true);

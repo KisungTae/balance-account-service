@@ -37,7 +37,6 @@ public class SettingController extends BaseController {
                                                    BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         settingService.savePushSettings(savePushSettingsVM.getAccountId(),
-                                        savePushSettingsVM.getIdentityToken(),
                                         savePushSettingsVM.getMatchPush(),
                                         savePushSettingsVM.getClickedPush(),
                                         savePushSettingsVM.getChatMessagePush());
@@ -48,7 +47,7 @@ public class SettingController extends BaseController {
     public ResponseEntity<String> getPushSetting(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
                                                  BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        PushSettingDTO pushSettingDTO = settingService.getPushSetting(accountIdentityVM.getAccountId(), accountIdentityVM.getIdentityToken());
+        PushSettingDTO pushSettingDTO = settingService.getPushSetting(accountIdentityVM.getAccountId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(pushSettingDTO));
     }
 

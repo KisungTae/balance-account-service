@@ -43,20 +43,16 @@ public class PhotoController extends BaseController {
                                                        BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         PreSignedUrl preSignedUrl = s3Service.generatePreSignedUrl(generatePreSignedURLVM.getAccountId(),
-                                                                   generatePreSignedURLVM.getIdentityToken(),
                                                                    generatePreSignedURLVM.getPhotoKey());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(preSignedUrl));
     }
 
     @PostMapping("/save")
     public ResponseEntity<String> savePhoto(@Valid @RequestBody SavePhotoVM savePhotoVM,
-                                           BindingResult bindingResult)
+                                            BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        photoService.savePhoto(savePhotoVM.getAccountId(),
-                               savePhotoVM.getIdentityToken(),
-                               savePhotoVM.getPhotoKey(),
-                               savePhotoVM.getSequence());
+        photoService.savePhoto(savePhotoVM.getAccountId(), savePhotoVM.getPhotoKey(), savePhotoVM.getSequence());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
@@ -65,9 +61,7 @@ public class PhotoController extends BaseController {
                                              BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<PhotoDTO> photoDTOs = photoService.listPhotos(accountIdentityVM.getAccountId(),
-                                                           accountIdentityVM.getIdentityToken());
-
+        List<PhotoDTO> photoDTOs = photoService.listPhotos(accountIdentityVM.getAccountId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(photoDTOs));
     }
 
@@ -75,11 +69,7 @@ public class PhotoController extends BaseController {
     public ResponseEntity<String> reorderPhotos(@Valid @RequestBody ReorderPhotosVM reorderPhotosVM,
                                                 BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-
-        photoService.reorderPhotos(reorderPhotosVM.getAccountId(),
-                                   reorderPhotosVM.getIdentityToken(),
-                                   reorderPhotosVM.getPhotoOrders());
-
+        photoService.reorderPhotos(reorderPhotosVM.getAccountId(), reorderPhotosVM.getPhotoOrders());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
@@ -87,10 +77,8 @@ public class PhotoController extends BaseController {
     public ResponseEntity<String> deletePhoto(@Valid @RequestBody DeletePhotoVM deletePhotoVM,
                                               BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        photoService.deletePhoto(deletePhotoVM.getAccountId(),
-                                 deletePhotoVM.getIdentityToken(),
-                                 deletePhotoVM.getPhotoKey());
-        s3Service.deletePhoto(deletePhotoVM.getAccountId().toString(), deletePhotoVM.getPhotoKey());
+        photoService.deletePhoto(deletePhotoVM.getAccountId(), deletePhotoVM.getPhotoKey());
+        s3Service.deletePhoto(deletePhotoVM.getAccountId(), deletePhotoVM.getPhotoKey());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 }

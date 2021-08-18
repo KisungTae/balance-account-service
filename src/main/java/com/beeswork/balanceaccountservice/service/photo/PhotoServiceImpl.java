@@ -38,11 +38,10 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
 
     @Override
     @Transactional
-    public void savePhoto(UUID accountId, UUID identityToken, String photoKey, int sequence) {
+    public void savePhoto(UUID accountId, String photoKey, int sequence) {
         //TODO: check getPhotos 
 
-
-        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
+        Account account = accountDAO.findById(accountId);
         List<Photo> photos = account.getPhotos();
         if (photos.size() >= PhotoConstant.MAX_NUM_OF_PHOTOS) throw new PhotoExceededMaxException();
 
@@ -57,19 +56,18 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
         accountDAO.persist(account);
     }
 
+//    TODO: right away check photodao should find all
     @Override
-    @Transactional(propagation = Propagation.REQUIRED,
-                   isolation = Isolation.READ_COMMITTED,
-                   readOnly = true)
-    public List<PhotoDTO> listPhotos(UUID accountId, UUID identityToken) {
-        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public List<PhotoDTO> listPhotos(UUID accountId) {
+        Account account = accountDAO.findById(accountId);
         return modelMapper.map(account.getPhotos(), new TypeToken<List<PhotoDTO>>() {}.getType());
     }
 
     @Override
     @Transactional
-    public void deletePhoto(UUID accountId, UUID identityToken, String photoKey) {
-        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
+    public void deletePhoto(UUID accountId, String photoKey) {
+        Account account = accountDAO.findById(accountId);
         List<Photo> photos = account.getPhotos();
 
         Photo photo = photos.stream()
@@ -95,8 +93,8 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
 
     @Override
     @Transactional
-    public void reorderPhotos(UUID accountId, UUID identityToken, Map<String, Integer> photoOrders) {
-        Account account = validateAccount(accountDAO.findById(accountId), identityToken);
+    public void reorderPhotos(UUID accountId, Map<String, Integer> photoOrders) {
+        Account account = accountDAO.findById(accountId);
         List<Photo> photos = account.getPhotos();
         Date updatedAt = new Date();
         for (Photo photo : photos) {

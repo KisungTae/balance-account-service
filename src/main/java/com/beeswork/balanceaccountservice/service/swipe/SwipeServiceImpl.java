@@ -24,9 +24,7 @@ import com.beeswork.balanceaccountservice.entity.swipe.SwipeId;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
 import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipeClickedExistsException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipeMatchedExistsException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipeNotFoundException;
+import com.beeswork.balanceaccountservice.exception.swipe.*;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -71,9 +69,10 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public List<QuestionDTO> swipe(UUID accountId, UUID identityToken, UUID swipedId) {
-        Account swiper = validateAccount(accountDAO.findById(accountId), identityToken);
-        Account swiped = validateSwiped(accountDAO.findById(swipedId));
+    public List<QuestionDTO> swipe(UUID accountId, UUID swipedId) {
+        Account swiper = accountDAO.findById(accountId);
+        Account swiped = accountDAO.findById(swipedId);
+        validateSwiped(swiped);
 
         Wallet wallet = walletDAO.findByAccountId(swiper.getId());
         SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
@@ -102,8 +101,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public ListSwipesDTO listSwipes(UUID accountId, UUID identityToken, Date fetchedAt) {
-        validateAccount(accountDAO.findById(accountId), identityToken);
+    public ListSwipesDTO listSwipes(UUID accountId, Date fetchedAt) {
         List<SwipeDTO> swipeDTOs = swipeDAO.findSwipes(accountId, fetchedAt);
         ListSwipesDTO listSwipesDTO = new ListSwipesDTO(fetchedAt);
         if (swipeDTOs == null) return listSwipesDTO;
@@ -119,14 +117,13 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<SwipeDTO> listClicks(UUID accountId, UUID identityToken, Date fetchedAt) {
-        validateAccount(accountDAO.findById(accountId), identityToken);
+    public List<SwipeDTO> listClicks(UUID accountId, Date fetchedAt) {
         return swipeDAO.findClicks(accountId, fetchedAt);
     }
 
     @Override
     @Transactional
-    public ClickDTO click(UUID accountId, UUID identityToken, UUID swipedId, Map<Integer, Boolean> answers) {
+    public ClickDTO click(UUID accountId, UUID swipedId, Map<Integer, Boolean> answers) {
         Swipe subSwipe, objSwipe;
         if (accountId.compareTo(swipedId) > 0) {
             subSwipe = swipeDAO.findByIdWithLock(new SwipeId(accountId, swipedId));
@@ -140,8 +137,10 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         else if (subSwipe.isClicked()) throw new SwipeClickedExistsException();
         else if (subSwipe.isMatched()) throw new SwipeMatchedExistsException();
 
-        Account swiper = validateAccount(subSwipe.getSwiper(), identityToken);
-        Account swiped = validateSwiped(subSwipe.getSwiped());
+        Account swiper = subSwipe.getSwiper();
+        Account swiped = subSwipe.getSwiped();
+        validateSwiped(swiped);
+
         Wallet wallet = walletDAO.findByAccountId(swiper.getId());
         SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
 
@@ -212,5 +211,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             wallet.setFreeSwipe(swipeMeta.getMaxFreeSwipe());
             wallet.setFreeSwipeRechargedAt(now);
         }
+    }
+
+    private void validateSwiped(Account swiped) {
+        if (swiped == null) throw new SwipedNotFoundException();
+        if (swiped.isDeleted()) throw new SwipedDeletedException();
+        if (swiped.isBlocked()) throw new SwipedBlockedException();
     }
 }

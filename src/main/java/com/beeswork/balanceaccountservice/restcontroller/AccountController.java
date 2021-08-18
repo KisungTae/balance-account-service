@@ -44,9 +44,7 @@ public class AccountController extends BaseController {
                                               BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        accountService.saveQuestionAnswers(saveAnswersVM.getAccountId(),
-                                           saveAnswersVM.getIdentityToken(),
-                                           saveAnswersVM.getAnswers());
+        accountService.saveQuestionAnswers(saveAnswersVM.getAccountId(), saveAnswersVM.getAnswers());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
@@ -54,17 +52,17 @@ public class AccountController extends BaseController {
     public ResponseEntity<String> listQuestions(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
                                                 BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<QuestionDTO> questionDTOs = accountService.listQuestions(accountIdentityVM.getAccountId(),
-                                                                      accountIdentityVM.getIdentityToken());
+        List<QuestionDTO> questionDTOs = accountService.listQuestions(accountIdentityVM.getAccountId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
     }
 
+
+//  TODO: comment in s3Service.deletephoto
     @PostMapping("/delete")
     public ResponseEntity<String> deleteAccount(@Valid @RequestBody AccountIdentityVM accountIdentityVM,
                                                 BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        DeleteAccountDTO deleteAccountDTO = accountService.deleteAccount(accountIdentityVM.getAccountId(),
-                                                                         accountIdentityVM.getIdentityToken());
+        DeleteAccountDTO deleteAccountDTO = accountService.deleteAccount(accountIdentityVM.getAccountId());
 //        s3Service.deletePhotosAsync(deleteAccountDTO.getAccountId(), deleteAccountDTO.getPhotoKeys());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }

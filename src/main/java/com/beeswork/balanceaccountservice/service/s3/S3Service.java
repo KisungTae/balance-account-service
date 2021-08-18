@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface S3Service {
-    void deletePhoto(String accountId, String photoKey);
-    PreSignedUrl generatePreSignedUrl(UUID accountId, UUID identityToken, String photoKey) throws JsonProcessingException;
+    void deletePhoto(UUID accountId, String photoKey);
+    PreSignedUrl generatePreSignedUrl(UUID accountId, String photoKey) throws JsonProcessingException;
     void deletePhotosAsync(UUID accountId, List<String> photoKeys);
 }

@@ -17,28 +17,16 @@ import java.util.UUID;
 
 public interface ProfileService {
 
-    ProfileDTO getProfile(UUID accountId, UUID identityToken);
-
-    CardDTO getCard(UUID accountId, UUID identityToken, UUID swipedId);
-
+    ProfileDTO getProfile(UUID accountId);
+    CardDTO getCard(UUID accountId, UUID swipedId);
     // delay = 0 then default to 1 second
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-    void saveProfile(UUID accountId,
-                     UUID identityToken,
-                     String name,
-                     Date birth,
-                     String about,
-                     int height,
-                     boolean gender);
-
+    void saveProfile(UUID accountId, String name, Date birth, String about, int height, boolean gender);
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-    void saveAbout(UUID accountId, UUID identityToken, String about, Integer height);
-
+    void saveAbout(UUID accountId, String about, Integer height);
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-    void saveLocation(UUID accountId, UUID identityToken, double latitude, double longitude, Date updatedAt);
-
-    RecommendDTO recommend(UUID accountId, UUID identityToken, int distance, int minAge, int maxAge, boolean gender, int pageIndex);
-
-    void saveEmail(UUID accountId, UUID identityToken, String email);
-    String getEmail(UUID accountId, UUID identityToken);
+    void saveLocation(UUID accountId, double latitude, double longitude, Date updatedAt);
+    RecommendDTO recommend(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int pageIndex);
+    void saveEmail(UUID accountId, String email);
+    String getEmail(UUID accountId);
 }

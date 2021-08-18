@@ -39,7 +39,6 @@ public class ReportController extends BaseController {
                                                 BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         reportService.reportProfile(reportVM.getAccountId(),
-                                    reportVM.getIdentityToken(),
                                     reportVM.getReportedId(),
                                     reportVM.getReportReasonId(),
                                     reportVM.getDescription());
@@ -51,7 +50,6 @@ public class ReportController extends BaseController {
                                               BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         reportService.reportMatch(reportVM.getAccountId(),
-                                  reportVM.getIdentityToken(),
                                   reportVM.getReportedId(),
                                   reportVM.getReportReasonId(),
                                   reportVM.getDescription());

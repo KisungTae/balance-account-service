@@ -13,11 +13,9 @@ import java.util.*;
 public interface SwipeService {
 
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-    List<QuestionDTO> swipe(UUID accountId, UUID identityToken, UUID swipedId);
-
+    List<QuestionDTO> swipe(UUID accountId, UUID swipedId);
     @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
-    ClickDTO click(UUID accountId, UUID identityToken, UUID swipedId, Map<Integer, Boolean> answers);
-
-    ListSwipesDTO listSwipes(UUID accountId, UUID identityToken, Date fetchedAt);
-    List<SwipeDTO> listClicks(UUID accountId, UUID identityToken, Date fetchedAt);
+    ClickDTO click(UUID accountId, UUID swipedId, Map<Integer, Boolean> answers);
+    ListSwipesDTO listSwipes(UUID accountId, Date fetchedAt);
+    List<SwipeDTO> listClicks(UUID accountId, Date fetchedAt);
 }

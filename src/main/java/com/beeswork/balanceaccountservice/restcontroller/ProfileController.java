@@ -35,8 +35,7 @@ public class ProfileController extends BaseController {
     public ResponseEntity<String> getProfile(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
                                              BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ProfileDTO profileDTO = profileService.getProfile(accountIdentityVM.getAccountId(),
-                                                          accountIdentityVM.getIdentityToken());
+        ProfileDTO profileDTO = profileService.getProfile(accountIdentityVM.getAccountId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(profileDTO));
     }
 
@@ -45,9 +44,7 @@ public class ProfileController extends BaseController {
                                           BindingResult bindingResult)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        CardDTO cardDTO = profileService.getCard(getCardVM.getAccountId(),
-                                                 getCardVM.getIdentityToken(),
-                                                 getCardVM.getSwipedId());
+        CardDTO cardDTO = profileService.getCard(getCardVM.getAccountId(), getCardVM.getSwipedId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(cardDTO));
     }
 
@@ -57,7 +54,6 @@ public class ProfileController extends BaseController {
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
         profileService.saveProfile(saveProfileVM.getAccountId(),
-                                   saveProfileVM.getIdentityToken(),
                                    saveProfileVM.getName(),
                                    saveProfileVM.getBirth(),
                                    saveProfileVM.getAbout(),
@@ -70,10 +66,7 @@ public class ProfileController extends BaseController {
     public ResponseEntity<String> saveAbout(@Valid @RequestBody SaveAboutVM saveAboutVM,
                                             BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
-        profileService.saveAbout(saveAboutVM.getAccountId(),
-                                 saveAboutVM.getIdentityToken(),
-                                 saveAboutVM.getAbout(),
-                                 saveAboutVM.getHeight());
+        profileService.saveAbout(saveAboutVM.getAccountId(), saveAboutVM.getAbout(), saveAboutVM.getHeight());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
@@ -82,7 +75,6 @@ public class ProfileController extends BaseController {
                                                BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         profileService.saveLocation(saveLocationVM.getAccountId(),
-                                    saveLocationVM.getIdentityToken(),
                                     saveLocationVM.getLatitude(),
                                     saveLocationVM.getLongitude(),
                                     saveLocationVM.getUpdatedAt());
@@ -94,7 +86,6 @@ public class ProfileController extends BaseController {
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         RecommendDTO recommendDTO = profileService.recommend(recommendVM.getAccountId(),
-                                                             recommendVM.getIdentityToken(),
                                                              recommendVM.getDistance(),
                                                              recommendVM.getMinAge(),
                                                              recommendVM.getMaxAge(),
@@ -107,7 +98,7 @@ public class ProfileController extends BaseController {
     public ResponseEntity<String> saveEmail(@Valid @RequestBody SaveEmailVM saveEmailVM,
                                             BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) super.fieldExceptionResponse(bindingResult);
-        profileService.saveEmail(saveEmailVM.getAccountId(), saveEmailVM.getIdentityToken(), saveEmailVM.getEmail());
+        profileService.saveEmail(saveEmailVM.getAccountId(), saveEmailVM.getEmail());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
@@ -115,7 +106,7 @@ public class ProfileController extends BaseController {
     public ResponseEntity<String> getEmail(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
                                            BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        String email = profileService.getEmail(accountIdentityVM.getAccountId(), accountIdentityVM.getIdentityToken());
+        String email = profileService.getEmail(accountIdentityVM.getAccountId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(email));
     }
 }
