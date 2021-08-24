@@ -1,6 +1,5 @@
 package com.beeswork.balanceaccountservice.config.properties;
 
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @Component
 @NoArgsConstructor
-@ConfigurationProperties("aws")
-public class AWSProperties {
-    private String balancePhotoBucket;
+@ConfigurationProperties("jwt-token")
+public class JWTTokenProperties {
+    private String secretKey;
 }

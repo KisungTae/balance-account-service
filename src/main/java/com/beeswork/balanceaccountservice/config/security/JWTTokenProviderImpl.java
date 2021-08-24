@@ -1,8 +1,9 @@
 package com.beeswork.balanceaccountservice.config.security;
 
+import com.beeswork.balanceaccountservice.config.properties.JWTTokenProperties;
 import com.beeswork.balanceaccountservice.constant.HttpHeader;
 import com.beeswork.balanceaccountservice.exception.login.RefreshTokenNotFoundException;
-import com.beeswork.balanceaccountservice.service.login.LoginService;
+import com.beeswork.balanceaccountservice.service.security.UserDetailService;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,23 +22,26 @@ import java.util.List;
 public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     //  TODO: secretkey should be from credential.yaml
-    private       String             secretKey                = "a8300909-ece3-4cc5-ac66-12883a8eb452";
-    //    private final long ACCESS_TOKEN_VALID_TIME = 5 * 60 * 60 * 1000L;
-    private final long               ACCESS_TOKEN_VALID_TIME  = 5 * 60 * 1000L;
-    private final long               REFRESH_TOKEN_VALID_TIME = 14 * 24 * 60 * 60 * 1000L;
-    private final String             REFRESH_TOKEN_KEY        = "key";
-    private final String             ACCESS_TOKEN_ROLES       = "roles";
+//    private final long   ACCESS_TOKEN_VALID_TIME  = 60 * 60 * 1000L;
+    private final long   ACCESS_TOKEN_VALID_TIME  = 1 * 60 * 1000L;
+    private final long   REFRESH_TOKEN_VALID_TIME = 14 * 24 * 60 * 60 * 1000L;
+    private final String REFRESH_TOKEN_KEY        = "key";
+    private final String ACCESS_TOKEN_ROLES       = "roles";
+    private       String secretKey;
 
-    private final LoginService loginService;
+    private final JWTTokenProperties jwtTokenProperties;
+    private final UserDetailService  userDetailsService;
 
     @Autowired
-    public JWTTokenProviderImpl(LoginService loginService) {
-        this.loginService = loginService;
+    public JWTTokenProviderImpl(JWTTokenProperties jwtTokenProperties,
+                                UserDetailService userDetailsService) {
+        this.jwtTokenProperties = jwtTokenProperties;
+        this.userDetailsService = userDetailsService;
     }
 
     @PostConstruct
     protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+        secretKey = Base64.getEncoder().encodeToString(jwtTokenProperties.getSecretKey().getBytes());
     }
 
     public String createRefreshToken(String userName, String key) {
@@ -65,8 +69,7 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
     }
 
     public Authentication getAuthentication(String token, String identityToken) {
-//        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserName(token));
-        UserDetails userDetails = loginService.loadUserByUsername(getUserName(token), identityToken);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserName(token), identityToken);
         return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
     }
 

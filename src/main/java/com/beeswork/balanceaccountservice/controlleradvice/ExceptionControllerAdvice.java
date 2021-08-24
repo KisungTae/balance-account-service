@@ -1,8 +1,6 @@
 package com.beeswork.balanceaccountservice.controlleradvice;
 
 
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.SdkClientException;
 import com.beeswork.balanceaccountservice.constant.PhotoConstant;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.BaseException;
@@ -13,6 +11,8 @@ import com.beeswork.balanceaccountservice.exception.photo.PhotoAlreadyExistsExce
 import com.beeswork.balanceaccountservice.exception.photo.PhotoExceededMaxException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoNotFoundException;
+import com.beeswork.balanceaccountservice.exception.profile.EmailDuplicateException;
+import com.beeswork.balanceaccountservice.exception.profile.EmailNotMutableException;
 import com.beeswork.balanceaccountservice.exception.profile.ProfileNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
@@ -32,20 +32,16 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.security.GeneralSecurityException;
 import java.util.Locale;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-//@RestControllerAdvice(annotations = RestController.class)
 @RestControllerAdvice
 public class ExceptionControllerAdvice {
 
@@ -69,7 +65,8 @@ public class ExceptionControllerAdvice {
                        ProfileNotFoundException.class, MatchNotFoundException.class,
                        ReportReasonNotFoundException.class, ReportedNotFoundException.class,
                        QueueNotFoundException.class, SwipeMetaNotFoundException.class,
-                       SettingNotFoundException.class})
+                       SettingNotFoundException.class, RefreshTokenNotFoundException.class,
+                       RefreshTokenKeyNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale) throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .contentType(MediaType.APPLICATION_JSON)
@@ -123,7 +120,7 @@ public class ExceptionControllerAdvice {
                        EmailDuplicateException.class, PhotoInvalidDeleteException.class,
                        AccountDeletedException.class, PhotoAlreadyExistsException.class,
                        PhotoExceededMaxException.class, InvalidSocialLoginException.class,
-                       RefreshTokenExpiredException.class, RefreshTokenNotFoundException.class})
+                       RefreshTokenExpiredException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {
         Object[] arguments = null;

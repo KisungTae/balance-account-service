@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.config.websocket;
 
+import com.beeswork.balanceaccountservice.config.security.JWTTokenProvider;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
@@ -43,8 +44,8 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private MessageChannel outChannel;
-
+    @Autowired
+    private JWTTokenProvider jwtTokenProvider;
 
     //  NOTE 1. if exception is thrown from compositeMessageConverter.fromMessage for invalid UUId or Long then ignore the request
     @SneakyThrows
@@ -61,22 +62,24 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
         return message;
     }
 
+//    TODO: right away check if chat request goes throughh security then chagne accordingly
     private Message<?> validateBeforeSubscribe(StompHeaderAccessor headerAccessor, Message<?> message) {
-        throw new BadRequestException();
+//        throw new BadRequestException();
 //        BadRequestException badRequestException = new BadRequestException();
 //        UUID accountId = Convert.toUUIDOrThrow(getIdFromDestination(headerAccessor.getDestination()), badRequestException);
 //        UUID identityToken = Convert.toUUIDOrThrow(headerAccessor.getFirstNativeHeader(StompHeader.IDENTITY_TOKEN), badRequestException);
 //        accountService.validateAccount(accountId, identityToken);
 //
-//        StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.SUBSCRIBE);
-//        accessor.setSessionId(headerAccessor.getSessionId());
-//        accessor.setDestination(headerAccessor.getDestination());
-//        accessor.addNativeHeader(StompHeader.AUTO_DELETE, String.valueOf(true));
-//        accessor.addNativeHeader(StompHeader.DURABLE, String.valueOf(true));
-//        accessor.addNativeHeader(StompHeader.EXCLUSIVE, String.valueOf(false));
-//        accessor.setSubscriptionId(StompHeader.PRIVATE_QUEUE_SUBSCRIPTION_ID);
-//        accessor.setAck(StompHeader.DEFAULT_ACK);
-//        return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
+        StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.SUBSCRIBE);
+        accessor.setSessionId(headerAccessor.getSessionId());
+        accessor.setDestination(headerAccessor.getDestination());
+        accessor.addNativeHeader(StompHeader.AUTO_DELETE, String.valueOf(true));
+        accessor.addNativeHeader(StompHeader.DURABLE, String.valueOf(true));
+        accessor.addNativeHeader(StompHeader.EXCLUSIVE, String.valueOf(false));
+        accessor.setSubscriptionId(StompHeader.PRIVATE_QUEUE_SUBSCRIPTION_ID);
+        accessor.setAck(StompHeader.DEFAULT_ACK);
+        return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
+//        return message;
     }
 
 

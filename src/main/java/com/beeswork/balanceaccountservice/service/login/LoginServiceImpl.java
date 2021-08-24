@@ -116,8 +116,11 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
 
         String newRefreshToken = createNewRefreshToken(account, refreshToken);
         String accessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
-        boolean profileExists = profileExists(account.getId());
-        return new LoginDTO(account.getId(), account.getIdentityToken(), profileExists, accessToken, newRefreshToken, login.getEmail());
+
+        Profile profile = profileDAO.findById(account.getId());
+        boolean profileExists = profile != null && profile.isEnabled();
+        Boolean gender = profileExists ? profile.isGender() : null;
+        return new LoginDTO(account.getId(), account.getIdentityToken(), profileExists, accessToken, newRefreshToken, login.getEmail(), gender);
     }
 
     private void updatePushToken(UUID accountId) {
@@ -153,10 +156,14 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         if (!jwtTokenProvider.validateRefreshToken(refreshToken)) throw new RefreshTokenExpiredException();
         Account account = findValidAccountFromToken(accountId, refreshToken);
         RefreshToken accountRefreshToken = findValidRefreshToken(accountId, refreshToken);
-        boolean profileExists = profileExists(account.getId());
+
+        Profile profile = profileDAO.findById(account.getId());
+        boolean profileExists = profile != null && profile.isEnabled();
+        Boolean gender = profileExists ? profile.isGender() : null;
+
         String newRefreshToken = createNewRefreshToken(account, accountRefreshToken);
         String newAccessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
-        return new LoginDTO(account.getId(), account.getIdentityToken(), profileExists, newAccessToken, newRefreshToken);
+        return new LoginDTO(account.getId(), account.getIdentityToken(), profileExists, newAccessToken, newRefreshToken, gender);
     }
 
     private Account findValidAccountFromToken(UUID accountId, String token) {
@@ -173,8 +180,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         if (accountRefreshToken == null) throw new RefreshTokenNotFoundException();
 
         String refreshTokenKey = jwtTokenProvider.getRefreshTokenKey(refreshToken);
-        if (!accountRefreshToken.getKey().toString().equals(refreshTokenKey))
-            throw new RefreshTokenNotFoundException();
+        if (!accountRefreshToken.getKey().toString().equals(refreshTokenKey)) throw new RefreshTokenKeyNotFoundException();
 
         return accountRefreshToken;
     }

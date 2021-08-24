@@ -47,6 +47,8 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     private static final int MAX_STOMP_MESSAGE_BODY = 500;
 
+//  TODO: clientlogin and passcode should be in credentials.yaml
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
 //        config.enableSimpleBroker("/queue");
@@ -77,7 +79,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/chat");
+        registry.addEndpoint("/websocket");
         registry.setErrorHandler(stompErrorHandler());
     }
 

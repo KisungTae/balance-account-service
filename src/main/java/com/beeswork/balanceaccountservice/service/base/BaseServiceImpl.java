@@ -17,25 +17,6 @@ public abstract class BaseServiceImpl {
 
     private static final int FETCH_OFFSET_IN_MINUTES = -5;
 
-//    protected Account validateAccount(Account account, UUID identityToken) {
-//        validateAccount(account);
-//        if (!account.getIdentityToken().equals(identityToken)) throw new AccountNotFoundException();
-//        return account;
-//    }
-//
-//    protected void validateAccount(Account account) {
-//        if (account == null) throw new AccountNotFoundException();
-//        if (account.isBlocked()) throw new AccountBlockedException();
-//        if (account.isDeleted()) throw new AccountDeletedException();
-//    }
-//
-//    protected Account validateSwiped(Account account) {
-//        if (account == null) throw new SwipedNotFoundException();
-//        if (account.isDeleted()) throw new SwipedDeletedException();
-//        if (account.isBlocked()) throw new SwipedBlockedException();
-//        return account;
-//    }
-
     protected Date offsetFetchedAt(Date date) {
         return DateUtils.addMinutes(date, FETCH_OFFSET_IN_MINUTES);
     }

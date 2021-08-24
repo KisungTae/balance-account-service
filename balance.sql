@@ -179,9 +179,9 @@ create table account
 
 create table refresh_token
 (
-    account_id uuid         primary key,
-    key      uuid not null,
-    updated_at timestamptz  not null,
+    account_id uuid primary key,
+    key        uuid        not null,
+    updated_at timestamptz not null,
 
     constraint refresh_token_account_id_fk foreign key (account_id) references account (id)
 );
@@ -403,8 +403,6 @@ create index swipe_swiped_id_idx on swipe (swiped_id);
 
 
 
-
-
 create table report
 (
     id               serial primary key,
@@ -448,7 +446,6 @@ values (default, 200, 300, 43200000, 10, current_timestamp, current_timestamp);
 
 
 
-
 create table role
 (
     id   serial primary key,
@@ -486,28 +483,50 @@ from match
 group by swiper_id
 order by count(swiper_id) desc;
 
-delete from account;
+delete
+from account;
 
 select *
 from role;
 
-select * from login;
-select * from account;
-select * from wallet;
-select * from push_setting;
-select * from refresh_token;
+select *
+from login;
+select *
+from account;
+select *
+from wallet;
+select *
+from push_setting;
+select *
+from refresh_token;
 
+select *
+from profile;
 
+insert into chat
+values (1);
+insert into match
+values (0, 'aac25164-d504-4fc3-bdb7-7fc773d6920f', 'dd7cafa8-8f60-4218-ada5-90de64d2c352', 1, false, false, false, false, current_timestamp, current_timestamp);
+insert into match values (0, 'dd7cafa8-8f60-4218-ada5-90de64d2c352', 'aac25164-d504-4fc3-bdb7-7fc773d6920f', 1, false, false, false, false, current_timestamp, current_timestamp);
 
+select *
+from chat_message;
 
+select *
+from match;
 
-
-delete from login;
-delete from wallet;
-delete from push_setting;
-delete from refresh_token;
-delete from account;
-delete from push_token;
+delete
+from login;
+delete
+from wallet;
+delete
+from push_setting;
+delete
+from refresh_token;
+delete
+from account;
+delete
+from push_token;
 
 
 select *
