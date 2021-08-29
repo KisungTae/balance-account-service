@@ -30,7 +30,6 @@ public class StompHeader {
     public static final String PRIVATE_QUEUE_SUBSCRIPTION_ID = "0";
     public static final String DEFAULT_ACK = "auto";
     public static final String SUBSCRIPTION = "subscription";
-    public static final long UNMATCHED_RECEIPT_ID = -1;
 
 
     public static Locale getLocaleFromAcceptLanguageHeader(StompHeaderAccessor stompHeaderAccessor) {

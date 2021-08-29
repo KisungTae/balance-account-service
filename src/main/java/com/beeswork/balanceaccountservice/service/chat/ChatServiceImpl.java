@@ -11,6 +11,8 @@ import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.chat.SentChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
+import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
+import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,12 +48,13 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     public Long saveChatMessage(UUID accountId, long chatId, UUID recipientId, long key, String body, Date createdAt) {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
         Match match = matchDAO.findById(accountId, recipientId);
-        if (match == null) return null;
+        if (match == null) throw new MatchNotFoundException();
         Account swiped = match.getSwiped();
         Chat chat = match.getChat();
-        if (swiped == null || chat == null || chat.getId() != chatId) return null;
+        if (swiped == null || chat == null || chat.getId() != chatId)
+            throw new MatchNotFoundException();
         if (match.isUnmatched() || match.getSwiped().isDeleted() || match.getSwiped().isBlocked())
-            return StompHeader.UNMATCHED_RECEIPT_ID;
+            throw new MatchUnmatchedException();
 
         SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(accountId, key);
         if (sentChatMessage == null) {

@@ -22,6 +22,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashSet;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/chat")
@@ -42,8 +44,8 @@ public class ChatController {
 
     @MessageMapping("/chat/send")
     public void send(@Payload ChatMessageVM chatMessageVM, MessageHeaders messageHeaders) {
-        if (chatMessageVM.getId() != null && chatMessageVM.getId() != StompHeader.UNMATCHED_RECEIPT_ID)
-            stompService.sendChatMessage(modelMapper.map(chatMessageVM, ChatMessageDTO.class), messageHeaders);
+        Locale locale = StompHeader.getLocaleFromMessageHeaders(messageHeaders);
+        stompService.sendChatMessage(modelMapper.map(chatMessageVM, ChatMessageDTO.class), locale);
     }
 
     @PostMapping("/message/sync")

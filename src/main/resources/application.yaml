@@ -71,6 +71,15 @@ task-executor:
 aws:
   balance-photo-bucket: balance-photo-bucket
 
+stomp:
+  destination-prefix: /app
+  stomp-broker-relay: /queue
+  relay-host: localhost
+  relay-port: 61613
+  max-message-size: 500
+  end-point: /balance
+
+
 
 #spring:
 #  jpa:

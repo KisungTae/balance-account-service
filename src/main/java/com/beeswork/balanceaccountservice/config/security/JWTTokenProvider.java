@@ -14,4 +14,5 @@ public interface JWTTokenProvider {
     String getRefreshTokenKey(String token);
     boolean validateAccessToken(String token);
     boolean validateRefreshToken(String token);
+    void validateAuthentication(String token, String identityToken);
 }

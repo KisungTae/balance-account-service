@@ -39,7 +39,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(httpServletRequest, httpServletResponse);
         } catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
             handlerExceptionResolver.resolveException(httpServletRequest, httpServletResponse, null, e);
         }
     }

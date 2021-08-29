@@ -528,6 +528,10 @@ from account;
 delete
 from push_token;
 
+select * from chat_message;
+
+delete from sent_chat_message;
+delete from chat_message;
 
 select *
 from push_token;

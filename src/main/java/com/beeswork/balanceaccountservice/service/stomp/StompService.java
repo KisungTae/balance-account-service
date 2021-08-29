@@ -8,6 +8,6 @@ import java.util.Locale;
 
 public interface StompService {
 
-    void sendChatMessage(ChatMessageDTO chatMessageDTO, MessageHeaders messageHeaders);
+    void sendChatMessage(ChatMessageDTO chatMessageDTO, Locale locale);
     void sendMatch(MatchDTO matchDTO, Locale locale);
 }

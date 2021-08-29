@@ -56,6 +56,7 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
                    .compact();
     }
 
+    @Override
     public String createAccessToken(String userName, List<String> roles) {
         Claims claims = Jwts.claims().setSubject(userName);
         claims.put(ACCESS_TOKEN_ROLES, roles);
@@ -68,37 +69,48 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
                    .compact();
     }
 
+    @Override
     public Authentication getAuthentication(String token, String identityToken) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(getUserName(token), identityToken);
         return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
     }
 
+    @Override
     public String getUserName(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
+    @Override
     public String resolveAccessToken(HttpServletRequest httpServletRequest) {
         return httpServletRequest.getHeader(HttpHeader.ACCESS_TOKEN);
     }
 
+    @Override
     public String getRefreshTokenKey(String token) {
         Object refreshTokenKey = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get(REFRESH_TOKEN_KEY);
         if (refreshTokenKey == null) throw new RefreshTokenNotFoundException();
         return refreshTokenKey.toString();
     }
 
+    @Override
     public boolean validateAccessToken(String token) {
-        Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-        return !claims.getBody().getExpiration().before(new Date());
+        try {
+            if (token.isEmpty()) return false;
+            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            return !claims.getBody().getExpiration().before(new Date());
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
     public boolean validateRefreshToken(String token) {
-        try {
-            return validateAccessToken(token);
-        } catch (Exception e) {
-            return false;
-        }
+        return validateAccessToken(token);
+    }
+
+    @Override
+    public void validateAuthentication(String token, String identityToken) {
+        userDetailsService.loadUserByUsername(getUserName(token), identityToken);
     }
 
 
