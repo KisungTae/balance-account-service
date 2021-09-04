@@ -34,3 +34,4 @@ build/
 git
 ### Credential ###
 src/main/resources/application-credential.yaml
+src/main/resources/balance-896d6-firebase-adminsdk-sppjt-13d87a9365.json
