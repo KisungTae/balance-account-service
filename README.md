@@ -1,5 +1,5 @@
 # Balance web server
-It's a REST API for Android Balance application that connects people based on their location and interests.
+It's a REST API for mobile application called Balance that connects people based on their location and interests.
 
 
 # Functionalities
