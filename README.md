@@ -8,11 +8,11 @@ Provide a chat funtionality for people who have similar interests to have more c
 Allow people to upload their photos, basic information and interests
 
 # Tech stacks
-Framework: Spring Boot, Hibernate \
-AWS Cloud: AWS EC2, Postgresql RDS, S3, Application Load balancer \
-Database: Postgresql, Postgis \
-Deisng pattern: MVP, DAO \
-Third party: Firebase Cloud Messaign
+Language: Java
+Framework: Spring Boot \
+AWS Cloud: AWS EC2, Postgresql RDS, S3 \
+Database: Postgresql, Postgis, Hibernate (ORM) \
+Design pattern: MVP, DAO \
 
 
 
