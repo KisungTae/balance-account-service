@@ -3,14 +3,16 @@ It's a REST API for Android Balance application that connects people based on th
 
 
 # Functionalities
-
-Recommends people around the user 
-Allow chat
-Profile
+Recommend people around user based on the location and interests \
+Provide a chat funtionality for people who have similar interests to have more conversation \
+Allow people to upload their photos, basic information and interests
 
 # Tech stacks
-AWS Ec2, RDs, Application Load balancer,
-MVC design pattern, DI, DAO, rabbit, stomp, hiberante, postgresql, google firebase,
+Framework: Spring Boot, Hibernate \
+AWS Cloud: AWS EC2, Postgresql RDS, S3, Application Load balancer \
+Database: Postgresql, Postgis \
+Deisng pattern: MVP, DAO \
+Third party: Firebase Cloud Messaign
 
 
 
