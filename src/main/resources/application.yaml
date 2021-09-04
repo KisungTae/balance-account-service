@@ -70,6 +70,8 @@ task-executor:
 
 aws:
   balance-photo-bucket: balance-photo-bucket
+  s3-url: https://s3.%s.amazonaws.com/%s
+
 
 stomp:
   destination-prefix: /app

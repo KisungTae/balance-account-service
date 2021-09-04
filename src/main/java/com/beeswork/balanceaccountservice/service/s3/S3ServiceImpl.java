@@ -1,14 +1,12 @@
 package com.beeswork.balanceaccountservice.service.s3;
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.regions.DefaultAwsRegionProviderChain;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
+import com.beeswork.balanceaccountservice.config.properties.AWSProperties;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.photo.PhotoDAO;
 import com.beeswork.balanceaccountservice.dto.s3.PreSignedUrl;
-import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoAlreadyExistsException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,35 +31,30 @@ import java.util.UUID;
 @Service
 public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
 
-    private final DefaultAwsRegionProviderChain      defaultAwsRegionProviderChain;
-    private final DefaultAWSCredentialsProviderChain defaultAWSCredentialsProviderChain;
-    private final ObjectMapper                       objectMapper;
-    private final AmazonS3                           amazonS3;
-    private final AccountDAO                         accountDAO;
-    private final PhotoDAO                           photoDAO;
-
-    private final static String BALANCE_PHOTO_BUCKET = "test-balance-photo-bucket";
-    private final static String S3_URL               = "https://s3.%s.amazonaws.com/%s";
+    private final ObjectMapper  objectMapper;
+    private final AmazonS3      amazonS3;
+    private final AccountDAO    accountDAO;
+    private final PhotoDAO      photoDAO;
+    private final AWSProperties awsProperties;
 
     @Autowired
-    public S3ServiceImpl(DefaultAwsRegionProviderChain defaultAwsRegionProviderChain,
-                         DefaultAWSCredentialsProviderChain defaultAWSCredentialsProviderChain,
-                         ObjectMapper objectMapper,
+    public S3ServiceImpl(ObjectMapper objectMapper,
                          AmazonS3 amazonS3,
-                         AccountDAO accountDAO, PhotoDAO photoDAO) {
-        this.defaultAwsRegionProviderChain = defaultAwsRegionProviderChain;
-        this.defaultAWSCredentialsProviderChain = defaultAWSCredentialsProviderChain;
+                         AccountDAO accountDAO,
+                         PhotoDAO photoDAO,
+                         AWSProperties awsProperties) {
         this.objectMapper = objectMapper;
         this.amazonS3 = amazonS3;
         this.accountDAO = accountDAO;
         this.photoDAO = photoDAO;
+        this.awsProperties = awsProperties;
     }
 
     @Override
     @Async("processExecutor")
     public void deletePhoto(UUID accountId, String photoKey) {
         String key = generateKey(accountId.toString(), photoKey);
-        amazonS3.deleteObject(new DeleteObjectRequest(BALANCE_PHOTO_BUCKET, key));
+        amazonS3.deleteObject(new DeleteObjectRequest(awsProperties.getBalancePhotoBucket(), key));
     }
 
     @Override
@@ -70,13 +63,13 @@ public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
         if (photoDAO.existsByKey(accountId, photoKey)) throw new PhotoAlreadyExistsException();
 
         String key = generateKey(accountId.toString(), photoKey);
-        String region = defaultAwsRegionProviderChain.getRegion();
-        String accessKeyId = defaultAWSCredentialsProviderChain.getCredentials().getAWSAccessKeyId();
-        String secretKey = defaultAWSCredentialsProviderChain.getCredentials().getAWSSecretKey();
-        String endpoint = String.format(S3_URL, region, BALANCE_PHOTO_BUCKET);
+        String region = awsProperties.getRegion();
+        String accessKeyId = awsProperties.getAccessKeyId();
+        String secretKey = awsProperties.getSecretKey();
+        String endpoint = String.format(awsProperties.getS3Url(), region, awsProperties.getBalancePhotoBucket());
 
         Instant now = Instant.now();
-        PreSignedUrl preSignedUrl = new PreSignedUrl(endpoint, accessKeyId, region, BALANCE_PHOTO_BUCKET, key, now);
+        PreSignedUrl preSignedUrl = new PreSignedUrl(endpoint, accessKeyId, region, awsProperties.getBalancePhotoBucket(), key, now);
         String encodePolicy = encodePolicy(preSignedUrl.getUploadPolicy(now));
         String signature = computeSignature(encodePolicy, secretKey, region, now);
         preSignedUrl.sign(encodePolicy, signature);
@@ -91,7 +84,7 @@ public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
             keys.add(new DeleteObjectsRequest.KeyVersion(generateKey(accountId.toString(), photoKey)));
 
         if (!keys.isEmpty()) {
-            DeleteObjectsRequest request = new DeleteObjectsRequest(BALANCE_PHOTO_BUCKET).withKeys(keys).withQuiet(true);
+            DeleteObjectsRequest request = new DeleteObjectsRequest(awsProperties.getBalancePhotoBucket()).withKeys(keys).withQuiet(true);
             amazonS3.deleteObjects(request);
         }
     }

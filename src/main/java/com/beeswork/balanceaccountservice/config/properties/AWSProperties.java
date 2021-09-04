@@ -14,4 +14,8 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("aws")
 public class AWSProperties {
     private String balancePhotoBucket;
+    private String s3Url;
+    private String accessKeyId;
+    private String secretKey;
+    private String region;
 }

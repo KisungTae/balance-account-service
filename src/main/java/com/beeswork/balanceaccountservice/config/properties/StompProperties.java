@@ -21,17 +21,4 @@ public class StompProperties {
     private String clientLogin;
     private String clientPasscode;
     private String endPoint;
-
-    @Override
-    public String toString() {
-        return "StompProperties{" +
-               "destinationPrefix='" + destinationPrefix + '\'' +
-               ", stompBrokerRelay='" + stompBrokerRelay + '\'' +
-               ", relayHost='" + relayHost + '\'' +
-               ", relayPort='" + relayPort + '\'' +
-               ", maxMessageSize=" + maxMessageSize +
-               ", clientLogin='" + clientLogin + '\'' +
-               ", clientPasscode='" + clientPasscode + '\'' +
-               '}';
-    }
 }
