@@ -32,7 +32,7 @@ public class FirebaseConfig {
         InputStream is = getClass().getClassLoader().getResourceAsStream(firebaseProperties.getServiceAccountKeyPath());
         FirebaseOptions options = FirebaseOptions.builder()
                                                  .setCredentials(GoogleCredentials.fromStream(is))
-                                                 .setDatabaseUrl(firebaseProperties.getDatabaseURL())
+//                                                 .setDatabaseUrl(firebaseProperties.getDatabaseURL())
                                                  .build();
 
         if (FirebaseApp.getApps().isEmpty()) FirebaseApp.initializeApp(options);

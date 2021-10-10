@@ -544,9 +544,9 @@ public class DummyController {
 
     @GetMapping("/send/chat/message")
     public void sendDummyChatMessageToFCM() {
-        ChatMessageDTO chatMessageDTO = new ChatMessageDTO(1L, "test chat message", 12L, new Date());
+        ChatMessageDTO chatMessageDTO = new ChatMessageDTO(1L, "test chat message123123 now", 12L, new Date());
         fcmService.sendChatMessage(chatMessageDTO,
-                                   "dNx-ay3rS0qnIITWvS2ue7:APA91bHTsw7heoTkdZXiIQTvIovZEQBcLIw-hIdlv-Ti141OeUjEjW860r2WlfzVtKGqX0gYhymGJ2b_VDbNY2Ao5SbCzeTjquIPmSYb3QunGgdRuqqU8scU3QGxtXTxV9FeKFdLKsEE",
+                                   "fYvPOxLATZuorJ_apfzSD4:APA91bGHgxnNE3dEinyoQrN7XwB68n_mx5-cRKHIXLy8cW2XwgxizNoVooEDAduhOqP73In5WEeMIK1w13jMLAWNloQSvNAskzGZZC8IVL8j0icHvqabVnhj3QpHWOrNwtNv33ky5c6s",
                                    "michael",
                                    Locale.getDefault());
     }
