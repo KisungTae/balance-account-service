@@ -55,9 +55,6 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     private MessageChannel outChannel;
 
-
-//  TODO: clientlogin and passcode should be in credentials.yaml
-
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.setApplicationDestinationPrefixes(stompProperties.getDestinationPrefix())

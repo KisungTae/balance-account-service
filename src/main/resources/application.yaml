@@ -8,7 +8,7 @@ server:
       charset: UTF-8
       enabled: true
   port: 8081
-  address: 192.168.1.100
+  address: 192.168.1.119
 #  port: 8081
 #  address: 192.168.1.92
 
@@ -79,7 +79,7 @@ stomp:
   relay-host: localhost
   relay-port: 61613
   max-message-size: 500
-  end-point: /balance
+  end-point: /web-socket
 
 
 

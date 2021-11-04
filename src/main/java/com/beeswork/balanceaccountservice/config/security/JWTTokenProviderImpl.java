@@ -21,8 +21,7 @@ import java.util.List;
 @Component
 public class JWTTokenProviderImpl implements JWTTokenProvider {
 
-    //  TODO: secretkey should be from credential.yaml
-//    private final long   ACCESS_TOKEN_VALID_TIME  = 60 * 60 * 1000L;
+    //    private final long   ACCESS_TOKEN_VALID_TIME  = 60 * 60 * 1000L;
     private final long   ACCESS_TOKEN_VALID_TIME  = 1 * 60 * 1000L;
     private final long   REFRESH_TOKEN_VALID_TIME = 14 * 24 * 60 * 60 * 1000L;
     private final String REFRESH_TOKEN_KEY        = "key";
@@ -98,6 +97,8 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
             if (token.isEmpty()) return false;
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
+        } catch (ExpiredJwtException e) {
+            throw e;
         } catch (Exception e) {
             return false;
         }
@@ -105,7 +106,11 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     @Override
     public boolean validateRefreshToken(String token) {
-        return validateAccessToken(token);
+        try {
+            return validateAccessToken(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override

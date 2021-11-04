@@ -56,6 +56,8 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
     @Autowired
     private JWTTokenProvider jwtTokenProvider;
 
+    private static final String QUEUE = "queue/";
+
     //  NOTE 1. if exception is thrown from compositeMessageConverter.fromMessage for invalid UUId or Long then ignore the request
     @SneakyThrows
     @Override
@@ -67,8 +69,11 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
 
         if (StompCommand.SUBSCRIBE.equals(stompCommand))
             return validateBeforeSubscribe(stompHeaderAccessor, message, accessToken, identityToken);
-        else if (StompCommand.SEND.equals(stompCommand))
-            return validateBeforeSend(stompHeaderAccessor, message, accessToken, identityToken);
+        else if (StompCommand.SEND.equals(stompCommand)) {
+            throw new BadRequestException();
+//            return validateBeforeSend(stompHeaderAccessor, message, accessToken, identityToken);
+        }
+
 
         return message;
     }
@@ -82,8 +87,8 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
                                                Message<?> message,
                                                String accessToken,
                                                String identityToken) {
-        String destination = "/queue/" + jwtTokenProvider.getUserName(accessToken);
-        if (!destination.equals(headerAccessor.getDestination())) throw new BadRequestException();
+//        String destination = QUEUE + jwtTokenProvider.getUserName(accessToken);
+//        if (!destination.equals(headerAccessor.getDestination())) throw new BadRequestException();
 
         StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.SUBSCRIBE);
         accessor.setSessionId(headerAccessor.getSessionId());
