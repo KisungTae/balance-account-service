@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.entity.account;
 
+import com.beeswork.balanceaccountservice.entity.login.RefreshToken;
 import com.beeswork.balanceaccountservice.entity.login.Role;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
@@ -86,6 +87,12 @@ public class Account implements UserDetails {
                cascade = CascadeType.ALL,
                orphanRemoval = true)
     private List<PushToken> pushTokens = new ArrayList<>();
+
+    @OneToMany(mappedBy = "account",
+               fetch = FetchType.LAZY,
+               cascade = CascadeType.ALL,
+               orphanRemoval = true)
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)

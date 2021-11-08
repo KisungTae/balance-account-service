@@ -21,7 +21,22 @@ public class RefreshTokenDAOImpl extends BaseDAOImpl<RefreshToken> implements Re
     }
 
     @Override
+    public boolean existsByAccountIdAndKey(UUID accountId, UUID key) {
+        return jpaQueryFactory.selectFrom(qRefreshToken)
+                              .where(qRefreshToken.account.id.eq(accountId).and(qRefreshToken.key.eq(key)))
+                              .fetchCount() > 0;
+    }
+
+    @Override
+    public RefreshToken findRecentByAccountId(UUID accountId) {
+        return jpaQueryFactory.selectFrom(qRefreshToken)
+                              .where(qRefreshToken.account.id.eq(accountId))
+                              .orderBy(qRefreshToken.updatedAt.desc())
+                              .fetchFirst();
+    }
+
+    @Override
     public RefreshToken findByAccountId(UUID accountId) {
-        return jpaQueryFactory.selectFrom(qRefreshToken).where(qRefreshToken.accountId.eq(accountId)).fetchFirst();
+        return null;
     }
 }

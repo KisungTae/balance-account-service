@@ -110,7 +110,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         validateAccount(account);
         updatePushToken(account.getId());
 
-        RefreshToken refreshToken = refreshTokenDAO.findByAccountId(account.getId());
+        RefreshToken refreshToken = refreshTokenDAO.findRecentByAccountId(account.getId());
         if (refreshToken == null)
             refreshToken = new RefreshToken(account);
 
@@ -134,15 +134,10 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         }
     }
 
-    private boolean profileExists(UUID accountId) {
-        Profile profile = profileDAO.findById(accountId);
-        return profile != null && profile.isEnabled();
-    }
-
     @Override
     @Transactional
     public RefreshAccessTokenDTO refreshAccessToken(UUID accountId, String refreshToken) {
-        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) throw new RefreshTokenExpiredException();
+        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) throw new InvalidRefreshTokenException();
         Account account = findValidAccountFromToken(accountId, refreshToken);
         RefreshToken accountRefreshToken = findValidRefreshToken(accountId, refreshToken);
         String newRefreshToken = createNewRefreshToken(account, accountRefreshToken);
@@ -153,7 +148,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     @Override
     @Transactional
     public LoginDTO loginWithRefreshToken(UUID accountId, String refreshToken) {
-        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) throw new RefreshTokenExpiredException();
+        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) throw new InvalidRefreshTokenException();
         Account account = findValidAccountFromToken(accountId, refreshToken);
         RefreshToken accountRefreshToken = findValidRefreshToken(accountId, refreshToken);
 

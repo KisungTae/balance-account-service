@@ -120,7 +120,7 @@ public class ExceptionControllerAdvice {
                        EmailDuplicateException.class, PhotoInvalidDeleteException.class,
                        AccountDeletedException.class, PhotoAlreadyExistsException.class,
                        PhotoExceededMaxException.class, InvalidSocialLoginException.class,
-                       RefreshTokenExpiredException.class})
+                       RefreshTokenExpiredException.class, InvalidRefreshTokenException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {
         Object[] arguments = null;
