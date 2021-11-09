@@ -139,8 +139,8 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     public RefreshAccessTokenDTO refreshAccessToken(UUID accountId, String refreshToken) {
         if (!jwtTokenProvider.validateRefreshToken(refreshToken)) throw new InvalidRefreshTokenException();
         Account account = findValidAccountFromToken(accountId, refreshToken);
-        RefreshToken accountRefreshToken = findValidRefreshToken(accountId, refreshToken);
-        String newRefreshToken = createNewRefreshToken(account, accountRefreshToken);
+        validateRefreshTokenKey(accountId, refreshToken);
+        String newRefreshToken = createNewRefreshToken(account, new RefreshToken(account));
         String newAccessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
         return new RefreshAccessTokenDTO(newAccessToken, newRefreshToken);
     }
@@ -150,15 +150,21 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     public LoginDTO loginWithRefreshToken(UUID accountId, String refreshToken) {
         if (!jwtTokenProvider.validateRefreshToken(refreshToken)) throw new InvalidRefreshTokenException();
         Account account = findValidAccountFromToken(accountId, refreshToken);
-        RefreshToken accountRefreshToken = findValidRefreshToken(accountId, refreshToken);
+        validateRefreshTokenKey(accountId, refreshToken);
 
         Profile profile = profileDAO.findById(account.getId());
         boolean profileExists = profile != null && profile.isEnabled();
         Boolean gender = profileExists ? profile.isGender() : null;
 
-        String newRefreshToken = createNewRefreshToken(account, accountRefreshToken);
+        String newRefreshToken = createNewRefreshToken(account, new RefreshToken(account));
         String newAccessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
         return new LoginDTO(account.getId(), account.getIdentityToken(), profileExists, newAccessToken, newRefreshToken, gender);
+    }
+
+    private void validateRefreshTokenKey(UUID accountId, String refreshToken) {
+        UUID refreshTokenKey = jwtTokenProvider.getRefreshTokenKey(refreshToken);
+        if (!refreshTokenDAO.existsByAccountIdAndKey(accountId, refreshTokenKey))
+            throw new InvalidRefreshTokenException();
     }
 
     private Account findValidAccountFromToken(UUID accountId, String token) {
@@ -168,16 +174,6 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         Account account = accountDAO.findById(accountId);
         validateAccount(account);
         return account;
-    }
-
-    private RefreshToken findValidRefreshToken(UUID accountId, String refreshToken) {
-        RefreshToken accountRefreshToken = refreshTokenDAO.findByAccountId(accountId);
-        if (accountRefreshToken == null) throw new RefreshTokenNotFoundException();
-
-        String refreshTokenKey = jwtTokenProvider.getRefreshTokenKey(refreshToken);
-        if (!accountRefreshToken.getKey().toString().equals(refreshTokenKey)) throw new RefreshTokenKeyNotFoundException();
-
-        return accountRefreshToken;
     }
 
     private String createNewRefreshToken(Account account, RefreshToken refreshToken) {

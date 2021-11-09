@@ -2,8 +2,10 @@ package com.beeswork.balanceaccountservice.config.security;
 
 import com.beeswork.balanceaccountservice.config.properties.JWTTokenProperties;
 import com.beeswork.balanceaccountservice.constant.HttpHeader;
+import com.beeswork.balanceaccountservice.exception.login.InvalidRefreshTokenException;
 import com.beeswork.balanceaccountservice.exception.login.RefreshTokenNotFoundException;
 import com.beeswork.balanceaccountservice.service.security.UserDetailService;
+import com.beeswork.balanceaccountservice.util.Convert;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 
 @Component
@@ -69,8 +72,8 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
     }
 
     @Override
-    public Authentication getAuthentication(String token, String identityToken) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserName(token), identityToken);
+    public Authentication getAuthentication(String accessToken, String identityToken) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserName(accessToken), identityToken);
         return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
     }
 
@@ -85,17 +88,17 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
     }
 
     @Override
-    public String getRefreshTokenKey(String token) {
-        Object refreshTokenKey = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get(REFRESH_TOKEN_KEY);
-        if (refreshTokenKey == null) throw new RefreshTokenNotFoundException();
-        return refreshTokenKey.toString();
+    public UUID getRefreshTokenKey(String refreshToken) {
+        Object refreshTokenKey = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(refreshToken).getBody().get(REFRESH_TOKEN_KEY);
+        if (refreshTokenKey == null) throw new InvalidRefreshTokenException();
+        return Convert.toUUIDOrThrow(refreshTokenKey.toString(), new InvalidRefreshTokenException());
     }
 
     @Override
-    public boolean validateAccessToken(String token) {
+    public boolean validateAccessToken(String accessToken) {
         try {
-            if (token.isEmpty()) return false;
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            if (accessToken.isEmpty()) return false;
+            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(accessToken);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (ExpiredJwtException e) {
             throw e;
@@ -105,17 +108,17 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
     }
 
     @Override
-    public boolean validateRefreshToken(String token) {
+    public boolean validateRefreshToken(String refreshToken) {
         try {
-            return validateAccessToken(token);
+            return validateAccessToken(refreshToken);
         } catch (Exception e) {
             return false;
         }
     }
 
     @Override
-    public void validateAuthentication(String token, String identityToken) {
-        userDetailsService.loadUserByUsername(getUserName(token), identityToken);
+    public void validateAuthentication(String accessToken, String identityToken) {
+        userDetailsService.loadUserByUsername(getUserName(accessToken), identityToken);
     }
 
 

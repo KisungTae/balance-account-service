@@ -4,15 +4,16 @@ import org.springframework.security.core.Authentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.UUID;
 
 public interface JWTTokenProvider {
     String createRefreshToken(String userName, String key);
     String createAccessToken(String userName, List<String> roles);
-    Authentication getAuthentication(String token, String identityToken);
+    Authentication getAuthentication(String accessToken, String identityToken);
     String getUserName(String token);
     String resolveAccessToken(HttpServletRequest httpServletRequest);
-    String getRefreshTokenKey(String token);
-    boolean validateAccessToken(String token);
-    boolean validateRefreshToken(String token);
-    void validateAuthentication(String token, String identityToken);
+    UUID getRefreshTokenKey(String refreshToken);
+    boolean validateAccessToken(String accessToken);
+    boolean validateRefreshToken(String refreshToken);
+    void validateAuthentication(String accessToken, String identityToken);
 }
