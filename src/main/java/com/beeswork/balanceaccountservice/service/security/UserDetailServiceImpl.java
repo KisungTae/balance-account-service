@@ -27,11 +27,9 @@ public class UserDetailServiceImpl implements UserDetailService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public UserDetails loadUserByUsername(String userName, String identityToken) {
-        UUID userNameUUID = Convert.toUUIDOrThrow(userName, new AccountNotFoundException());
-        UUID identityTokenUUID = Convert.toUUIDOrThrow(identityToken, new AccountNotFoundException());
-        Account account = accountDAO.findById(userNameUUID);
-        validateAccount(account, identityTokenUUID);
+    public UserDetails loadUserByUsername(UUID userName, UUID identityToken) {
+        Account account = accountDAO.findById(userName);
+        validateAccount(account, identityToken);
         return account;
     }
 
