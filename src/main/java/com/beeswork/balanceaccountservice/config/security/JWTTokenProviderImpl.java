@@ -9,6 +9,7 @@ import com.beeswork.balanceaccountservice.service.security.UserDetailService;
 import com.beeswork.balanceaccountservice.util.Convert;
 import com.google.common.base.Strings;
 import io.jsonwebtoken.*;
+import io.micrometer.core.instrument.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,7 +32,7 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
     private final long   REFRESH_TOKEN_LIFE_TIME = 14 * 24 * 60 * 60 * 1000L;
     private final String REFRESH_TOKEN_KEY       = "key";
     private final String ACCESS_TOKEN_ROLES      = "roles";
-    private final int REFRESH_TOKEN_REVIVAL_TIME =
+    private final int REFRESH_TOKEN_RESET_TIME = 2;
     private       String secretKey;
 
     private final JWTTokenProperties jwtTokenProperties;
@@ -52,8 +53,7 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
     @Override
     public Jws<Claims> parseJWTToken(String token) {
         try {
-            if (Strings.isNullOrEmpty(token))
-                throw new InvalidJWTTokenException();
+            if (StringUtils.isBlank(token)) throw new InvalidJWTTokenException();
             return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
         } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
             throw new InvalidJWTTokenException();
@@ -65,7 +65,7 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
         Claims claims = jws.getBody();
         if (claims == null) throw new InvalidJWTTokenException();
         else if (claims.getExpiration() == null) throw new InvalidJWTTokenException();
-        if (!claims.getExpiration().before(new Date())) throw new ExpiredJwtException(null, claims, "");
+        else if (!claims.getExpiration().before(new Date())) throw new ExpiredJwtException(null, claims, "");
     }
 
     @Override
@@ -77,9 +77,9 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
     @Override
     public UUID getUserName(Jws<Claims> jws) {
         Claims claims = jws.getBody();
-        if (claims == null) throw new InvalidJWTTokenException();
+        if (claims == null) return null;
         String userName = claims.getSubject();
-        return Convert.toUUIDOrThrow(userName, new AccountNotFoundException());
+        return Convert.toUUID(userName);
     }
 
     @Override

@@ -43,6 +43,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             UUID identityToken = Convert.toUUIDOrThrow(identityTokenInString, new AccountNotFoundException());
             Authentication authentication = jwtTokenProvider.getAuthentication(jws, identityToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
             filterChain.doFilter(httpServletRequest, httpServletResponse);
         } catch (Exception e) {
             handlerExceptionResolver.resolveException(httpServletRequest, httpServletResponse, null, e);

@@ -343,6 +343,7 @@ public class BalanceAccountServiceApplication {
 // TODO			101. check identityToken check in stomp in regards to spring security
 
 
+
 // TODO			Chat Business rules
 //				1. 	send, receipt and ack || receive and ack
 //				2. 	listMatches retrieve only the chatMessages that are not received or synced

@@ -5,6 +5,9 @@ import com.beeswork.balanceaccountservice.entity.login.Role;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.match.Match;
+import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
+import com.beeswork.balanceaccountservice.exception.account.AccountDeletedException;
+import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -147,4 +150,6 @@ public class Account implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
 }
