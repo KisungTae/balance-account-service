@@ -5,6 +5,7 @@ import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundExcep
 import com.beeswork.balanceaccountservice.util.Convert;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import io.micrometer.core.instrument.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
@@ -36,14 +37,15 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain) {
         try {
             String token = jwtTokenProvider.resolveAccessToken(httpServletRequest);
-            Jws<Claims> jws = jwtTokenProvider.parseJWTToken(token);
-            jwtTokenProvider.validateJWTToken(jws);
+            if (StringUtils.isNotBlank(token)) {
+                Jws<Claims> jws = jwtTokenProvider.parseJWTToken(token);
+                jwtTokenProvider.validateJWTToken(jws);
 
-            String identityTokenInString = httpServletRequest.getHeader(HttpHeader.IDENTITY_TOKEN);
-            UUID identityToken = Convert.toUUIDOrThrow(identityTokenInString, new AccountNotFoundException());
-            Authentication authentication = jwtTokenProvider.getAuthentication(jws, identityToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
+                String identityTokenInString = httpServletRequest.getHeader(HttpHeader.IDENTITY_TOKEN);
+                UUID identityToken = Convert.toUUID(identityTokenInString);
+                Authentication authentication = jwtTokenProvider.getAuthentication(jws, identityToken);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
             filterChain.doFilter(httpServletRequest, httpServletResponse);
         } catch (Exception e) {
             handlerExceptionResolver.resolveException(httpServletRequest, httpServletResponse, null, e);

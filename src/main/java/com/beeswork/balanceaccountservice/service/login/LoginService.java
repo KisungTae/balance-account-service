@@ -12,5 +12,4 @@ public interface LoginService {
     LoginDTO socialLogin(String loginId, String email, LoginType loginType);
     RefreshAccessTokenDTO refreshAccessToken(UUID accountId, String refreshToken);
     LoginDTO loginWithRefreshToken(UUID accountId, String refreshToken);
-    UserDetails loadUserByUsername(String userName, String identityToken);
 }

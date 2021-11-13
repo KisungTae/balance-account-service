@@ -114,6 +114,16 @@ public class Account implements UserDetails {
         this.updatedAt = createdAt;
     }
 
+    public void validate() {
+        if (this.isBlocked()) throw new AccountBlockedException();
+        if (this.isDeleted()) throw new AccountDeletedException();
+    }
+
+    public void validate(UUID identityToken) {
+        if (!this.getIdentityToken().equals(identityToken)) throw new AccountNotFoundException();
+        validate();
+    }
+
     public List<String> getRoleNames() {
         return roles.stream().map(Role::getName).collect(Collectors.toList());
     }

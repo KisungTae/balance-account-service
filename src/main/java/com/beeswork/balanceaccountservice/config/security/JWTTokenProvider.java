@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface JWTTokenProvider {
-    Jws<Claims> parseJWTToken(String token);
+    Jws<Claims> parseJWTToken(String jwtToken);
     void validateJWTToken(Jws<Claims> jws);
     Authentication getAuthentication(Jws<Claims> jws, UUID identityToken);
     UUID getUserName(Jws<Claims> jws);
@@ -18,10 +18,10 @@ public interface JWTTokenProvider {
     String createAccessToken(String userName, List<String> roles);
     String resolveAccessToken(HttpServletRequest httpServletRequest);
     UUID getRefreshTokenKey(Jws<Claims> jws);
-    boolean shouldCreateNewRefreshToken(Jws<Claims> jws);
+    Date getExpirationDate(Jws<Claims> jws);
+    boolean shouldReissueRefreshToken(Date expiration);
 
-    UUID getRefreshTokenKey(String refreshToken);
-    boolean validateAccessToken(String accessToken);
-    boolean validateRefreshToken(String refreshToken);
+
+
     void validateAuthentication(String accessToken, String identityToken);
 }

@@ -79,8 +79,8 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
     }
 
     private void validateAccessToken(String accessToken, String identityToken) {
-        if (!jwtTokenProvider.validateAccessToken(accessToken)) throw new AccessTokenExpiredException();
-        jwtTokenProvider.validateAuthentication(accessToken, identityToken);
+//        if (!jwtTokenProvider.validateAccessToken(accessToken)) throw new AccessTokenExpiredException();
+//        jwtTokenProvider.validateAuthentication(accessToken, identityToken);
     }
 
     private Message<?> validateBeforeSubscribe(StompHeaderAccessor headerAccessor,

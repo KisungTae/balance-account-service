@@ -21,9 +21,8 @@ import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.setting.PushSetting;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
-import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
-import com.beeswork.balanceaccountservice.exception.account.AccountDeletedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
+import com.beeswork.balanceaccountservice.exception.jwt.InvalidJWTTokenException;
 import com.beeswork.balanceaccountservice.exception.login.*;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import com.beeswork.balanceaccountservice.util.Convert;
@@ -109,13 +108,11 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
 
     private LoginDTO loginWithExistingAccount(Login login) {
         Account account = accountDAO.findById(login.getAccountId());
-        validateAccount(account);
+        if (account == null) throw new AccountNotFoundException();
+        account.validate();
         updatePushToken(account.getId());
 
-        RefreshToken refreshToken = refreshTokenDAO.findRecentByAccountId(account.getId());
-        if (refreshToken == null)
-            refreshToken = new RefreshToken(account);
-
+        RefreshToken refreshToken = new RefreshToken(account);
         String newRefreshToken = createNewRefreshToken(account, refreshToken);
         String accessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
 
@@ -141,19 +138,14 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     public RefreshAccessTokenDTO refreshAccessToken(UUID accountId, String refreshToken) {
         Jws<Claims> jws = jwtTokenProvider.parseJWTToken(refreshToken);
         jwtTokenProvider.validateJWTToken(jws);
-        Account account = findValidAccountFromToken(accountId, jws);
+        Account account = findValidAccountFromJWTToken(accountId, jws);
         validateRefreshTokenKey(accountId, jws);
-
         Date expirationDate = jwtTokenProvider.getExpirationDate(jws);
 
-
-
-        RefreshToken recentRefreshToken = refreshTokenDAO.findRecentByAccountId(accountId);
-
-
-
-
-        String newRefreshToken = createNewRefreshToken(account, new RefreshToken(account));
+        String newRefreshToken = null;
+        if (jwtTokenProvider.shouldReissueRefreshToken(expirationDate)) {
+            newRefreshToken = createNewRefreshToken(account, new RefreshToken(account));
+        }
         String newAccessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
         return new RefreshAccessTokenDTO(newAccessToken, newRefreshToken);
     }
@@ -161,30 +153,38 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     @Override
     @Transactional
     public LoginDTO loginWithRefreshToken(UUID accountId, String refreshToken) {
-        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) throw new InvalidRefreshTokenException();
-        Account account = findValidAccountFromToken(accountId, refreshToken);
-        validateRefreshTokenKey(accountId, refreshToken);
+        RefreshAccessTokenDTO refreshAccessTokenDTO = refreshAccessToken(accountId, refreshToken);
+
+        // account will be retrieved from hibernate first cache, so won't impact performance
+        Account account = accountDAO.findById(accountId);
 
         Profile profile = profileDAO.findById(account.getId());
         boolean profileExists = profile != null && profile.isEnabled();
         Boolean gender = profileExists ? profile.isGender() : null;
 
-        String newRefreshToken = createNewRefreshToken(account, new RefreshToken(account));
-        String newAccessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
-        return new LoginDTO(account.getId(), account.getIdentityToken(), profileExists, newAccessToken, newRefreshToken, gender);
+        return new LoginDTO(account.getId(),
+                            account.getIdentityToken(),
+                            profileExists,
+                            refreshAccessTokenDTO.getAccessToken(),
+                            refreshAccessTokenDTO.getRefreshToken(),
+                            gender);
     }
+
 
     private void validateRefreshTokenKey(UUID accountId, Jws<Claims> jws) {
         UUID refreshTokenKey = jwtTokenProvider.getRefreshTokenKey(jws);
+        if (refreshTokenKey == null) throw new InvalidRefreshTokenException();
         if (!refreshTokenDAO.existsByAccountIdAndKey(accountId, refreshTokenKey))
             throw new InvalidRefreshTokenException();
     }
 
-    private Account findValidAccountFromToken(UUID accountId, Jws<Claims> jws) {
+    private Account findValidAccountFromJWTToken(UUID accountId, Jws<Claims> jws) {
         UUID userName = jwtTokenProvider.getUserName(jws);
+        if (userName == null) throw new AccountNotFoundException();
         if (!accountId.equals(userName)) throw new AccountNotFoundException();
         Account account = accountDAO.findById(accountId);
-        validateAccount(account);
+        if (account == null) throw new AccountNotFoundException();
+        account.validate();
         return account;
     }
 
@@ -195,26 +195,5 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         refreshToken.setUpdatedAt(issuedAt);
         refreshTokenDAO.persist(refreshToken);
         return jwtTokenProvider.createRefreshToken(account.getId().toString(), refreshTokenKey.toString(), issuedAt);
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public UserDetails loadUserByUsername(String userName, String identityToken) {
-        UUID userNameUUID = Convert.toUUIDOrThrow(userName, new AccountNotFoundException());
-        UUID identityTokenUUID = Convert.toUUIDOrThrow(identityToken, new AccountNotFoundException());
-        Account account = accountDAO.findById(userNameUUID);
-        validateAccount(account, identityTokenUUID);
-        return account;
-    }
-
-    private void validateAccount(Account account, UUID identityToken) {
-        validateAccount(account);
-        if (!account.getIdentityToken().equals(identityToken)) throw new AccountNotFoundException();
-    }
-
-    private void validateAccount(Account account) {
-        if (account == null) throw new AccountNotFoundException();
-        if (account.isBlocked()) throw new AccountBlockedException();
-        if (account.isDeleted()) throw new AccountDeletedException();
     }
 }
