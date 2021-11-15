@@ -19,7 +19,7 @@ public interface JWTTokenProvider {
     String resolveAccessToken(HttpServletRequest httpServletRequest);
     UUID getRefreshTokenKey(Jws<Claims> jws);
     Date getExpirationDate(Jws<Claims> jws);
-    boolean shouldReissueRefreshToken(Date expiration);
+    boolean shouldReissueRefreshToken(Jws<Claims> jws);
 
 
 

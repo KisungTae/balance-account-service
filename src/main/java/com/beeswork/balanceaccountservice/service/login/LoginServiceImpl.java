@@ -140,10 +140,9 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         jwtTokenProvider.validateJWTToken(jws);
         Account account = findValidAccountFromJWTToken(accountId, jws);
         validateRefreshTokenKey(accountId, jws);
-        Date expirationDate = jwtTokenProvider.getExpirationDate(jws);
 
         String newRefreshToken = null;
-        if (jwtTokenProvider.shouldReissueRefreshToken(expirationDate)) {
+        if (jwtTokenProvider.shouldReissueRefreshToken(jws)) {
             newRefreshToken = createNewRefreshToken(account, new RefreshToken(account));
         }
         String newAccessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());

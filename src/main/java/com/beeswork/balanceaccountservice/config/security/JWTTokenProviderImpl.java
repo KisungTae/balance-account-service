@@ -60,7 +60,7 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
         Claims claims = jws.getBody();
         if (claims == null) throw new InvalidJWTTokenException();
         else if (claims.getExpiration() == null) throw new InvalidJWTTokenException();
-        else if (claims.getExpiration().before(new Date())) throw new ExpiredJwtException(null, claims, "");
+        else if (claims.getExpiration().before(new Date())) throw new ExpiredJwtException(null, null, "");
     }
 
     @Override
@@ -125,10 +125,13 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
     }
 
     @Override
-    public boolean shouldReissueRefreshToken(Date expiration) {
-        if (expiration == null) throw new InvalidRefreshTokenException();
-        expiration = new Date(expiration.getTime() + REFRESH_TOKEN_LIFE_TIME);
-        return expiration.after(new Date());
+    public boolean shouldReissueRefreshToken(Jws<Claims> jws) {
+        Date expirationDate = getExpirationDate(jws);
+        if (expirationDate == null) throw new InvalidRefreshTokenException();
+        Date now = new Date();
+        long diff = expirationDate.getTime() - now.getTime();
+        if (diff <= 0) throw new ExpiredJwtException(null, null, "");
+        return diff <= REFRESH_TOKEN_REISSUE_TIME;
     }
 
 
