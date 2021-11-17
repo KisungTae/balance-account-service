@@ -34,9 +34,7 @@ build/
 git
 ### Credential ###
 src/main/resources/application-credential.yaml
-src/main/resources/balance-ae51e-firebase-adminsdk-xpy2h-4e18e7ef72.json
-src/main/resources/balance-ae51e-firebase-adminsdk-xpy2h-3c992ea25c.json
-src/main/resources/balance-8f5ee-firebase-adminsdk-4f4p4-62eff958c2.json
+src/main/resources/weclick-632af-firebase-adminsdk-t5pzm-d09ed68490.json
 
 
 balance.sql

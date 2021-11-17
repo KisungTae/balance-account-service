@@ -1,7 +1,7 @@
 package com.beeswork.balanceaccountservice.service.login;
 
-import com.beeswork.balanceaccountservice.dto.login.VerifyLoginDTO;
+import com.beeswork.balanceaccountservice.dto.login.VerifySocialLoginDTO;
 
 public interface FacebookLoginService {
-    VerifyLoginDTO verifyLogin(String loginId, String accessToken);
+    VerifySocialLoginDTO verifyLogin(String loginId, String accessToken);
 }

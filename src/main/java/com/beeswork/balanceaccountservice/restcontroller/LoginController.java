@@ -1,13 +1,12 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.config.security.JWTTokenProviderImpl;
+import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.dto.login.LoginDTO;
 import com.beeswork.balanceaccountservice.dto.login.RefreshAccessTokenDTO;
+import com.beeswork.balanceaccountservice.dto.login.VerifySocialLoginDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
-import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
+import com.beeswork.balanceaccountservice.exception.login.InvalidSocialLoginException;
 import com.beeswork.balanceaccountservice.service.login.*;
-import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
-import com.beeswork.balanceaccountservice.vm.account.SaveEmailVM;
 import com.beeswork.balanceaccountservice.vm.login.LoginVM;
 import com.beeswork.balanceaccountservice.vm.login.SocialLoginVM;
 import com.beeswork.balanceaccountservice.vm.login.RefreshAccessTokenVM;
@@ -59,26 +58,22 @@ public class LoginController extends BaseController {
                                               BindingResult bindingResult)
     throws GeneralSecurityException, IOException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-//        VerifyLoginDTO verifyLoginDTO = null;
-//
-//        if (socialLoginVM.getLoginType() == LoginType.GOOGLE)
-//            verifyLoginDTO = googleLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
-//        else if (socialLoginVM.getLoginType() == LoginType.KAKAO)
-//            verifyLoginDTO = kakaoLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
-//        else if (socialLoginVM.getLoginType() == LoginType.NAVER)
-//            verifyLoginDTO = naverLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
-//        else if (socialLoginVM.getLoginType() == LoginType.FACEBOOK)
-//            verifyLoginDTO = facebookLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
-//
-//        if (verifyLoginDTO == null) throw new InvalidSocialLoginException();
-//        LoginDTO loginDTO = loginService.socialLogin(verifyLoginDTO.getSocialLoginId(),
-//                                                     verifyLoginDTO.getEmail(),
-//                                                     socialLoginVM.getLoginType());
+        VerifySocialLoginDTO verifySocialLoginDTO = null;
 
-        LoginDTO loginDTO = loginService.socialLogin(socialLoginVM.getLoginId(),
-                                                     "testemail@gmail.com",
+        if (socialLoginVM.getLoginType() == LoginType.GOOGLE)
+            verifySocialLoginDTO = googleLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+        else if (socialLoginVM.getLoginType() == LoginType.KAKAO)
+            verifySocialLoginDTO = kakaoLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+        else if (socialLoginVM.getLoginType() == LoginType.NAVER)
+            verifySocialLoginDTO = naverLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+        else if (socialLoginVM.getLoginType() == LoginType.FACEBOOK)
+            verifySocialLoginDTO = facebookLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+
+        if (verifySocialLoginDTO == null || !verifySocialLoginDTO.isVerified()) throw new InvalidSocialLoginException();
+
+        LoginDTO loginDTO = loginService.socialLogin(verifySocialLoginDTO.getSocialLoginId(),
+                                                     verifySocialLoginDTO.getEmail(),
                                                      socialLoginVM.getLoginType());
-
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
     }
 

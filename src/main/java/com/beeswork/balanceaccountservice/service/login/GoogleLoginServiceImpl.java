@@ -1,18 +1,15 @@
 package com.beeswork.balanceaccountservice.service.login;
 
-import com.beeswork.balanceaccountservice.config.properties.GoogleLoginProperties;
-import com.beeswork.balanceaccountservice.dto.login.VerifyLoginDTO;
+import com.beeswork.balanceaccountservice.dto.login.VerifySocialLoginDTO;
 import com.beeswork.balanceaccountservice.exception.login.InvalidSocialLoginException;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
+import io.micrometer.core.instrument.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
 
 @Service
 public class GoogleLoginServiceImpl implements GoogleLoginService {
@@ -25,15 +22,20 @@ public class GoogleLoginServiceImpl implements GoogleLoginService {
     }
 
     @Override
-    public VerifyLoginDTO verifyLogin(String loginId, String idToken) throws GeneralSecurityException, IOException {
-        if (loginId.isEmpty() || idToken.isEmpty()) throw new InvalidSocialLoginException();
+    public VerifySocialLoginDTO verifyLogin(String loginId, String idToken) throws GeneralSecurityException, IOException {
+        VerifySocialLoginDTO verifySocialLoginDTO = new VerifySocialLoginDTO(false);
+        if (StringUtils.isBlank(loginId) || StringUtils.isBlank(idToken)) return verifySocialLoginDTO;
 
         GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
-        if (googleIdToken == null) throw new InvalidSocialLoginException();
+        if (googleIdToken == null) return verifySocialLoginDTO;
 
         String subject = googleIdToken.getPayload().getSubject();
+        if (!loginId.equals(subject)) return verifySocialLoginDTO;
+
         String email = googleIdToken.getPayload().getEmail();
-        if (!loginId.equals(subject)) throw new InvalidSocialLoginException();
-        return new VerifyLoginDTO(subject, email);
+        verifySocialLoginDTO.setVerified(true);
+        verifySocialLoginDTO.setEmail(email);
+        verifySocialLoginDTO.setSocialLoginId(subject);
+        return verifySocialLoginDTO;
     }
 }

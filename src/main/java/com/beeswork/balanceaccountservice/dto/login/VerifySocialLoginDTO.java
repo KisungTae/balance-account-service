@@ -9,7 +9,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VerifyLoginDTO {
+public class VerifySocialLoginDTO {
     private String socialLoginId;
     private String email;
+    private boolean isVerified;
+
+    public VerifySocialLoginDTO(boolean isVerified) {
+        this.isVerified = isVerified;
+    }
 }
