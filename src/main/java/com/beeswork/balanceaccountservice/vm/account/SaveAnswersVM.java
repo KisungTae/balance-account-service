@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class SaveAnswersVM extends AccountIdentityVM {
+public class SaveAnswersVM {
 
     @Size(min = 3, max = 5)
     private Map<Integer, Boolean> answers = new HashMap<>();

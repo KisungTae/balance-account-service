@@ -4,7 +4,6 @@ package com.beeswork.balanceaccountservice.restcontroller;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.question.QuestionService;
-import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import com.beeswork.balanceaccountservice.vm.question.RandomQuestionVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

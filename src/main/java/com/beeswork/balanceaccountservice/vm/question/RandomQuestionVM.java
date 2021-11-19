@@ -1,6 +1,5 @@
 package com.beeswork.balanceaccountservice.vm.question;
 
-import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import lombok.Getter;
 import lombok.Setter;
 import javax.validation.constraints.Size;

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/push-token")
@@ -35,19 +36,21 @@ public class PushTokenController extends BaseController {
 
     @PostMapping("/fcm")
     public ResponseEntity<String> saveFCMToken(@Valid @RequestBody SavePushTokenVM savePushTokenVM,
-                                               BindingResult bindingResult)
+                                               BindingResult bindingResult,
+                                               Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        pushTokenService.savePushToken(savePushTokenVM.getAccountId(), savePushTokenVM.getToken(), PushTokenType.FCM);
+        pushTokenService.savePushToken(getAccountIdFrom(principal), savePushTokenVM.getToken(), PushTokenType.FCM);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
     @PostMapping("/aps")
     public ResponseEntity<String> saveAPSToken(@Valid @RequestBody SavePushTokenVM savePushTokenVM,
-                                               BindingResult bindingResult)
+                                               BindingResult bindingResult,
+                                               Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        pushTokenService.savePushToken(savePushTokenVM.getAccountId(), savePushTokenVM.getToken(), PushTokenType.APS);
+        pushTokenService.savePushToken(getAccountIdFrom(principal), savePushTokenVM.getToken(), PushTokenType.APS);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 

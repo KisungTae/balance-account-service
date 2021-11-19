@@ -11,9 +11,6 @@ import java.util.UUID;
 @Setter
 public class RefreshAccessTokenVM {
 
-    @ValidUUID
-    private UUID accountId;
-
     @NotEmpty
     private String refreshToken;
 }

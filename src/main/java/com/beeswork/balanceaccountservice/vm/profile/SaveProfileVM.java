@@ -1,11 +1,8 @@
 package com.beeswork.balanceaccountservice.vm.profile;
 
-import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
-
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -13,7 +10,7 @@ import java.util.*;
 
 @Getter
 @Setter
-public class SaveProfileVM extends AccountIdentityVM {
+public class SaveProfileVM {
 
 //  TEST 1. when a value is invalid for multiple validator, then the last one win
     @NotEmpty(message = "{name.empty}")

@@ -556,7 +556,7 @@ public class DummyController {
         MatchDTO matchDTO = new MatchDTO(1L, UUID.randomUUID(), false, "Michael", "profilephotoeky", false, true, new Date(), new Date());
         matchDTO.setPushType(PushType.MATCHED);
         fcmService.sendMatch(matchDTO,
-                             "dNx-ay3rS0qnIITWvS2ue7:APA91bHTsw7heoTkdZXiIQTvIovZEQBcLIw-hIdlv-Ti141OeUjEjW860r2WlfzVtKGqX0gYhymGJ2b_VDbNY2Ao5SbCzeTjquIPmSYb3QunGgdRuqqU8scU3QGxtXTxV9FeKFdLKsEE",
+                             "c1x4LYePRdO3X8hJnNe8Z2:APA91bHpnXUSjS4xPSfs5KxeNXmUsv1pCnJ7ch2Lnq7MxcjWlQdy7Z4kCBG3Vk1tEB4hC4XevyqMTtWJ2RfnHlplvJAdjeFpMHhnZcimwRMgruSb5lDzDPOmYu-ux7OO5Osduz9q_QHr",
                              Locale.getDefault());
     }
 

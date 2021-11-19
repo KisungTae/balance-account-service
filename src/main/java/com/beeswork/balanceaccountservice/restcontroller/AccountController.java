@@ -20,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -41,28 +42,27 @@ public class AccountController extends BaseController {
 
     @PostMapping("/question/answers")
     public ResponseEntity<String> saveAnswers(@Valid @RequestBody SaveAnswersVM saveAnswersVM,
-                                              BindingResult bindingResult)
+                                              BindingResult bindingResult,
+                                              Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        accountService.saveQuestionAnswers(saveAnswersVM.getAccountId(), saveAnswersVM.getAnswers());
+        accountService.saveQuestionAnswers(getAccountIdFrom(principal), saveAnswersVM.getAnswers());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
     @GetMapping("/question/list")
-    public ResponseEntity<String> listQuestions(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
-                                                BindingResult bindingResult) throws JsonProcessingException {
+    public ResponseEntity<String> listQuestions(BindingResult bindingResult, Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<QuestionDTO> questionDTOs = accountService.listQuestions(accountIdentityVM.getAccountId());
+        List<QuestionDTO> questionDTOs = accountService.listQuestions(getAccountIdFrom(principal));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
     }
 
 
 //  TODO: comment in s3Service.deletephoto
     @PostMapping("/delete")
-    public ResponseEntity<String> deleteAccount(@Valid @RequestBody AccountIdentityVM accountIdentityVM,
-                                                BindingResult bindingResult) throws JsonProcessingException {
+    public ResponseEntity<String> deleteAccount(BindingResult bindingResult, Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        DeleteAccountDTO deleteAccountDTO = accountService.deleteAccount(accountIdentityVM.getAccountId());
+        DeleteAccountDTO deleteAccountDTO = accountService.deleteAccount(getAccountIdFrom(principal));
 //        s3Service.deletePhotosAsync(deleteAccountDTO.getAccountId(), deleteAccountDTO.getPhotoKeys());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }

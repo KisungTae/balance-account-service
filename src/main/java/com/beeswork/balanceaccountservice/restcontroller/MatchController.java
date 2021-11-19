@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 @Validated
@@ -33,18 +34,22 @@ public class MatchController extends BaseController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<String> listMatches(@Valid @ModelAttribute ListMatchesVM listMatchesVM, BindingResult bindingResult)
+    public ResponseEntity<String> listMatches(@Valid @ModelAttribute ListMatchesVM listMatchesVM,
+                                              BindingResult bindingResult,
+                                              Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ListMatchesDTO listMatchesDTO = matchService.listMatches(listMatchesVM.getAccountId(), listMatchesVM.getFetchedAt());
+        ListMatchesDTO listMatchesDTO = matchService.listMatches(getAccountIdFrom(principal), listMatchesVM.getFetchedAt());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listMatchesDTO));
     }
 
     @PostMapping("/unmatch")
-    public ResponseEntity<String> unmatch(@Valid @RequestBody UnmatchVM unmatchVM, BindingResult bindingResult)
+    public ResponseEntity<String> unmatch(@Valid @RequestBody UnmatchVM unmatchVM,
+                                          BindingResult bindingResult,
+                                          Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        matchService.unmatch(unmatchVM.getAccountId(), unmatchVM.getSwipedId());
+        matchService.unmatch(getAccountIdFrom(principal), unmatchVM.getSwipedId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 

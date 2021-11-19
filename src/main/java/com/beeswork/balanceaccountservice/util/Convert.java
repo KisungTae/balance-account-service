@@ -13,11 +13,7 @@ public class Convert {
     public static UUID toUUIDOrThrow(String uuid, RuntimeException runtimeException) {
         if (StringUtils.isBlank(uuid)) throw runtimeException;
         if (!UUID_REGEX_PATTERN.matcher(uuid).matches()) throw runtimeException;
-        try {
-            return UUID.fromString(uuid);
-        } catch (IllegalArgumentException exception) {
-            throw runtimeException;
-        }
+        return UUID.fromString(uuid);
     }
 
     public static UUID toUUID(String uuid) {

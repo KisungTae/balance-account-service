@@ -17,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/profile")
@@ -32,28 +33,29 @@ public class ProfileController extends BaseController {
     }
 
     @GetMapping
-    public ResponseEntity<String> getProfile(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
-                                             BindingResult bindingResult) throws JsonProcessingException {
+    public ResponseEntity<String> getProfile(BindingResult bindingResult, Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ProfileDTO profileDTO = profileService.getProfile(accountIdentityVM.getAccountId());
+        ProfileDTO profileDTO = profileService.getProfile(getAccountIdFrom(principal));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(profileDTO));
     }
 
     @GetMapping("/card")
     public ResponseEntity<String> getCard(@Valid @ModelAttribute GetCardVM getCardVM,
-                                          BindingResult bindingResult)
+                                          BindingResult bindingResult,
+                                          Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        CardDTO cardDTO = profileService.getCard(getCardVM.getAccountId(), getCardVM.getSwipedId());
+        CardDTO cardDTO = profileService.getCard(getAccountIdFrom(principal), getCardVM.getSwipedId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(cardDTO));
     }
 
     @PostMapping
     public ResponseEntity<String> saveProfile(@Valid @RequestBody SaveProfileVM saveProfileVM,
-                                              BindingResult bindingResult)
+                                              BindingResult bindingResult,
+                                              Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
-        profileService.saveProfile(saveProfileVM.getAccountId(),
+        profileService.saveProfile(getAccountIdFrom(principal),
                                    saveProfileVM.getName(),
                                    saveProfileVM.getBirth(),
                                    saveProfileVM.getAbout(),
@@ -64,17 +66,19 @@ public class ProfileController extends BaseController {
 
     @PostMapping("/about")
     public ResponseEntity<String> saveAbout(@Valid @RequestBody SaveAboutVM saveAboutVM,
-                                            BindingResult bindingResult) throws JsonProcessingException {
+                                            BindingResult bindingResult,
+                                            Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
-        profileService.saveAbout(saveAboutVM.getAccountId(), saveAboutVM.getAbout(), saveAboutVM.getHeight());
+        profileService.saveAbout(getAccountIdFrom(principal), saveAboutVM.getAbout(), saveAboutVM.getHeight());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
     @PostMapping("/location")
     public ResponseEntity<String> saveLocation(@Valid @RequestBody SaveLocationVM saveLocationVM,
-                                               BindingResult bindingResult) throws JsonProcessingException {
+                                               BindingResult bindingResult,
+                                               Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        profileService.saveLocation(saveLocationVM.getAccountId(),
+        profileService.saveLocation(getAccountIdFrom(principal),
                                     saveLocationVM.getLatitude(),
                                     saveLocationVM.getLongitude(),
                                     saveLocationVM.getUpdatedAt());
@@ -82,10 +86,12 @@ public class ProfileController extends BaseController {
     }
 
     @GetMapping("/recommend")
-    public ResponseEntity<String> recommend(@Valid @ModelAttribute RecommendVM recommendVM, BindingResult bindingResult)
+    public ResponseEntity<String> recommend(@Valid @ModelAttribute RecommendVM recommendVM,
+                                            BindingResult bindingResult,
+                                            Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        RecommendDTO recommendDTO = profileService.recommend(recommendVM.getAccountId(),
+        RecommendDTO recommendDTO = profileService.recommend(getAccountIdFrom(principal),
                                                              recommendVM.getDistance(),
                                                              recommendVM.getMinAge(),
                                                              recommendVM.getMaxAge(),
@@ -96,17 +102,17 @@ public class ProfileController extends BaseController {
 
     @PostMapping("/email")
     public ResponseEntity<String> saveEmail(@Valid @RequestBody SaveEmailVM saveEmailVM,
-                                            BindingResult bindingResult) throws JsonProcessingException {
+                                            BindingResult bindingResult,
+                                            Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) super.fieldExceptionResponse(bindingResult);
-        profileService.saveEmail(saveEmailVM.getAccountId(), saveEmailVM.getEmail());
+        profileService.saveEmail(getAccountIdFrom(principal), saveEmailVM.getEmail());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
     @GetMapping("/email")
-    public ResponseEntity<String> getEmail(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
-                                           BindingResult bindingResult) throws JsonProcessingException {
+    public ResponseEntity<String> getEmail(BindingResult bindingResult, Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        String email = profileService.getEmail(accountIdentityVM.getAccountId());
+        String email = profileService.getEmail(getAccountIdFrom(principal));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(email));
     }
 }

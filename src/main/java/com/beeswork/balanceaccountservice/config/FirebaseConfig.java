@@ -28,13 +28,10 @@ public class FirebaseConfig {
 
     @Bean
     public FirebaseMessaging firebaseMessaging() throws IOException {
-//        FileInputStream serviceAccount = new FileInputStream(firebaseProperties.getServiceAccountKeyPath());
         InputStream is = getClass().getClassLoader().getResourceAsStream(firebaseProperties.getServiceAccountKeyPath());
         FirebaseOptions options = FirebaseOptions.builder()
                                                  .setCredentials(GoogleCredentials.fromStream(is))
-//                                                 .setDatabaseUrl(firebaseProperties.getDatabaseURL())
                                                  .build();
-
         if (FirebaseApp.getApps().isEmpty()) FirebaseApp.initializeApp(options);
         return FirebaseMessaging.getInstance();
     }

@@ -1,7 +1,6 @@
 package com.beeswork.balanceaccountservice.vm.report;
 
 import com.beeswork.balanceaccountservice.validator.ValidUUID;
-import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +9,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class ReportVM extends AccountIdentityVM {
+public class ReportVM {
 
     @ValidUUID
     private UUID reportedId;

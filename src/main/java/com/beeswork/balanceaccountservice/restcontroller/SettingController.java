@@ -5,7 +5,6 @@ import com.beeswork.balanceaccountservice.dto.setting.PushSettingDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.setting.SettingService;
-import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import com.beeswork.balanceaccountservice.vm.setting.SavePushSettingsVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,8 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/setting")
@@ -34,9 +33,10 @@ public class SettingController extends BaseController {
 
     @PostMapping("/push")
     public ResponseEntity<String> savePushSettings(@Valid @RequestBody SavePushSettingsVM savePushSettingsVM,
-                                                   BindingResult bindingResult) throws JsonProcessingException {
+                                                   BindingResult bindingResult,
+                                                   Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        settingService.savePushSettings(savePushSettingsVM.getAccountId(),
+        settingService.savePushSettings(getAccountIdFrom(principal),
                                         savePushSettingsVM.getMatchPush(),
                                         savePushSettingsVM.getClickedPush(),
                                         savePushSettingsVM.getChatMessagePush());
@@ -44,10 +44,9 @@ public class SettingController extends BaseController {
     }
 
     @GetMapping("/push")
-    public ResponseEntity<String> getPushSetting(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
-                                                 BindingResult bindingResult) throws JsonProcessingException {
+    public ResponseEntity<String> getPushSetting(BindingResult bindingResult, Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        PushSettingDTO pushSettingDTO = settingService.getPushSetting(accountIdentityVM.getAccountId());
+        PushSettingDTO pushSettingDTO = settingService.getPushSetting(getAccountIdFrom(principal));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(pushSettingDTO));
     }
 

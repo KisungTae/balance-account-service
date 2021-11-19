@@ -6,10 +6,13 @@ import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ListSwipesDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
+import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
+import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
 import com.beeswork.balanceaccountservice.service.swipe.SwipeService;
+import com.beeswork.balanceaccountservice.util.Convert;
 import com.beeswork.balanceaccountservice.vm.swipe.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +24,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.*;
 
 @RestController
@@ -41,28 +45,32 @@ public class SwipeController extends BaseController {
     }
 
     @PostMapping("/swipe")
-    public ResponseEntity<String> swipe(@Valid @RequestBody LikeVM likeVM, BindingResult bindingResult)
+    public ResponseEntity<String> swipe(@Valid @RequestBody LikeVM likeVM,
+                                        BindingResult bindingResult,
+                                        Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<QuestionDTO> questionDTOs = swipeService.swipe(likeVM.getAccountId(), likeVM.getSwipedId());
+        List<QuestionDTO> questionDTOs = swipeService.swipe(getAccountIdFrom(principal), likeVM.getSwipedId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
     }
 
     @GetMapping("/swipe/list")
     public ResponseEntity<String> listSwipes(@Valid @ModelAttribute ListSwipesVM listSwipesVM,
-                                             BindingResult bindingResult)
+                                             BindingResult bindingResult,
+                                             Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ListSwipesDTO listSwipesDTO = swipeService.listSwipes(listSwipesVM.getAccountId(), listSwipesVM.getFetchedAt());
+        ListSwipesDTO listSwipesDTO = swipeService.listSwipes(getAccountIdFrom(principal), listSwipesVM.getFetchedAt());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listSwipesDTO));
     }
 
     @GetMapping("/click/list")
     public ResponseEntity<String> listClicks(@Valid @ModelAttribute ListSwipesVM listSwipesVM,
-                                             BindingResult bindingResult)
+                                             BindingResult bindingResult,
+                                             Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<SwipeDTO> clicks = swipeService.listClicks(listSwipesVM.getAccountId(), listSwipesVM.getFetchedAt());
+        List<SwipeDTO> clicks = swipeService.listClicks(getAccountIdFrom(principal), listSwipesVM.getFetchedAt());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clicks));
     }
 
@@ -70,10 +78,11 @@ public class SwipeController extends BaseController {
     @PostMapping("/click")
     public ResponseEntity<String> click(@Valid @RequestBody ClickVM clickVM,
                                         BindingResult bindingResult,
-                                        Locale locale)
+                                        Locale locale,
+                                        Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ClickDTO clickDTO = swipeService.click(clickVM.getAccountId(), clickVM.getSwipedId(), clickVM.getAnswers());
+        ClickDTO clickDTO = swipeService.click(getAccountIdFrom(principal), clickVM.getSwipedId(), clickVM.getAnswers());
         stompService.sendMatch(clickDTO.getObjMatchDTO(), locale);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO.getSubMatchDTO()));
     }

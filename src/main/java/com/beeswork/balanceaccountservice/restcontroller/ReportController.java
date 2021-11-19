@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/report")
@@ -36,9 +37,10 @@ public class ReportController extends BaseController {
 
     @PostMapping("/profile")
     public ResponseEntity<String> reportProfile(@Valid @RequestBody ReportVM reportVM,
-                                                BindingResult bindingResult) throws JsonProcessingException {
+                                                BindingResult bindingResult,
+                                                Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        reportService.reportProfile(reportVM.getAccountId(),
+        reportService.reportProfile(getAccountIdFrom(principal),
                                     reportVM.getReportedId(),
                                     reportVM.getReportReasonId(),
                                     reportVM.getDescription());
@@ -47,9 +49,10 @@ public class ReportController extends BaseController {
 
     @PostMapping("/match")
     public ResponseEntity<String> reportMatch(@Valid @RequestBody ReportVM reportVM,
-                                              BindingResult bindingResult) throws JsonProcessingException {
+                                              BindingResult bindingResult,
+                                              Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        reportService.reportMatch(reportVM.getAccountId(),
+        reportService.reportMatch(getAccountIdFrom(principal),
                                   reportVM.getReportedId(),
                                   reportVM.getReportReasonId(),
                                   reportVM.getDescription());

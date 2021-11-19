@@ -6,7 +6,6 @@ import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.photo.PhotoService;
 import com.beeswork.balanceaccountservice.service.s3.S3Service;
-import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import com.beeswork.balanceaccountservice.vm.photo.SavePhotoVM;
 import com.beeswork.balanceaccountservice.vm.photo.DeletePhotoVM;
 import com.beeswork.balanceaccountservice.vm.photo.GeneratePreSignedURLVM;
@@ -21,7 +20,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/photo")
@@ -40,45 +41,49 @@ public class PhotoController extends BaseController {
 
     @GetMapping("/sign")
     public ResponseEntity<String> generatePreSignedURL(@Valid @ModelAttribute GeneratePreSignedURLVM generatePreSignedURLVM,
-                                                       BindingResult bindingResult) throws JsonProcessingException {
+                                                       BindingResult bindingResult,
+                                                       Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        PreSignedUrl preSignedUrl = s3Service.generatePreSignedUrl(generatePreSignedURLVM.getAccountId(),
+        PreSignedUrl preSignedUrl = s3Service.generatePreSignedUrl(getAccountIdFrom(principal),
                                                                    generatePreSignedURLVM.getPhotoKey());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(preSignedUrl));
     }
 
     @PostMapping("/save")
     public ResponseEntity<String> savePhoto(@Valid @RequestBody SavePhotoVM savePhotoVM,
-                                            BindingResult bindingResult)
+                                            BindingResult bindingResult,
+                                            Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        photoService.savePhoto(savePhotoVM.getAccountId(), savePhotoVM.getPhotoKey(), savePhotoVM.getSequence());
+        photoService.savePhoto(getAccountIdFrom(principal), savePhotoVM.getPhotoKey(), savePhotoVM.getSequence());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
     @GetMapping("/list")
-    public ResponseEntity<String> listPhotos(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM,
-                                             BindingResult bindingResult)
+    public ResponseEntity<String> listPhotos(BindingResult bindingResult, Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<PhotoDTO> photoDTOs = photoService.listPhotos(accountIdentityVM.getAccountId());
+        List<PhotoDTO> photoDTOs = photoService.listPhotos(getAccountIdFrom(principal));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(photoDTOs));
     }
 
     @PostMapping("/reorder")
     public ResponseEntity<String> reorderPhotos(@Valid @RequestBody ReorderPhotosVM reorderPhotosVM,
-                                                BindingResult bindingResult) throws JsonProcessingException {
+                                                BindingResult bindingResult,
+                                                Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        photoService.reorderPhotos(reorderPhotosVM.getAccountId(), reorderPhotosVM.getPhotoOrders());
+        photoService.reorderPhotos(getAccountIdFrom(principal), reorderPhotosVM.getPhotoOrders());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
     @PostMapping("/delete")
     public ResponseEntity<String> deletePhoto(@Valid @RequestBody DeletePhotoVM deletePhotoVM,
-                                              BindingResult bindingResult) throws JsonProcessingException {
+                                              BindingResult bindingResult,
+                                              Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        photoService.deletePhoto(deletePhotoVM.getAccountId(), deletePhotoVM.getPhotoKey());
-        s3Service.deletePhoto(deletePhotoVM.getAccountId(), deletePhotoVM.getPhotoKey());
+        UUID accountId = getAccountIdFrom(principal);
+        photoService.deletePhoto(accountId, deletePhotoVM.getPhotoKey());
+        s3Service.deletePhoto(accountId, deletePhotoVM.getPhotoKey());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 }

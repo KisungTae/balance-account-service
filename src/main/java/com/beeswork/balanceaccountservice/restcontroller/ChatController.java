@@ -6,7 +6,6 @@ import com.beeswork.balanceaccountservice.dto.chat.ListChatMessagesDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
-import com.beeswork.balanceaccountservice.vm.account.AccountIdentityVM;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.beeswork.balanceaccountservice.vm.chat.SyncChatMessagesVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,26 +19,22 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
-import java.util.HashSet;
+import java.security.Principal;
 import java.util.Locale;
 
 @RestController
 @RequestMapping("/chat")
-public class ChatController {
+public class ChatController extends BaseController {
 
     private final StompService stompService;
     private final ChatService  chatService;
-    private final ObjectMapper objectMapper;
-    private final ModelMapper  modelMapper;
 
     @Autowired
     public ChatController(StompService stompService, ChatService chatService, ObjectMapper objectMapper, ModelMapper modelMapper) {
+        super(objectMapper, modelMapper);
         this.stompService = stompService;
         this.chatService = chatService;
-        this.objectMapper = objectMapper;
-        this.modelMapper = modelMapper;
     }
 
     @MessageMapping("/chat/send")
@@ -55,10 +50,10 @@ public class ChatController {
     }
 
     @GetMapping("/message/list")
-    public ResponseEntity<String> listChatMessages(@Valid @ModelAttribute AccountIdentityVM accountIdentityVM, BindingResult bindingResult)
+    public ResponseEntity<String> listChatMessages(BindingResult bindingResult, Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ListChatMessagesDTO listChatMessagesDTO = chatService.listChatMessages(accountIdentityVM.getAccountId());
+        ListChatMessagesDTO listChatMessagesDTO = chatService.listChatMessages(getAccountIdFrom(principal));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listChatMessagesDTO));
     }
 

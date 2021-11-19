@@ -8,6 +8,7 @@ import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.login.InvalidSocialLoginException;
 import com.beeswork.balanceaccountservice.service.login.*;
 import com.beeswork.balanceaccountservice.vm.login.LoginVM;
+import com.beeswork.balanceaccountservice.vm.login.LoginWithRefreshTokenVM;
 import com.beeswork.balanceaccountservice.vm.login.SocialLoginVM;
 import com.beeswork.balanceaccountservice.vm.login.RefreshAccessTokenVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.security.Principal;
 
 @RestController
 public class LoginController extends BaseController {
@@ -87,18 +89,21 @@ public class LoginController extends BaseController {
     }
 
     @PostMapping("/login/refresh-token")
-    public ResponseEntity<String> loginWithRefreshToken(@Valid @RequestBody RefreshAccessTokenVM refreshAccessTokenVM,
-                                                        BindingResult bindingResult) throws JsonProcessingException {
+    public ResponseEntity<String> loginWithRefreshToken(@Valid @RequestBody LoginWithRefreshTokenVM loginWithRefreshTokenVM,
+                                                        BindingResult bindingResult,
+                                                        Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        LoginDTO loginDTO = loginService.loginWithRefreshToken(refreshAccessTokenVM.getAccountId(), refreshAccessTokenVM.getRefreshToken());
+        LoginDTO loginDTO = loginService.loginWithRefreshToken(getAccountIdFrom(principal),
+                                                               loginWithRefreshTokenVM.getRefreshToken());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
     }
 
     @PostMapping("/login/access-token/refresh")
     public ResponseEntity<String> refreshAccessToken(@Valid @RequestBody RefreshAccessTokenVM refreshAccessTokenVM,
-                                                     BindingResult bindingResult) throws JsonProcessingException {
+                                                     BindingResult bindingResult,
+                                                     Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        RefreshAccessTokenDTO refreshAccessTokenDTO = loginService.refreshAccessToken(refreshAccessTokenVM.getAccountId(),
+        RefreshAccessTokenDTO refreshAccessTokenDTO = loginService.refreshAccessToken(getAccountIdFrom(principal),
                                                                                       refreshAccessTokenVM.getRefreshToken());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(refreshAccessTokenDTO));
     }
