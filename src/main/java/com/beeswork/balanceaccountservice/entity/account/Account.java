@@ -43,10 +43,6 @@ public class Account implements UserDetails {
     @Type(type = "pg-uuid")
     private UUID id;
 
-    @Column(name = "identity_token")
-    @Type(type = "pg-uuid")
-    private UUID identityToken;
-
     @Column(name = "name")
     private String name;
 
@@ -106,8 +102,7 @@ public class Account implements UserDetails {
     )
     private List<Role> roles = new ArrayList<>();
 
-    public Account(UUID identityToken, Date createdAt) {
-        this.identityToken = identityToken;
+    public Account(Date createdAt) {
         this.name = "";
         this.profilePhotoKey = "";
         this.createdAt = createdAt;
@@ -117,11 +112,6 @@ public class Account implements UserDetails {
     public void validate() {
         if (this.isBlocked()) throw new AccountBlockedException();
         if (this.isDeleted()) throw new AccountDeletedException();
-    }
-
-    public void validate(UUID identityToken) {
-        if (!this.getIdentityToken().equals(identityToken)) throw new AccountNotFoundException();
-        validate();
     }
 
     public List<String> getRoleNames() {

@@ -11,6 +11,7 @@ import java.util.UUID;
 @Setter
 public class RefreshAccessTokenVM {
 
-    @NotEmpty
+    // no validator to throw InvalidJWTTokenException when empty or null
+    private String accessToken;
     private String refreshToken;
 }

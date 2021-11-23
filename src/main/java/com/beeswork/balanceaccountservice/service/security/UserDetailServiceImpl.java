@@ -24,11 +24,11 @@ public class UserDetailServiceImpl implements UserDetailService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public UserDetails loadValidUserByUsername(UUID userName, UUID identityToken) {
-        if (userName == null || identityToken == null) throw new AccountNotFoundException();
+    public UserDetails loadValidUserByUsername(UUID userName) {
+        if (userName == null) throw new AccountNotFoundException();
         Account account = accountDAO.findById(userName);
         if (account == null) throw new AccountNotFoundException();
-        account.validate(identityToken);
+        account.validate();
         return account;
     }
 }

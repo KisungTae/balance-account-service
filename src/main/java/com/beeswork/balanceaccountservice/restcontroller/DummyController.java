@@ -201,7 +201,6 @@ public class DummyController {
         Date now = new Date();
 
         String name = "user-" + count;
-        account.setIdentityToken(UUID.randomUUID());
         account.setName(name);
 //        account.setPoint(50000);
 //        account.setFreeSwipe(2000);

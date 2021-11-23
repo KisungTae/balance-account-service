@@ -22,17 +22,12 @@ import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.setting.PushSetting;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
-import com.beeswork.balanceaccountservice.exception.jwt.InvalidJWTTokenException;
-import com.beeswork.balanceaccountservice.exception.login.*;
+import com.beeswork.balanceaccountservice.exception.jwt.InvalidRefreshTokenException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
-import com.beeswork.balanceaccountservice.util.Convert;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -90,7 +85,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         Date now = new Date();
         SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
 
-        Account account = new Account(UUID.randomUUID(), now);
+        Account account = new Account(now);
         Login login = new Login(loginId, loginType, account, email);
         Wallet wallet = new Wallet(account, swipeMeta.getMaxFreeSwipe() * swipeMeta.getSwipePoint(), now);
         PushSetting pushSetting = new PushSetting(account);
@@ -103,7 +98,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         RefreshToken refreshToken = new RefreshToken(account);
         String newRefreshToken = createNewRefreshToken(account, refreshToken);
         String accessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
-        return new LoginDTO(account.getId(), account.getIdentityToken(), false, accessToken, newRefreshToken, email);
+        return new LoginDTO(account.getId(), false, accessToken, newRefreshToken, email);
     }
 
     private LoginDTO loginWithExistingAccount(Login login) {
@@ -119,7 +114,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         Profile profile = profileDAO.findById(account.getId());
         boolean profileExists = profile != null && profile.isEnabled();
         Boolean gender = profileExists ? profile.isGender() : null;
-        return new LoginDTO(account.getId(), account.getIdentityToken(), profileExists, accessToken, newRefreshToken, login.getEmail(), gender);
+        return new LoginDTO(account.getId(), profileExists, accessToken, newRefreshToken, login.getEmail(), gender);
     }
 
     private void updatePushToken(UUID accountId) {
@@ -135,34 +130,37 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
 
     @Override
     @Transactional
-    public RefreshAccessTokenDTO refreshAccessToken(UUID accountId, String refreshToken) {
-        Jws<Claims> jws = jwtTokenProvider.parseJWTToken(refreshToken);
-        jwtTokenProvider.validateJWTToken(jws);
-        Account account = findValidAccountFromJWTToken(accountId, jws);
-        validateRefreshTokenKey(accountId, jws);
+    public RefreshAccessTokenDTO refreshAccessToken(String accessToken, String refreshToken, boolean includeAccountId) {
+        Jws<Claims> refreshTokenJws = jwtTokenProvider.parseJWTToken(refreshToken);
+        jwtTokenProvider.validateJWTToken(refreshTokenJws);
+        UUID refreshTokenUserName = jwtTokenProvider.getUserName(refreshTokenJws);
 
+        Jws<Claims> accessTokenJws = jwtTokenProvider.parseJWTToken(accessToken);
+        UUID accessTokenUserName = jwtTokenProvider.getUserName(accessTokenJws);
+        if (!refreshTokenUserName.equals(accessTokenUserName)) throw new InvalidRefreshTokenException();
+
+        Account account = findValidAccountFromJWTToken(refreshTokenUserName);
+        validateRefreshTokenKey(account.getId(), refreshTokenJws);
         String newRefreshToken = null;
-        if (jwtTokenProvider.shouldReissueRefreshToken(jws)) {
+        if (jwtTokenProvider.shouldReissueRefreshToken(refreshTokenJws)) {
             newRefreshToken = createNewRefreshToken(account, new RefreshToken(account));
         }
         String newAccessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
-        return new RefreshAccessTokenDTO(newAccessToken, newRefreshToken);
+
+        RefreshAccessTokenDTO refreshAccessTokenDTO = new RefreshAccessTokenDTO(newAccessToken, newRefreshToken);
+        if (includeAccountId) refreshAccessTokenDTO.setAccountId(account.getId());
+        return refreshAccessTokenDTO;
     }
 
     @Override
     @Transactional
-    public LoginDTO loginWithRefreshToken(UUID accountId, String refreshToken) {
-        RefreshAccessTokenDTO refreshAccessTokenDTO = refreshAccessToken(accountId, refreshToken);
-
-        // account will be retrieved from hibernate first cache, so won't impact performance
-        Account account = accountDAO.findById(accountId);
-
-        Profile profile = profileDAO.findById(account.getId());
+    public LoginDTO loginWithRefreshToken(String accessToken, String refreshToken) {
+        RefreshAccessTokenDTO refreshAccessTokenDTO = refreshAccessToken(accessToken, refreshToken, true);
+        Profile profile = profileDAO.findById(refreshAccessTokenDTO.getAccountId());
         boolean profileExists = profile != null && profile.isEnabled();
         Boolean gender = profileExists ? profile.isGender() : null;
 
-        return new LoginDTO(account.getId(),
-                            account.getIdentityToken(),
+        return new LoginDTO(refreshAccessTokenDTO.getAccountId(),
                             profileExists,
                             refreshAccessTokenDTO.getAccessToken(),
                             refreshAccessTokenDTO.getRefreshToken(),
@@ -177,11 +175,9 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
             throw new InvalidRefreshTokenException();
     }
 
-    private Account findValidAccountFromJWTToken(UUID accountId, Jws<Claims> jws) {
-        UUID userName = jwtTokenProvider.getUserName(jws);
+    private Account findValidAccountFromJWTToken(UUID userName) {
         if (userName == null) throw new AccountNotFoundException();
-        if (!accountId.equals(userName)) throw new AccountNotFoundException();
-        Account account = accountDAO.findById(accountId);
+        Account account = accountDAO.findById(userName);
         if (account == null) throw new AccountNotFoundException();
         account.validate();
         return account;

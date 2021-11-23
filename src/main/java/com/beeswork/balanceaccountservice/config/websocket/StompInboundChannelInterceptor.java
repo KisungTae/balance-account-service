@@ -6,7 +6,6 @@ import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
-import com.beeswork.balanceaccountservice.exception.login.AccessTokenExpiredException;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedException;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
@@ -65,14 +64,14 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
         StompCommand stompCommand = stompHeaderAccessor.getCommand();
         String accessToken = stompHeaderAccessor.getFirstNativeHeader(HttpHeader.ACCESS_TOKEN);
-        String identityToken = stompHeaderAccessor.getFirstNativeHeader(HttpHeader.IDENTITY_TOKEN);
+//        String identityToken = stompHeaderAccessor.getFirstNativeHeader(HttpHeader.IDENTITY_TOKEN);
 
-        if (StompCommand.SUBSCRIBE.equals(stompCommand))
-            return validateBeforeSubscribe(stompHeaderAccessor, message, accessToken, identityToken);
-        else if (StompCommand.SEND.equals(stompCommand)) {
-            throw new BadRequestException();
+//        if (StompCommand.SUBSCRIBE.equals(stompCommand))
+//            return validateBeforeSubscribe(stompHeaderAccessor, message, accessToken, identityToken);
+//        else if (StompCommand.SEND.equals(stompCommand)) {
+//            throw new BadRequestException();
 //            return validateBeforeSend(stompHeaderAccessor, message, accessToken, identityToken);
-        }
+//        }
 
 
         return message;

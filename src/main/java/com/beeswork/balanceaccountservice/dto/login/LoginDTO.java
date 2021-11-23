@@ -15,25 +15,22 @@ import java.util.UUID;
 @NoArgsConstructor
 public class LoginDTO {
     private UUID    accountId;
-    private UUID    identityToken;
     private boolean profileExists;
     private String  accessToken;
     private String  refreshToken;
     private String  email;
     private Boolean gender;
 
-    public LoginDTO(UUID accountId, UUID identityToken, boolean profileExists, String accessToken, String refreshToken, String email) {
+    public LoginDTO(UUID accountId, boolean profileExists, String accessToken, String refreshToken, String email) {
         this.accountId = accountId;
-        this.identityToken = identityToken;
         this.profileExists = profileExists;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.email = email;
     }
 
-    public LoginDTO(UUID accountId, UUID identityToken, boolean profileExists, String accessToken, String refreshToken, Boolean gender) {
+    public LoginDTO(UUID accountId, boolean profileExists, String accessToken, String refreshToken, Boolean gender) {
         this.accountId = accountId;
-        this.identityToken = identityToken;
         this.profileExists = profileExists;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;

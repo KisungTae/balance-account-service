@@ -89,22 +89,21 @@ public class LoginController extends BaseController {
     }
 
     @PostMapping("/login/refresh-token")
-    public ResponseEntity<String> loginWithRefreshToken(@Valid @RequestBody LoginWithRefreshTokenVM loginWithRefreshTokenVM,
-                                                        BindingResult bindingResult,
-                                                        Principal principal) throws JsonProcessingException {
+    public ResponseEntity<String> loginWithRefreshToken(@RequestBody LoginWithRefreshTokenVM loginWithRefreshTokenVM,
+                                                        BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        LoginDTO loginDTO = loginService.loginWithRefreshToken(getAccountIdFrom(principal),
+        LoginDTO loginDTO = loginService.loginWithRefreshToken(loginWithRefreshTokenVM.getAccessToken(),
                                                                loginWithRefreshTokenVM.getRefreshToken());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
     }
 
     @PostMapping("/login/access-token/refresh")
-    public ResponseEntity<String> refreshAccessToken(@Valid @RequestBody RefreshAccessTokenVM refreshAccessTokenVM,
-                                                     BindingResult bindingResult,
-                                                     Principal principal) throws JsonProcessingException {
+    public ResponseEntity<String> refreshAccessToken(@RequestBody RefreshAccessTokenVM refreshAccessTokenVM,
+                                                     BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        RefreshAccessTokenDTO refreshAccessTokenDTO = loginService.refreshAccessToken(getAccountIdFrom(principal),
-                                                                                      refreshAccessTokenVM.getRefreshToken());
+        RefreshAccessTokenDTO refreshAccessTokenDTO = loginService.refreshAccessToken(refreshAccessTokenVM.getAccessToken(),
+                                                                                      refreshAccessTokenVM.getRefreshToken(),
+                                                                                      false);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(refreshAccessTokenDTO));
     }
 }

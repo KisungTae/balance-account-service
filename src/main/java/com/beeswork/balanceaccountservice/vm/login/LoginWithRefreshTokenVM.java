@@ -9,6 +9,9 @@ import javax.validation.constraints.NotEmpty;
 @Setter
 public class LoginWithRefreshTokenVM {
 
-    @NotEmpty
+    // no validator to throw InvalidJWTTokenException when empty or null
+    private String accessToken;
     private String refreshToken;
+
+
 }

@@ -40,10 +40,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.isNotBlank(token)) {
                 Jws<Claims> jws = jwtTokenProvider.parseJWTToken(token);
                 jwtTokenProvider.validateJWTToken(jws);
-
-                String identityTokenInString = httpServletRequest.getHeader(HttpHeader.IDENTITY_TOKEN);
-                UUID identityToken = Convert.toUUID(identityTokenInString);
-                Authentication authentication = jwtTokenProvider.getAuthentication(jws, identityToken);
+                Authentication authentication = jwtTokenProvider.getAuthentication(jws);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
             filterChain.doFilter(httpServletRequest, httpServletResponse);

@@ -3,7 +3,7 @@ package com.beeswork.balanceaccountservice.config.security;
 import com.beeswork.balanceaccountservice.config.properties.JWTTokenProperties;
 import com.beeswork.balanceaccountservice.constant.HttpHeader;
 import com.beeswork.balanceaccountservice.exception.jwt.InvalidJWTTokenException;
-import com.beeswork.balanceaccountservice.exception.login.InvalidRefreshTokenException;
+import com.beeswork.balanceaccountservice.exception.jwt.InvalidRefreshTokenException;
 import com.beeswork.balanceaccountservice.service.security.UserDetailService;
 import com.beeswork.balanceaccountservice.util.Convert;
 import io.jsonwebtoken.*;
@@ -23,7 +23,7 @@ import java.util.*;
 public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     //    private final long   ACCESS_TOKEN_LIFE_TIME  = 60 * 60 * 1000L;
-    private final long   ACCESS_TOKEN_LIFE_TIME     = 1 * 60 * 1000L;
+    private final long   ACCESS_TOKEN_LIFE_TIME     = 1 * 60 * 60 * 1000L;
     private final long   REFRESH_TOKEN_LIFE_TIME    = 14 * 24 * 60 * 60 * 1000L;
     private final String REFRESH_TOKEN_KEY          = "key";
     private final String ACCESS_TOKEN_ROLES         = "roles";
@@ -64,8 +64,8 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
     }
 
     @Override
-    public Authentication getAuthentication(Jws<Claims> jws, UUID identityToken) {
-        UserDetails userDetails = userDetailsService.loadValidUserByUsername(getUserName(jws), identityToken);
+    public Authentication getAuthentication(Jws<Claims> jws) {
+        UserDetails userDetails = userDetailsService.loadValidUserByUsername(getUserName(jws));
         return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
     }
 
@@ -136,7 +136,7 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
 
 
     @Override
-    public void validateAuthentication(String accessToken, String identityToken) {
+    public void validateAuthentication(String accessToken) {
 //        userDetailsService.loadUserByUsername(getUserName(accessToken), identityToken);
     }
 
