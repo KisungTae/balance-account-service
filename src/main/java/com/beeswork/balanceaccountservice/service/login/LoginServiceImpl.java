@@ -24,7 +24,9 @@ import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.jwt.InvalidRefreshTokenException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
+import com.beeswork.balanceaccountservice.util.Convert;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -135,8 +137,15 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         jwtTokenProvider.validateJWTToken(refreshTokenJws);
         UUID refreshTokenUserName = jwtTokenProvider.getUserName(refreshTokenJws);
 
-        Jws<Claims> accessTokenJws = jwtTokenProvider.parseJWTToken(accessToken);
-        UUID accessTokenUserName = jwtTokenProvider.getUserName(accessTokenJws);
+        // parsJWTToken throws ExpiredJWTException
+        UUID accessTokenUserName = null;
+        try {
+            Jws<Claims> accessTokenJws = jwtTokenProvider.parseJWTToken(accessToken);
+            accessTokenUserName = jwtTokenProvider.getUserName(accessTokenJws);
+        } catch (ExpiredJwtException e) {
+            Claims claims = e.getClaims();
+            if (claims != null) accessTokenUserName = Convert.toUUID(claims.getSubject());
+        }
         if (!refreshTokenUserName.equals(accessTokenUserName)) throw new InvalidRefreshTokenException();
 
         Account account = findValidAccountFromJWTToken(refreshTokenUserName);

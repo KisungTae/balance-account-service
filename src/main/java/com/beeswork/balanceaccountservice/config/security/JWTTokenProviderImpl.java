@@ -22,12 +22,12 @@ import java.util.*;
 @Component
 public class JWTTokenProviderImpl implements JWTTokenProvider {
 
-    //    private final long   ACCESS_TOKEN_LIFE_TIME  = 60 * 60 * 1000L;
-    private final long   ACCESS_TOKEN_LIFE_TIME     = 1 * 60 * 60 * 1000L;
+    //    private final long   ACCESS_TOKEN_LIFE_TIME     = 60 * 60 * 1000L;
+    private final long   ACCESS_TOKEN_LIFE_TIME     = 60 * 1000L;
     private final long   REFRESH_TOKEN_LIFE_TIME    = 14 * 24 * 60 * 60 * 1000L;
     private final String REFRESH_TOKEN_KEY          = "key";
     private final String ACCESS_TOKEN_ROLES         = "roles";
-    private final long    REFRESH_TOKEN_REISSUE_TIME = 2 * 24 * 60 * 60 * 1000L;
+    private final long   REFRESH_TOKEN_REISSUE_TIME = 2 * 24 * 60 * 60 * 1000L;
     private       String secretKey;
 
     private final JWTTokenProperties jwtTokenProperties;
