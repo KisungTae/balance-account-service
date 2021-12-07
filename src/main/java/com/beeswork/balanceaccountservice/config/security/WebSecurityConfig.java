@@ -56,12 +56,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.httpBasic().disable()
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and().authorizeRequests()
-            .antMatchers("/login/**", "/dummy/**").permitAll()
+            .and()
+            .authorizeRequests()
+            .antMatchers("/login/**", "/dummy/**", "/web-socket").permitAll()
             .antMatchers("/admin").hasRole("ADMIN")
             .anyRequest().authenticated()
-            .and().exceptionHandling().accessDeniedHandler(restAccessDeniedHandler).authenticationEntryPoint(restAuthenticationEntryPoint)
-            .and().addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .and()
+            .exceptionHandling()
+            .accessDeniedHandler(restAccessDeniedHandler)
+            .authenticationEntryPoint(restAuthenticationEntryPoint)
+            .and()
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean

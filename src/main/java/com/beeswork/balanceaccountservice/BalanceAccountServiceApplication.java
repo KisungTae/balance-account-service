@@ -342,6 +342,8 @@ public class BalanceAccountServiceApplication {
 
 // TODO			101. check identityToken check in stomp in regards to spring security
 
+// TODO			102. check the matched and siwped notification separatae them dont' use the same class
+
 
 
 // TODO			Chat Business rules

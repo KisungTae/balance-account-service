@@ -13,7 +13,7 @@ public interface JWTTokenProvider {
     Jws<Claims> parseJWTToken(String jwtToken);
     void validateJWTToken(Jws<Claims> jws);
     Authentication getAuthentication(Jws<Claims> jws);
-    UUID getUserName(Jws<Claims> jws);
+    String getUserName(Jws<Claims> jws);
     String createRefreshToken(String userName, String key, Date date);
     String createAccessToken(String userName, List<String> roles);
     String resolveAccessToken(HttpServletRequest httpServletRequest);

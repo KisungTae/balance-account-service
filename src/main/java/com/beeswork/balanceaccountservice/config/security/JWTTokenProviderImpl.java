@@ -65,16 +65,15 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     @Override
     public Authentication getAuthentication(Jws<Claims> jws) {
-        UserDetails userDetails = userDetailsService.loadValidUserByUsername(getUserName(jws));
+        UserDetails userDetails = userDetailsService.loadValidUserByUsername(Convert.toUUID(getUserName(jws)));
         return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
     }
 
     @Override
-    public UUID getUserName(Jws<Claims> jws) {
+    public String getUserName(Jws<Claims> jws) {
         Claims claims = jws.getBody();
         if (claims == null) return null;
-        String userName = claims.getSubject();
-        return Convert.toUUID(userName);
+        return claims.getSubject();
     }
 
     @Override

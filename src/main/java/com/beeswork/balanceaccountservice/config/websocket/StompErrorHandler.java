@@ -30,8 +30,11 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
         Locale locale = StompHeader.getLocaleFromAcceptLanguageHeader(clientHeaderAccessor);
         if (cause != null && cause.getCause() != null) {
             BaseException exception;
-            if (cause.getCause() instanceof BaseException) exception = (BaseException) cause.getCause();
-            else exception = new InternalServerException();
+            if (cause.getCause() instanceof BaseException) {
+                exception = (BaseException) cause.getCause();
+            } else {
+                exception = new InternalServerException();
+            }
             String exceptionMessage = messageSource.getMessage(exception.getExceptionCode(), null, locale);
             errorHeaderAccessor.addNativeHeader(StompHeader.ERROR, exception.getExceptionCode());
             errorHeaderAccessor.setMessage(exceptionMessage);

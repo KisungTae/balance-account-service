@@ -135,13 +135,13 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     public RefreshAccessTokenDTO refreshAccessToken(String accessToken, String refreshToken, boolean includeAccountId) {
         Jws<Claims> refreshTokenJws = jwtTokenProvider.parseJWTToken(refreshToken);
         jwtTokenProvider.validateJWTToken(refreshTokenJws);
-        UUID refreshTokenUserName = jwtTokenProvider.getUserName(refreshTokenJws);
+        UUID refreshTokenUserName = Convert.toUUID(jwtTokenProvider.getUserName(refreshTokenJws));
 
         // parsJWTToken throws ExpiredJWTException
         UUID accessTokenUserName = null;
         try {
             Jws<Claims> accessTokenJws = jwtTokenProvider.parseJWTToken(accessToken);
-            accessTokenUserName = jwtTokenProvider.getUserName(accessTokenJws);
+            accessTokenUserName = Convert.toUUID(jwtTokenProvider.getUserName(accessTokenJws));
         } catch (ExpiredJwtException e) {
             Claims claims = e.getClaims();
             if (claims != null) accessTokenUserName = Convert.toUUID(claims.getSubject());
