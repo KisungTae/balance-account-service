@@ -15,6 +15,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.micrometer.core.lang.NonNull;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -41,7 +42,7 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
     @Autowired
     private JWTTokenProvider jwtTokenProvider;
 
-    private static final String QUEUE = "queue/";
+    private static final String QUEUE = "/queue/";
 
     //  NOTE 1. if exception is thrown from compositeMessageConverter.fromMessage for invalid UUId or Long then ignore the request
     @SneakyThrows
@@ -68,13 +69,8 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
 
         }
 
+
         // TODO: when unmatched, it should not throw an error, but message receipt error = UnmatchedErrorCode
-
-        // TODO: remove me
-        if (StompCommand.SEND.equals(stompCommand)) {
-            throw new BadRequestException();
-        }
-
 
 
 //        else if (StompCommand.SEND.equals(stompCommand)) {
@@ -99,14 +95,11 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
     }
 
 
-
-    private Message<?> validateBeforeSend(StompHeaderAccessor stompHeaderAccessor,
-                                          Message<?> message,
-                                          String accessToken,
-                                          String identityToken) throws JsonProcessingException {
+    private Message<?> validateBeforeSend(StompHeaderAccessor stompHeaderAccessor, Message<?> message) throws JsonProcessingException {
         try {
             ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
             String receipt = stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECEIPT);
+            
             if (chatMessageVM == null || receipt == null) throw new BadRequestException();
             Long chatMessageId = chatService.saveChatMessage(chatMessageVM.getAccountId(),
                                                              chatMessageVM.getChatId(),

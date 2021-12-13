@@ -344,6 +344,9 @@ public class BalanceAccountServiceApplication {
 
 // TODO			102. check the matched and siwped notification separatae them dont' use the same class
 
+// TODO			103. check controllers and change parameters to class like vm to dto, not passing values
+
+// TODO			104. create indexes in sql based on the queries in DAOs
 
 
 // TODO			Chat Business rules
