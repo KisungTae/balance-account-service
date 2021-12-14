@@ -11,5 +11,5 @@ public interface SentChatMessageDAO extends BaseDAO<SentChatMessage> {
 
     List<ChatMessageDTO> findAllUnfetched(UUID accountId);
     SentChatMessage findByKey(UUID accountId, long key);
-    List<SentChatMessage> findAllIn(List<Long> chatMessageIds);
+    List<SentChatMessage> findAllIn(List<UUID> chatMessageIds);
 }

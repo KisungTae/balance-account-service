@@ -15,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ChatMessageDTO {
     private PushType pushType = PushType.CHAT_MESSAGE;
-    private Long id;
+    private UUID id;
     private UUID accountId;
     private UUID recipientId;
     private String body;
@@ -24,14 +24,14 @@ public class ChatMessageDTO {
     private Date createdAt;
 
     @QueryProjection
-    public ChatMessageDTO(Long id, Long key, Date createdAt) {
+    public ChatMessageDTO(UUID id, Long key, Date createdAt) {
         this.id = id;
         this.key = key;
         this.createdAt = createdAt;
     }
 
     @QueryProjection
-    public ChatMessageDTO(Long id, String body, Long chatId, Date createdAt) {
+    public ChatMessageDTO(UUID id, String body, Long chatId, Date createdAt) {
         this.id = id;
         this.body = body;
         this.chatId = chatId;

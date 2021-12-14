@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -20,8 +22,10 @@ public class ChatMessage {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Type(type = "pg-uuid")
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id")
@@ -33,9 +37,6 @@ public class ChatMessage {
 
     @Column(name = "body")
     private String body;
-
-    @Column(name = "read")
-    private boolean read;
 
     @Column(name = "received")
     private boolean received;
@@ -49,7 +50,7 @@ public class ChatMessage {
     private Date updatedAt;
 
     public ChatMessage(Chat chat, Account recipient, String body, Date createdAt) {
-        this.chat = chat;
+//        this.chat = chat;
         this.recipient = recipient;
         this.body = body;
         this.createdAt = createdAt;

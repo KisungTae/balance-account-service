@@ -3,7 +3,6 @@ package com.beeswork.balanceaccountservice.dao.chat;
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.chat.QChatMessageDTO;
-import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.chat.QSentChatMessage;
 import com.beeswork.balanceaccountservice.entity.chat.SentChatMessage;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -43,7 +42,7 @@ public class SentChatMessageDAOImpl extends BaseDAOImpl<SentChatMessage> impleme
     }
 
     @Override
-    public List<SentChatMessage> findAllIn(List<Long> chatMessageIds) {
+    public List<SentChatMessage> findAllIn(List<UUID> chatMessageIds) {
         return jpaQueryFactory.selectFrom(qSentChatMessage)
                               .where(qSentChatMessage.chatMessageId.in(chatMessageIds))
                               .fetch();

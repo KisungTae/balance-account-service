@@ -4,10 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
 public class SyncChatMessagesVM {
-    private List<Long> receivedChatMessageIds = new ArrayList<>();
-    private List<Long> sentChatMessageIds = new ArrayList<>();
+    private List<UUID> receivedChatMessageIds = new ArrayList<>();
+    private List<UUID> sentChatMessageIds     = new ArrayList<>();
 }

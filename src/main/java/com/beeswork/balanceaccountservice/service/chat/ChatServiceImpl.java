@@ -1,6 +1,5 @@
 package com.beeswork.balanceaccountservice.service.chat;
 
-import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
@@ -14,7 +13,6 @@ import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,12 +66,14 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
             match.setActive(true);
             matchDAO.persist(match);
         }
-        return sentChatMessage.getChatMessageId();
+        //        TODO: implement it
+//        return sentChatMessage.getChatMessageId();
+        return null;
     }
 
     @Override
     @Transactional
-    public void syncChatMessages(List<Long> sentChatMessageIds, List<Long> receivedChatMessageIds) {
+    public void syncChatMessages(List<UUID> sentChatMessageIds, List<UUID> receivedChatMessageIds) {
         List<ChatMessage> receivedChatMessages = chatMessageDAO.findAllIn(receivedChatMessageIds);
         Date now = new Date();
         for (ChatMessage chatMessage : receivedChatMessages) {
