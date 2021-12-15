@@ -4,9 +4,9 @@ import com.beeswork.balanceaccountservice.exception.BaseException;
 
 public class MatchUnmatchedException extends BaseException {
 
-    private static final String MATCH_UNMATCHED_EXCEPTION = "match.unmatched.exception";
+    public static final String CODE = "match.unmatched.exception";
 
     public MatchUnmatchedException() {
-        super(MATCH_UNMATCHED_EXCEPTION);
+        super(CODE);
     }
 }

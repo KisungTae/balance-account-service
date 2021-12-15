@@ -39,8 +39,10 @@ public class ChatController extends BaseController {
 
     @MessageMapping("/chat/send")
     public void send(@Payload ChatMessageVM chatMessageVM, MessageHeaders messageHeaders) {
-        Locale locale = StompHeader.getLocaleFromMessageHeaders(messageHeaders);
-        stompService.sendChatMessage(modelMapper.map(chatMessageVM, ChatMessageDTO.class), locale);
+        if (chatMessageVM != null && !chatMessageVM.isError()) {
+            Locale locale = StompHeader.getLocaleFromMessageHeaders(messageHeaders);
+            stompService.sendChatMessage(modelMapper.map(chatMessageVM, ChatMessageDTO.class), locale);
+        }
     }
 
     @PostMapping("/message/sync")

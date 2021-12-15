@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 
 import com.beeswork.balanceaccountservice.exception.InternalServerException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.micrometer.core.lang.NonNullApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -29,9 +30,12 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
                                              StompHeaderAccessor clientHeaderAccessor) {
         Locale locale = StompHeader.getLocaleFromAcceptLanguageHeader(clientHeaderAccessor);
         if (cause != null && cause.getCause() != null) {
-            BaseException exception;
+            String exceptionCode = null;
             if (cause.getCause() instanceof BaseException) {
-                exception = (BaseException) cause.getCause();
+                BaseException exception = (BaseException) cause.getCause();
+                exceptionCode = exception.getExceptionCode();
+            } else if (cause.getCause() instanceof ExpiredJwtException) {
+                exceptionCode =
             } else {
                 exception = new InternalServerException();
             }

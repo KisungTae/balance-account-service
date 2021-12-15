@@ -23,7 +23,7 @@ import java.util.*;
 public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     //    private final long   ACCESS_TOKEN_LIFE_TIME     = 60 * 60 * 1000L;
-    private final long   ACCESS_TOKEN_LIFE_TIME     = 5 * 60 * 1000L;
+    private final long   ACCESS_TOKEN_LIFE_TIME     = 60 * 1000L;
     private final long   REFRESH_TOKEN_LIFE_TIME    = 14 * 24 * 60 * 60 * 1000L;
     private final String REFRESH_TOKEN_KEY          = "key";
     private final String ACCESS_TOKEN_ROLES         = "roles";
@@ -57,6 +57,7 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     @Override
     public void validateJWTToken(Jws<Claims> jws) {
+        if (jws == null) throw new InvalidJWTTokenException();
         Claims claims = jws.getBody();
         if (claims == null) throw new InvalidJWTTokenException();
         else if (claims.getExpiration() == null) throw new InvalidJWTTokenException();
@@ -71,6 +72,7 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     @Override
     public String getUserName(Jws<Claims> jws) {
+        if (jws == null) return null;
         Claims claims = jws.getBody();
         if (claims == null) return null;
         return claims.getSubject();
@@ -109,6 +111,7 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     @Override
     public UUID getRefreshTokenKey(Jws<Claims> jws) {
+        if (jws == null) return null;
         Claims claims = jws.getBody();
         if (claims == null) return null;
         Object refreshTokenKey = claims.get(REFRESH_TOKEN_KEY);
@@ -118,6 +121,7 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     @Override
     public Date getExpirationDate(Jws<Claims> jws) {
+        if (jws == null) return null;
         Claims claims = jws.getBody();
         if (claims == null) return null;
         return claims.getExpiration();

@@ -4,9 +4,9 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
+import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.chat.ListChatMessagesDTO;
-import com.beeswork.balanceaccountservice.entity.account.Account;
-import com.beeswork.balanceaccountservice.entity.chat.Chat;
+import com.beeswork.balanceaccountservice.dto.chat.SaveChatMessageDTO;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.chat.SentChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
@@ -43,21 +43,26 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
 
     @Override
     @Transactional
-    public Long saveChatMessage(UUID accountId, long chatId, UUID recipientId, long key, String body, Date createdAt) {
+    public SaveChatMessageDTO saveChatMessage(ChatMessageDTO chatMessageDTO) {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
-        Match match = matchDAO.findById(accountId, recipientId);
-        if (match == null) throw new MatchNotFoundException();
-        Account swiped = match.getSwiped();
-        Chat chat = match.getChat();
-        if (swiped == null || chat == null || chat.getId() != chatId)
-            throw new MatchNotFoundException();
-        if (match.isUnmatched() || match.getSwiped().isDeleted() || match.getSwiped().isBlocked())
-            throw new MatchUnmatchedException();
 
-        SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(accountId, key);
+        SaveChatMessageDTO saveChatMessageDTO = new SaveChatMessageDTO();
+        Match match = matchDAO.findById(chatMessageDTO.getAccountId(), chatMessageDTO.getRecipientId());
+        if (match == null || match.getSwiped() == null || match.getChat() == null || match.getChatId() != chatMessageDTO.getChatId()) {
+            saveChatMessageDTO.setError(MatchNotFoundException.CODE);
+            return saveChatMessageDTO;
+        }
+
+        if (match.isUnmatched() || match.getSwiped().isDeleted() || match.getSwiped().isBlocked()) {
+            saveChatMessageDTO.setError(MatchUnmatchedException.CODE);
+            return saveChatMessageDTO;
+        }
+
+        SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(chatMessageDTO.getAccountId(), chatMessageDTO.getKey());
         if (sentChatMessage == null) {
-            ChatMessage chatMessage = new ChatMessage(chat, swiped, body, createdAt);
-            sentChatMessage = new SentChatMessage(chatMessage, match.getSwiper(), key, createdAt);
+            Date now = new Date();
+            ChatMessage chatMessage = new ChatMessage(match.getChat(), match.getSwiped(), chatMessageDTO.getBody(), now);
+            sentChatMessage = new SentChatMessage(chatMessage, match.getSwiper(), chatMessageDTO.getKey(), now);
             chatMessageDAO.persist(chatMessage);
             sentChatMessageDAO.persist(sentChatMessage);
         }
@@ -66,9 +71,9 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
             match.setActive(true);
             matchDAO.persist(match);
         }
-        //        TODO: implement it
-//        return sentChatMessage.getChatMessageId();
-        return null;
+        saveChatMessageDTO.setId(sentChatMessage.getChatMessageId());
+        saveChatMessageDTO.setCreatedAt(sentChatMessage.getCreatedAt());
+        return saveChatMessageDTO;
     }
 
     @Override

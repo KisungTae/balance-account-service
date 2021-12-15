@@ -3,19 +3,20 @@ package com.beeswork.balanceaccountservice.config.websocket;
 import com.beeswork.balanceaccountservice.config.security.JWTTokenProvider;
 import com.beeswork.balanceaccountservice.constant.HttpHeader;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
+import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.beeswork.balanceaccountservice.dto.chat.SaveChatMessageDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
-import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
-import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedException;
+import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.micrometer.core.lang.NonNull;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.math.NumberUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -40,6 +41,9 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
     private ObjectMapper objectMapper;
 
     @Autowired
+    private ModelMapper modelMapper;
+
+    @Autowired
     private JWTTokenProvider jwtTokenProvider;
 
     private static final String QUEUE = "/queue/";
@@ -50,12 +54,18 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, @NonNull MessageChannel channel) {
         StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
         String accessToken = stompHeaderAccessor.getFirstNativeHeader(HttpHeader.ACCESS_TOKEN);
-        Jws<Claims> jws = jwtTokenProvider.parseJWTToken(accessToken);
-        jwtTokenProvider.validateJWTToken(jws);
+
 
         StompCommand stompCommand = stompHeaderAccessor.getCommand();
         if (stompCommand == null) {
             throw new BadRequestException();
+        }
+
+        Jws<Claims> jws = null;
+        if (stompCommand == StompCommand.CONNECT || stompCommand == StompCommand.SUBSCRIBE || stompCommand == StompCommand.SEND) {
+//            jws = jwtTokenProvider.parseJWTToken(accessToken);
+//            jwtTokenProvider.validateJWTToken(jws);
+            throw new ExpiredJwtException(null, null, "");
         }
 
         if (stompCommand == StompCommand.SUBSCRIBE) {
@@ -66,19 +76,26 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
             }
             return updateSubscribeHeaders(stompHeaderAccessor, message);
         } else if (stompCommand == StompCommand.SEND) {
+            ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
+            if (chatMessageVM == null) {
+                return message;
+            }
 
+            ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessageVM, ChatMessageDTO.class);
+            String userName = jwtTokenProvider.getUserName(jws);
+            if (!userName.equals(chatMessageDTO.getAccountId().toString())) {
+                throw new AccountNotFoundException();
+            }
+            SaveChatMessageDTO saveChatMessageDTO = chatService.saveChatMessage(chatMessageDTO);
+            if (saveChatMessageDTO.isError()) {
+                chatMessageVM = new ChatMessageVM(saveChatMessageDTO.getError());
+            } else {
+                chatMessageVM.setId(saveChatMessageDTO.getId());
+                chatMessageVM.setCreatedAt(saveChatMessageDTO.getCreatedAt());
+            }
+            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM),
+                                                stompHeaderAccessor.getMessageHeaders());
         }
-
-
-        // TODO: when unmatched, it should not throw an error, but message receipt error = UnmatchedErrorCode
-
-
-//        else if (StompCommand.SEND.equals(stompCommand)) {
-//            throw new BadRequestException();
-//            return validateBeforeSend(stompHeaderAccessor, message, accessToken, identityToken);
-//        }
-
-
         return message;
     }
 
@@ -92,30 +109,5 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
         accessor.setSubscriptionId(StompHeader.PRIVATE_QUEUE_SUBSCRIPTION_ID);
         accessor.setAck(StompHeader.DEFAULT_ACK);
         return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
-    }
-
-
-    private Message<?> validateBeforeSend(StompHeaderAccessor stompHeaderAccessor, Message<?> message) throws JsonProcessingException {
-        try {
-            ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
-            String receipt = stompHeaderAccessor.getFirstNativeHeader(StompHeader.RECEIPT);
-            
-            if (chatMessageVM == null || receipt == null) throw new BadRequestException();
-            Long chatMessageId = chatService.saveChatMessage(chatMessageVM.getAccountId(),
-                                                             chatMessageVM.getChatId(),
-                                                             chatMessageVM.getRecipientId(),
-                                                             Long.parseLong(receipt),
-                                                             chatMessageVM.getBody(),
-                                                             chatMessageVM.getCreatedAt());
-            chatMessageVM.setId(chatMessageId);
-            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM), stompHeaderAccessor.getMessageHeaders());
-        } catch (MatchNotFoundException | MatchUnmatchedException exception) {
-            ChatMessageVM chatMessageVM = new ChatMessageVM(false, exception.getExceptionCode());
-            chatMessageVM.setError(exception.getExceptionCode());
-            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM), stompHeaderAccessor.getMessageHeaders());
-        } catch (Exception exception) {
-            ChatMessageVM chatMessageVM = new ChatMessageVM(false, null);
-            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM), stompHeaderAccessor.getMessageHeaders());
-        }
     }
 }

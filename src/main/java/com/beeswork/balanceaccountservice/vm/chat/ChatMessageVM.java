@@ -11,17 +11,20 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class ChatMessageVM {
-    private Long id;
-    private String body;
-    private Long chatId;
-    private UUID accountId;
-    private UUID recipientId;
-    private Date createdAt = new Date();
-    private boolean sent = true;
-    private String error;
+    private UUID    id;
+    private Long    key;
+    private String  body;
+    private Long    chatId;
+    private UUID    accountId;
+    private UUID    recipientId;
+    private Date    createdAt;
+    private String  error;
 
-    public ChatMessageVM(boolean sent, String error) {
-        this.sent = sent;
+    public ChatMessageVM(String error) {
         this.error = error;
+    }
+
+    public boolean isError() {
+        return this.error != null;
     }
 }
