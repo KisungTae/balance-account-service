@@ -136,6 +136,9 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         Jws<Claims> refreshTokenJws = jwtTokenProvider.parseJWTToken(refreshToken);
         jwtTokenProvider.validateJWTToken(refreshTokenJws);
         UUID refreshTokenUserName = Convert.toUUID(jwtTokenProvider.getUserName(refreshTokenJws));
+        if (refreshTokenUserName == null) {
+            throw new InvalidRefreshTokenException();
+        }
 
         // parsJWTToken throws ExpiredJWTException
         UUID accessTokenUserName = null;
@@ -146,7 +149,9 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
             Claims claims = e.getClaims();
             if (claims != null) accessTokenUserName = Convert.toUUID(claims.getSubject());
         }
-        if (!refreshTokenUserName.equals(accessTokenUserName)) throw new InvalidRefreshTokenException();
+        if (!refreshTokenUserName.equals(accessTokenUserName)) {
+            throw new InvalidRefreshTokenException();
+        }
 
         Account account = findValidAccountFromJWTToken(refreshTokenUserName);
         validateRefreshTokenKey(account.getId(), refreshTokenJws);

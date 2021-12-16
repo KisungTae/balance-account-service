@@ -5,7 +5,7 @@ import com.beeswork.balanceaccountservice.exception.BaseException;
 public class ExpiredJWTTokenException extends BaseException {
     public static final String CODE = "expired.jwt.token.exception";
 
-    public ExpiredJWTTokenException(String exceptionCode) {
-        super(exceptionCode);
+    public ExpiredJWTTokenException() {
+        super(CODE);
     }
 }

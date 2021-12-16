@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.config.security;
 
 import com.beeswork.balanceaccountservice.config.properties.JWTTokenProperties;
 import com.beeswork.balanceaccountservice.constant.HttpHeader;
+import com.beeswork.balanceaccountservice.exception.jwt.ExpiredJWTTokenException;
 import com.beeswork.balanceaccountservice.exception.jwt.InvalidJWTTokenException;
 import com.beeswork.balanceaccountservice.exception.jwt.InvalidRefreshTokenException;
 import com.beeswork.balanceaccountservice.service.security.UserDetailService;
@@ -50,7 +51,11 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
         try {
             if (StringUtils.isBlank(jwtToken)) throw new InvalidJWTTokenException();
             return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
-        } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+        }
+        catch (ExpiredJwtException e) {
+            throw new ExpiredJWTTokenException();
+        }
+        catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
             throw new InvalidJWTTokenException();
         }
     }
@@ -61,7 +66,7 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
         Claims claims = jws.getBody();
         if (claims == null) throw new InvalidJWTTokenException();
         else if (claims.getExpiration() == null) throw new InvalidJWTTokenException();
-        else if (claims.getExpiration().before(new Date())) throw new ExpiredJwtException(null, null, "");
+        else if (claims.getExpiration().before(new Date())) throw new ExpiredJWTTokenException();
     }
 
     @Override
@@ -133,7 +138,7 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
         if (expirationDate == null) throw new InvalidRefreshTokenException();
         Date now = new Date();
         long diff = expirationDate.getTime() - now.getTime();
-        if (diff <= 0) throw new ExpiredJwtException(null, null, "");
+        if (diff <= 0) throw new ExpiredJWTTokenException();
         return diff <= REFRESH_TOKEN_REISSUE_TIME;
     }
 

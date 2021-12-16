@@ -7,6 +7,7 @@ import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.chat.SaveChatMessageDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
+import com.beeswork.balanceaccountservice.exception.jwt.ExpiredJWTTokenException;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
@@ -65,7 +66,7 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
         if (stompCommand == StompCommand.CONNECT || stompCommand == StompCommand.SUBSCRIBE || stompCommand == StompCommand.SEND) {
 //            jws = jwtTokenProvider.parseJWTToken(accessToken);
 //            jwtTokenProvider.validateJWTToken(jws);
-            throw new ExpiredJwtException(null, null, "");
+            throw new ExpiredJWTTokenException();
         }
 
         if (stompCommand == StompCommand.SUBSCRIBE) {
