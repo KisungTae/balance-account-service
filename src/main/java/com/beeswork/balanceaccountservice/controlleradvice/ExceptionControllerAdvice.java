@@ -112,7 +112,7 @@ public class ExceptionControllerAdvice {
     throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(exceptionResponse("expired.jwt.exception", null, locale));
+                             .body(exceptionResponse("expired.jwt.token.exception", null, locale));
     }
 
     @ExceptionHandler({AccountShortOfPointException.class, AccountBlockedException.class,

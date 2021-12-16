@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 
 import com.beeswork.balanceaccountservice.exception.InternalServerException;
+import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.micrometer.core.lang.NonNullApi;
 import org.springframework.beans.factory.annotation.Autowired;

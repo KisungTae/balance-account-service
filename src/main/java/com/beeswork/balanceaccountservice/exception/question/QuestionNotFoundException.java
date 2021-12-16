@@ -4,9 +4,9 @@ import com.beeswork.balanceaccountservice.exception.BaseException;
 
 public class QuestionNotFoundException extends BaseException {
 
-    private static final String QUESTION_NOT_FOUND_EXCEPTION = "question.not.found.exception";
+    private static final String CODE = "question.not.found.exception";
 
     public QuestionNotFoundException() {
-        super(QUESTION_NOT_FOUND_EXCEPTION);
+        super(CODE);
     }
 }

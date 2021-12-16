@@ -4,9 +4,9 @@ import com.beeswork.balanceaccountservice.exception.BaseException;
 
 public class SwipedNotFoundException extends BaseException {
 
-    private static final String SWIPED_NOT_FOUND_EXCEPTION = "swiped.not.found.exception";
+    private static final String CODE = "swiped.not.found.exception";
 
     public SwipedNotFoundException() {
-        super(SWIPED_NOT_FOUND_EXCEPTION);
+        super(CODE);
     }
 }

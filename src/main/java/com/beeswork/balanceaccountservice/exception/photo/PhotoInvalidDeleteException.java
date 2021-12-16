@@ -4,9 +4,9 @@ import com.beeswork.balanceaccountservice.exception.BaseException;
 
 public class PhotoInvalidDeleteException extends BaseException {
 
-    private static final String PHOTO_INVALID_DELETE_EXCEPTION = "photo.invalid.delete.exception";
+    private static final String CODE = "photo.invalid.delete.exception";
 
     public PhotoInvalidDeleteException() {
-        super(PHOTO_INVALID_DELETE_EXCEPTION);
+        super(CODE);
     }
 }

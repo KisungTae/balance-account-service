@@ -4,9 +4,9 @@ import com.beeswork.balanceaccountservice.exception.BaseException;
 
 public class SwipedBlockedException extends BaseException {
 
-    private static final String SWIPED_BLOCKED_EXCEPTION = "swiped.blocked.exception";
+    private static final String CODE = "swiped.blocked.exception";
 
     public SwipedBlockedException() {
-        super(SWIPED_BLOCKED_EXCEPTION);
+        super(CODE);
     }
 }

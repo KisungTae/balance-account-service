@@ -4,9 +4,9 @@ import com.beeswork.balanceaccountservice.exception.BaseException;
 
 public class PhotoNotFoundException extends BaseException {
 
-    private static final String PHOTO_NOT_FOUND_EXCEPTION = "photo.not.found.exception";
+    private static final String CODE = "photo.not.found.exception";
 
     public PhotoNotFoundException() {
-        super(PHOTO_NOT_FOUND_EXCEPTION);
+        super(CODE);
     }
 }

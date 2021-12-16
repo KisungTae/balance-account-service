@@ -4,7 +4,7 @@ import com.beeswork.balanceaccountservice.exception.BaseException;
 
 public class PhotoAlreadyExistsException extends BaseException {
 
-    private static final String PHOTO_ALREADY_EXISTS_EXCEPTION = "photo.already.exists.exception";
+    private static final String CODE = "photo.already.exists.exception";
 
-    public PhotoAlreadyExistsException() { super(PHOTO_ALREADY_EXISTS_EXCEPTION); }
+    public PhotoAlreadyExistsException() { super(CODE); }
 }

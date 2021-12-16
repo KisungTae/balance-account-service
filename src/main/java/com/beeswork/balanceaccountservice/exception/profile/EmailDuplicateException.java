@@ -4,9 +4,9 @@ import com.beeswork.balanceaccountservice.exception.BaseException;
 
 public class EmailDuplicateException extends BaseException {
 
-    private static final String EMAIL_DUPLICATE_EXCEPTION = "email.duplicate.exception";
+    private static final String CODE = "email.duplicate.exception";
 
     public EmailDuplicateException() {
-        super(EMAIL_DUPLICATE_EXCEPTION);
+        super(CODE);
     }
 }
