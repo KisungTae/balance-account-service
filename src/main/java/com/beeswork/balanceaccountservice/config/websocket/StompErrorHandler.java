@@ -4,15 +4,11 @@ import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 
 import com.beeswork.balanceaccountservice.exception.InternalServerException;
-import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.micrometer.core.lang.NonNullApi;
+import com.beeswork.balanceaccountservice.exception.jwt.ExpiredJWTException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.simp.stomp.StompConversionException;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 
@@ -23,7 +19,7 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
     @Autowired
     private MessageSource messageSource;
 
-//  NOTE 1. if frame exceeds the size limit, then StompConversionException is thrown and is caught in handleInternal
+    //  NOTE 1. if frame exceeds the size limit, then StompConversionException is thrown and is caught in handleInternal
     @Override
     protected Message<byte[]> handleInternal(@NonNull StompHeaderAccessor errorHeaderAccessor,
                                              @NonNull byte[] errorPayload,
@@ -31,14 +27,16 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
                                              StompHeaderAccessor clientHeaderAccessor) {
         Locale locale = StompHeader.getLocaleFromAcceptLanguageHeader(clientHeaderAccessor);
         if (cause != null && cause.getCause() != null) {
-            BaseException exception;
+            String exceptionCode = "";
             if (cause.getCause() instanceof BaseException) {
-                exception = (BaseException) cause.getCause();
+                exceptionCode = ((BaseException) cause.getCause()).getExceptionCode();
+            } else if (cause.getCause() instanceof ExpiredJWTException) {
+                exceptionCode = ((ExpiredJWTException) cause.getCause()).getExceptionCode();
             } else {
-                exception = new InternalServerException();
+                exceptionCode = InternalServerException.CODE;
             }
-            String exceptionMessage = messageSource.getMessage(exception.getExceptionCode(), null, locale);
-            errorHeaderAccessor.addNativeHeader(StompHeader.ERROR, exception.getExceptionCode());
+            String exceptionMessage = messageSource.getMessage(exceptionCode, null, locale);
+            errorHeaderAccessor.addNativeHeader(StompHeader.ERROR, exceptionCode);
             errorHeaderAccessor.setMessage(exceptionMessage);
         }
         return super.handleInternal(errorHeaderAccessor, errorPayload, cause, clientHeaderAccessor);

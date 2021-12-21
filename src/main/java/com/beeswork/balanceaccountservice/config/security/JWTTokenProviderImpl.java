@@ -2,7 +2,7 @@ package com.beeswork.balanceaccountservice.config.security;
 
 import com.beeswork.balanceaccountservice.config.properties.JWTTokenProperties;
 import com.beeswork.balanceaccountservice.constant.HttpHeader;
-import com.beeswork.balanceaccountservice.exception.jwt.ExpiredJWTTokenException;
+import com.beeswork.balanceaccountservice.exception.jwt.ExpiredJWTException;
 import com.beeswork.balanceaccountservice.exception.jwt.InvalidJWTTokenException;
 import com.beeswork.balanceaccountservice.exception.jwt.InvalidRefreshTokenException;
 import com.beeswork.balanceaccountservice.service.security.UserDetailService;
@@ -24,7 +24,7 @@ import java.util.*;
 public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     //    private final long   ACCESS_TOKEN_LIFE_TIME     = 60 * 60 * 1000L;
-    private final long   ACCESS_TOKEN_LIFE_TIME     = 60 * 1000L;
+    private final long   ACCESS_TOKEN_LIFE_TIME     = 3 * 60 * 1000L;
     private final long   REFRESH_TOKEN_LIFE_TIME    = 14 * 24 * 60 * 60 * 1000L;
     private final String REFRESH_TOKEN_KEY          = "key";
     private final String ACCESS_TOKEN_ROLES         = "roles";
@@ -49,24 +49,30 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
     @Override
     public Jws<Claims> parseJWTToken(String jwtToken) {
         try {
-            if (StringUtils.isBlank(jwtToken)) throw new InvalidJWTTokenException();
+            if (StringUtils.isBlank(jwtToken)) {
+                throw new InvalidJWTTokenException();
+            }
             return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
-        }
-        catch (ExpiredJwtException e) {
-            throw new ExpiredJWTTokenException();
-        }
-        catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+        } catch (ExpiredJwtException e) {
+            throw new ExpiredJWTException(e);
+        } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
             throw new InvalidJWTTokenException();
         }
     }
 
     @Override
     public void validateJWTToken(Jws<Claims> jws) {
-        if (jws == null) throw new InvalidJWTTokenException();
+        if (jws == null) {
+            throw new InvalidJWTTokenException();
+        }
         Claims claims = jws.getBody();
-        if (claims == null) throw new InvalidJWTTokenException();
-        else if (claims.getExpiration() == null) throw new InvalidJWTTokenException();
-        else if (claims.getExpiration().before(new Date())) throw new ExpiredJWTTokenException();
+        if (claims == null) {
+            throw new InvalidJWTTokenException();
+        } else if (claims.getExpiration() == null) {
+            throw new InvalidJWTTokenException();
+        } else if (claims.getExpiration().before(new Date())) {
+            throw new ExpiredJWTException();
+        }
     }
 
     @Override
@@ -77,9 +83,13 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     @Override
     public String getUserName(Jws<Claims> jws) {
-        if (jws == null) return null;
+        if (jws == null) {
+            return null;
+        }
         Claims claims = jws.getBody();
-        if (claims == null) return null;
+        if (claims == null) {
+            return null;
+        }
         return claims.getSubject();
     }
 
@@ -110,35 +120,51 @@ public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     @Override
     public String resolveAccessToken(HttpServletRequest httpServletRequest) {
-        if (httpServletRequest == null) return null;
+        if (httpServletRequest == null) {
+            return null;
+        }
         return httpServletRequest.getHeader(HttpHeader.ACCESS_TOKEN);
     }
 
     @Override
     public UUID getRefreshTokenKey(Jws<Claims> jws) {
-        if (jws == null) return null;
+        if (jws == null) {
+            return null;
+        }
         Claims claims = jws.getBody();
-        if (claims == null) return null;
+        if (claims == null) {
+            return null;
+        }
         Object refreshTokenKey = claims.get(REFRESH_TOKEN_KEY);
-        if (refreshTokenKey == null) return null;
+        if (refreshTokenKey == null) {
+            return null;
+        }
         return Convert.toUUID(refreshTokenKey.toString());
     }
 
     @Override
     public Date getExpirationDate(Jws<Claims> jws) {
-        if (jws == null) return null;
+        if (jws == null) {
+            return null;
+        }
         Claims claims = jws.getBody();
-        if (claims == null) return null;
+        if (claims == null) {
+            return null;
+        }
         return claims.getExpiration();
     }
 
     @Override
     public boolean shouldReissueRefreshToken(Jws<Claims> jws) {
         Date expirationDate = getExpirationDate(jws);
-        if (expirationDate == null) throw new InvalidRefreshTokenException();
+        if (expirationDate == null) {
+            throw new InvalidRefreshTokenException();
+        }
         Date now = new Date();
         long diff = expirationDate.getTime() - now.getTime();
-        if (diff <= 0) throw new ExpiredJWTTokenException();
+        if (diff <= 0) {
+            throw new ExpiredJWTException();
+        }
         return diff <= REFRESH_TOKEN_REISSUE_TIME;
     }
 

@@ -5,7 +5,7 @@ import com.beeswork.balanceaccountservice.constant.PhotoConstant;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.BaseException;
 import com.beeswork.balanceaccountservice.exception.account.*;
-import com.beeswork.balanceaccountservice.exception.jwt.ExpiredJWTTokenException;
+import com.beeswork.balanceaccountservice.exception.jwt.ExpiredJWTException;
 import com.beeswork.balanceaccountservice.exception.jwt.InvalidJWTTokenException;
 import com.beeswork.balanceaccountservice.exception.jwt.InvalidRefreshTokenException;
 import com.beeswork.balanceaccountservice.exception.login.*;
@@ -27,7 +27,6 @@ import com.beeswork.balanceaccountservice.exception.swipe.*;
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.Ordered;
@@ -107,12 +106,12 @@ public class ExceptionControllerAdvice {
                              .body(exceptionResponse("access.denied.exception", null, locale));
     }
 
-    @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<String> handleExpiredJwtException(ExpiredJwtException exception, Locale locale)
+    @ExceptionHandler(ExpiredJWTException.class)
+    public ResponseEntity<String> handleExpiredJWTException(ExpiredJWTException exception, Locale locale)
     throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(exceptionResponse("expired.jwt.token.exception", null, locale));
+                             .body(exceptionResponse(exception.getExceptionCode(), null, locale));
     }
 
     @ExceptionHandler({AccountShortOfPointException.class, AccountBlockedException.class,
@@ -122,8 +121,7 @@ public class ExceptionControllerAdvice {
                        EmailDuplicateException.class, PhotoInvalidDeleteException.class,
                        AccountDeletedException.class, PhotoAlreadyExistsException.class,
                        PhotoExceededMaxException.class, InvalidSocialLoginException.class,
-                       InvalidRefreshTokenException.class, InvalidJWTTokenException.class,
-                       ExpiredJWTTokenException.class})
+                       InvalidRefreshTokenException.class, InvalidJWTTokenException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {
         Object[] arguments = null;

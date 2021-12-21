@@ -3,17 +3,12 @@ package com.beeswork.balanceaccountservice.config.websocket;
 import com.beeswork.balanceaccountservice.config.security.JWTTokenProvider;
 import com.beeswork.balanceaccountservice.constant.HttpHeader;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
-import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
-import com.beeswork.balanceaccountservice.dto.chat.SaveChatMessageDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
-import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
-import com.beeswork.balanceaccountservice.exception.jwt.ExpiredJWTTokenException;
+import com.beeswork.balanceaccountservice.exception.jwt.ExpiredJWTException;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
-import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.micrometer.core.lang.NonNull;
 import lombok.SneakyThrows;
@@ -64,9 +59,8 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
 
         Jws<Claims> jws = null;
         if (stompCommand == StompCommand.CONNECT || stompCommand == StompCommand.SUBSCRIBE || stompCommand == StompCommand.SEND) {
-//            jws = jwtTokenProvider.parseJWTToken(accessToken);
-//            jwtTokenProvider.validateJWTToken(jws);
-            throw new ExpiredJWTTokenException();
+            jws = jwtTokenProvider.parseJWTToken(accessToken);
+            jwtTokenProvider.validateJWTToken(jws);
         }
 
         if (stompCommand == StompCommand.SUBSCRIBE) {
@@ -77,25 +71,26 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
             }
             return updateSubscribeHeaders(stompHeaderAccessor, message);
         } else if (stompCommand == StompCommand.SEND) {
-            ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
-            if (chatMessageVM == null) {
-                return message;
-            }
-
-            ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessageVM, ChatMessageDTO.class);
-            String userName = jwtTokenProvider.getUserName(jws);
-            if (!userName.equals(chatMessageDTO.getAccountId().toString())) {
-                throw new AccountNotFoundException();
-            }
-            SaveChatMessageDTO saveChatMessageDTO = chatService.saveChatMessage(chatMessageDTO);
-            if (saveChatMessageDTO.isError()) {
-                chatMessageVM = new ChatMessageVM(saveChatMessageDTO.getError());
-            } else {
-                chatMessageVM.setId(saveChatMessageDTO.getId());
-                chatMessageVM.setCreatedAt(saveChatMessageDTO.getCreatedAt());
-            }
-            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM),
-                                                stompHeaderAccessor.getMessageHeaders());
+            throw new ExpiredJWTException();
+//            ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
+//            if (chatMessageVM == null) {
+//                return message;
+//            }
+//
+//            ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessageVM, ChatMessageDTO.class);
+//            String userName = jwtTokenProvider.getUserName(jws);
+//            if (!userName.equals(chatMessageDTO.getAccountId().toString())) {
+//                throw new AccountNotFoundException();
+//            }
+//            SaveChatMessageDTO saveChatMessageDTO = chatService.saveChatMessage(chatMessageDTO);
+//            if (saveChatMessageDTO.isError()) {
+//                chatMessageVM = new ChatMessageVM(saveChatMessageDTO.getError());
+//            } else {
+//                chatMessageVM.setId(saveChatMessageDTO.getId());
+//                chatMessageVM.setCreatedAt(saveChatMessageDTO.getCreatedAt());
+//            }
+//            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM),
+//                                                stompHeaderAccessor.getMessageHeaders());
         }
         return message;
     }
