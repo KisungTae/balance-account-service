@@ -15,4 +15,7 @@ public interface ChatService {
     SaveChatMessageDTO saveChatMessage(ChatMessageDTO chatMessageDTO);
     void syncChatMessages(List<UUID> sentChatMessageIds, List<UUID> receivedChatMessageIds);
     ListChatMessagesDTO listChatMessages(UUID accountId);
+    void fetchedChatMessage(UUID accountId, UUID chatMessageId);
+    void receivedChatMessage(UUID accountId, UUID chatMessageId);
+
 }

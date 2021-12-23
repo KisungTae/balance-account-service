@@ -43,8 +43,11 @@ public class SentChatMessage {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
+    @Column(name = "account_id", insertable = false, updatable = false)
+    private UUID accountId;
+
     public SentChatMessage(ChatMessage chatMessage, Account account, long key, Date createdAt) {
-//        this.chatMessage = chatMessage;
+        this.chatMessage = chatMessage;
         this.account = account;
         this.key = key;
         this.createdAt = createdAt;

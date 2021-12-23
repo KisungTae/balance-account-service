@@ -3,10 +3,14 @@ package com.beeswork.balanceaccountservice.config.websocket;
 import com.beeswork.balanceaccountservice.config.security.JWTTokenProvider;
 import com.beeswork.balanceaccountservice.constant.HttpHeader;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
+import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.beeswork.balanceaccountservice.dto.chat.SaveChatMessageDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
+import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.jwt.ExpiredJWTException;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
+import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -51,7 +55,6 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
         String accessToken = stompHeaderAccessor.getFirstNativeHeader(HttpHeader.ACCESS_TOKEN);
 
-
         StompCommand stompCommand = stompHeaderAccessor.getCommand();
         if (stompCommand == null) {
             throw new BadRequestException();
@@ -71,26 +74,25 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
             }
             return updateSubscribeHeaders(stompHeaderAccessor, message);
         } else if (stompCommand == StompCommand.SEND) {
-            throw new ExpiredJWTException();
-//            ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
-//            if (chatMessageVM == null) {
-//                return message;
-//            }
-//
-//            ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessageVM, ChatMessageDTO.class);
-//            String userName = jwtTokenProvider.getUserName(jws);
-//            if (!userName.equals(chatMessageDTO.getAccountId().toString())) {
-//                throw new AccountNotFoundException();
-//            }
-//            SaveChatMessageDTO saveChatMessageDTO = chatService.saveChatMessage(chatMessageDTO);
-//            if (saveChatMessageDTO.isError()) {
-//                chatMessageVM = new ChatMessageVM(saveChatMessageDTO.getError());
-//            } else {
-//                chatMessageVM.setId(saveChatMessageDTO.getId());
-//                chatMessageVM.setCreatedAt(saveChatMessageDTO.getCreatedAt());
-//            }
-//            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM),
-//                                                stompHeaderAccessor.getMessageHeaders());
+            ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
+            if (chatMessageVM == null) {
+                return message;
+            }
+
+            ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessageVM, ChatMessageDTO.class);
+            String userName = jwtTokenProvider.getUserName(jws);
+            if (!userName.equals(chatMessageDTO.getAccountId().toString())) {
+                throw new AccountNotFoundException();
+            }
+            SaveChatMessageDTO saveChatMessageDTO = chatService.saveChatMessage(chatMessageDTO);
+            if (saveChatMessageDTO.isError()) {
+                chatMessageVM = new ChatMessageVM(saveChatMessageDTO.getError());
+            } else {
+                chatMessageVM.setId(saveChatMessageDTO.getId());
+                chatMessageVM.setCreatedAt(saveChatMessageDTO.getCreatedAt());
+            }
+            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM),
+                                                stompHeaderAccessor.getMessageHeaders());
         }
         return message;
     }

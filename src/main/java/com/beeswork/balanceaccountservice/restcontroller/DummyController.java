@@ -25,7 +25,9 @@ import com.beeswork.balanceaccountservice.entity.setting.PushSetting;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeId;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
+import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.service.fcm.FCMService;
+import com.beeswork.balanceaccountservice.service.stomp.StompService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -62,6 +64,8 @@ public class DummyController {
     private final WalletDAO          walletDAO;
     private final PushSettingDAO     pushSettingDAO;
     private final GeometryFactory    geometryFactory;
+    private final StompService       stompService;
+    private final ChatService chatService;
 
     @Autowired
     public DummyController(MatchDAO matchDAO,
@@ -72,7 +76,9 @@ public class DummyController {
                            SentChatMessageDAO sentChatMessageDAO,
                            WalletDAO walletDAO,
                            PushSettingDAO pushSettingDAO,
-                           GeometryFactory geometryFactory) {
+                           GeometryFactory geometryFactory,
+                           StompService stompService,
+                           ChatService chatService) {
         this.matchDAO = matchDAO;
         this.objectMapper = objectMapper;
         this.fcmService = FCMService;
@@ -82,6 +88,8 @@ public class DummyController {
         this.walletDAO = walletDAO;
         this.pushSettingDAO = pushSettingDAO;
         this.geometryFactory = geometryFactory;
+        this.stompService = stompService;
+        this.chatService = chatService;
     }
 
 
@@ -539,6 +547,26 @@ public class DummyController {
 //
 //        fcmService.sendNotifications(notificationDTOs);
 
+    }
+
+    @GetMapping("/send/chat/message/stomp")
+    public void sendDummyChatMessageToStomp(@RequestParam("accountId") UUID accountId,
+                                            @RequestParam("recipientId") UUID recipientId,
+                                            @RequestParam("chatId") long chatId,
+                                            @RequestParam("body") String body) {
+
+
+        ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
+        chatMessageDTO.setRecipientId(recipientId);
+        chatMessageDTO.setBody(body);
+        chatMessageDTO.setCreatedAt(new Date());
+        chatMessageDTO.setChatId(chatId);
+        chatMessageDTO.setAccountId(accountId);
+
+        chatService.saveChatMessage(chatMessageDTO);
+
+        chatMessageDTO.setId(UUID.randomUUID());
+        stompService.sendChatMessage(chatMessageDTO, Locale.getDefault());
     }
 
     @GetMapping("/send/chat/message")

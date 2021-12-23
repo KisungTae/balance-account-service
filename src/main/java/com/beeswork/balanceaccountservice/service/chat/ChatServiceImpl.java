@@ -10,6 +10,7 @@ import com.beeswork.balanceaccountservice.dto.chat.SaveChatMessageDTO;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.chat.SentChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
+import com.beeswork.balanceaccountservice.exception.chat.ChatMessageNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
@@ -100,8 +101,30 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         return listChatMessagesDTO;
     }
 
+    @Override
+    @Transactional
+    public void fetchedChatMessage(UUID accountId, UUID chatMessageId) {
+        SentChatMessage sentChatMessage = sentChatMessageDAO.findById(chatMessageId);
+        if (sentChatMessage == null || !sentChatMessage.getAccountId().equals(accountId)) {
+            throw new ChatMessageNotFoundException();
+        }
+        sentChatMessage.setFetched(true);
+        sentChatMessage.setUpdatedAt(new Date());
+    }
 
-    //    @Override
+    @Override
+    @Transactional
+    public void receivedChatMessage(UUID accountId, UUID chatMessageId) {
+        ChatMessage chatMessage = chatMessageDAO.findById(chatMessageId);
+        if (chatMessage == null || !chatMessage.getRecipientId().equals(accountId)) {
+            throw new ChatMessageNotFoundException();
+        }
+        chatMessage.setReceived(true);
+        chatMessage.setUpdatedAt(new Date());
+    }
+
+
+//    @Override
 //    @Transactional
 //    public void receivedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
 //        validateAccount(accountDAO.findById(accountId), identityToken);

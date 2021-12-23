@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.ThemeResolver;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +25,7 @@ import java.util.*;
 public class JWTTokenProviderImpl implements JWTTokenProvider {
 
     //    private final long   ACCESS_TOKEN_LIFE_TIME     = 60 * 60 * 1000L;
-    private final long   ACCESS_TOKEN_LIFE_TIME     = 3 * 60 * 1000L;
+    private final long   ACCESS_TOKEN_LIFE_TIME     = 5 * 60 * 1000L;
     private final long   REFRESH_TOKEN_LIFE_TIME    = 14 * 24 * 60 * 60 * 1000L;
     private final String REFRESH_TOKEN_KEY          = "key";
     private final String ACCESS_TOKEN_ROLES         = "roles";

@@ -1,7 +1,9 @@
 package com.beeswork.balanceaccountservice.exception.jwt;
 
 import com.beeswork.balanceaccountservice.exception.BaseException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Header;
 import lombok.Getter;
 import lombok.Setter;
 

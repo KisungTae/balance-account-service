@@ -48,4 +48,9 @@ public class SentChatMessageDAOImpl extends BaseDAOImpl<SentChatMessage> impleme
                               .fetch();
     }
 
+    @Override
+    public SentChatMessage findById(UUID chatMessageId) {
+        return jpaQueryFactory.selectFrom(qSentChatMessage).where(qSentChatMessage.chatMessageId.eq(chatMessageId)).fetchFirst();
+    }
+
 }
