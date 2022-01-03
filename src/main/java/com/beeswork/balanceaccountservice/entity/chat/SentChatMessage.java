@@ -5,6 +5,8 @@ import com.beeswork.balanceaccountservice.entity.account.Account;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -29,9 +31,6 @@ public class SentChatMessage {
     @JoinColumn(name = "account_id")
     private Account account;
 
-    @Column(name = "key")
-    private long key;
-
     @Column(name = "fetched")
     private boolean fetched;
 
@@ -46,10 +45,9 @@ public class SentChatMessage {
     @Column(name = "account_id", insertable = false, updatable = false)
     private UUID accountId;
 
-    public SentChatMessage(ChatMessage chatMessage, Account account, long key, Date createdAt) {
+    public SentChatMessage(ChatMessage chatMessage, Account account, Date createdAt) {
         this.chatMessage = chatMessage;
         this.account = account;
-        this.key = key;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
     }

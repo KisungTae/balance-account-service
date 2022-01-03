@@ -19,14 +19,12 @@ public class ChatMessageDTO {
     private UUID accountId;
     private UUID recipientId;
     private String body;
-    private Long key;
     private Long chatId;
     private Date createdAt;
 
     @QueryProjection
-    public ChatMessageDTO(UUID id, Long key, Date createdAt) {
+    public ChatMessageDTO(UUID id, Date createdAt) {
         this.id = id;
-        this.key = key;
         this.createdAt = createdAt;
     }
 

@@ -28,6 +28,7 @@ import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundExcep
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.service.fcm.FCMService;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
+import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -159,16 +160,16 @@ public class DummyController {
                     boolean who = random.nextBoolean();
                     Account sender = who ? match.getSwiper() : match.getSwiped();
                     Account receiver = who ? match.getSwiped() : match.getSwiper();
-                    ChatMessage chatMessage = new ChatMessage(match.getChat(),
-                                                              receiver,
-                                                              "message-" + random.nextFloat(),
-                                                              date);
-                    match.getChat().getChatMessages().add(chatMessage);
-
-                    if (sender.getId().equals(account.getId())) {
-                        SentChatMessage sentChatMessage = new SentChatMessage(chatMessage, sender, innerCount, date);
-                        sentChatMessageDAO.persist(sentChatMessage);
-                    }
+//                    ChatMessage chatMessage = new ChatMessage(match.getChat(),
+//                                                              receiver,
+//                                                              "message-" + random.nextFloat(),
+//                                                              date);
+//                    match.getChat().getChatMessages().add(chatMessage);
+//
+//                    if (sender.getId().equals(account.getId())) {
+//                        SentChatMessage sentChatMessage = new SentChatMessage(chatMessage, sender, innerCount, date);
+//                        sentChatMessageDAO.persist(sentChatMessage);
+//                    }
                 }
             }
         }
@@ -456,18 +457,18 @@ public class DummyController {
 
             for (Match match : matches) {
                 if (random.nextBoolean()) {
-                    innerCount++;
-                    boolean who = random.nextBoolean();
-                    Account sender = who ? match.getSwiper() : match.getSwiped();
-                    Account receiver = who ? match.getSwiped() : match.getSwiper();
-                    ChatMessage chatMessage = new ChatMessage(match.getChat(),
-                                                              receiver,
-                                                              "message-" + random.nextFloat(),
-                                                              date);
-                    match.getChat().getChatMessages().add(chatMessage);
-
-                    SentChatMessage sentChatMessage = new SentChatMessage(chatMessage, sender, innerCount, date);
-                    sentChatMessageDAO.persist(sentChatMessage);
+//                    innerCount++;
+//                    boolean who = random.nextBoolean();
+//                    Account sender = who ? match.getSwiper() : match.getSwiped();
+//                    Account receiver = who ? match.getSwiped() : match.getSwiper();
+//                    ChatMessage chatMessage = new ChatMessage(match.getChat(),
+//                                                              receiver,
+//                                                              "message-" + random.nextFloat(),
+//                                                              date);
+//                    match.getChat().getChatMessages().add(chatMessage);
+//
+//                    SentChatMessage sentChatMessage = new SentChatMessage(chatMessage, sender, innerCount, date);
+//                    sentChatMessageDAO.persist(sentChatMessage);
 
 
                 }
@@ -599,6 +600,17 @@ public class DummyController {
         fcmService.sendMatch(matchDTO,
                              "dNx-ay3rS0qnIITWvS2ue7:APA91bHTsw7heoTkdZXiIQTvIovZEQBcLIw-hIdlv-Ti141OeUjEjW860r2WlfzVtKGqX0gYhymGJ2b_VDbNY2Ao5SbCzeTjquIPmSYb3QunGgdRuqqU8scU3QGxtXTxV9FeKFdLKsEE",
                              Locale.getDefault());
+    }
+
+    @GetMapping("/save/chat/message")
+    public void saveDummyChatMessage(@RequestParam("body") String body) {
+        ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
+        chatMessageDTO.setAccountId(UUID.fromString("174d0164-bfa3-4233-b8c8-54169f5da787"));
+        chatMessageDTO.setRecipientId(UUID.fromString("d9310f89-4db5-4e0a-8f1c-b7e4859cfb52"));
+        chatMessageDTO.setBody(body);
+        chatMessageDTO.setChatId(1L);
+        chatMessageDTO.setId(UUID.fromString("ecbeacc4-3409-4195-8c47-76a1f6a4798c"));
+        chatService.saveChatMessage(chatMessageDTO);
     }
 
 //    @PostMapping("/change/swipe-count")

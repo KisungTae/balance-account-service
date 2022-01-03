@@ -59,11 +59,11 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
             return saveChatMessageDTO;
         }
 
-        SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(chatMessageDTO.getAccountId(), chatMessageDTO.getKey());
+        SentChatMessage sentChatMessage = sentChatMessageDAO.findById(chatMessageDTO.getId());
         if (sentChatMessage == null) {
             Date now = new Date();
             ChatMessage chatMessage = new ChatMessage(match.getChat(), match.getSwiped(), chatMessageDTO.getBody(), now);
-            sentChatMessage = new SentChatMessage(chatMessage, match.getSwiper(), chatMessageDTO.getKey(), now);
+            sentChatMessage = new SentChatMessage(chatMessage, match.getSwiper(), now);
             chatMessageDAO.persist(chatMessage);
             sentChatMessageDAO.persist(sentChatMessage);
         }
@@ -72,8 +72,8 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
             match.setActive(true);
             matchDAO.persist(match);
         }
-        saveChatMessageDTO.setId(sentChatMessage.getChatMessageId());
         saveChatMessageDTO.setCreatedAt(sentChatMessage.getCreatedAt());
+        saveChatMessageDTO.setError("common error");
         return saveChatMessageDTO;
     }
 
@@ -124,19 +124,4 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     }
 
 
-//    @Override
-//    @Transactional
-//    public void receivedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
-//        validateAccount(accountDAO.findById(accountId), identityToken);
-//        ChatMessage chatMessage = chatMessageDAO.findById(chatMessageId);
-//        chatMessage.setReceived(true);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public void fetchedChatMessage(UUID accountId, UUID identityToken, Long chatMessageId) {
-//        validateAccount(accountDAO.findById(accountId), identityToken);
-//        SentChatMessage sentChatMessage = sentChatMessageDAO.findByKey(accountId, chatMessageId);
-//        sentChatMessage.setFetched(true);
-//    }
 }

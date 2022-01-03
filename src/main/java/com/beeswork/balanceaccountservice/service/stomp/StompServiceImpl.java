@@ -35,14 +35,18 @@ public class StompServiceImpl implements StompService {
     //  NOTE 1. convertAndSend to not existing queue, it creates a new queue under the queue desitination
     @Override
     public void sendChatMessage(ChatMessageDTO chatMessageDTO, Locale locale) {
-        if (chatMessageDTO.getId() == null) return;
+        if (chatMessageDTO == null || chatMessageDTO.getId() == null) {
+            return;
+        }
         String queue = getQueue(chatMessageDTO.getRecipientId());
         if (queue != null) {
             MessageHeaders outHeaders = sendingHeaders(PushType.CHAT_MESSAGE);
             chatMessageDTO.setRecipientId(null);
             chatMessageDTO.setAccountId(null);
             simpMessagingTemplate.convertAndSend(queue, chatMessageDTO, outHeaders);
-        } else pushService.pushChatMessage(chatMessageDTO, locale);
+        } else {
+            pushService.pushChatMessage(chatMessageDTO, locale);
+        }
     }
 
     private MessageHeaders sendingHeaders(PushType pushType) {

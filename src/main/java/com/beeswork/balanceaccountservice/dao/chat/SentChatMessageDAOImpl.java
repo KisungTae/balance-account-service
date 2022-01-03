@@ -27,18 +27,10 @@ public class SentChatMessageDAOImpl extends BaseDAOImpl<SentChatMessage> impleme
     @Override
     public List<ChatMessageDTO> findAllUnfetched(UUID accountId) {
         return jpaQueryFactory.select(new QChatMessageDTO(qSentChatMessage.chatMessageId,
-                                                          qSentChatMessage.key,
                                                           qSentChatMessage.createdAt))
                               .from(qSentChatMessage)
                               .where(qSentChatMessage.account.id.eq(accountId).and(qSentChatMessage.fetched.eq(false)))
                               .fetch();
-    }
-
-    @Override
-    public SentChatMessage findByKey(UUID accountId, long key) {
-        return jpaQueryFactory.selectFrom(qSentChatMessage)
-                              .where(qSentChatMessage.account.id.eq(accountId).and(qSentChatMessage.key.eq(key)))
-                              .fetchFirst();
     }
 
     @Override

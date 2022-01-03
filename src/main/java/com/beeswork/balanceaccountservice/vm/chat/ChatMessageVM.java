@@ -12,7 +12,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ChatMessageVM {
     private UUID    id;
-    private Long    key;
     private String  body;
     private Long    chatId;
     private UUID    accountId;
@@ -20,7 +19,8 @@ public class ChatMessageVM {
     private Date    createdAt;
     private String  error;
 
-    public ChatMessageVM(String error) {
+    public ChatMessageVM(UUID id, String error) {
+        this.id = id;
         this.error = error;
     }
 

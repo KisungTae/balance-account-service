@@ -74,25 +74,25 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
             }
             return updateSubscribeHeaders(stompHeaderAccessor, message);
         } else if (stompCommand == StompCommand.SEND) {
-            ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
-            if (chatMessageVM == null) {
-                return message;
-            }
-
-            ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessageVM, ChatMessageDTO.class);
-            String userName = jwtTokenProvider.getUserName(jws);
-            if (!userName.equals(chatMessageDTO.getAccountId().toString())) {
-                throw new AccountNotFoundException();
-            }
-            SaveChatMessageDTO saveChatMessageDTO = chatService.saveChatMessage(chatMessageDTO);
-            if (saveChatMessageDTO.isError()) {
-                chatMessageVM = new ChatMessageVM(saveChatMessageDTO.getError());
-            } else {
-                chatMessageVM.setId(saveChatMessageDTO.getId());
-                chatMessageVM.setCreatedAt(saveChatMessageDTO.getCreatedAt());
-            }
-            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM),
-                                                stompHeaderAccessor.getMessageHeaders());
+            throw new BadRequestException();
+//            ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
+//            if (chatMessageVM == null) {
+//                return message;
+//            }
+//
+//            ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessageVM, ChatMessageDTO.class);
+//            String userName = jwtTokenProvider.getUserName(jws);
+//            if (!userName.equals(chatMessageDTO.getAccountId().toString())) {
+//                throw new AccountNotFoundException();
+//            }
+//            SaveChatMessageDTO saveChatMessageDTO = chatService.saveChatMessage(chatMessageDTO);
+//            if (saveChatMessageDTO.isError()) {
+//                chatMessageVM = new ChatMessageVM(chatMessageVM.getId(), saveChatMessageDTO.getError());
+//            } else {
+//                chatMessageVM.setCreatedAt(saveChatMessageDTO.getCreatedAt());
+//            }
+//            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM),
+//                                                stompHeaderAccessor.getMessageHeaders());
         }
         return message;
     }

@@ -117,31 +117,24 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                 if (StompCommand.SEND.equals(inAccessor.getCommand())) {
                     ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
                     String receipt = inAccessor.getReceipt();
-                    if (StringUtils.isEmpty(receipt) || outChannel == null || chatMessageVM == null) return;
+                    if (StringUtils.isEmpty(receipt) || outChannel == null || chatMessageVM == null) {
+                        return;
+                    }
 
                     StompHeaderAccessor outAccessor = StompHeaderAccessor.create(StompCommand.RECEIPT);
                     outAccessor.setSessionId(inAccessor.getSessionId());
-                    outAccessor.setReceiptId(inAccessor.getReceipt());
+//                    outAccessor.setReceiptId(inAccessor.getReceipt());
+
                     chatMessageVM.setBody(null);
+                    chatMessageVM.setChatId(null);
                     chatMessageVM.setAccountId(null);
                     chatMessageVM.setRecipientId(null);
                     byte[] payload = objectMapper.writeValueAsString(chatMessageVM).getBytes();
                     outChannel.send(MessageBuilder.createMessage(payload, outAccessor.getMessageHeaders()));
-//                    Locale locale = StompHeader.getLocaleFromAcceptLanguageHeader(inAccessor);
-
-
-
-//                    if (chatMessageVM.getId() == null) {
-//                        chatMessageVM.setCreatedAt(null);
-//                        chatMessageVM.setBody(messageSource.getMessage(BadRequestException.BAD_REQUEST_EXCEPTION, null, locale));
-//                    } else if (chatMessageVM.getId() == StompHeader.UNMATCHED_RECEIPT_ID) {
-//                        chatMessageVM.setCreatedAt(null);
-//                    }
-
                 }
             }
         });
-    }   
+    }
 
     @Override
     public void configureClientOutboundChannel(ChannelRegistration registration) {
