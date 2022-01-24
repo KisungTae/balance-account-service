@@ -101,24 +101,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public ListSwipesDTO listSwipes(UUID accountId, Date fetchedAt) {
-        List<SwipeDTO> swipeDTOs = swipeDAO.findSwipes(accountId, fetchedAt);
-        ListSwipesDTO listSwipesDTO = new ListSwipesDTO(fetchedAt);
-        if (swipeDTOs == null) return listSwipesDTO;
-        List<UUID> swipedIds = swipeDTOs.stream().map(SwipeDTO::getSwipedId).collect(Collectors.toList());
-        listSwipesDTO.setSwipedIds(swipedIds);
-        for (SwipeDTO swipeDTO : swipeDTOs) {
-            Date updatedAt = swipeDTO.getUpdatedAt();
-            if (updatedAt != null && updatedAt.after(listSwipesDTO.getFetchedAt()))
-                listSwipesDTO.setFetchedAt(swipeDTO.getUpdatedAt());
-        }
-        return listSwipesDTO;
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<SwipeDTO> listClicks(UUID accountId, Date fetchedAt) {
-        return swipeDAO.findClicks(accountId, fetchedAt);
+    public List<SwipeDTO> listClicks(UUID accountId, int loadSize, int startPosition) {
+        return swipeDAO.findClicks(accountId, loadSize, startPosition);
     }
 
     @Override
@@ -185,6 +169,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
             subSwipe.setMatched(true);
             objSwipe.setMatched(true);
+            objSwipe.setUpdatedAt(updatedAt);
 
             MatchDTO subMatchDTO = modelMapper.map(subMatch, MatchDTO.class);
             subMatchDTO.setPushType(PushType.MATCHED);

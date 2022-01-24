@@ -14,8 +14,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExceptionResponse {
-
-    private String error;
-    private String message;
-    private Map<String, String> fieldErrorMessages = new HashMap<>();
+    private String              error;
+    private String              message;
+    private Map<String, String> fieldErrors = new HashMap<>();
 }

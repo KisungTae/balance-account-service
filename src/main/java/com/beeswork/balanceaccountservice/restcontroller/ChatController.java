@@ -56,9 +56,8 @@ public class ChatController extends BaseController {
     }
 
     @GetMapping("/message/list")
-    public ResponseEntity<String> listChatMessages(BindingResult bindingResult, Principal principal)
+    public ResponseEntity<String> listChatMessages(Principal principal)
     throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
         ListChatMessagesDTO listChatMessagesDTO = chatService.listChatMessages(getAccountIdFrom(principal));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listChatMessagesDTO));
     }
