@@ -67,10 +67,13 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     @Override
     @Transactional
     public void unmatch(UUID accountId, UUID swipedId) {
+        // todo: check if it causes deadlock when both parties unmatch at the same time, check and refactor
         Match swiperMatch = matchDAO.findById(accountId, swipedId);
         Match swipedMatch = matchDAO.findById(swipedId, accountId);
 
-        if (swiperMatch == null || swipedMatch == null) throw new MatchNotFoundException();
+        if (swiperMatch == null || swipedMatch == null) {
+            throw new MatchNotFoundException();
+        }
 
         Date updatedAt = new Date();
         if (swiperMatch.isUnmatched()) {

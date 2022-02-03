@@ -25,7 +25,7 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
                                              @NonNull byte[] errorPayload,
                                              Throwable cause,
                                              StompHeaderAccessor clientHeaderAccessor) {
-        Locale locale = StompHeader.getLocaleFromAcceptLanguageHeader(clientHeaderAccessor);
+        Locale locale = StompHeader.getLocale(clientHeaderAccessor);
         if (cause != null && cause.getCause() != null) {
             String exceptionCode = "";
             if (cause.getCause() instanceof BaseException) {

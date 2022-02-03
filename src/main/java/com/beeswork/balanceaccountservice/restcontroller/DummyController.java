@@ -112,18 +112,16 @@ public class DummyController {
             if (swiper.getId().equals(swiped.getId())) continue;
 
             Date now = new Date();
-            Swipe subSwipe = new Swipe();
-            subSwipe.setSwipeId(new SwipeId(swiper.getId(), swiped.getId()));
-            subSwipe.setSwiper(swiper);
-            subSwipe.setSwiped(swiped);
-            subSwipe.setClicked(random.nextBoolean());
-            subSwipe.setCount((random.nextInt(10) + 1));
-            subSwipe.setCreatedAt(now);
-            subSwipe.setUpdatedAt(now);
+//            Swipe subSwipe = new Swipe();
+//            subSwipe.setSwiper(swiper);
+//            subSwipe.setSwiped(swiped);
+//            subSwipe.setClicked(random.nextBoolean());
+//            subSwipe.setCount((random.nextInt(10) + 1));
+//            subSwipe.setCreatedAt(now);
+//            subSwipe.setUpdatedAt(now);
 
             now = new Date();
             Swipe objSwipe = new Swipe();
-            objSwipe.setSwipeId(new SwipeId(swiped.getId(), swiper.getId()));
             objSwipe.setSwiper(swiped);
             objSwipe.setSwiped(swiper);
             objSwipe.setClicked(random.nextBoolean());
@@ -131,7 +129,7 @@ public class DummyController {
             objSwipe.setCreatedAt(now);
             objSwipe.setUpdatedAt(now);
 
-            entityManager.persist(subSwipe);
+//            entityManager.persist(subSwipe);
             entityManager.persist(objSwipe);
         }
 
@@ -312,7 +310,7 @@ public class DummyController {
             Date now = new Date();
             Swipe swipe = new Swipe();
             Account swiped = accounts.get(j);
-            swipe.setSwipeId(new SwipeId(swiper.getId(), swiped.getId()));
+//            swipe.setSwipeId(new SwipeId(swiper.getId(), swiped.getId()));
             swipe.setSwiper(swiper);
             swipe.setSwiped(swiped);
             swipe.setClicked(random.nextBoolean());
@@ -357,49 +355,49 @@ public class DummyController {
     public void createDummyMatch() {
 
 
-        List<Swipe> swipes = entityManager.unwrap(Session.class).createQuery("select s1 from Swipe s1 " +
-                                                                             "inner join Swipe s2 on s1.swipeId.swipedId = s2.swipeId.swiperId " +
-                                                                             "where s1.clicked = true and s2.clicked = true " +
-                                                                             "and s1.swipeId.swiperId = s2.swipeId.swipedId order by s1.swipeId.swiperId",
-                                                                             Swipe.class).getResultList();
-        HashMap<String, Match> matchMap = new HashMap<>();
-        Random random = new Random();
-
-        Date date = new Date();
-
-        for (Swipe swipe : swipes) {
-
-            if (random.nextBoolean()) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(date);
-                calendar.add(Calendar.HOUR, -1);
-                date = calendar.getTime();
-            }
-
-            Chat chat = new Chat();
-
-            if (matchMap.containsKey(swipe.getSwipeId().getSwipedId().toString() + swipe.getSwipeId().getSwiperId().toString())) {
-                chat = matchMap.get(swipe.getSwipeId().getSwipedId().toString() + swipe.getSwipeId().getSwiperId().toString()).getChat();
-            }
-            swipe.setMatched(true);
-
-            Match newMatch = new Match();
-            newMatch.setChat(chat);
-            newMatch.setSwiper(swipe.getSwiper());
-            newMatch.setSwiped(swipe.getSwiped());
-            newMatch.setUnmatcher(false);
-
-            newMatch.setCreatedAt(date);
-            newMatch.setUpdatedAt(date);
-
-            MatchId matchId = new MatchId(swipe.getSwipeId().getSwiperId(), swipe.getSwipeId().getSwipedId());
-            newMatch.setMatchId(matchId);
-
-            chatDAO.persist(chat);
-            matchDAO.persist(newMatch);
-
-            matchMap.put(swipe.getSwipeId().getSwiperId().toString() + swipe.getSwipeId().getSwipedId().toString(), newMatch);
-        }
+//        List<Swipe> swipes = entityManager.unwrap(Session.class).createQuery("select s1 from Swipe s1 " +
+//                                                                             "inner join Swipe s2 on s1.swipeId.swipedId = s2.swipeId.swiperId " +
+//                                                                             "where s1.clicked = true and s2.clicked = true " +
+//                                                                             "and s1.swipeId.swiperId = s2.swipeId.swipedId order by s1.swipeId.swiperId",
+//                                                                             Swipe.class).getResultList();
+//        HashMap<String, Match> matchMap = new HashMap<>();
+//        Random random = new Random();
+//
+//        Date date = new Date();
+//
+//        for (Swipe swipe : swipes) {
+//
+//            if (random.nextBoolean()) {
+//                Calendar calendar = Calendar.getInstance();
+//                calendar.setTime(date);
+//                calendar.add(Calendar.HOUR, -1);
+//                date = calendar.getTime();
+//            }
+//
+//            Chat chat = new Chat();
+//
+//            if (matchMap.containsKey(swipe.getSwipeId().getSwipedId().toString() + swipe.getSwipeId().getSwiperId().toString())) {
+//                chat = matchMap.get(swipe.getSwipeId().getSwipedId().toString() + swipe.getSwipeId().getSwiperId().toString()).getChat();
+//            }
+//            swipe.setMatched(true);
+//
+//            Match newMatch = new Match();
+//            newMatch.setChat(chat);
+//            newMatch.setSwiper(swipe.getSwiper());
+//            newMatch.setSwiped(swipe.getSwiped());
+//            newMatch.setUnmatcher(false);
+//
+//            newMatch.setCreatedAt(date);
+//            newMatch.setUpdatedAt(date);
+//
+//            MatchId matchId = new MatchId(swipe.getSwipeId().getSwiperId(), swipe.getSwipeId().getSwipedId());
+//            newMatch.setMatchId(matchId);
+//
+//            chatDAO.persist(chat);
+//            matchDAO.persist(newMatch);
+//
+//            matchMap.put(swipe.getSwipeId().getSwiperId().toString() + swipe.getSwipeId().getSwipedId().toString(), newMatch);
+//        }
     }
 
     @Transactional

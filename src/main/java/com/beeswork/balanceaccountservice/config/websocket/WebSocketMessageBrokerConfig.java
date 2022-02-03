@@ -1,11 +1,7 @@
 package com.beeswork.balanceaccountservice.config.websocket;
 
 import com.beeswork.balanceaccountservice.config.properties.StompProperties;
-import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
-import com.beeswork.balanceaccountservice.exception.BadRequestException;
-import com.beeswork.balanceaccountservice.service.chat.ChatService;
-import com.beeswork.balanceaccountservice.service.chat.ChatServiceImpl;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.util.StringUtils;
@@ -14,27 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.server.ServerHttpRequest;
-import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.messaging.simp.stomp.StompBrokerRelayMessageHandler;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.ExecutorChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.*;
-import org.springframework.web.socket.server.HandshakeInterceptor;
-import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 import java.util.Locale;
-import java.util.Map;
 
 @Configuration
 @EnableWebSocket
@@ -121,15 +109,24 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                         return;
                     }
 
-                    StompHeaderAccessor outAccessor = StompHeaderAccessor.create(StompCommand.RECEIPT);
-                    outAccessor.setSessionId(inAccessor.getSessionId());
-//                    outAccessor.setReceiptId(inAccessor.getReceipt());
 
-                    chatMessageVM.setBody(null);
+                    if (chatMessageVM.isError()) {
+                        Locale locale = StompHeader.getLocale(inAccessor);
+                        String exceptionMessage = messageSource.getMessage(chatMessageVM.getError(), null, locale);
+                        chatMessageVM.setBody(exceptionMessage);
+                    } else {
+                        chatMessageVM.setBody(null);
+                    }
+
+//                    outAccessor.setReceiptId(inAccessor.getReceipt());
                     chatMessageVM.setChatId(null);
                     chatMessageVM.setAccountId(null);
                     chatMessageVM.setRecipientId(null);
                     byte[] payload = objectMapper.writeValueAsString(chatMessageVM).getBytes();
+
+                    StompHeaderAccessor outAccessor = StompHeaderAccessor.create(StompCommand.RECEIPT);
+                    outAccessor.setSessionId(inAccessor.getSessionId());
+
                     outChannel.send(MessageBuilder.createMessage(payload, outAccessor.getMessageHeaders()));
                 }
             }

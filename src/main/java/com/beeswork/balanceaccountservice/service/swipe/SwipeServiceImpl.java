@@ -11,7 +11,7 @@ import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.ListSwipesDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.CountClicksDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.Wallet;
@@ -20,7 +20,6 @@ import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
-import com.beeswork.balanceaccountservice.entity.swipe.SwipeId;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
 import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
@@ -35,19 +34,18 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
-    private final AccountDAO accountDAO;
-    private final SwipeDAO swipeDAO;
-    private final ChatDAO chatDAO;
+    private final AccountDAO         accountDAO;
+    private final SwipeDAO           swipeDAO;
+    private final ChatDAO            chatDAO;
     private final AccountQuestionDAO accountQuestionDAO;
-    private final ProfileDAO profileDAO;
-    private final SwipeMetaDAO swipeMetaDAO;
-    private final WalletDAO walletDAO;
-    private final ModelMapper modelMapper;
+    private final ProfileDAO         profileDAO;
+    private final SwipeMetaDAO       swipeMetaDAO;
+    private final WalletDAO          walletDAO;
+    private final ModelMapper        modelMapper;
 
     @Autowired
     public SwipeServiceImpl(ModelMapper modelMapper,
@@ -69,8 +67,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public List<QuestionDTO> swipe(UUID accountId, UUID swipedId) {
-        Account swiper = accountDAO.findById(accountId);
+    public List<QuestionDTO> swipe(UUID swiperId, UUID swipedId) {
+        Account swiper = accountDAO.findById(swiperId);
         Account swiped = accountDAO.findById(swipedId);
         validateSwiped(swiped);
 
@@ -78,21 +76,28 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
         rechargeFreeSwipe(wallet, swipeMeta);
 
-        if (wallet.getFreeSwipe() < swipeMeta.getSwipePoint() && wallet.getPoint() < swipeMeta.getSwipePoint())
+        if (wallet.getFreeSwipe() < swipeMeta.getSwipePoint() && wallet.getPoint() < swipeMeta.getSwipePoint()) {
             throw new AccountShortOfPointException();
+        }
 
         List<Question> questions = accountQuestionDAO.findAllQuestionsSelected(swipedId);
-        if (questions == null || questions.size() <= 0)
+        if (questions == null || questions.size() <= 0) {
             throw new AccountQuestionNotFoundException();
+        }
 
-        Swipe swipe = swipeDAO.findByIdWithLock(new SwipeId(accountId, swipedId));
+        Swipe swipe = swipeDAO.findBySwiperIdAndSwipedId(swiperId, swipedId, true);
         Date updatedAt = new Date();
         if (swipe == null) {
             swipe = new Swipe(swiper, swiped, updatedAt);
             Profile profile = profileDAO.findByIdWithLock(swiped.getId());
-            if (profile != null) profile.incrementScore();
-        } else if (swipe.isMatched()) throw new SwipeMatchedExistsException();
-        else if (swipe.isClicked()) throw new SwipeClickedExistsException();
+            if (profile != null) {
+                profile.incrementScore();
+            }
+        } else if (swipe.isMatched()) {
+            throw new SwipeMatchedExistsException();
+        } else if (swipe.isClicked()) {
+            throw new SwipeClickedExistsException();
+        }
 
         swipe.setCount((swipe.getCount() + 1));
         swipeDAO.persist(swipe);
@@ -101,38 +106,65 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<SwipeDTO> listClicks(UUID accountId, int loadSize, int startPosition) {
-        return swipeDAO.findClicks(accountId, loadSize, startPosition);
+    public List<SwipeDTO> listClicks(UUID accountId, int startPosition, int loadSize) {
+        List<SwipeDTO> clicks = swipeDAO.findClicks(accountId, startPosition, loadSize);
+        for (SwipeDTO click : clicks) {
+            if (click.getDeleted()) {
+                click.setSwipedId(null);
+                click.setName(null);
+                click.setProfilePhotoKey(null);
+            }
+        }
+        return swipeDAO.findClicks(accountId, startPosition, loadSize);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public List<SwipeDTO> fetchClicks(UUID accountId, UUID lastSwiperId, int loadSize) {
+        return swipeDAO.findClicks(accountId, lastSwiperId, loadSize);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public CountClicksDTO countClicks(UUID accountId) {
+        return new CountClicksDTO(swipeDAO.countClicks(accountId));
     }
 
     @Override
     @Transactional
-    public ClickDTO click(UUID accountId, UUID swipedId, Map<Integer, Boolean> answers) {
+    public ClickDTO click(UUID swiperId, UUID swipedId, Map<Integer, Boolean> answers) {
         Swipe subSwipe, objSwipe;
-        if (accountId.compareTo(swipedId) > 0) {
-            subSwipe = swipeDAO.findByIdWithLock(new SwipeId(accountId, swipedId));
-            objSwipe = swipeDAO.findByIdWithLock(new SwipeId(swipedId, accountId));
+        if (swiperId.compareTo(swipedId) > 0) {
+            subSwipe = swipeDAO.findBySwiperIdAndSwipedId(swiperId, swipedId, true);
+            objSwipe = swipeDAO.findBySwiperIdAndSwipedId(swipedId, swiperId, true);
         } else {
-            objSwipe = swipeDAO.findByIdWithLock(new SwipeId(swipedId, accountId));
-            subSwipe = swipeDAO.findByIdWithLock(new SwipeId(accountId, swipedId));
+            objSwipe = swipeDAO.findBySwiperIdAndSwipedId(swipedId, swiperId, true);
+            subSwipe = swipeDAO.findBySwiperIdAndSwipedId(swiperId, swipedId, true);
         }
 
-        if (subSwipe == null) throw new SwipeNotFoundException();
-        else if (subSwipe.isClicked()) throw new SwipeClickedExistsException();
-        else if (subSwipe.isMatched()) throw new SwipeMatchedExistsException();
+        if (subSwipe == null) {
+            throw new SwipeNotFoundException();
+        } else if (subSwipe.isClicked()) {
+            throw new SwipeClickedExistsException();
+        } else if (subSwipe.isMatched()) {
+            throw new SwipeMatchedExistsException();
+        }
 
         Account swiper = subSwipe.getSwiper();
         Account swiped = subSwipe.getSwiped();
         validateSwiped(swiped);
 
+        // wallet needs to be locked
         Wallet wallet = walletDAO.findByAccountId(swiper.getId());
         SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
 
-        if (wallet.getFreeSwipe() >= swipeMeta.getSwipePoint())
+        if (wallet.getFreeSwipe() >= swipeMeta.getSwipePoint()) {
             wallet.setFreeSwipe((wallet.getFreeSwipe() - swipeMeta.getSwipePoint()));
-        else if (wallet.getPoint() < swipeMeta.getSwipePoint())
+        } else if (wallet.getPoint() < swipeMeta.getSwipePoint()) {
             throw new AccountShortOfPointException();
-        else wallet.setPoint((wallet.getPoint() - swipeMeta.getSwipePoint()));
+        } else {
+            wallet.setPoint((wallet.getPoint() - swipeMeta.getSwipePoint()));
+        }
 
         ClickDTO clickDTO = new ClickDTO();
         if (accountQuestionDAO.countAllByAnswers(swipedId, answers) != answers.size()) {
@@ -199,8 +231,12 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     }
 
     private void validateSwiped(Account swiped) {
-        if (swiped == null) throw new SwipedNotFoundException();
-        if (swiped.isDeleted()) throw new SwipedDeletedException();
-        if (swiped.isBlocked()) throw new SwipedBlockedException();
+        if (swiped == null) {
+            throw new SwipedNotFoundException();
+        } else if (swiped.isDeleted()) {
+            throw new SwipedDeletedException();
+        } else if (swiped.isBlocked()) {
+            throw new SwipedBlockedException();
+        }
     }
 }

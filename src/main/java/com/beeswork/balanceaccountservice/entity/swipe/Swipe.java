@@ -19,15 +19,17 @@ import java.util.UUID;
 @Table(name = "swipe")
 public class Swipe {
 
-    @EmbeddedId
-    private SwipeId swipeId;
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("swiperId")
+    @JoinColumn(name = "swiper_id")
     private Account swiper;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("swipedId")
+    @JoinColumn(name = "swiped_id")
     private Account swiped;
 
     @Column(name = "clicked")
@@ -51,7 +53,6 @@ public class Swipe {
     private Date updatedAt;
 
     public Swipe(Account swiper, Account swiped, Date createdAt) {
-        this.swipeId = new SwipeId(swiper.getId(), swiped.getId());
         this.swiper = swiper;
         this.swiped = swiped;
         this.createdAt = createdAt;
