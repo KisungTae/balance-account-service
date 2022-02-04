@@ -12,6 +12,7 @@ import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.CountClicksDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.ListClicksDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.Wallet;
@@ -106,16 +107,17 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<SwipeDTO> listClicks(UUID accountId, int startPosition, int loadSize) {
+    public ListClicksDTO listClicks(UUID accountId, int startPosition, int loadSize) {
         List<SwipeDTO> clicks = swipeDAO.findClicks(accountId, startPosition, loadSize);
+        ListClicksDTO listClicksDTO = new ListClicksDTO();
         for (SwipeDTO click : clicks) {
             if (click.getDeleted()) {
-                click.setSwipedId(null);
-                click.setName(null);
-                click.setProfilePhotoKey(null);
+                listClicksDTO.getDeletedSwiperIds().add(click.getSwiperId());
+            } else {
+                listClicksDTO.getClickDTOs().add(click);
             }
         }
-        return swipeDAO.findClicks(accountId, startPosition, loadSize);
+        return listClicksDTO;
     }
 
     @Override
