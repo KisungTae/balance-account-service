@@ -6,6 +6,7 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.pushtoken.PushTokenDAO;
 import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.beeswork.balanceaccountservice.dto.common.Pushable;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
@@ -40,7 +41,7 @@ public class PushServiceImpl implements PushService {
 
     @Override
     public void pushChatMessage(ChatMessageDTO chatMessageDTO, Locale locale) {
-        PushToken pushToken = pushTokenDAO.findRecent(chatMessageDTO.getRecipientId());
+        PushToken pushToken = pushTokenDAO.findRecentByAccountId(chatMessageDTO.getRecipientId());
         if (pushToken == null) return;
 
         PushSetting pushSetting = pushSettingDAO.findByAccountId(chatMessageDTO.getRecipientId());
@@ -56,7 +57,7 @@ public class PushServiceImpl implements PushService {
     public void pushMatch(MatchDTO matchDTO, Locale locale) {
         if (matchDTO == null || matchDTO.getSwipedId() == null) return;
 
-        PushToken pushToken = pushTokenDAO.findRecent(matchDTO.getSwipedId());
+        PushToken pushToken = pushTokenDAO.findRecentByAccountId(matchDTO.getSwipedId());
         if (pushToken == null || !pushToken.isLogin()) return;
 
         PushSetting pushSetting = pushSettingDAO.findByAccountId(matchDTO.getSwipedId());
@@ -68,5 +69,22 @@ public class PushServiceImpl implements PushService {
 
         if (pushToken.getType() == PushTokenType.APS) apnsService.sendMatch(matchDTO, locale);
         else if (pushToken.getType() == PushTokenType.FCM) fcmService.sendMatch(matchDTO, pushToken.getToken(), locale);
+    }
+
+    @Override
+    public void push(Pushable pushable) {
+        if (pushable == null) {
+            return;
+        }
+        PushToken pushToken = pushTokenDAO.findRecentByAccountId(pushable.getRecipientId());
+        if (pushToken == null || !pushToken.isLogin()) {
+            return;
+        }
+
+        PushSetting pushSetting = pushSettingDAO.findByAccountId(pushable.getRecipientId());
+
+
+
+
     }
 }

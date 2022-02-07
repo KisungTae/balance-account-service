@@ -1,10 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.CountClicksDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.ListClicksDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.*;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
 import com.beeswork.balanceaccountservice.service.swipe.SwipeService;
@@ -39,14 +35,15 @@ public class SwipeController extends BaseController {
         this.stompService = stompService;
     }
 
-    @PostMapping("/swipe")
-    public ResponseEntity<String> swipe(@Valid @RequestBody SwipeVM swipeVM,
+    @PostMapping("/like")
+    public ResponseEntity<String> like(@Valid @RequestBody SwipeVM swipeVM,
                                         BindingResult bindingResult,
                                         Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<QuestionDTO> questionDTOs = swipeService.swipe(getAccountIdFrom(principal), swipeVM.getSwipedId());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
+        LikeDTO likeDTO = swipeService.like(getAccountIdFrom(principal), swipeVM.getSwipedId());
+        stompService.push(likeDTO.getSwipeDTO());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(likeDTO.getQuestionDTOs()));
     }
 
     @GetMapping("/click/list")

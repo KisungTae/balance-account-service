@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.service.fcm;
 import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.dao.pushtoken.PushTokenDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.beeswork.balanceaccountservice.dto.common.Pushable;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.service.base.BasePushServiceImpl;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
@@ -70,5 +71,10 @@ public class FCMServiceImpl extends BasePushServiceImpl implements FCMService {
         setNotification(matchDTO.getPushType(), token, new String[] {matchDTO.getName()}, locale, messageBuilder);
         setData(objectMapper.convertValue(matchDTO, new TypeReference<>() {}), messageBuilder);
         sendMessage(messageBuilder.build());
+    }
+
+    @Override
+    public void push(Pushable pushable) {
+
     }
 }

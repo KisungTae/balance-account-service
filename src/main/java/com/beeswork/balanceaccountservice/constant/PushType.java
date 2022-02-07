@@ -4,5 +4,7 @@ public enum PushType {
     MISSED,
     CLICKED,
     MATCHED,
+    SWIPE,
+    MATCH,
     CHAT_MESSAGE
 }

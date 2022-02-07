@@ -9,6 +9,6 @@ import java.util.UUID;
 
 public interface PushTokenDAO extends BaseDAO<PushToken> {
     PushToken findById(PushTokenId pushTokenId);
-    PushToken findRecent(UUID accountId);
+    PushToken findRecentByAccountId(UUID accountId);
     List<PushToken> findAllByToken(String token);
 }

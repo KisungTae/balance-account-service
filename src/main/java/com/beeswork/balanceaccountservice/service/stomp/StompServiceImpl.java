@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.service.stomp;
 import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.beeswork.balanceaccountservice.dto.common.Pushable;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.exception.stomp.QueueNotFoundException;
 import com.beeswork.balanceaccountservice.service.push.PushService;
@@ -41,8 +42,8 @@ public class StompServiceImpl implements StompService {
         String queue = getQueue(chatMessageDTO.getRecipientId());
         if (queue != null) {
             MessageHeaders outHeaders = sendingHeaders(PushType.CHAT_MESSAGE);
-            chatMessageDTO.setRecipientId(null);
-            chatMessageDTO.setAccountId(null);
+//            chatMessageDTO.setRecipientId(null);
+//            chatMessageDTO.setAccountId(null);
             simpMessagingTemplate.convertAndSend(queue, chatMessageDTO, outHeaders);
         } else {
             pushService.pushChatMessage(chatMessageDTO, locale);
@@ -71,10 +72,26 @@ public class StompServiceImpl implements StompService {
         } else pushService.pushMatch(matchDTO, locale);
     }
 
+    @Override
+    @Async("processExecutor")
+    public void push(Pushable pushable) {
+        String queue = getQueue(pushable.getRecipientId());
+        if (queue == null) {
+            pushService.push(pushable);
+        } else {
+            MessageHeaders outHeaders = sendingHeaders(pushable.getPushType());
+            simpMessagingTemplate.convertAndSend(queue, pushable, outHeaders);
+        }
+    }
+
     private String getQueue(UUID queue) {
-        if (queue == null) throw new QueueNotFoundException();
+        if (queue == null) {
+            return null;
+        }
         QueueInformation queueInformation = amqpAdmin.getQueueInfo(queue.toString());
-        if (queueInformation == null || queueInformation.getConsumerCount() <= 0) return null;
+        if (queueInformation == null || queueInformation.getConsumerCount() <= 0) {
+            return null;
+        }
         return StompHeader.QUEUE_PREFIX + queue.toString();
     }
 

@@ -28,9 +28,15 @@ public class Swipe {
     @JoinColumn(name = "swiper_id")
     private Account swiper;
 
+    @Column(name = "swiper_id", insertable = false, updatable = false)
+    private UUID swiperId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "swiped_id")
     private Account swiped;
+
+    @Column(name = "swiped_id", insertable = false, updatable = false)
+    private UUID swipedId;
 
     @Column(name = "clicked")
     private boolean clicked;

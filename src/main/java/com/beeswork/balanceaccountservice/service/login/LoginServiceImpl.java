@@ -79,8 +79,11 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     @Transactional
     public LoginDTO socialLogin(String loginId, String email, LoginType loginType) {
         Login login = loginDAO.findById(new LoginId(loginId, loginType));
-        if (login == null) return loginWithNewAccount(loginId, email, loginType);
-        else return loginWithExistingAccount(login);
+        if (login == null) {
+            return loginWithNewAccount(loginId, email, loginType);
+        } else {
+            return loginWithExistingAccount(login);
+        }
     }
 
     private LoginDTO loginWithNewAccount(String loginId, String email, LoginType loginType) {
@@ -120,11 +123,13 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     }
 
     private void updatePushToken(UUID accountId) {
-        PushToken pushToken = pushTokenDAO.findRecent(accountId);
+        PushToken pushToken = pushTokenDAO.findRecentByAccountId(accountId);
         if (pushToken != null) {
             List<PushToken> pushTokens = pushTokenDAO.findAllByToken(pushToken.getToken());
             for (PushToken otherPushToken : pushTokens) {
-                if (pushToken != otherPushToken) otherPushToken.setLogin(false);
+                if (pushToken != otherPushToken) {
+                    otherPushToken.setLogin(false);
+                }
             }
             pushToken.setLogin(true);
         }

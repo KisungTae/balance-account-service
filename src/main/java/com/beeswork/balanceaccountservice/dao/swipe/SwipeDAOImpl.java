@@ -31,7 +31,7 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
     @Override
-    public Swipe findBySwiperIdAndSwipedId(UUID swiperId, UUID swipedId, boolean writeLock) {
+    public Swipe findBy(UUID swiperId, UUID swipedId, boolean writeLock) {
         JPAQuery<Swipe> query = jpaQueryFactory.selectFrom(qSwipe)
                                                .where(qSwipe.swiper.id.eq(swiperId).and(qSwipe.swiped.id.eq(swipedId)));
         if (writeLock) {
@@ -44,7 +44,6 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
         return jpaQueryFactory.select(new QSwipeDTO(qSwipe.id,
                                                     qSwipe.swiper.id,
                                                     qSwipe.swiped.id,
-                                                    qAccount.name,
                                                     qAccount.profilePhotoKey,
                                                     qSwipe.clicked,
                                                     qAccount.deleted))
@@ -72,7 +71,6 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
         return jpaQueryFactory.select(new QSwipeDTO(qSwipe.id,
                                                     qSwipe.swiper.id,
                                                     qSwipe.swiped.id,
-                                                    qAccount.name,
                                                     qAccount.profilePhotoKey,
                                                     qSwipe.clicked))
                               .from(qSwipe)

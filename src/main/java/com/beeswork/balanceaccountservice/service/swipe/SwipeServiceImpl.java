@@ -10,10 +10,7 @@ import com.beeswork.balanceaccountservice.dao.swipe.SwipeMetaDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.ClickDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.CountClicksDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.ListClicksDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.*;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.Wallet;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
@@ -68,7 +65,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional
-    public List<QuestionDTO> swipe(UUID swiperId, UUID swipedId) {
+    public LikeDTO like(UUID swiperId, UUID swipedId) {
         Account swiper = accountDAO.findById(swiperId);
         Account swiped = accountDAO.findById(swipedId);
         validateSwiped(swiped);
@@ -86,7 +83,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             throw new AccountQuestionNotFoundException();
         }
 
-        Swipe swipe = swipeDAO.findBySwiperIdAndSwipedId(swiperId, swipedId, true);
+        Swipe swipe = swipeDAO.findBy(swiperId, swipedId, true);
         Date updatedAt = new Date();
         if (swipe == null) {
             swipe = new Swipe(swiper, swiped, updatedAt);
@@ -102,6 +99,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         swipe.setCount((swipe.getCount() + 1));
         swipeDAO.persist(swipe);
+
+        List<QuestionDTO> questionDTOs = modelMapper.map(questions, new TypeToken<List<QuestionDTO>>() {}.getType());
+        SwipeDTO swipeDTO = modelMapper.map(swipe, SwipeDTO.class);
+        LikeDTO likeDTO = new LikeDTO(questionDTOs, swipeDTO);
+
         return modelMapper.map(questions, new TypeToken<List<QuestionDTO>>() {}.getType());
     }
 
@@ -137,11 +139,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     public ClickDTO click(UUID swiperId, UUID swipedId, Map<Integer, Boolean> answers) {
         Swipe subSwipe, objSwipe;
         if (swiperId.compareTo(swipedId) > 0) {
-            subSwipe = swipeDAO.findBySwiperIdAndSwipedId(swiperId, swipedId, true);
-            objSwipe = swipeDAO.findBySwiperIdAndSwipedId(swipedId, swiperId, true);
+            subSwipe = swipeDAO.findBy(swiperId, swipedId, true);
+            objSwipe = swipeDAO.findBy(swipedId, swiperId, true);
         } else {
-            objSwipe = swipeDAO.findBySwiperIdAndSwipedId(swipedId, swiperId, true);
-            subSwipe = swipeDAO.findBySwiperIdAndSwipedId(swiperId, swipedId, true);
+            objSwipe = swipeDAO.findBy(swipedId, swiperId, true);
+            subSwipe = swipeDAO.findBy(swiperId, swipedId, true);
         }
 
         if (subSwipe == null) {

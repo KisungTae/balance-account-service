@@ -29,7 +29,7 @@ public class PushTokenDAOImpl extends BaseDAOImpl<PushToken> implements PushToke
     }
 
     @Override
-    public PushToken findRecent(UUID accountId) {
+    public PushToken findRecentByAccountId(UUID accountId) {
         return jpaQueryFactory.selectFrom(qPushToken)
                               .where(qPushToken.account.id.eq(accountId))
                               .orderBy(qPushToken.updatedAt.desc())

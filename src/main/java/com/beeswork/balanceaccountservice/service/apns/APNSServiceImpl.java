@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.service.apns;
 
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.beeswork.balanceaccountservice.dto.common.Pushable;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,11 @@ public class APNSServiceImpl implements APNSService {
 
     @Override
     public void sendMatch(MatchDTO matchDTO, Locale locale) {
+
+    }
+
+    @Override
+    public void push(Pushable pushable) {
 
     }
 }
