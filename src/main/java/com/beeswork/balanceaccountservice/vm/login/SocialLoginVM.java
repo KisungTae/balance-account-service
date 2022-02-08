@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.vm.login;
 
 import com.beeswork.balanceaccountservice.constant.LoginType;
+import com.beeswork.balanceaccountservice.constant.PushTokenType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,4 +20,9 @@ public class SocialLoginVM {
 
     @NotNull
     private LoginType loginType;
+
+    private String        pushToken;
+
+    @NotNull
+    private PushTokenType pushTokenType;
 }

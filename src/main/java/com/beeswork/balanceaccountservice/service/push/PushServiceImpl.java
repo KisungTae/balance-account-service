@@ -58,7 +58,7 @@ public class PushServiceImpl implements PushService {
         if (matchDTO == null || matchDTO.getSwipedId() == null) return;
 
         PushToken pushToken = pushTokenDAO.findRecentByAccountId(matchDTO.getSwipedId());
-        if (pushToken == null || !pushToken.isLogin()) return;
+        if (pushToken == null || !pushToken.isActive()) return;
 
         PushSetting pushSetting = pushSettingDAO.findByAccountId(matchDTO.getSwipedId());
         if (pushSetting != null) {
@@ -77,7 +77,7 @@ public class PushServiceImpl implements PushService {
             return;
         }
         PushToken pushToken = pushTokenDAO.findRecentByAccountId(pushable.getRecipientId());
-        if (pushToken == null || !pushToken.isLogin()) {
+        if (pushToken == null || !pushToken.isActive()) {
             return;
         }
 

@@ -7,12 +7,13 @@ import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushTokenId;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
-import org.modelmapper.ModelMapper;
+import io.micrometer.core.instrument.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -31,14 +32,26 @@ public class PushTokenServiceImpl extends BaseServiceImpl implements PushTokenSe
     @Override
     @Transactional
     public void savePushToken(UUID accountId, String token, PushTokenType type) {
-        Account account = accountDAO.findById(accountId);
-        PushToken pushToken = pushTokenDAO.findById(new PushTokenId(accountId, type));
-        if (pushToken == null) {
-            pushToken = new PushToken(account, type, token, new Date());
-        } else {
-            pushToken.setToken(token);
-            pushToken.setUpdatedAt(new Date());
+        if (StringUtils.isBlank(token)) {
+            return;
         }
-        pushTokenDAO.persist(pushToken);
+        PushToken pushToken = pushTokenDAO.findById(new PushTokenId(accountId, type));
+        Date now = new Date();
+        if (pushToken == null) {
+            Account account = accountDAO.findById(accountId);
+            pushToken = new PushToken(account, type, token, now);
+            pushTokenDAO.persist(pushToken);
+        } else {
+            pushToken.setActive(true);
+            pushToken.setToken(token);
+            pushToken.setUpdatedAt(now);
+        }
+
+        List<PushToken> pushTokens = pushTokenDAO.findAllBy(pushToken.getToken(), pushToken.getType());
+        for (PushToken otherPushToken : pushTokens) {
+            if (pushToken != otherPushToken) {
+                otherPushToken.setActive(false);
+            }
+        }
     }
 }

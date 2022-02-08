@@ -27,8 +27,8 @@ public class PushToken {
     @Column(name = "token")
     private String token;
 
-    @Column(name = "login")
-    private boolean login;
+    @Column(name = "active")
+    private boolean active;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -42,6 +42,7 @@ public class PushToken {
         this.pushTokenId = new PushTokenId(account.getId(), type);
         this.account = account;
         this.token = token;
+        this.active = true;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
     }

@@ -7,6 +7,7 @@ import com.beeswork.balanceaccountservice.dto.login.VerifySocialLoginDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.login.InvalidSocialLoginException;
 import com.beeswork.balanceaccountservice.service.login.*;
+import com.beeswork.balanceaccountservice.service.pushtoken.PushTokenService;
 import com.beeswork.balanceaccountservice.vm.login.LoginVM;
 import com.beeswork.balanceaccountservice.vm.login.LoginWithRefreshTokenVM;
 import com.beeswork.balanceaccountservice.vm.login.SocialLoginVM;
@@ -23,12 +24,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.Principal;
 
 @RestController
 public class LoginController extends BaseController {
 
     private final LoginService         loginService;
+    private final PushTokenService     pushTokenService;
     private final GoogleLoginService   googleLoginService;
     private final KakaoLoginService    kakaoLoginService;
     private final NaverLoginService    naverLoginService;
@@ -38,12 +39,14 @@ public class LoginController extends BaseController {
     public LoginController(ObjectMapper objectMapper,
                            ModelMapper modelMapper,
                            LoginService loginService,
+                           PushTokenService pushTokenService,
                            GoogleLoginService googleLoginService,
                            KakaoLoginService kakaoLoginService,
                            NaverLoginService naverLoginService,
                            FacebookLoginService facebookLoginService) {
         super(objectMapper, modelMapper);
         this.loginService = loginService;
+        this.pushTokenService = pushTokenService;
         this.googleLoginService = googleLoginService;
         this.kakaoLoginService = kakaoLoginService;
         this.naverLoginService = naverLoginService;
@@ -56,26 +59,33 @@ public class LoginController extends BaseController {
     }
 
     @PostMapping("/login/social")
-    public ResponseEntity<String> socialLogin(@Valid @RequestBody SocialLoginVM socialLoginVM,
-                                              BindingResult bindingResult)
+    public ResponseEntity<String> socialLogin(@Valid @RequestBody SocialLoginVM socialLoginVM, BindingResult bindingResult)
     throws GeneralSecurityException, IOException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         VerifySocialLoginDTO verifySocialLoginDTO = null;
 
-        if (socialLoginVM.getLoginType() == LoginType.GOOGLE)
+        if (socialLoginVM.getLoginType() == LoginType.GOOGLE) {
             verifySocialLoginDTO = googleLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
-        else if (socialLoginVM.getLoginType() == LoginType.KAKAO)
+        } else if (socialLoginVM.getLoginType() == LoginType.KAKAO) {
             verifySocialLoginDTO = kakaoLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
-        else if (socialLoginVM.getLoginType() == LoginType.NAVER)
+        } else if (socialLoginVM.getLoginType() == LoginType.NAVER) {
             verifySocialLoginDTO = naverLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
-        else if (socialLoginVM.getLoginType() == LoginType.FACEBOOK)
+        } else if (socialLoginVM.getLoginType() == LoginType.FACEBOOK) {
             verifySocialLoginDTO = facebookLoginService.verifyLogin(socialLoginVM.getLoginId(), socialLoginVM.getAccessToken());
+        }
 
-        if (verifySocialLoginDTO == null || !verifySocialLoginDTO.isVerified()) throw new InvalidSocialLoginException();
+        if (verifySocialLoginDTO == null || !verifySocialLoginDTO.isVerified()) {
+            throw new InvalidSocialLoginException();
+        }
 
         LoginDTO loginDTO = loginService.socialLogin(verifySocialLoginDTO.getSocialLoginId(),
                                                      verifySocialLoginDTO.getEmail(),
                                                      socialLoginVM.getLoginType());
+
+        pushTokenService.savePushToken(loginDTO.getAccountId(),
+                                       socialLoginVM.getPushToken(),
+                                       socialLoginVM.getPushTokenType());
+
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
     }
 
@@ -94,6 +104,11 @@ public class LoginController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         LoginDTO loginDTO = loginService.loginWithRefreshToken(loginWithRefreshTokenVM.getAccessToken(),
                                                                loginWithRefreshTokenVM.getRefreshToken());
+
+        pushTokenService.savePushToken(loginDTO.getAccountId(),
+                                       loginWithRefreshTokenVM.getPushToken(),
+                                       loginWithRefreshTokenVM.getPushTokenType());
+
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
     }
 

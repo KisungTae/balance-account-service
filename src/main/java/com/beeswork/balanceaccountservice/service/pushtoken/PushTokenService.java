@@ -6,5 +6,4 @@ import java.util.UUID;
 
 public interface PushTokenService {
     void savePushToken(UUID accountId, String token, PushTokenType type);
-
 }

@@ -110,7 +110,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         Account account = accountDAO.findById(login.getAccountId());
         if (account == null) throw new AccountNotFoundException();
         account.validate();
-        updatePushToken(account.getId());
+//        updatePushToken(account.getId());
 
         RefreshToken refreshToken = new RefreshToken(account);
         String newRefreshToken = createNewRefreshToken(account, refreshToken);
@@ -122,18 +122,18 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         return new LoginDTO(account.getId(), profileExists, accessToken, newRefreshToken, login.getEmail(), gender);
     }
 
-    private void updatePushToken(UUID accountId) {
-        PushToken pushToken = pushTokenDAO.findRecentByAccountId(accountId);
-        if (pushToken != null) {
-            List<PushToken> pushTokens = pushTokenDAO.findAllByToken(pushToken.getToken());
-            for (PushToken otherPushToken : pushTokens) {
-                if (pushToken != otherPushToken) {
-                    otherPushToken.setLogin(false);
-                }
-            }
-            pushToken.setLogin(true);
-        }
-    }
+//    private void updatePushToken(UUID accountId) {
+//        PushToken pushToken = pushTokenDAO.findRecentByAccountId(accountId);
+//        if (pushToken != null) {
+//            List<PushToken> pushTokens = pushTokenDAO.findAllBy(pushToken.getToken(), );
+//            for (PushToken otherPushToken : pushTokens) {
+//                if (pushToken != otherPushToken) {
+//                    otherPushToken.setLogin(false);
+//                }
+//            }
+//            pushToken.setLogin(true);
+//        }
+//    }
 
     @Override
     @Transactional

@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.dao.pushtoken;
 
 
+import com.beeswork.balanceaccountservice.constant.PushTokenType;
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushTokenId;
@@ -38,7 +39,9 @@ public class PushTokenDAOImpl extends BaseDAOImpl<PushToken> implements PushToke
     }
 
     @Override
-    public List<PushToken> findAllByToken(String token) {
-        return jpaQueryFactory.selectFrom(qPushToken).where(qPushToken.token.eq(token)).fetch();
+    public List<PushToken> findAllBy(String token, PushTokenType pushTokenType) {
+        return jpaQueryFactory.selectFrom(qPushToken)
+                              .where(qPushToken.token.eq(token).and(qPushToken.pushTokenId.type.eq(pushTokenType)))
+                              .fetch();
     }
 }
