@@ -6,8 +6,5 @@ import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import java.util.Locale;
 
 public interface FCMService {
-
-    void sendChatMessage(ChatMessageDTO chatMessageDTO, String token, String senderName, Locale locale);
-    void sendMatch(MatchDTO matchDTO, String token, Locale locale);
-    void push(Pushable pushable);
+    void push(Pushable pushable, String token, Locale locale);
 }

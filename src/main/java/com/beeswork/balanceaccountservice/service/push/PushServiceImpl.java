@@ -17,13 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
+import java.util.UUID;
 
 @Service
 public class PushServiceImpl implements PushService {
 
-    private final FCMService fcmService;
-    private final APNSService apnsService;
-    private final PushTokenDAO pushTokenDAO;
+    private final FCMService     fcmService;
+    private final APNSService    apnsService;
+    private final PushTokenDAO   pushTokenDAO;
     private final AccountDAO     accountDAO;
     private final PushSettingDAO pushSettingDAO;
 
@@ -41,50 +42,56 @@ public class PushServiceImpl implements PushService {
 
     @Override
     public void pushChatMessage(ChatMessageDTO chatMessageDTO, Locale locale) {
-        PushToken pushToken = pushTokenDAO.findRecentByAccountId(chatMessageDTO.getRecipientId());
-        if (pushToken == null) return;
-
-        PushSetting pushSetting = pushSettingDAO.findByAccountId(chatMessageDTO.getRecipientId());
-        if (pushSetting != null && !pushSetting.isChatMessagePush()) return;
-
-        Account sender = accountDAO.findById(chatMessageDTO.getAccountId());
-        if (sender == null) return;
-        if (pushToken.getType() == PushTokenType.APS) apnsService.sendChatMessage(chatMessageDTO, locale);
-        else fcmService.sendChatMessage(chatMessageDTO, pushToken.getToken(), sender.getName(), locale);
-    }
-
-    @Override
-    public void pushMatch(MatchDTO matchDTO, Locale locale) {
-        if (matchDTO == null || matchDTO.getSwipedId() == null) return;
-
-        PushToken pushToken = pushTokenDAO.findRecentByAccountId(matchDTO.getSwipedId());
-        if (pushToken == null || !pushToken.isActive()) return;
-
-        PushSetting pushSetting = pushSettingDAO.findByAccountId(matchDTO.getSwipedId());
-        if (pushSetting != null) {
-            if (matchDTO.getPushType() == PushType.CLICKED && !pushSetting.isClickedPush()) return;
-            if (matchDTO.getPushType() == PushType.MATCHED && !pushSetting.isMatchPush()) return;
+        if (chatMessageDTO == null) {
+            return;
         }
-        if (matchDTO.getPushType() == PushType.MATCHED) matchDTO.swapIds();
-
-        if (pushToken.getType() == PushTokenType.APS) apnsService.sendMatch(matchDTO, locale);
-        else if (pushToken.getType() == PushTokenType.FCM) fcmService.sendMatch(matchDTO, pushToken.getToken(), locale);
+        PushToken pushToken = getPushToken(chatMessageDTO);
+        if (pushToken == null) {
+            return;
+        }
+        Account sender = accountDAO.findById(chatMessageDTO.getAccountId());
+        chatMessageDTO.setSenderName(sender.getName());
+        push(chatMessageDTO, pushToken, locale);
     }
 
     @Override
-    public void push(Pushable pushable) {
+    public void push(Pushable pushable, Locale locale) {
         if (pushable == null) {
             return;
         }
+        PushToken pushToken = getPushToken(pushable);
+        if (pushToken == null) {
+            return;
+        }
+        push(pushable, pushToken, locale);
+    }
+
+    private void push(Pushable pushable, PushToken pushToken, Locale locale) {
+        if (pushToken.getType() == PushTokenType.APS) {
+            apnsService.push(pushable, locale);
+        } else if (pushToken.getType() == PushTokenType.FCM) {
+            fcmService.push(pushable, pushToken.getToken(), locale);
+        }
+    }
+
+    private PushToken getPushToken(Pushable pushable) {
         PushToken pushToken = pushTokenDAO.findRecentByAccountId(pushable.getRecipientId());
         if (pushToken == null || !pushToken.isActive()) {
-            return;
+            return null;
         }
 
         PushSetting pushSetting = pushSettingDAO.findByAccountId(pushable.getRecipientId());
-
-
-
-
+        if (pushSetting != null) {
+            if (pushable.getPushType() == PushType.SWIPE && !pushSetting.isSwipePush()) {
+                return null;
+            }
+            if (pushable.getPushType() == PushType.MATCH && !pushSetting.isMatchPush()) {
+                return null;
+            }
+            if (pushable.getPushType() == PushType.CHAT_MESSAGE && !pushSetting.isChatMessagePush()) {
+                return null;
+            }
+        }
+        return pushToken;
     }
 }

@@ -18,7 +18,6 @@ import com.beeswork.balanceaccountservice.entity.login.Login;
 import com.beeswork.balanceaccountservice.entity.login.LoginId;
 import com.beeswork.balanceaccountservice.entity.login.RefreshToken;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
-import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.setting.PushSetting;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
@@ -33,7 +32,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -137,7 +135,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
 
     @Override
     @Transactional
-    public RefreshAccessTokenDTO refreshAccessToken(String accessToken, String refreshToken, boolean includeAccountId) {
+    public RefreshAccessTokenDTO refreshAccessToken(String accessToken, String refreshToken) {
         Jws<Claims> refreshTokenJws = jwtTokenProvider.parseJWTToken(refreshToken);
         jwtTokenProvider.validateJWTToken(refreshTokenJws);
         UUID refreshTokenUserName = Convert.toUUID(jwtTokenProvider.getUserName(refreshTokenJws));
@@ -169,14 +167,14 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         String newAccessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
 
         RefreshAccessTokenDTO refreshAccessTokenDTO = new RefreshAccessTokenDTO(newAccessToken, newRefreshToken);
-        if (includeAccountId) refreshAccessTokenDTO.setAccountId(account.getId());
+        refreshAccessTokenDTO.setAccountId(account.getId());
         return refreshAccessTokenDTO;
     }
 
     @Override
     @Transactional
     public LoginDTO loginWithRefreshToken(String accessToken, String refreshToken) {
-        RefreshAccessTokenDTO refreshAccessTokenDTO = refreshAccessToken(accessToken, refreshToken, true);
+        RefreshAccessTokenDTO refreshAccessTokenDTO = refreshAccessToken(accessToken, refreshToken);
         Profile profile = profileDAO.findById(refreshAccessTokenDTO.getAccountId());
         boolean profileExists = profile != null && profile.isEnabled();
         Boolean gender = profileExists ? profile.isGender() : null;

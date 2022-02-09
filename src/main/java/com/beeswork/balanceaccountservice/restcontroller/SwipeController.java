@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.*;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
@@ -36,14 +37,14 @@ public class SwipeController extends BaseController {
     }
 
     @PostMapping("/like")
-    public ResponseEntity<String> like(@Valid @RequestBody SwipeVM swipeVM,
-                                        BindingResult bindingResult,
-                                        Principal principal)
+    public ResponseEntity<String> like(@Valid @RequestBody LikeVM likeVM,
+                                       BindingResult bindingResult,
+                                       Principal principal,
+                                       Locale locale)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        LikeDTO likeDTO = swipeService.like(getAccountIdFrom(principal), swipeVM.getSwipedId());
-        stompService.push(likeDTO.getSwipeDTO());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(likeDTO.getQuestionDTOs()));
+        List<QuestionDTO> questionDTOs = swipeService.like(getAccountIdFrom(principal), likeVM.getSwipedId(), locale);
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
     }
 
     @GetMapping("/click/list")
@@ -84,7 +85,7 @@ public class SwipeController extends BaseController {
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         ClickDTO clickDTO = swipeService.click(getAccountIdFrom(principal), clickVM.getSwipedId(), clickVM.getAnswers());
-        stompService.sendMatch(clickDTO.getObjMatchDTO(), locale);
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO.getSubMatchDTO()));
+//        stompService.sendMatch(clickDTO.getObjMatchDTO(), locale);
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO.getMatchDTO()));
     }
 }

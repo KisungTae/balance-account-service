@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.dto.match;
 
 
 import com.beeswork.balanceaccountservice.constant.PushType;
+import com.beeswork.balanceaccountservice.dto.common.Pushable;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,18 +14,22 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MatchDTO {
-    private PushType pushType;
+public class MatchDTO implements Pushable {
+
+    private static final String        PUSH_TITLE_MATCH        = "push.title.match";
+    private static final String        PUSH_BODY_MATCH         = "push.body.match";
+
+    private PushType pushType = PushType.MATCH;
     private Long     chatId;
-    private UUID    swiperId;
-    private UUID    swipedId;
-    private Boolean active;
-    private Boolean unmatched;
-    private String name;
-    private String profilePhotoKey;
-    private Boolean deleted;
-    private Date createdAt;
-    private Date updatedAt;
+    private UUID     swiperId;
+    private UUID     swipedId;
+    private Boolean  active;
+    private Boolean  unmatched;
+    private String   name;
+    private String   profilePhotoKey;
+    private Boolean  deleted;
+    private Date     createdAt;
+    private Date     updatedAt;
 
     public MatchDTO(PushType pushType) {
         this.pushType = pushType;
@@ -51,9 +56,28 @@ public class MatchDTO {
         this.updatedAt = updatedAt;
     }
 
-    public void swapIds() {
-        UUID swiperId = this.swiperId;
-        this.swiperId = this.swipedId;
-        this.swipedId = swiperId;
+    @Override
+    public UUID getRecipientId() {
+        return swiperId;
+    }
+
+    @Override
+    public String[] getPushTitleArguments() {
+        return null;
+    }
+
+    @Override
+    public String[] getPushBodyArguments() {
+        return new String[] {name};
+    }
+
+    @Override
+    public String getPushTitleId() {
+        return PUSH_TITLE_MATCH;
+    }
+
+    @Override
+    public String getPushBodyId() {
+        return PUSH_BODY_MATCH;
     }
 }

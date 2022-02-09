@@ -35,15 +35,22 @@ public class SettingServiceImpl extends BaseServiceImpl implements SettingServic
 
     @Override
     @Transactional
-    public void savePushSettings(UUID accountId, Boolean matchPush, Boolean clickedPush, Boolean chatMessagePush) {
+    public void savePushSettings(UUID accountId, Boolean matchPush, Boolean swipePush, Boolean chatMessagePush) {
         Account account = accountDAO.findById(accountId);
         PushSetting pushSetting = pushSettingDAO.findByAccountId(account.getId());
-        if (pushSetting == null) pushSetting = new PushSetting(account);
+        if (pushSetting == null) {
+            pushSetting = new PushSetting(account);
+        }
 
-        if (matchPush != null) pushSetting.setMatchPush(matchPush);
-        if (clickedPush != null) pushSetting.setClickedPush(clickedPush);
-        if (chatMessagePush != null) pushSetting.setChatMessagePush(chatMessagePush);
-
+        if (matchPush != null) {
+            pushSetting.setMatchPush(matchPush);
+        }
+        if (swipePush != null) {
+            pushSetting.setSwipePush(swipePush);
+        }
+        if (chatMessagePush != null) {
+            pushSetting.setChatMessagePush(chatMessagePush);
+        }
         pushSettingDAO.persist(pushSetting);
     }
 }

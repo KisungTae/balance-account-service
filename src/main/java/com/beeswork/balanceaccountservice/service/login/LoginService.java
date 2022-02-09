@@ -7,6 +7,6 @@ import com.beeswork.balanceaccountservice.dto.login.RefreshAccessTokenDTO;
 public interface LoginService {
     LoginDTO login(String loginId, LoginType loginType, String email, String password);
     LoginDTO socialLogin(String loginId, String email, LoginType loginType);
-    RefreshAccessTokenDTO refreshAccessToken(String accessToken, String refreshToken, boolean includeAccountId);
+    RefreshAccessTokenDTO refreshAccessToken(String accessToken, String refreshToken);
     LoginDTO loginWithRefreshToken(String accessToken, String refreshToken);
 }

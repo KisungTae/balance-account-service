@@ -5,7 +5,6 @@ import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.common.Pushable;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
-import com.beeswork.balanceaccountservice.exception.stomp.QueueNotFoundException;
 import com.beeswork.balanceaccountservice.service.push.PushService;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.QueueInformation;
@@ -35,49 +34,30 @@ public class StompServiceImpl implements StompService {
 
     //  NOTE 1. convertAndSend to not existing queue, it creates a new queue under the queue desitination
     @Override
-    public void sendChatMessage(ChatMessageDTO chatMessageDTO, Locale locale) {
+    public void pushChatMessage(ChatMessageDTO chatMessageDTO, Locale locale) {
         if (chatMessageDTO == null || chatMessageDTO.getId() == null) {
             return;
         }
         String queue = getQueue(chatMessageDTO.getRecipientId());
-        if (queue != null) {
-            MessageHeaders outHeaders = sendingHeaders(PushType.CHAT_MESSAGE);
-//            chatMessageDTO.setRecipientId(null);
-//            chatMessageDTO.setAccountId(null);
-            simpMessagingTemplate.convertAndSend(queue, chatMessageDTO, outHeaders);
-        } else {
+        if (queue == null) {
             pushService.pushChatMessage(chatMessageDTO, locale);
+        } else {
+            MessageHeaders outHeaders = sendingHeaders(chatMessageDTO.getPushType());
+            chatMessageDTO.setRecipientId(null);
+            chatMessageDTO.setAccountId(null);
+            simpMessagingTemplate.convertAndSend(queue, chatMessageDTO, outHeaders);
         }
     }
 
-    private MessageHeaders sendingHeaders(PushType pushType) {
-        Map<String, Object> headers = new HashMap<>();
-        headers.put(StompHeader.AUTO_DELETE, true);
-        headers.put(StompHeader.EXCLUSIVE, false);
-        headers.put(StompHeader.DURABLE, true);
-        headers.put(StompHeader.PUSH_TYPE, pushType);
-//        headers.put(StompHeader.SUBSCRIPTION, StompHeader.PRIVATE_QUEUE_SUBSCRIPTION_ID);
-        return new MessageHeaders(headers);
-    }
-
     @Override
     @Async("processExecutor")
-    public void sendMatch(MatchDTO matchDTO, Locale locale) {
-        if (matchDTO == null) return;
-        String queue = getQueue(matchDTO.getSwipedId());
-        if (queue != null) {
-            MessageHeaders outHeaders = sendingHeaders(matchDTO.getPushType());
-            if (matchDTO.getPushType() == PushType.MATCHED) matchDTO.swapIds();
-            simpMessagingTemplate.convertAndSend(queue, matchDTO, outHeaders);
-        } else pushService.pushMatch(matchDTO, locale);
-    }
-
-    @Override
-    @Async("processExecutor")
-    public void push(Pushable pushable) {
+    public void push(Pushable pushable, Locale locale) {
+        if (pushable == null) {
+            return;
+        }
         String queue = getQueue(pushable.getRecipientId());
         if (queue == null) {
-            pushService.push(pushable);
+            pushService.push(pushable, locale);
         } else {
             MessageHeaders outHeaders = sendingHeaders(pushable.getPushType());
             simpMessagingTemplate.convertAndSend(queue, pushable, outHeaders);
@@ -95,4 +75,13 @@ public class StompServiceImpl implements StompService {
         return StompHeader.QUEUE_PREFIX + queue.toString();
     }
 
+    private MessageHeaders sendingHeaders(PushType pushType) {
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(StompHeader.AUTO_DELETE, true);
+        headers.put(StompHeader.EXCLUSIVE, false);
+        headers.put(StompHeader.DURABLE, true);
+        headers.put(StompHeader.PUSH_TYPE, pushType);
+//        headers.put(StompHeader.SUBSCRIPTION, StompHeader.PRIVATE_QUEUE_SUBSCRIPTION_ID);
+        return new MessageHeaders(headers);
+    }
 }

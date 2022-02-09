@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class SwipeVM {
+public class LikeVM {
 
     @ValidUUID
     private UUID swipedId;

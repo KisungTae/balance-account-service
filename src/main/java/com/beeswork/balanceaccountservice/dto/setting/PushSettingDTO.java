@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class PushSettingDTO {
     private boolean matchPush;
-    private boolean clickedPush;
+    private boolean swipePush;
     private boolean chatMessagePush;
     private boolean emailPush;
 }

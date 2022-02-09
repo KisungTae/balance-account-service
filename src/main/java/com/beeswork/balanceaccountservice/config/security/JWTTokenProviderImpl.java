@@ -24,7 +24,8 @@ import java.util.*;
 @Component
 public class JWTTokenProviderImpl implements JWTTokenProvider {
 
-        private final long   ACCESS_TOKEN_LIFE_TIME     = 60 * 60 * 1000L;
+//    TODO: configure time to refresh access token
+        private final long   ACCESS_TOKEN_LIFE_TIME     = 10 * 60 * 60 * 1000L;
 //    private final long   ACCESS_TOKEN_LIFE_TIME     = 5 * 60 * 1000L;
     private final long   REFRESH_TOKEN_LIFE_TIME    = 14 * 24 * 60 * 60 * 1000L;
     private final String REFRESH_TOKEN_KEY          = "key";

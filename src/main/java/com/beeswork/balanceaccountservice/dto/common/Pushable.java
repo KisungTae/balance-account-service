@@ -8,4 +8,8 @@ public interface Pushable {
 
     UUID getRecipientId();
     PushType getPushType();
+    String[] getPushTitleArguments();
+    String[] getPushBodyArguments();
+    String getPushTitleId();
+    String getPushBodyId();
 }

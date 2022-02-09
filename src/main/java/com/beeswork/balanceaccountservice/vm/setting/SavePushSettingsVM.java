@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class SavePushSettingsVM {
     private Boolean matchPush;
-    private Boolean clickedPush;
+    private Boolean swipePush;
     private Boolean chatMessagePush;
 }

@@ -1,6 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
-import com.beeswork.balanceaccountservice.constant.PushType;
+import com.beeswork.balanceaccountservice.config.security.JWTTokenProvider;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
@@ -10,11 +10,7 @@ import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.entity.account.*;
-import com.beeswork.balanceaccountservice.entity.chat.Chat;
-import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
-import com.beeswork.balanceaccountservice.entity.chat.SentChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
-import com.beeswork.balanceaccountservice.entity.match.MatchId;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.photo.PhotoId;
@@ -23,18 +19,15 @@ import com.beeswork.balanceaccountservice.entity.question.QQuestion;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.setting.PushSetting;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
-import com.beeswork.balanceaccountservice.entity.swipe.SwipeId;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.service.fcm.FCMService;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
-import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.commons.lang3.time.DateUtils;
-import org.hibernate.Session;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -67,6 +60,7 @@ public class DummyController {
     private final GeometryFactory    geometryFactory;
     private final StompService       stompService;
     private final ChatService chatService;
+    private final JWTTokenProvider jwtTokenProvider;
 
     @Autowired
     public DummyController(MatchDAO matchDAO,
@@ -79,7 +73,7 @@ public class DummyController {
                            PushSettingDAO pushSettingDAO,
                            GeometryFactory geometryFactory,
                            StompService stompService,
-                           ChatService chatService) {
+                           ChatService chatService, JWTTokenProvider jwtTokenProvider) {
         this.matchDAO = matchDAO;
         this.objectMapper = objectMapper;
         this.fcmService = FCMService;
@@ -91,6 +85,7 @@ public class DummyController {
         this.geometryFactory = geometryFactory;
         this.stompService = stompService;
         this.chatService = chatService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
 
@@ -254,7 +249,7 @@ public class DummyController {
 
         PushSetting pushSetting = new PushSetting();
         pushSetting.setMatchPush(true);
-        pushSetting.setClickedPush(true);
+        pushSetting.setSwipePush(true);
         pushSetting.setChatMessagePush(true);
         pushSetting.setAccount(account);
 
@@ -565,39 +560,39 @@ public class DummyController {
         chatService.saveChatMessage(chatMessageDTO);
 
         chatMessageDTO.setId(UUID.randomUUID());
-        stompService.sendChatMessage(chatMessageDTO, Locale.getDefault());
+//        stompService.pushChatMessage(chatMessageDTO, Locale.getDefault());
     }
 
     @GetMapping("/send/chat/message")
     public void sendDummyChatMessageToFCM() {
         ChatMessageDTO chatMessageDTO = new ChatMessageDTO(UUID.randomUUID(), "test chat message123123 now", 12L, new Date());
-        fcmService.sendChatMessage(chatMessageDTO,
-                                   "fYvPOxLATZuorJ_apfzSD4:APA91bGHgxnNE3dEinyoQrN7XwB68n_mx5-cRKHIXLy8cW2XwgxizNoVooEDAduhOqP73In5WEeMIK1w13jMLAWNloQSvNAskzGZZC8IVL8j0icHvqabVnhj3QpHWOrNwtNv33ky5c6s",
-                                   "michael",
-                                   Locale.getDefault());
+//        fcmService.sendChatMessage(chatMessageDTO,
+//                                   "fYvPOxLATZuorJ_apfzSD4:APA91bGHgxnNE3dEinyoQrN7XwB68n_mx5-cRKHIXLy8cW2XwgxizNoVooEDAduhOqP73In5WEeMIK1w13jMLAWNloQSvNAskzGZZC8IVL8j0icHvqabVnhj3QpHWOrNwtNv33ky5c6s",
+//                                   "michael",
+//                                   Locale.getDefault());
     }
 
     @GetMapping("/send/match")
     public void sendDummyMatch() {
         MatchDTO matchDTO = new MatchDTO(1L, UUID.randomUUID(), false, "Michael", "profilephotoeky", false, true, new Date(), new Date());
-        matchDTO.setPushType(PushType.MATCHED);
-        fcmService.sendMatch(matchDTO,
-                             "c1x4LYePRdO3X8hJnNe8Z2:APA91bHpnXUSjS4xPSfs5KxeNXmUsv1pCnJ7ch2Lnq7MxcjWlQdy7Z4kCBG3Vk1tEB4hC4XevyqMTtWJ2RfnHlplvJAdjeFpMHhnZcimwRMgruSb5lDzDPOmYu-ux7OO5Osduz9q_QHr",
-                             Locale.getDefault());
+//        matchDTO.setPushType(PushType.MATCHED);
+//        fcmService.sendMatch(matchDTO,
+//                             "c1x4LYePRdO3X8hJnNe8Z2:APA91bHpnXUSjS4xPSfs5KxeNXmUsv1pCnJ7ch2Lnq7MxcjWlQdy7Z4kCBG3Vk1tEB4hC4XevyqMTtWJ2RfnHlplvJAdjeFpMHhnZcimwRMgruSb5lDzDPOmYu-ux7OO5Osduz9q_QHr",
+//                             Locale.getDefault());
     }
 
     @GetMapping("/send/click")
     public void sendDummyClick() {
-        MatchDTO matchDTO = new MatchDTO(PushType.CLICKED);
-        matchDTO.setSwiperId(UUID.randomUUID());
-        matchDTO.setSwipedId(UUID.randomUUID());
-        matchDTO.setName("Michael");
-        matchDTO.setProfilePhotoKey("profile key");
-        matchDTO.setUpdatedAt(new Date());
-        matchDTO.setDeleted(false);
-        fcmService.sendMatch(matchDTO,
-                             "dNx-ay3rS0qnIITWvS2ue7:APA91bHTsw7heoTkdZXiIQTvIovZEQBcLIw-hIdlv-Ti141OeUjEjW860r2WlfzVtKGqX0gYhymGJ2b_VDbNY2Ao5SbCzeTjquIPmSYb3QunGgdRuqqU8scU3QGxtXTxV9FeKFdLKsEE",
-                             Locale.getDefault());
+//        MatchDTO matchDTO = new MatchDTO(PushType.CLICKED);
+//        matchDTO.setSwiperId(UUID.randomUUID());
+//        matchDTO.setSwipedId(UUID.randomUUID());
+//        matchDTO.setName("Michael");
+//        matchDTO.setProfilePhotoKey("profile key");
+//        matchDTO.setUpdatedAt(new Date());
+//        matchDTO.setDeleted(false);
+//        fcmService.sendMatch(matchDTO,
+//                             "dNx-ay3rS0qnIITWvS2ue7:APA91bHTsw7heoTkdZXiIQTvIovZEQBcLIw-hIdlv-Ti141OeUjEjW860r2WlfzVtKGqX0gYhymGJ2b_VDbNY2Ao5SbCzeTjquIPmSYb3QunGgdRuqqU8scU3QGxtXTxV9FeKFdLKsEE",
+//                             Locale.getDefault());
     }
 
     @GetMapping("/save/chat/message")
@@ -609,6 +604,12 @@ public class DummyController {
         chatMessageDTO.setChatId(1L);
         chatMessageDTO.setId(UUID.fromString("ecbeacc4-3409-4195-8c47-76a1f6a4798c"));
         chatService.saveChatMessage(chatMessageDTO);
+    }
+
+    @GetMapping("/access-token-for-account")
+    public String getAccessTokenFor(@RequestParam("accountId") UUID accountId) {
+        Account account = accountDAO.findById(accountId);
+        return jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
     }
 
 //    @PostMapping("/change/swipe-count")

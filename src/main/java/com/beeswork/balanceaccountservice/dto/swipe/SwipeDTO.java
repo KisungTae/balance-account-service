@@ -15,13 +15,20 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class SwipeDTO implements Pushable {
+
+    private static final String PUSH_TITLE_SWIPE = "push.title.swipe";
+    private static final String PUSH_BODY_SWIPE  = "push.body.swipe";
+
+    private static final String PUSH_TITLE_CLICK = "push.title.click";
+    private static final String PUSH_BODY_CLICK  = "push.body.click";
+
     private PushType pushType = PushType.SWIPE;
-    private Long    id;
-    private UUID    swiperId;
-    private UUID    swipedId;
-    private String  profilePhotoKey;
-    private Boolean clicked;
-    private Boolean deleted;
+    private Long     id;
+    private UUID     swiperId;
+    private UUID     swipedId;
+    private String   profilePhotoKey;
+    private Boolean  clicked;
+    private Boolean  deleted;
 
     @QueryProjection
     public SwipeDTO(Long id, UUID swiperId, UUID swipedId, String profilePhotoKey, Boolean clicked) {
@@ -48,7 +55,28 @@ public class SwipeDTO implements Pushable {
     }
 
     @Override
-    public PushType getPushType() {
-        return pushType;
+    public String[] getPushTitleArguments() {
+        return null;
+    }
+
+    @Override
+    public String[] getPushBodyArguments() {
+        return new String[0];
+    }
+
+    @Override
+    public String getPushTitleId() {
+        if (clicked) {
+            return PUSH_TITLE_CLICK;
+        }
+        return PUSH_TITLE_SWIPE;
+    }
+
+    @Override
+    public String getPushBodyId() {
+        if (clicked) {
+            return PUSH_BODY_CLICK;
+        }
+        return PUSH_BODY_SWIPE;
     }
 }

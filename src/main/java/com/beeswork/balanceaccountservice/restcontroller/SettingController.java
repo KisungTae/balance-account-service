@@ -38,7 +38,7 @@ public class SettingController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         settingService.savePushSettings(getAccountIdFrom(principal),
                                         savePushSettingsVM.getMatchPush(),
-                                        savePushSettingsVM.getClickedPush(),
+                                        savePushSettingsVM.getSwipePush(),
                                         savePushSettingsVM.getChatMessagePush());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }

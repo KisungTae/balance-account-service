@@ -13,8 +13,6 @@ import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.*;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.Wallet;
-import com.beeswork.balanceaccountservice.entity.chat.Chat;
-import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
@@ -23,6 +21,7 @@ import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFo
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
 import com.beeswork.balanceaccountservice.exception.swipe.*;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
+import com.beeswork.balanceaccountservice.service.stomp.StompService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +43,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     private final SwipeMetaDAO       swipeMetaDAO;
     private final WalletDAO          walletDAO;
     private final ModelMapper        modelMapper;
+    private final StompService       stompService;
 
     @Autowired
     public SwipeServiceImpl(ModelMapper modelMapper,
@@ -52,7 +52,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
                             ChatDAO chatDAO,
                             AccountQuestionDAO accountQuestionDAO,
                             ProfileDAO profileDAO, SwipeMetaDAO swipeMetaDAO,
-                            WalletDAO walletDAO) {
+                            WalletDAO walletDAO,
+                            StompService stompService) {
         this.modelMapper = modelMapper;
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
@@ -61,11 +62,18 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         this.profileDAO = profileDAO;
         this.swipeMetaDAO = swipeMetaDAO;
         this.walletDAO = walletDAO;
+        this.stompService = stompService;
     }
 
     @Override
+    public List<QuestionDTO> like(UUID swiperId, UUID swipedId, Locale locale) {
+        LikeDTO likeDTO = doLike(swiperId, swipedId);
+        stompService.push(likeDTO.getSwipeDTO(), locale);
+        return likeDTO.getQuestionDTOs();
+    }
+
     @Transactional
-    public LikeDTO like(UUID swiperId, UUID swipedId) {
+    public LikeDTO doLike(UUID swiperId, UUID swipedId) {
         Account swiper = accountDAO.findById(swiperId);
         Account swiped = accountDAO.findById(swipedId);
         validateSwiped(swiped);
@@ -102,9 +110,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         List<QuestionDTO> questionDTOs = modelMapper.map(questions, new TypeToken<List<QuestionDTO>>() {}.getType());
         SwipeDTO swipeDTO = modelMapper.map(swipe, SwipeDTO.class);
-        LikeDTO likeDTO = new LikeDTO(questionDTOs, swipeDTO);
-
-        return modelMapper.map(questions, new TypeToken<List<QuestionDTO>>() {}.getType());
+        swipeDTO.setSwiperId(swiper.getId());
+        swipeDTO.setSwipedId(swiped.getId());
+        swipeDTO.setDeleted(false);
+        swipeDTO.setProfilePhotoKey(swiper.getProfilePhotoKey());
+        return new LikeDTO(questionDTOs, swipeDTO);
     }
 
     @Override
@@ -172,7 +182,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         ClickDTO clickDTO = new ClickDTO();
         if (accountQuestionDAO.countAllByAnswers(swipedId, answers) != answers.size()) {
-            clickDTO.setSubMatchDTO(new MatchDTO(PushType.MISSED));
+            clickDTO.setMatchDTO(new MatchDTO(PushType.MISSED));
             return clickDTO;
         }
 
@@ -180,48 +190,48 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         subSwipe.setClicked(true);
         subSwipe.setUpdatedAt(updatedAt);
 
-        if (objSwipe == null || !objSwipe.isClicked()) {
-            MatchDTO subMatchDTO = new MatchDTO(PushType.CLICKED);
-            subMatchDTO.setSwiperId(swiper.getId());
-            subMatchDTO.setSwipedId(swiped.getId());
-            clickDTO.setSubMatchDTO(subMatchDTO);
-
-            MatchDTO objMatchDTO = new MatchDTO(PushType.CLICKED);
-            objMatchDTO.setSwiperId(swiper.getId());
-            objMatchDTO.setSwipedId(swiped.getId());
-            objMatchDTO.setName(swiper.getName());
-            objMatchDTO.setProfilePhotoKey(swiper.getProfilePhotoKey());
-            objMatchDTO.setUpdatedAt(updatedAt);
-            objMatchDTO.setDeleted(false);
-            clickDTO.setObjMatchDTO(objMatchDTO);
-        } else {
-            Chat chat = new Chat();
-            chatDAO.persist(chat);
-
-            Match subMatch = new Match(swiper, swiped, chat, updatedAt);
-            Match objMatch = new Match(swiped, swiper, chat, updatedAt);
-            swiper.getMatches().add(subMatch);
-            swiped.getMatches().add(objMatch);
-
-            subSwipe.setMatched(true);
-            objSwipe.setMatched(true);
-            objSwipe.setUpdatedAt(updatedAt);
-
-            MatchDTO subMatchDTO = modelMapper.map(subMatch, MatchDTO.class);
-            subMatchDTO.setPushType(PushType.MATCHED);
-            subMatchDTO.setName(swiped.getName());
-            subMatchDTO.setProfilePhotoKey(swiped.getProfilePhotoKey());
-            subMatchDTO.setChatId(chat.getId());
-            clickDTO.setSubMatchDTO(subMatchDTO);
-
-            MatchDTO objMatchDTO = modelMapper.map(subMatch, MatchDTO.class);
-            objMatchDTO.setPushType(PushType.MATCHED);
-            objMatchDTO.setName(swiper.getName());
-            objMatchDTO.setProfilePhotoKey(swiper.getProfilePhotoKey());
-            objMatchDTO.setChatId(chat.getId());
-            objMatchDTO.setDeleted(false);
-            clickDTO.setObjMatchDTO(objMatchDTO);
-        }
+//        if (objSwipe == null || !objSwipe.isClicked()) {
+//            MatchDTO subMatchDTO = new MatchDTO(PushType.CLICKED);
+//            subMatchDTO.setSwiperId(swiper.getId());
+//            subMatchDTO.setSwipedId(swiped.getId());
+//            clickDTO.setMatchDTO(subMatchDTO);
+//
+//            MatchDTO objMatchDTO = new MatchDTO(PushType.CLICKED);
+//            objMatchDTO.setSwiperId(swiper.getId());
+//            objMatchDTO.setSwipedId(swiped.getId());
+//            objMatchDTO.setName(swiper.getName());
+//            objMatchDTO.setProfilePhotoKey(swiper.getProfilePhotoKey());
+//            objMatchDTO.setUpdatedAt(updatedAt);
+//            objMatchDTO.setDeleted(false);
+//            clickDTO.setObjMatchDTO(objMatchDTO);
+//        } else {
+//            Chat chat = new Chat();
+//            chatDAO.persist(chat);
+//
+//            Match subMatch = new Match(swiper, swiped, chat, updatedAt);
+//            Match objMatch = new Match(swiped, swiper, chat, updatedAt);
+//            swiper.getMatches().add(subMatch);
+//            swiped.getMatches().add(objMatch);
+//
+//            subSwipe.setMatched(true);
+//            objSwipe.setMatched(true);
+//            objSwipe.setUpdatedAt(updatedAt);
+//
+//            MatchDTO subMatchDTO = modelMapper.map(subMatch, MatchDTO.class);
+//            subMatchDTO.setPushType(PushType.MATCHED);
+//            subMatchDTO.setName(swiped.getName());
+//            subMatchDTO.setProfilePhotoKey(swiped.getProfilePhotoKey());
+//            subMatchDTO.setChatId(chat.getId());
+//            clickDTO.setMatchDTO(subMatchDTO);
+//
+//            MatchDTO objMatchDTO = modelMapper.map(subMatch, MatchDTO.class);
+//            objMatchDTO.setPushType(PushType.MATCHED);
+//            objMatchDTO.setName(swiper.getName());
+//            objMatchDTO.setProfilePhotoKey(swiper.getProfilePhotoKey());
+//            objMatchDTO.setChatId(chat.getId());
+//            objMatchDTO.setDeleted(false);
+//            clickDTO.setObjMatchDTO(objMatchDTO);
+//        }
         return clickDTO;
     }
 

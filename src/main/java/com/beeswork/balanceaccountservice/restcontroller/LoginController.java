@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
+import java.util.Locale;
 
 @RestController
 public class LoginController extends BaseController {
@@ -94,7 +97,6 @@ public class LoginController extends BaseController {
                                         BindingResult bindingResult)
     throws GeneralSecurityException, IOException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
@@ -117,8 +119,8 @@ public class LoginController extends BaseController {
                                                      BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         RefreshAccessTokenDTO refreshAccessTokenDTO = loginService.refreshAccessToken(refreshAccessTokenVM.getAccessToken(),
-                                                                                      refreshAccessTokenVM.getRefreshToken(),
-                                                                                      false);
+                                                                                      refreshAccessTokenVM.getRefreshToken());
+        refreshAccessTokenDTO.setAccountId(null);
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(refreshAccessTokenDTO));
     }
 }

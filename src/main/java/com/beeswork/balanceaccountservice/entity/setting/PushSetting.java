@@ -26,8 +26,8 @@ public class PushSetting {
     @Column(name = "match_push")
     private boolean matchPush;
 
-    @Column(name = "clicked_push")
-    private boolean clickedPush;
+    @Column(name = "swipe_push")
+    private boolean swipePush;
 
     @Column(name = "chat_message_push")
     private boolean chatMessagePush;
@@ -38,7 +38,7 @@ public class PushSetting {
     public PushSetting(Account account) {
         this.account = account;
         this.matchPush = true;
-        this.clickedPush = true;
+        this.swipePush = true;
         this.chatMessagePush = true;
     }
 }
