@@ -114,7 +114,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         String newRefreshToken = createNewRefreshToken(account, refreshToken);
         String accessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
 
-        Profile profile = profileDAO.findById(account.getId());
+        Profile profile = profileDAO.findById(account.getId(), false);
         boolean profileExists = profile != null && profile.isEnabled();
         Boolean gender = profileExists ? profile.isGender() : null;
         return new LoginDTO(account.getId(), profileExists, accessToken, newRefreshToken, login.getEmail(), gender);
@@ -175,7 +175,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     @Transactional
     public LoginDTO loginWithRefreshToken(String accessToken, String refreshToken) {
         RefreshAccessTokenDTO refreshAccessTokenDTO = refreshAccessToken(accessToken, refreshToken);
-        Profile profile = profileDAO.findById(refreshAccessTokenDTO.getAccountId());
+        Profile profile = profileDAO.findById(refreshAccessTokenDTO.getAccountId(), false);
         boolean profileExists = profile != null && profile.isEnabled();
         Boolean gender = profileExists ? profile.isGender() : null;
 

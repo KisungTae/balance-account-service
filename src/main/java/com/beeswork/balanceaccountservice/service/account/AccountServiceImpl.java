@@ -6,8 +6,6 @@ import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.login.LoginDAO;
 import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dao.question.QuestionDAO;
-import com.beeswork.balanceaccountservice.dao.report.ReportDAO;
-import com.beeswork.balanceaccountservice.dao.report.ReportReasonDAO;
 import com.beeswork.balanceaccountservice.dto.account.DeleteAccountDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
@@ -16,19 +14,9 @@ import com.beeswork.balanceaccountservice.entity.login.Login;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.question.Question;
-import com.beeswork.balanceaccountservice.entity.report.Report;
-import com.beeswork.balanceaccountservice.entity.report.ReportReason;
-import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
-import com.beeswork.balanceaccountservice.exception.account.AccountDeletedException;
-import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
-import com.beeswork.balanceaccountservice.exception.report.ReportReasonNotFoundException;
-import com.beeswork.balanceaccountservice.exception.report.ReportedNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
-import com.beeswork.balanceaccountservice.util.Convert;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -126,10 +114,14 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
         Account account = accountDAO.findById(accountId);
 
         Login login = loginDAO.findByAccountId(accountId);
-        if (login != null) loginDAO.remove(login);
+        if (login != null) {
+            loginDAO.remove(login);
+        }
 
-        Profile profile = profileDAO.findById(accountId);
-        if (profile != null) profileDAO.remove(profile);
+        Profile profile = profileDAO.findById(accountId, true);
+        if (profile != null) {
+            profileDAO.remove(profile);
+        }
 
         DeleteAccountDTO deleteAccountDTO = new DeleteAccountDTO();
 

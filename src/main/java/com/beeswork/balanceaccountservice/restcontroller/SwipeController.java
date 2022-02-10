@@ -84,8 +84,7 @@ public class SwipeController extends BaseController {
                                         Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ClickDTO clickDTO = swipeService.click(getAccountIdFrom(principal), clickVM.getSwipedId(), clickVM.getAnswers());
-//        stompService.sendMatch(clickDTO.getObjMatchDTO(), locale);
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO.getMatchDTO()));
+        ClickDTO clickDTO = swipeService.click(getAccountIdFrom(principal), clickVM.getSwipedId(), clickVM.getAnswers(), locale);
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(clickDTO));
     }
 }

@@ -6,5 +6,5 @@ import com.beeswork.balanceaccountservice.entity.account.Wallet;
 import java.util.UUID;
 
 public interface WalletDAO extends BaseDAO<Wallet> {
-    Wallet findByAccountId(UUID accountId);
+    Wallet findByAccountId(UUID accountId, boolean writeLock);
 }

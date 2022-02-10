@@ -5,6 +5,7 @@ import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
 import com.beeswork.balanceaccountservice.dto.profile.CardDTOResultTransformer;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.profile.QProfile;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,12 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
     }
 
     @Override
-    public Profile findById(UUID accountId) {
-        return jpaQueryFactory.selectFrom(qProfile).where(qProfile.accountId.eq(accountId)).fetchFirst();
-    }
-
-    @Override
-    public Profile findByIdWithLock(UUID accountId) {
-        return entityManager.find(Profile.class, accountId, LockModeType.PESSIMISTIC_WRITE);
+    public Profile findById(UUID accountId, boolean writeLock) {
+        JPAQuery<Profile> query = jpaQueryFactory.selectFrom(qProfile).where(qProfile.accountId.eq(accountId));
+        if (writeLock) {
+            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+        }
+        return query.fetchFirst();
     }
 
     @Override

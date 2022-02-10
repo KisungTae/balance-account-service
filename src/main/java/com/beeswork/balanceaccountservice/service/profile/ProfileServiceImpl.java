@@ -102,7 +102,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     @Override
     @Transactional
     public void saveAbout(UUID accountId, String about, Integer height) {
-        Profile profile = profileDAO.findByIdWithLock(accountId);
+        Profile profile = profileDAO.findById(accountId, true);
         profile.setAbout(about);
         profile.setHeight(height);
     }
@@ -110,7 +110,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     @Override
     @Transactional
     public void saveLocation(UUID accountId, double latitude, double longitude, Date updatedAt) {
-        Profile profile = profileDAO.findByIdWithLock(accountId);
+        Profile profile = profileDAO.findById(accountId, true);
         if (updatedAt.after(profile.getLocationUpdatedAt())) {
             profile.setLocation(getLocation(latitude, longitude));
             profile.setLocationUpdatedAt(updatedAt);
@@ -152,7 +152,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     }
 
     private Profile findValidProfile(UUID accountId) {
-        Profile profile = profileDAO.findById(accountId);
+        Profile profile = profileDAO.findById(accountId, false);
         if (profile == null) throw new ProfileNotFoundException();
         return profile;
     }

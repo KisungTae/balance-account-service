@@ -1,15 +1,19 @@
 package com.beeswork.balanceaccountservice.dao.base;
 
 
+import com.beeswork.balanceaccountservice.exception.BadRequestException;
+import com.beeswork.balanceaccountservice.exception.BaseException;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AllArgsConstructor;
+import org.hibernate.Session;
 
 import javax.persistence.EntityManager;
+import java.sql.Connection;
 
 @AllArgsConstructor
 public abstract class BaseDAOImpl<E> implements BaseDAO<E> {
 
-    protected EntityManager entityManager;
+    protected EntityManager   entityManager;
     protected JPAQueryFactory jpaQueryFactory;
 
     @Override
@@ -26,6 +30,5 @@ public abstract class BaseDAOImpl<E> implements BaseDAO<E> {
     public void flush() {
         entityManager.flush();
     }
-
 
 }

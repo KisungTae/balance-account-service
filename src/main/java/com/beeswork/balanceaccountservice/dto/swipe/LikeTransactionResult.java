@@ -1,7 +1,7 @@
 package com.beeswork.balanceaccountservice.dto.swipe;
 
-import com.beeswork.balanceaccountservice.dto.common.Pushable;
-import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
+import com.beeswork.balanceaccountservice.entity.question.Question;
+import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LikeDTO {
-    private List<QuestionDTO> questionDTOs = new ArrayList<>();
-    private Pushable          swipeDTO;
+public class LikeTransactionResult {
+    private List<Question> questions = new ArrayList<>();
+    private Swipe          swipe;
 }
