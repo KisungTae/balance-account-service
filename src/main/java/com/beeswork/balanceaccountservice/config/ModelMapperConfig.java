@@ -26,21 +26,8 @@ public class ModelMapperConfig {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         modelMapper.getConfiguration().setSkipNullEnabled(true);
         setCustomMapping(modelMapper);
-        modelMapper.addMappings(matchToDTOMappings());
         return modelMapper;
     }
-
-    private PropertyMap<Match, MatchDTO> matchToDTOMappings() {
-        return new PropertyMap<>() {
-            @Override protected void configure() {
-                skip(destination.getUpdatedAt());
-                skip(destination.getActive());
-                skip(destination.getDeleted());
-                skip(destination.getUnmatched());
-            }
-        };
-    }
-
 
     private void setCustomMapping(ModelMapper modelMapper) {
         modelMapper.addConverter(stringToUUIDConverter());

@@ -60,10 +60,18 @@ public class Swipe {
     }
 
     public UUID getSwiperId() {
-        return this.swiper == null ? null : this.swiper.getId();
+        return this.swiper.getId();
     }
 
     public UUID getSwipedId() {
-        return this.swiped == null ? null : this.swiped.getId();
+        return this.swiped.getId();
+    }
+
+    public String getProfilePhotoKey() {
+        return this.swiper.getProfilePhotoKey();
+    }
+
+    public boolean isDeleted() {
+        return this.swiper.isDeleted();
     }
 }

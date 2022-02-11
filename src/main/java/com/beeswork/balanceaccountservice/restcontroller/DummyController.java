@@ -574,7 +574,7 @@ public class DummyController {
 
     @GetMapping("/send/match")
     public void sendDummyMatch() {
-        MatchDTO matchDTO = new MatchDTO(1L, UUID.randomUUID(), false, "Michael", "profilephotoeky", false, true, new Date(), new Date());
+//        MatchDTO matchDTO = new MatchDTO(1L, UUID.randomUUID(), false, "Michael", "profilephotoeky", false, true, new Date(), new Date());
 //        matchDTO.setPushType(PushType.MATCHED);
 //        fcmService.sendMatch(matchDTO,
 //                             "c1x4LYePRdO3X8hJnNe8Z2:APA91bHpnXUSjS4xPSfs5KxeNXmUsv1pCnJ7ch2Lnq7MxcjWlQdy7Z4kCBG3Vk1tEB4hC4XevyqMTtWJ2RfnHlplvJAdjeFpMHhnZcimwRMgruSb5lDzDPOmYu-ux7OO5Osduz9q_QHr",

@@ -35,12 +35,6 @@ public class Match {
     @MapsId("swipedId")
     private Account swiped;
 
-    @Column(name = "swiped_id", insertable = false, updatable = false)
-    private UUID swipedId;
-
-    @Column(name = "chat_id", insertable = false, updatable = false)
-    private long chatId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id")
     private Chat chat;
@@ -75,11 +69,36 @@ public class Match {
     }
 
     public UUID getSwiperId() {
-        return matchId.getSwiperId();
+        return this.matchId.getSwiperId();
     }
 
     public UUID getSwipedId() {
-        return matchId.getSwipedId();
+        return this.matchId.getSwipedId();
+    }
+
+    public long getChatId() {
+        return this.chat.getId();
+    }
+
+    public String getName() {
+        return this.swiped.getName();
+    }
+
+    public String getProfilePhotoKey() {
+        return this.swiped.getProfilePhotoKey();
+    }
+
+    public boolean isDeleted() {
+        return this.swiped.isDeleted();
+    }
+
+    public void swap() {
+        Account tempSwiper = this.swiper;
+        this.swiper = this.swiped;
+        this.swiped = tempSwiper;
+
+        this.matchId.setSwiperId(this.swiper.getId());
+        this.matchId.setSwipedId(this.swiped.getId());
     }
 
     public void setupAsUnmatcher(Date updatedAt) {

@@ -9,6 +9,7 @@ import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeMetaDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
+import com.beeswork.balanceaccountservice.dto.common.Pushable;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.*;
@@ -51,6 +52,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     private final ModelMapper                modelMapper;
     private final StompService               stompService;
     private final PlatformTransactionManager transactionManager;
+    private final TransactionTemplate transactionTemplate;
 
     @Autowired
     public SwipeServiceImpl(ModelMapper modelMapper,
@@ -72,11 +74,12 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         this.walletDAO = walletDAO;
         this.stompService = stompService;
         this.transactionManager = transactionManager;
+        this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
     @Override
     public List<QuestionDTO> like(UUID swiperId, UUID swipedId, Locale locale) {
-        LikeTransactionResult result = new TransactionTemplate(transactionManager).execute(status -> {
+        LikeTransactionResult result = transactionTemplate.execute(status -> {
             Account swiper = accountDAO.findById(swiperId);
             Account swiped = accountDAO.findById(swipedId);
             validateSwiped(swiped);
@@ -114,7 +117,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             throw new PersistenceException();
         }
 
-        pushSwipe(result.getSwipe(), locale, false);
+        SwipeDTO swipeDTO = modelMapper.map(result.getSwipe(), SwipeDTO.class);
+        stompService.push(swipeDTO, locale);
         return modelMapper.map(result.getQuestions(), new TypeToken<List<QuestionDTO>>() {}.getType());
     }
 
@@ -146,9 +150,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     }
 
     @Override
-    @Transactional
     public ClickDTO click(UUID swiperId, UUID swipedId, Map<Integer, Boolean> answers, Locale locale) {
-        ClickTransactionResult result = new TransactionTemplate(transactionManager).execute(status -> {
+        ClickTransactionResult result = transactionTemplate.execute(status -> {
             Swipe subSwipe, objSwipe;
             if (swiperId.compareTo(swipedId) > 0) {
                 subSwipe = swipeDAO.findBy(swiperId, swipedId, true);
@@ -218,110 +221,19 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         if (clickDTO.getClickResult() == ClickResult.MISSED) {
             return clickDTO;
         } else if (clickDTO.getClickResult() == ClickResult.CLICKED) {
-            pushSwipe(result.getSwipe(), locale, true);
+            Pushable pushable = modelMapper.map(result.getSwipe(), SwipeDTO.class);
+            stompService.push(pushable, locale);
             return clickDTO;
         } else {
+            Match match = result.getMatch();
+            MatchDTO matchDTO = modelMapper.map(match, MatchDTO.class);
+            clickDTO.setMatchDTO(matchDTO);
 
+            match.swap();
+            Pushable pushable = modelMapper.map(match, MatchDTO.class);
+            stompService.push(pushable, locale);
             return clickDTO;
         }
-
-
-//        Swipe subSwipe, objSwipe;
-//        if (swiperId.compareTo(swipedId) > 0) {
-//            subSwipe = swipeDAO.findBy(swiperId, swipedId, true);
-//            objSwipe = swipeDAO.findBy(swipedId, swiperId, true);
-//        } else {
-//            objSwipe = swipeDAO.findBy(swipedId, swiperId, true);
-//            subSwipe = swipeDAO.findBy(swiperId, swipedId, true);
-//        }
-//
-//        if (subSwipe == null) {
-//            throw new SwipeNotFoundException();
-//        } else if (subSwipe.isClicked()) {
-//            throw new SwipeClickedExistsException();
-//        } else if (subSwipe.isMatched()) {
-//            throw new SwipeMatchedExistsException();
-//        }
-//
-//        Account swiper = subSwipe.getSwiper();
-//        Account swiped = subSwipe.getSwiped();
-//        validateSwiped(swiped);
-//
-//        Wallet wallet = walletDAO.findByAccountId(swiper.getId(), true);
-//        SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
-//
-//        if (wallet.getFreeSwipe() >= swipeMeta.getSwipePoint()) {
-//            wallet.setFreeSwipe((wallet.getFreeSwipe() - swipeMeta.getSwipePoint()));
-//        } else if (wallet.getPoint() < swipeMeta.getSwipePoint()) {
-//            throw new AccountShortOfPointException();
-//        } else {
-//            wallet.setPoint((wallet.getPoint() - swipeMeta.getSwipePoint()));
-//        }
-
-        ClickDTO clickDTO = new ClickDTO();
-        if (accountQuestionDAO.countAllByAnswers(swipedId, answers) != answers.size()) {
-            clickDTO.setMatchDTO(new MatchDTO(PushType.MISSED));
-            return clickDTO;
-        }
-
-        Date updatedAt = new Date();
-        subSwipe.setClicked(true);
-        subSwipe.setUpdatedAt(updatedAt);
-
-        if (objSwipe == null || !objSwipe.isClicked()) {
-            MatchDTO subMatchDTO = new MatchDTO(PushType.CLICKED);
-            subMatchDTO.setSwiperId(swiper.getId());
-            subMatchDTO.setSwipedId(swiped.getId());
-            clickDTO.setMatchDTO(subMatchDTO);
-
-            MatchDTO objMatchDTO = new MatchDTO(PushType.CLICKED);
-            objMatchDTO.setSwiperId(swiper.getId());
-            objMatchDTO.setSwipedId(swiped.getId());
-            objMatchDTO.setName(swiper.getName());
-            objMatchDTO.setProfilePhotoKey(swiper.getProfilePhotoKey());
-            objMatchDTO.setUpdatedAt(updatedAt);
-            objMatchDTO.setDeleted(false);
-            clickDTO.setObjMatchDTO(objMatchDTO);
-        } else {
-            Chat chat = new Chat();
-            chatDAO.persist(chat);
-
-            Match subMatch = new Chat(swiper, swiped, chat, updatedAt);
-            Match objMatch = new Match(swiped, swiper, chat, updatedAt);
-            swiper.getMatches().add(subMatch);
-            swiped.getMatches().add(objMatch);
-
-            subSwipe.setMatched(true);
-            objSwipe.setMatched(true);
-            objSwipe.setUpdatedAt(updatedAt);
-
-            MatchDTO subMatchDTO = modelMapper.map(subMatch, MatchDTO.class);
-            subMatchDTO.setPushType(PushType.MATCHED);
-            subMatchDTO.setName(swiped.getName());
-            subMatchDTO.setProfilePhotoKey(swiped.getProfilePhotoKey());
-            subMatchDTO.setChatId(chat.getId());
-            clickDTO.setMatchDTO(subMatchDTO);
-
-            MatchDTO objMatchDTO = modelMapper.map(subMatch, MatchDTO.class);
-            objMatchDTO.setPushType(PushType.MATCHED);
-            objMatchDTO.setName(swiper.getName());
-            objMatchDTO.setProfilePhotoKey(swiper.getProfilePhotoKey());
-            objMatchDTO.setChatId(chat.getId());
-            objMatchDTO.setDeleted(false);
-            clickDTO.setObjMatchDTO(objMatchDTO);
-        }
-        return clickDTO;
-    }
-
-    private void pushMatch(Match match, Locale locale) {
-
-    }
-
-    private void pushSwipe(Swipe swipe, Locale locale, boolean clicked) {
-        Account swiper = swipe.getSwiper();
-        Account swiped = swipe.getSwiped();
-        SwipeDTO swipeDTO = new SwipeDTO(swipe.getId(), swiper.getId(), swiped.getId(), swiper.getProfilePhotoKey(), clicked);
-        stompService.push(swipeDTO, locale);
     }
 
     private void rechargeFreeSwipe(Wallet wallet, SwipeMeta swipeMeta) {

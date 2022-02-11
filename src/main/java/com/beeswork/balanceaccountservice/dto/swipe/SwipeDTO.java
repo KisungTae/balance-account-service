@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.dto.swipe;
 
 import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.dto.common.Pushable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,13 +17,18 @@ import java.util.UUID;
 @NoArgsConstructor
 public class SwipeDTO implements Pushable {
 
+    @JsonIgnore
     private static final String PUSH_TITLE_SWIPE = "push.title.swipe";
+
+    @JsonIgnore
     private static final String PUSH_BODY_SWIPE  = "push.body.swipe";
 
+    @JsonIgnore
     private static final String PUSH_TITLE_CLICK = "push.title.click";
+
+    @JsonIgnore
     private static final String PUSH_BODY_CLICK  = "push.body.click";
 
-    private PushType pushType = PushType.SWIPE;
     private Long     id;
     private UUID     swiperId;
     private UUID     swipedId;
@@ -50,21 +56,31 @@ public class SwipeDTO implements Pushable {
     }
 
     @Override
+    @JsonIgnore
+    public PushType getPushType() {
+        return PushType.SWIPE;
+    }
+
+    @Override
+    @JsonIgnore
     public UUID getRecipientId() {
         return swipedId;
     }
 
     @Override
+    @JsonIgnore
     public String[] getPushTitleArguments() {
         return null;
     }
 
     @Override
+    @JsonIgnore
     public String[] getPushBodyArguments() {
         return new String[0];
     }
 
     @Override
+    @JsonIgnore
     public String getPushTitleId() {
         if (clicked) {
             return PUSH_TITLE_CLICK;
@@ -73,6 +89,7 @@ public class SwipeDTO implements Pushable {
     }
 
     @Override
+    @JsonIgnore
     public String getPushBodyId() {
         if (clicked) {
             return PUSH_BODY_CLICK;

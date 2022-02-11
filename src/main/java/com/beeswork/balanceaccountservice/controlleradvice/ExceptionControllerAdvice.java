@@ -132,7 +132,7 @@ public class ExceptionControllerAdvice {
                        EmailDuplicateException.class, PhotoInvalidDeleteException.class,
                        AccountDeletedException.class, PhotoAlreadyExistsException.class,
                        InvalidSocialLoginException.class, InvalidRefreshTokenException.class,
-                       InvalidJWTTokenException.class})
+                       InvalidJWTTokenException.class, SwipeMatchedExistsException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

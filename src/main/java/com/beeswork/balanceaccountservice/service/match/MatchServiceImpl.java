@@ -50,13 +50,15 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
             for (MatchDTO matchDTO : matchDTOs) {
                 if (matchDTO.getUnmatched() || matchDTO.getDeleted()) {
                     matchDTO.setProfilePhotoKey(null);
-                    matchDTO.setCreatedAt(null);
+//                    matchDTO.setCreatedAt(null);
                     matchDTO.setActive(true);
                     matchDTO.setUnmatched(true);
                 }
-                if (matchDTO.getUpdatedAt().after(listMatchesDTO.getFetchedAt()))
-                    listMatchesDTO.setFetchedAt(matchDTO.getUpdatedAt());
-                matchDTO.setUpdatedAt(null);
+//                if (matchDTO.getUpdatedAt().after(listMatchesDTO.getFetchedAt())) {
+//                    listMatchesDTO.setFetchedAt(matchDTO.getUpdatedAt());
+//                }
+
+//                matchDTO.setUpdatedAt(null);
                 matchDTO.setDeleted(null);
             }
         }

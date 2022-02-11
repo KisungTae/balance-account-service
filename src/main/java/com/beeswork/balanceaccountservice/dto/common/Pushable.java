@@ -6,8 +6,8 @@ import java.util.UUID;
 
 public interface Pushable {
 
-    UUID getRecipientId();
     PushType getPushType();
+    UUID getRecipientId();
     String[] getPushTitleArguments();
     String[] getPushBodyArguments();
     String getPushTitleId();

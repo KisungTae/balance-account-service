@@ -53,9 +53,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                                                     qAccount.name,
                                                     qAccount.profilePhotoKey,
                                                     qAccount.deleted,
-                                                    qMatch.active,
-                                                    qMatch.createdAt,
-                                                    updatedAtCase))
+                                                    qMatch.active))
                               .from(qMatch)
                               .leftJoin(qAccount).on(qAccount.id.eq(qMatch.swiped.id))
                               .where(condition)
