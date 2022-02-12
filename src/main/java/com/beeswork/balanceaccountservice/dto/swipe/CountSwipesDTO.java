@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CountClicksDTO {
+public class CountSwipesDTO {
     private long count;
 }

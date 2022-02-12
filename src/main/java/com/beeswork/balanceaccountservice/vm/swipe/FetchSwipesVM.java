@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class FetchClicksVM {
+public class FetchSwipesVM {
 
     private UUID lastSwiperId;
 

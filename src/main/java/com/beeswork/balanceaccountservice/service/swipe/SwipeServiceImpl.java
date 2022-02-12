@@ -1,7 +1,6 @@
 package com.beeswork.balanceaccountservice.service.swipe;
 
 import com.beeswork.balanceaccountservice.constant.ClickResult;
-import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
@@ -52,7 +51,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     private final ModelMapper                modelMapper;
     private final StompService               stompService;
     private final PlatformTransactionManager transactionManager;
-    private final TransactionTemplate transactionTemplate;
+    private final TransactionTemplate        transactionTemplate;
 
     @Autowired
     public SwipeServiceImpl(ModelMapper modelMapper,
@@ -124,29 +123,29 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public ListClicksDTO listClicks(UUID accountId, int startPosition, int loadSize) {
-        List<SwipeDTO> clicks = swipeDAO.findClicks(accountId, startPosition, loadSize);
-        ListClicksDTO listClicksDTO = new ListClicksDTO();
-        for (SwipeDTO click : clicks) {
-            if (click.getDeleted()) {
-                listClicksDTO.getDeletedSwiperIds().add(click.getSwiperId());
-            } else {
-                listClicksDTO.getClickDTOs().add(click);
+    public List<SwipeDTO> listSwipes(UUID accountId, int startPosition, int loadSize) {
+        List<SwipeDTO> swipes = swipeDAO.findSwipes(accountId, startPosition, loadSize);
+        for (SwipeDTO swipeDTO : swipes) {
+            if (swipeDTO.getDeleted()) {
+                swipeDTO.setSwipedId(null);
+                swipeDTO.setClicked(null);
+                swipeDTO.setProfilePhotoKey(null);
+                swipeDTO.setId(null);
             }
         }
-        return listClicksDTO;
+        return swipes;
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<SwipeDTO> fetchClicks(UUID accountId, UUID lastSwiperId, int loadSize) {
-        return swipeDAO.findClicks(accountId, lastSwiperId, loadSize);
+    public List<SwipeDTO> fetchSwipes(UUID accountId, UUID lastSwiperId, int loadSize) {
+        return swipeDAO.findSwipes(accountId, lastSwiperId, loadSize);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public CountClicksDTO countClicks(UUID accountId) {
-        return new CountClicksDTO(swipeDAO.countClicks(accountId));
+    public CountSwipesDTO countSwipes(UUID accountId) {
+        return new CountSwipesDTO(swipeDAO.countClicks(accountId));
     }
 
     @Override

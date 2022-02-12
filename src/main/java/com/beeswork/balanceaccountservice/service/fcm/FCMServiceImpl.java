@@ -25,6 +25,8 @@ public class FCMServiceImpl implements FCMService {
     private final ObjectMapper objectMapper;
     private final MessageSource messageSource;
 
+    private static final String PUSH_TYPE = "pushType";
+
     @Autowired
     public FCMServiceImpl(FirebaseMessaging firebaseMessaging,
                           MessageSource messageSource,
@@ -47,6 +49,7 @@ public class FCMServiceImpl implements FCMService {
         for (Map.Entry<String, Object> entry: data.entrySet()) {
             messageBuilder.putData(entry.getKey(), entry.getValue().toString());
         }
+        messageBuilder.putData(PUSH_TYPE, pushable.getPushType().toString());
 
         try {
             firebaseMessaging.send(messageBuilder.build());

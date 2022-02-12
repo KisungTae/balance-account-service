@@ -564,12 +564,15 @@ public class DummyController {
     }
 
     @GetMapping("/send/chat/message")
-    public void sendDummyChatMessageToFCM() {
-        ChatMessageDTO chatMessageDTO = new ChatMessageDTO(UUID.randomUUID(), "test chat message123123 now", 12L, new Date());
-//        fcmService.sendChatMessage(chatMessageDTO,
-//                                   "fYvPOxLATZuorJ_apfzSD4:APA91bGHgxnNE3dEinyoQrN7XwB68n_mx5-cRKHIXLy8cW2XwgxizNoVooEDAduhOqP73In5WEeMIK1w13jMLAWNloQSvNAskzGZZC8IVL8j0icHvqabVnhj3QpHWOrNwtNv33ky5c6s",
-//                                   "michael",
-//                                   Locale.getDefault());
+    public void sendDummyChatMessageToFCM(@RequestParam("body") String body) {
+        ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
+        chatMessageDTO.setAccountId(UUID.fromString("5b677c5b-46c3-4749-83f6-704cd3c21ab8"));
+        chatMessageDTO.setRecipientId(UUID.fromString("2c2743bf-23ab-4e23-bd4e-4955b8191e12"));
+        chatMessageDTO.setBody(body);
+        chatMessageDTO.setChatId(1L);
+        chatMessageDTO.setId(UUID.fromString("ecbeacc4-3409-4195-8c47-76a1f6a4798c"));
+        chatMessageDTO.setCreatedAt(new Date());
+        stompService.pushChatMessage(chatMessageDTO, Locale.getDefault());
     }
 
     @GetMapping("/send/match")
@@ -598,8 +601,8 @@ public class DummyController {
     @GetMapping("/save/chat/message")
     public void saveDummyChatMessage(@RequestParam("body") String body) {
         ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
-        chatMessageDTO.setAccountId(UUID.fromString("174d0164-bfa3-4233-b8c8-54169f5da787"));
-        chatMessageDTO.setRecipientId(UUID.fromString("d9310f89-4db5-4e0a-8f1c-b7e4859cfb52"));
+        chatMessageDTO.setAccountId(UUID.fromString("5b677c5b-46c3-4749-83f6-704cd3c21ab8"));
+        chatMessageDTO.setRecipientId(UUID.fromString("2c2743bf-23ab-4e23-bd4e-4955b8191e12"));
         chatMessageDTO.setBody(body);
         chatMessageDTO.setChatId(1L);
         chatMessageDTO.setId(UUID.fromString("ecbeacc4-3409-4195-8c47-76a1f6a4798c"));

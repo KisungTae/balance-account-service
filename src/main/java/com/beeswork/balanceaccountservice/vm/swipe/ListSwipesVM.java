@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class ListClicksVM {
+public class ListSwipesVM {
 
     @NotNull
     private Integer startPosition;

@@ -50,6 +50,7 @@ public class MatchDTO implements Pushable {
     }
 
     @Override
+    @JsonIgnore
     public PushType getPushType() {
         return PushType.MATCH;
     }

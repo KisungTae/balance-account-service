@@ -13,9 +13,9 @@ public interface SwipeService {
 //    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
     ClickDTO click(UUID swiperId, UUID swipedId, Map<Integer, Boolean> answers, Locale locale);
 
-    ListClicksDTO listClicks(UUID accountId, int startPosition, int loadSize);
+    List<SwipeDTO> listSwipes(UUID accountId, int startPosition, int loadSize);
 
-    List<SwipeDTO> fetchClicks(UUID accountId, UUID lastSwiperId, int loadSize);
+    List<SwipeDTO> fetchSwipes(UUID accountId, UUID lastSwiperId, int loadSize);
 
-    CountClicksDTO countClicks(UUID accountId);
+    CountSwipesDTO countSwipes(UUID accountId);
 }

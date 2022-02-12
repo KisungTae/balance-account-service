@@ -13,6 +13,7 @@ import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.setting.PushSetting;
 import com.beeswork.balanceaccountservice.service.apns.APNSService;
 import com.beeswork.balanceaccountservice.service.fcm.FCMService;
+import io.micrometer.core.instrument.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,7 @@ public class PushServiceImpl implements PushService {
             return;
         }
         PushToken pushToken = getPushToken(chatMessageDTO);
-        if (pushToken == null) {
+        if (pushToken == null || StringUtils.isBlank(pushToken.getToken())) {
             return;
         }
         Account sender = accountDAO.findById(chatMessageDTO.getAccountId());
@@ -60,7 +61,7 @@ public class PushServiceImpl implements PushService {
             return;
         }
         PushToken pushToken = getPushToken(pushable);
-        if (pushToken == null) {
+        if (pushToken == null || StringUtils.isBlank(pushToken.getToken())) {
             return;
         }
         push(pushable, pushToken, locale);

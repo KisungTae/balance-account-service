@@ -72,12 +72,12 @@ public class ChatMessageDTO implements Pushable {
     @Override
     @JsonIgnore
     public String getPushTitleId() {
-        return null;
+        return PUSH_TITLE_CHAT_MESSAGE;
     }
 
     @Override
     @JsonIgnore
     public String getPushBodyId() {
-        return null;
+        return PUSH_BODY_CHAT_MESSAGE;
     }
 }
