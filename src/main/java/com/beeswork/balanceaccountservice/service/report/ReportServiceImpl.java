@@ -8,11 +8,9 @@ import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.report.Report;
 import com.beeswork.balanceaccountservice.entity.report.ReportReason;
-import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.exception.report.ReportReasonNotFoundException;
 import com.beeswork.balanceaccountservice.exception.report.ReportedNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,14 +48,17 @@ public class ReportServiceImpl extends BaseServiceImpl implements ReportService 
     @Transactional
     public void reportMatch(UUID accountId, UUID reportedId, int reportReasonId, String description) {
         createReport(accountId, reportedId, reportReasonId, description);
-        Match reporterMatch = matchDAO.findById(accountId, reportedId);
-        Match reportedMatch = matchDAO.findById(reportedId, accountId);
+        Match reporterMatch = matchDAO.findBy(accountId, reportedId, false);
+        Match reportedMatch = matchDAO.findBy(reportedId, accountId, false);
 
-        if (reporterMatch == null || reportedMatch == null) throw new MatchNotFoundException();
+        reporterMatch.setActive(true);
+        reportedMatch.setActive(true);
 
-        Date updatedAt = new Date();
-        reporterMatch.setupAsUnmatcher(updatedAt);
-        reportedMatch.setupAsUnmatched(updatedAt);
+//        if (reporterMatch == null || reportedMatch == null) throw new MatchNotFoundException();
+//
+//        Date updatedAt = new Date();
+//        reporterMatch.setupAsUnmatcher(updatedAt);
+//        reportedMatch.setupAsUnmatched(updatedAt);
     }
 
     private void createReport(UUID accountId, UUID reportedId, int reportReasonId, String description) {

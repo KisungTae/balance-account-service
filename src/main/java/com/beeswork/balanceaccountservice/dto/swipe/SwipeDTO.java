@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -31,28 +30,28 @@ public class SwipeDTO implements Pushable {
 
     private Long     id;
     private UUID     swiperId;
-    private UUID     swipedId;
-    private String   profilePhotoKey;
-    private Boolean  clicked;
-    private Boolean  deleted;
+    private UUID    swipedId;
+    private Boolean clicked;
+    private String  swiperProfilePhotoKey;
+    private Boolean swiperDeleted;
 
     @QueryProjection
-    public SwipeDTO(Long id, UUID swiperId, UUID swipedId, String profilePhotoKey, Boolean clicked) {
+    public SwipeDTO(Long id, UUID swiperId, UUID swipedId, String swiperProfilePhotoKey, Boolean clicked) {
         this.id = id;
         this.swiperId = swiperId;
         this.swipedId = swipedId;
-        this.profilePhotoKey = profilePhotoKey;
+        this.swiperProfilePhotoKey = swiperProfilePhotoKey;
         this.clicked = clicked;
     }
 
     @QueryProjection
-    public SwipeDTO(Long id, UUID swiperId, UUID swipedId, String profilePhotoKey, Boolean clicked, Boolean deleted) {
+    public SwipeDTO(Long id, UUID swiperId, UUID swipedId, String swiperProfilePhotoKey, Boolean clicked, Boolean swiperDeleted) {
         this.id = id;
         this.swiperId = swiperId;
         this.swipedId = swipedId;
-        this.profilePhotoKey = profilePhotoKey;
+        this.swiperProfilePhotoKey = swiperProfilePhotoKey;
         this.clicked = clicked;
-        this.deleted = deleted;
+        this.swiperDeleted = swiperDeleted;
     }
 
     @Override

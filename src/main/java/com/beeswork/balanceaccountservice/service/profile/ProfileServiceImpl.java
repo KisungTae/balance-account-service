@@ -90,10 +90,14 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     public void saveProfile(UUID accountId, String name, Date birth, String about, int height, boolean gender) {
         Account account = accountDAO.findById(accountId);
         account.setName(name);
-        if (profileDAO.existsById(accountId)) return;
+        if (profileDAO.existsById(accountId)) {
+            return;
+        }
         int birthYear = DateUtil.getYearFrom(birth);
         Point location = getLocation(DEFAULT_LONGITUDE, DEFAULT_LATITUDE);
-        if (about == null) about = "";
+        if (about == null) {
+            about = "";
+        }
         accountDAO.persist(account);
         Profile profile = new Profile(account, name, birthYear, birth, gender, height, about, location, new Date());
         profileDAO.persist(profile);
@@ -130,8 +134,11 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         Profile profile = findValidProfile(accountId);
         RecommendDTO recommendDTO = new RecommendDTO();
 
-        if (distance < MIN_DISTANCE) distance = MIN_DISTANCE;
-        else if (distance > MAX_DISTANCE) distance = MAX_DISTANCE;
+        if (distance < MIN_DISTANCE) {
+            distance = MIN_DISTANCE;
+        } else if (distance > MAX_DISTANCE) {
+            distance = MAX_DISTANCE;
+        }
         distance = distance * DISTANCE_UNIT;
         int offset = pageIndex * PAGE_LIMIT;
 
@@ -139,8 +146,11 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         if (minAge < MIN_AGE) minAge = MIN_AGE;
         minAge = currentYear - minAge + 1;
 
-        if (maxAge >= MAX_AGE) maxAge = 0;
-        else maxAge = currentYear - maxAge + 1;
+        if (maxAge >= MAX_AGE) {
+            maxAge = 0;
+        } else {
+            maxAge = currentYear - maxAge + 1;
+        }
 
         List<CardDTO> cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, profile.getLocation());
         if (cardDTOs.size() == 0 && pageIndex > 0) {
@@ -153,7 +163,9 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
 
     private Profile findValidProfile(UUID accountId) {
         Profile profile = profileDAO.findById(accountId, false);
-        if (profile == null) throw new ProfileNotFoundException();
+        if (profile == null) {
+            throw new ProfileNotFoundException();
+        }
         return profile;
     }
 
@@ -161,15 +173,18 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     @Transactional
     public void saveEmail(UUID accountId, String email) {
         Login login = loginDAO.findByAccountId(accountId);
-        if (login == null) throw new LoginNotFoundException();
+        if (login == null) {
+            throw new LoginNotFoundException();
+        }
 
         LoginType loginType = login.getType();
-        if (loginType == LoginType.NAVER || loginType == LoginType.GOOGLE)
+        if (loginType == LoginType.NAVER || loginType == LoginType.GOOGLE) {
             throw new EmailNotMutableException();
-
+        }
         if (!login.getEmail().equals(email)) {
-            if (loginDAO.existsByEmail(email))
+            if (loginDAO.existsByEmail(email)) {
                 throw new EmailDuplicateException();
+            }
             login.setEmail(email);
         }
     }
@@ -178,7 +193,9 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public String getEmail(UUID accountId) {
         Login login = loginDAO.findByAccountId(accountId);
-        if (login == null) throw new LoginNotFoundException();
+        if (login == null) {
+            throw new LoginNotFoundException();
+        }
         return login.getEmail();
     }
 

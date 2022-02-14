@@ -33,7 +33,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public Match findById(UUID swiperId, UUID swipedId) {
+    public Match findBy(UUID swiperId, UUID swipedId, boolean writeLock) {
         return entityManager.find(Match.class, new MatchId(swiperId, swipedId));
     }
 

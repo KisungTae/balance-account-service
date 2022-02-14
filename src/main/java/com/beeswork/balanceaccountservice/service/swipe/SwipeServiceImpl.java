@@ -16,7 +16,6 @@ import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.Wallet;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
-import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
@@ -98,10 +97,6 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             Date updatedAt = new Date();
             if (swipe == null) {
                 swipe = new Swipe(swiper, swiped, updatedAt);
-                Profile profile = profileDAO.findById(swiped.getId(), true);
-                if (profile != null) {
-                    profile.incrementScore();
-                }
                 swipeDAO.persist(swipe);
             } else if (swipe.isMatched()) {
                 throw new SwipeMatchedExistsException();
@@ -126,10 +121,10 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     public List<SwipeDTO> listSwipes(UUID accountId, int startPosition, int loadSize) {
         List<SwipeDTO> swipes = swipeDAO.findSwipes(accountId, startPosition, loadSize);
         for (SwipeDTO swipeDTO : swipes) {
-            if (swipeDTO.getDeleted()) {
+            if (swipeDTO.getSwiperDeleted()) {
                 swipeDTO.setSwipedId(null);
                 swipeDTO.setClicked(null);
-                swipeDTO.setProfilePhotoKey(null);
+                swipeDTO.setSwiperProfilePhotoKey(null);
                 swipeDTO.setId(null);
             }
         }
@@ -149,6 +144,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     }
 
     @Override
+    @SuppressWarnings("Duplicates")
     public ClickDTO click(UUID swiperId, UUID swipedId, Map<Integer, Boolean> answers, Locale locale) {
         ClickTransactionResult result = transactionTemplate.execute(status -> {
             Swipe subSwipe, objSwipe;
@@ -168,6 +164,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
                 throw new SwipeMatchedExistsException();
             }
 
+            // NOTE 1.swipeDAO.findBy does not fetch join Account because Account is cached
             Account swiper = subSwipe.getSwiper();
             Account swiped = subSwipe.getSwiped();
             validateSwiped(swiped);

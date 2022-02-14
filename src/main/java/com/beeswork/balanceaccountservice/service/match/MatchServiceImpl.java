@@ -4,12 +4,13 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
+import com.beeswork.balanceaccountservice.dao.match.UnmatchAuditDAO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.entity.match.Match;
+import com.beeswork.balanceaccountservice.entity.match.UnmatchAudit;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -27,16 +28,19 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     private final MatchDAO           matchDAO;
     private final ChatMessageDAO     chatMessageDAO;
     private final SentChatMessageDAO sentChatMessageDAO;
+    private final UnmatchAuditDAO unmatchAuditDAO;
 
     @Autowired
     public MatchServiceImpl(AccountDAO accountDAO,
                             MatchDAO matchDAO,
                             ChatMessageDAO chatMessageDAO,
-                            SentChatMessageDAO sentChatMessageDAO) {
+                            SentChatMessageDAO sentChatMessageDAO,
+                            UnmatchAuditDAO unmatchAuditDAO) {
         this.accountDAO = accountDAO;
         this.matchDAO = matchDAO;
         this.chatMessageDAO = chatMessageDAO;
         this.sentChatMessageDAO = sentChatMessageDAO;
+        this.unmatchAuditDAO = unmatchAuditDAO;
     }
 
 
@@ -49,7 +53,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
         if (matchDTOs != null) {
             for (MatchDTO matchDTO : matchDTOs) {
                 if (matchDTO.getUnmatched() || matchDTO.getDeleted()) {
-                    matchDTO.setProfilePhotoKey(null);
+                    matchDTO.setSwipedProfilePhotoKey(null);
 //                    matchDTO.setCreatedAt(null);
                     matchDTO.setActive(true);
                     matchDTO.setUnmatched(true);
@@ -68,22 +72,42 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Override
     @Transactional
-    public void unmatch(UUID accountId, UUID swipedId) {
-        // todo: check if it causes deadlock when both parties unmatch at the same time, check and refactor
-        Match swiperMatch = matchDAO.findById(accountId, swipedId);
-        Match swipedMatch = matchDAO.findById(swipedId, accountId);
+    @SuppressWarnings("Duplicates")
+    public void unmatch(UUID swiperId, UUID swipedId) {
+
+        // NOTE 1. Even if you fetch an entity with writeLock,
+        //         you can still write on the entity if you fetch it without writeLock on another thread
+
+        Match swiperMatch, swipedMatch;
+        if (swiperId.compareTo(swipedId) > 0) {
+            swiperMatch = matchDAO.findBy(swiperId, swipedId, true);
+            swipedMatch = matchDAO.findBy(swipedId, swiperId, true);
+        } else {
+            swipedMatch = matchDAO.findBy(swipedId, swiperId, true);
+            swiperMatch = matchDAO.findBy(swiperId, swipedId, true);
+        }
 
         if (swiperMatch == null || swipedMatch == null) {
             throw new MatchNotFoundException();
         }
 
-        Date updatedAt = new Date();
-        if (swiperMatch.isUnmatched()) {
-            swiperMatch.setDeleted(true);
-            swiperMatch.setUpdatedAt(updatedAt);
+        Date now = new Date();
+        if (swiperMatch.isUnmatched() && swipedMatch.isUnmatched()) {
+            if (!swiperMatch.isDeleted()) {
+                swiperMatch.setDeleted(true);
+                swiperMatch.setUpdatedAt(now);
+            }
         } else {
-            swiperMatch.setupAsUnmatcher(updatedAt);
-            swipedMatch.setupAsUnmatched(updatedAt);
+            swiperMatch.setUnmatched(true);
+            swiperMatch.setDeleted(true);
+            swiperMatch.setUpdatedAt(now);
+            swipedMatch.setUnmatched(true);
+            swipedMatch.setUpdatedAt(now);
+        }
+
+        if (!unmatchAuditDAO.existsBy(swiperId, swipedId)) {
+            UnmatchAudit unmatchAudit = new UnmatchAudit(swiperMatch.getSwiper(), swiperMatch.getSwiped(), now);
+            unmatchAuditDAO.persist(unmatchAudit);
         }
     }
 }

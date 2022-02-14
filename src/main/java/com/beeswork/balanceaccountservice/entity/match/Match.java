@@ -17,12 +17,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "match")
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+//@Cacheable
+//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Match {
-
-    @Version
-    private int version;
 
     @EmbeddedId
     private MatchId matchId;
@@ -41,9 +38,6 @@ public class Match {
 
     @Column(name = "unmatched")
     private boolean unmatched;
-
-    @Column(name = "unmatcher")
-    private boolean unmatcher;
 
     @Column(name = "active")
     private boolean active;
@@ -80,15 +74,15 @@ public class Match {
         return this.chat.getId();
     }
 
-    public String getName() {
+    public String getSwipedName() {
         return this.swiped.getName();
     }
 
-    public String getProfilePhotoKey() {
+    public String getSwipedProfilePhotoKey() {
         return this.swiped.getProfilePhotoKey();
     }
 
-    public boolean isDeleted() {
+    public boolean isSwipedDeleted() {
         return this.swiped.isDeleted();
     }
 
@@ -96,21 +90,7 @@ public class Match {
         Account tempSwiper = this.swiper;
         this.swiper = this.swiped;
         this.swiped = tempSwiper;
-
         this.matchId.setSwiperId(this.swiper.getId());
         this.matchId.setSwipedId(this.swiped.getId());
     }
-
-    public void setupAsUnmatcher(Date updatedAt) {
-        this.unmatcher = true;
-        this.deleted = true;
-        setupAsUnmatched(updatedAt);
-    }
-
-    public void setupAsUnmatched(Date updatedAt) {
-        this.active = true;
-        this.unmatched = true;
-        this.updatedAt = updatedAt;
-    }
-
 }

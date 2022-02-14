@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -28,23 +27,24 @@ public class MatchDTO implements Pushable {
     private UUID    swipedId;
     private Boolean active;
     private Boolean unmatched;
-    private String  name;
-    private String  profilePhotoKey;
     private Boolean deleted;
+    private String  swipedName;
+    private String  swipedProfilePhotoKey;
+    private Boolean swipedDeleted;
 
     @QueryProjection
     public MatchDTO(Long chatId,
                     UUID swipedId,
                     boolean unmatched,
-                    String name,
-                    String profilePhotoKey,
+                    String swipedName,
+                    String swipedProfilePhotoKey,
                     boolean deleted,
                     boolean active) {
         this.chatId = chatId;
         this.swipedId = swipedId;
         this.unmatched = unmatched;
-        this.name = name;
-        this.profilePhotoKey = profilePhotoKey;
+        this.swipedName = swipedName;
+        this.swipedProfilePhotoKey = swipedProfilePhotoKey;
         this.deleted = deleted;
         this.active = active;
     }
@@ -70,7 +70,7 @@ public class MatchDTO implements Pushable {
     @Override
     @JsonIgnore
     public String[] getPushBodyArguments() {
-        return new String[]{name};
+        return new String[]{swipedName};
     }
 
     @Override

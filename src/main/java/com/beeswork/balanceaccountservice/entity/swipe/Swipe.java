@@ -67,11 +67,11 @@ public class Swipe {
         return this.swiped.getId();
     }
 
-    public String getProfilePhotoKey() {
+    public String getSwiperProfilePhotoKey() {
         return this.swiper.getProfilePhotoKey();
     }
 
-    public boolean isDeleted() {
+    public boolean isSwiperDeleted() {
         return this.swiper.isDeleted();
     }
 }

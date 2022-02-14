@@ -47,7 +47,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     public SaveChatMessageDTO saveChatMessage(ChatMessageDTO chatMessageDTO) {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
         SaveChatMessageDTO saveChatMessageDTO = new SaveChatMessageDTO();
-        Match match = matchDAO.findById(chatMessageDTO.getAccountId(), chatMessageDTO.getRecipientId());
+        Match match = matchDAO.findBy(chatMessageDTO.getAccountId(), chatMessageDTO.getRecipientId(), true);
         if (match == null || match.getSwiped() == null || match.getChat() == null || match.getChatId() != chatMessageDTO.getChatId()) {
             saveChatMessageDTO.setError(MatchNotFoundException.CODE);
             return saveChatMessageDTO;
