@@ -120,19 +120,6 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         return new LoginDTO(account.getId(), profileExists, accessToken, newRefreshToken, login.getEmail(), gender);
     }
 
-//    private void updatePushToken(UUID accountId) {
-//        PushToken pushToken = pushTokenDAO.findRecentByAccountId(accountId);
-//        if (pushToken != null) {
-//            List<PushToken> pushTokens = pushTokenDAO.findAllBy(pushToken.getToken(), );
-//            for (PushToken otherPushToken : pushTokens) {
-//                if (pushToken != otherPushToken) {
-//                    otherPushToken.setLogin(false);
-//                }
-//            }
-//            pushToken.setLogin(true);
-//        }
-//    }
-
     @Override
     @Transactional
     public RefreshAccessTokenDTO refreshAccessToken(String accessToken, String refreshToken) {

@@ -10,14 +10,11 @@ import com.beeswork.balanceaccountservice.dto.profile.RecommendDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.login.Login;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
-import com.beeswork.balanceaccountservice.entity.report.Report;
-import com.beeswork.balanceaccountservice.entity.report.ReportReason;
+import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.profile.EmailDuplicateException;
 import com.beeswork.balanceaccountservice.exception.profile.EmailNotMutableException;
 import com.beeswork.balanceaccountservice.exception.login.LoginNotFoundException;
 import com.beeswork.balanceaccountservice.exception.profile.ProfileNotFoundException;
-import com.beeswork.balanceaccountservice.exception.report.ReportReasonNotFoundException;
-import com.beeswork.balanceaccountservice.exception.report.ReportedNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import com.beeswork.balanceaccountservice.util.DateUtil;
 import org.locationtech.jts.geom.Coordinate;
@@ -46,9 +43,6 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     private static final int MIN_AGE = 20;
     private static final int MAX_AGE = 80;
 
-    private static final double DEFAULT_LATITUDE  = 37.504508;
-    private static final double DEFAULT_LONGITUDE = 127.048992;
-
     private static final int DEFAULT_OFFSET = 0;
 
     private final AccountDAO      accountDAO;
@@ -71,15 +65,17 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public ProfileDTO getProfile(UUID accountId) {
-        return modelMapper.map(findValidProfile(accountId), ProfileDTO.class);
+        return modelMapper.map(findValidProfile(accountId, false), ProfileDTO.class);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public CardDTO getCard(UUID accountId, UUID swipedId) {
-        Profile profile = findValidProfile(accountId);
+        Profile profile = findValidProfile(accountId, false);
         CardDTO cardDTO = profileDAO.findCardDTO(swipedId, profile.getLocation());
-        if (cardDTO == null) throw new ProfileNotFoundException();
+        if (cardDTO == null) {
+            throw new ProfileNotFoundException();
+        }
         return cardDTO;
     }
 
@@ -89,28 +85,36 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     //  TEST 3. save account without accountQuestions with modemapper --> modelmapper call setAccountQuestions and Hibernate recognizes this call and
     //          update persistence context which will delete all accountQuestions. Without modelmapper and update account fields only
     //          then Hibernate won't delete accountQuestions even if their size = 0
+    //  NOTE 1. This is the only place where profile is created, so if profile already exists, it should not update profile at all
     @Override
     @Transactional
-    public void saveProfile(UUID accountId, String name, Date birth, String about, int height, boolean gender) {
+    public void saveProfile(UUID accountId,
+                            String name,
+                            Date birth,
+                            String about,
+                            int height,
+                            boolean gender,
+                            double latitude,
+                            double longitude) {
+        if (profileDAO.existsById(accountId)) {
+            throw new BadRequestException();
+        }
         Account account = accountDAO.findById(accountId);
         account.setName(name);
-        if (profileDAO.existsById(accountId)) {
-            return;
-        }
+
         int birthYear = DateUtil.getYearFrom(birth);
-        Point location = getLocation(DEFAULT_LONGITUDE, DEFAULT_LATITUDE);
+        Point location = getLocation(latitude, longitude);
         if (about == null) {
             about = "";
         }
-        accountDAO.persist(account);
-        Profile profile = new Profile(account, name, birthYear, birth, gender, height, about, location, new Date());
+        Profile profile = new Profile(account, name, birthYear, birth, gender, height, about, location, true, new Date());
         profileDAO.persist(profile);
     }
 
     @Override
     @Transactional
     public void saveAbout(UUID accountId, String about, Integer height) {
-        Profile profile = profileDAO.findById(accountId, true);
+        Profile profile = findValidProfile(accountId, true);
         profile.setAbout(about);
         profile.setHeight(height);
     }
@@ -118,7 +122,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     @Override
     @Transactional
     public void saveLocation(UUID accountId, double latitude, double longitude, Date updatedAt) {
-        Profile profile = profileDAO.findById(accountId, true);
+        Profile profile = findValidProfile(accountId, true);
         if (updatedAt.after(profile.getLocationUpdatedAt())) {
             profile.setLocation(getLocation(latitude, longitude));
             profile.setLocationUpdatedAt(updatedAt);
@@ -135,7 +139,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public RecommendDTO recommend(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int pageIndex) {
-        Profile profile = findValidProfile(accountId);
+        Profile profile = findValidProfile(accountId, false);
         RecommendDTO recommendDTO = new RecommendDTO();
 
         if (distance < MIN_DISTANCE) {
@@ -147,7 +151,9 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         int offset = pageIndex * PAGE_LIMIT;
 
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        if (minAge < MIN_AGE) minAge = MIN_AGE;
+        if (minAge < MIN_AGE) {
+            minAge = MIN_AGE;
+        }
         minAge = currentYear - minAge + 1;
 
         if (maxAge >= MAX_AGE) {
@@ -165,8 +171,8 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         return recommendDTO;
     }
 
-    private Profile findValidProfile(UUID accountId) {
-        Profile profile = profileDAO.findById(accountId, false);
+    private Profile findValidProfile(UUID accountId, boolean writeLock) {
+        Profile profile = profileDAO.findById(accountId, writeLock);
         if (profile == null) {
             throw new ProfileNotFoundException();
         }

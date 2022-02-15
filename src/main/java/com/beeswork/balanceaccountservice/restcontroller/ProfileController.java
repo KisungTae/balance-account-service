@@ -65,7 +65,9 @@ public class ProfileController extends BaseController {
                                    saveProfileVM.getBirth(),
                                    saveProfileVM.getAbout(),
                                    saveProfileVM.getHeight(),
-                                   saveProfileVM.getGender());
+                                   saveProfileVM.getGender(),
+                                   saveProfileVM.getLatitude(),
+                                   saveProfileVM.getLongitude());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 

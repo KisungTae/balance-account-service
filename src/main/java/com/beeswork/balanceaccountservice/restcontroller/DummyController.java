@@ -231,6 +231,7 @@ public class DummyController {
                                       random.nextInt(50) + 150,
                                       count + ": this is my profile",
                                       point,
+                                      true,
                                       now);
 
         profile.setEnabled(true);

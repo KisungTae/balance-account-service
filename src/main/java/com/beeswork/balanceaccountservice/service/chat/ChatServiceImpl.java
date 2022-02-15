@@ -67,6 +67,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
             sentChatMessageDAO.persist(sentChatMessage);
         }
 
+//        todo: should also update the active of swipedMatch
         if (!match.isActive()) {
             match.setActive(true);
             matchDAO.persist(match);

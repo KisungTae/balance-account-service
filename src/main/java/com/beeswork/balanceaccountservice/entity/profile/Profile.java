@@ -22,9 +22,6 @@ import java.util.UUID;
 @Table(name = "profile")
 public class Profile {
 
-    @Version
-    private int version;
-
     @Id
     private UUID accountId;
 
@@ -83,6 +80,7 @@ public class Profile {
                    Integer height,
                    String about,
                    Point location,
+                   boolean enabled,
                    Date createdAt) {
         this.account = account;
         this.name = name;
@@ -93,6 +91,7 @@ public class Profile {
         this.about = about;
         this.location = location;
         this.locationUpdatedAt = createdAt;
+        this.enabled = enabled;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
     }

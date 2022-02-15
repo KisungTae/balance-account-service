@@ -120,7 +120,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
 
         Profile profile = profileDAO.findById(accountId, true);
         if (profile != null) {
-            profileDAO.remove(profile);
+            profile.setEnabled(false);
         }
 
         DeleteAccountDTO deleteAccountDTO = new DeleteAccountDTO();
