@@ -21,10 +21,6 @@ public class WalletDAOImpl extends BaseDAOImpl<Wallet> implements WalletDAO {
 
     @Override
     public Wallet findByAccountId(UUID accountId, boolean writeLock) {
-        JPAQuery<Wallet> query = jpaQueryFactory.selectFrom(qWallet).where(qWallet.accountId.eq(accountId));
-        if (writeLock) {
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-        }
-        return query.fetchFirst();
+        return entityManager.find(Wallet.class, accountId, writeLock ? LockModeType.PESSIMISTIC_WRITE : LockModeType.NONE);
     }
 }

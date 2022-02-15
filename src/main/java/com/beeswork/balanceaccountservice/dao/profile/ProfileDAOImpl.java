@@ -28,11 +28,7 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
 
     @Override
     public Profile findById(UUID accountId, boolean writeLock) {
-        JPAQuery<Profile> query = jpaQueryFactory.selectFrom(qProfile).where(qProfile.accountId.eq(accountId));
-        if (writeLock) {
-            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-        }
-        return query.fetchFirst();
+        return entityManager.find(Profile.class, accountId, writeLock ? LockModeType.PESSIMISTIC_WRITE : LockModeType.NONE);
     }
 
     @Override

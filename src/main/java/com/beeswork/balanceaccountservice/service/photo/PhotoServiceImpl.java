@@ -41,7 +41,7 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     public void savePhoto(UUID accountId, String photoKey, int sequence) {
         //TODO: check getPhotos 
 
-        Account account = accountDAO.findById(accountId);
+        Account account = accountDAO.findById(accountId, true);
         List<Photo> photos = account.getPhotos();
         if (photos.size() >= PhotoConstant.MAX_NUM_OF_PHOTOS) throw new PhotoExceededMaxException();
 
@@ -50,8 +50,11 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
                             .findAny()
                             .orElse(null);
 
-        if (photo == null) photos.add(new Photo(account, photoKey, sequence, new Date()));
-        else photo.setSequence(sequence);
+        if (photo == null) {
+            photos.add(new Photo(account, photoKey, sequence, new Date()));
+        } else {
+            photo.setSequence(sequence);
+        }
         resetProfilePhoto(account, photos);
         accountDAO.persist(account);
     }
@@ -60,14 +63,14 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<PhotoDTO> listPhotos(UUID accountId) {
-        Account account = accountDAO.findById(accountId);
+        Account account = accountDAO.findById(accountId, false);
         return modelMapper.map(account.getPhotos(), new TypeToken<List<PhotoDTO>>() {}.getType());
     }
 
     @Override
     @Transactional
     public void deletePhoto(UUID accountId, String photoKey) {
-        Account account = accountDAO.findById(accountId);
+        Account account = accountDAO.findById(accountId, true);
         List<Photo> photos = account.getPhotos();
 
         Photo photo = photos.stream()
@@ -75,13 +78,17 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
                             .findAny()
                             .orElseThrow(PhotoNotFoundException::new);
 
-        if (photos.size() <= 1) throw new PhotoInvalidDeleteException();
+        if (photos.size() <= 1) {
+            throw new PhotoInvalidDeleteException();
+        }
         photos.remove(photo);
         resetProfilePhoto(account, photos);
     }
 
     private void resetProfilePhoto(Account account, List<Photo> photos) {
-        if (photos.size() <= 0) return;
+        if (photos.size() <= 0) {
+            return;
+        }
         Collections.sort(photos);
         Photo profilePhoto = photos.get(0);
 
@@ -94,7 +101,7 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     @Override
     @Transactional
     public void reorderPhotos(UUID accountId, Map<String, Integer> photoOrders) {
-        Account account = accountDAO.findById(accountId);
+        Account account = accountDAO.findById(accountId, true);
         List<Photo> photos = account.getPhotos();
         Date updatedAt = new Date();
         for (Photo photo : photos) {

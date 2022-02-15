@@ -21,7 +21,7 @@ public class SocialLoginVM {
     @NotNull
     private LoginType loginType;
 
-    private String        pushToken;
+    private String pushToken;
 
     @NotNull
     private PushTokenType pushTokenType;

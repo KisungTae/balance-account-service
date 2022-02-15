@@ -7,7 +7,6 @@ import com.beeswork.balanceaccountservice.dao.pushtoken.PushTokenDAO;
 import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.common.Pushable;
-import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.pushtoken.PushToken;
 import com.beeswork.balanceaccountservice.entity.setting.PushSetting;
@@ -18,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
-import java.util.UUID;
 
 @Service
 public class PushServiceImpl implements PushService {
@@ -50,7 +48,7 @@ public class PushServiceImpl implements PushService {
         if (pushToken == null || StringUtils.isBlank(pushToken.getToken())) {
             return;
         }
-        Account sender = accountDAO.findById(chatMessageDTO.getAccountId());
+        Account sender = accountDAO.findById(chatMessageDTO.getAccountId(), false);
         chatMessageDTO.setSenderName(sender.getName());
         push(chatMessageDTO, pushToken, locale);
     }

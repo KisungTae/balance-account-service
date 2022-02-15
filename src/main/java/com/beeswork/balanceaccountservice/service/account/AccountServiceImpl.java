@@ -58,7 +58,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public void saveQuestionAnswers(UUID accountId, Map<Integer, Boolean> answers) {
-        Account account = accountDAO.findById(accountId);
+        Account account = accountDAO.findById(accountId, false);
         List<AccountQuestion> accountQuestions = accountQuestionDAO.findAllIn(accountId, answers.keySet());
 
         Map<Integer, Integer> sequences = new LinkedHashMap<>();
@@ -111,7 +111,7 @@ public class AccountServiceImpl extends BaseServiceImpl implements AccountServic
     @Override
     @Transactional
     public DeleteAccountDTO deleteAccount(UUID accountId) {
-        Account account = accountDAO.findById(accountId);
+        Account account = accountDAO.findById(accountId, true);
 
         Login login = loginDAO.findByAccountId(accountId);
         if (login != null) {

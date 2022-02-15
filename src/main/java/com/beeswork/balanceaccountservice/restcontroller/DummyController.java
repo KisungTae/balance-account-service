@@ -8,7 +8,6 @@ import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
-import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
@@ -99,7 +98,7 @@ public class DummyController {
     @Transactional
     @PostMapping("/create/swipe-for-account")
     public void createDummySwipeForAccount(@RequestParam UUID accountId) {
-        Account swiper = accountDAO.findById(accountId);
+        Account swiper = accountDAO.findById(accountId, false);
         List<Account> accounts = new JPAQueryFactory(entityManager).selectFrom(QAccount.account).fetch();
         Random random = new Random();
 
@@ -133,14 +132,14 @@ public class DummyController {
     @Transactional
     @PostMapping("/create/match-for-account")
     public void createDummyMatchForAccount(@RequestParam UUID accountId) {
-        Account account = accountDAO.findById(accountId);
+        Account account = accountDAO.findById(accountId, false);
 
     }
 
     @Transactional
     @PostMapping("/create/chat-message-for-account")
     public void createDummyChatMessageForAccount(@RequestParam UUID accountId, @RequestParam int seed) {
-        Account account = accountDAO.findById(accountId);
+        Account account = accountDAO.findById(accountId, false);
         Random random = new Random();
         int innerCount = seed;
         Date date = new Date();
@@ -612,7 +611,7 @@ public class DummyController {
 
     @GetMapping("/access-token-for-account")
     public String getAccessTokenFor(@RequestParam("accountId") UUID accountId) {
-        Account account = accountDAO.findById(accountId);
+        Account account = accountDAO.findById(accountId, false);
         return jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
     }
 

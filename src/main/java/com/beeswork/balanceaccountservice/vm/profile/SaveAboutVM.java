@@ -8,7 +8,7 @@ import org.hibernate.validator.constraints.Length;
 @Setter
 public class SaveAboutVM {
 
-    @Length(max = 5, message = "{about.length}")
+    @Length(max = 50, message = "{about.length}")
     private String about;
 
     private Integer height;

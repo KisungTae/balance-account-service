@@ -33,9 +33,6 @@ import java.util.stream.Collectors;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Account implements UserDetails {
 
-    @Version
-    private int version;
-
     @Id
     @Column(name = "id")
     @GeneratedValue(generator = "UUID")

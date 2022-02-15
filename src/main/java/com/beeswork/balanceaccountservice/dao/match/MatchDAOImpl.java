@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +35,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
 
     @Override
     public Match findBy(UUID swiperId, UUID swipedId, boolean writeLock) {
-        return entityManager.find(Match.class, new MatchId(swiperId, swipedId));
+        return entityManager.find(Match.class, new MatchId(swiperId, swipedId), writeLock ? LockModeType.PESSIMISTIC_WRITE : LockModeType.NONE);
     }
 
     @Override

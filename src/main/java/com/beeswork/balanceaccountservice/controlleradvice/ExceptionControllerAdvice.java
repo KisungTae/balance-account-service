@@ -179,12 +179,12 @@ public class ExceptionControllerAdvice {
 //                             .body(messageSource.getMessage(QUERY_EXCEPTION, null, locale));
 //    }
 //
-//    @ExceptionHandler({Exception.class})
-//    public ResponseEntity<String> handleException(Locale locale) throws JsonProcessingException {
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                             .contentType(MediaType.APPLICATION_JSON)
-//                             .body(exceptionResponse(INTERNAL_SERVER_EXCEPTION, null, locale));
-//    }
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<String> handleException(Locale locale) throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(exceptionResponse(INTERNAL_SERVER_EXCEPTION, null, locale));
+    }
 
 
     private String exceptionResponse(String exceptionCode, Object[] object, Locale locale) throws JsonProcessingException {

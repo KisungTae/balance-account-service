@@ -10,9 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface PhotoService {
-    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
     void savePhoto(UUID accountId, String photoKey, int sequence);
-
     List<PhotoDTO> listPhotos(UUID accountId);
     void deletePhoto(UUID accountId, String photoKey);
     void reorderPhotos(UUID accountId, Map<String, Integer> photoOrders);

@@ -5,18 +5,12 @@ import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.match.UnmatchAuditDAO;
-import com.beeswork.balanceaccountservice.dao.report.ReportDAO;
-import com.beeswork.balanceaccountservice.dao.report.ReportReasonDAO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.UnmatchAudit;
-import com.beeswork.balanceaccountservice.entity.report.Report;
-import com.beeswork.balanceaccountservice.entity.report.ReportReason;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
-import com.beeswork.balanceaccountservice.exception.report.ReportReasonNotFoundException;
-import com.beeswork.balanceaccountservice.exception.report.ReportedNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import com.beeswork.balanceaccountservice.service.report.ReportService;
@@ -88,8 +82,8 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
         Date now = new Date();
         unmatch(swiperId, swipedId, now);
         if (!unmatchAuditDAO.existsBy(swiperId, swipedId)) {
-            Account swiper = accountDAO.findById(swiperId);
-            Account swiped = accountDAO.findById(swipedId);
+            Account swiper = accountDAO.findById(swiperId, false);
+            Account swiped = accountDAO.findById(swipedId, false);
             if (swiped == null) {
                 throw new SwipedNotFoundException();
             }

@@ -10,7 +10,5 @@ import java.util.UUID;
 public interface SettingService {
 
     PushSettingDTO getPushSetting(UUID accountId);
-
-    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
     void savePushSettings(UUID accountId, Boolean matchPush, Boolean swipePush, Boolean chatMessagePush);
 }

@@ -26,7 +26,7 @@ public class UserDetailServiceImpl implements UserDetailService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public UserDetails loadValidUserByUsername(UUID userName) {
         if (userName == null) throw new AccountNotFoundException();
-        Account account = accountDAO.findById(userName);
+        Account account = accountDAO.findById(userName, false);
         if (account == null) throw new AccountNotFoundException();
         account.validate();
         return account;

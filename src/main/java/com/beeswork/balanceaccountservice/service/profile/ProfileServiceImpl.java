@@ -99,7 +99,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         if (profileDAO.existsById(accountId)) {
             throw new BadRequestException();
         }
-        Account account = accountDAO.findById(accountId);
+        Account account = accountDAO.findById(accountId, true);
         account.setName(name);
 
         int birthYear = DateUtil.getYearFrom(birth);

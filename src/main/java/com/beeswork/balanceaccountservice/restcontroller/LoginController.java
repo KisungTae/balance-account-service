@@ -16,7 +16,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,14 +24,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
-import java.util.Locale;
 
 @RestController
 public class LoginController extends BaseController {
 
     private final LoginService         loginService;
-    private final PushTokenService     pushTokenService;
     private final GoogleLoginService   googleLoginService;
     private final KakaoLoginService    kakaoLoginService;
     private final NaverLoginService    naverLoginService;
@@ -42,14 +38,12 @@ public class LoginController extends BaseController {
     public LoginController(ObjectMapper objectMapper,
                            ModelMapper modelMapper,
                            LoginService loginService,
-                           PushTokenService pushTokenService,
                            GoogleLoginService googleLoginService,
                            KakaoLoginService kakaoLoginService,
                            NaverLoginService naverLoginService,
                            FacebookLoginService facebookLoginService) {
         super(objectMapper, modelMapper);
         this.loginService = loginService;
-        this.pushTokenService = pushTokenService;
         this.googleLoginService = googleLoginService;
         this.kakaoLoginService = kakaoLoginService;
         this.naverLoginService = naverLoginService;
@@ -83,18 +77,14 @@ public class LoginController extends BaseController {
 
         LoginDTO loginDTO = loginService.socialLogin(verifySocialLoginDTO.getSocialLoginId(),
                                                      verifySocialLoginDTO.getEmail(),
-                                                     socialLoginVM.getLoginType());
-
-        pushTokenService.savePushToken(loginDTO.getAccountId(),
-                                       socialLoginVM.getPushToken(),
-                                       socialLoginVM.getPushTokenType());
-
+                                                     socialLoginVM.getLoginType(),
+                                                     socialLoginVM.getPushToken(),
+                                                     socialLoginVM.getPushTokenType());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginVM loginVM,
-                                        BindingResult bindingResult)
+    public ResponseEntity<String> login(@Valid @RequestBody LoginVM loginVM, BindingResult bindingResult)
     throws GeneralSecurityException, IOException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         return ResponseEntity.status(HttpStatus.OK).body("");
@@ -102,15 +92,13 @@ public class LoginController extends BaseController {
 
     @PostMapping("/login/refresh-token")
     public ResponseEntity<String> loginWithRefreshToken(@RequestBody LoginWithRefreshTokenVM loginWithRefreshTokenVM,
-                                                        BindingResult bindingResult) throws JsonProcessingException {
+                                                        BindingResult bindingResult)
+    throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         LoginDTO loginDTO = loginService.loginWithRefreshToken(loginWithRefreshTokenVM.getAccessToken(),
-                                                               loginWithRefreshTokenVM.getRefreshToken());
-
-        pushTokenService.savePushToken(loginDTO.getAccountId(),
-                                       loginWithRefreshTokenVM.getPushToken(),
-                                       loginWithRefreshTokenVM.getPushTokenType());
-
+                                                               loginWithRefreshTokenVM.getRefreshToken(),
+                                                               loginWithRefreshTokenVM.getPushToken(),
+                                                               loginWithRefreshTokenVM.getPushTokenType());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(loginDTO));
     }
 

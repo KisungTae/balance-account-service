@@ -78,8 +78,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     @Override
     public List<QuestionDTO> like(UUID swiperId, UUID swipedId, Locale locale) {
         LikeTransactionResult result = transactionTemplate.execute(status -> {
-            Account swiper = accountDAO.findById(swiperId);
-            Account swiped = accountDAO.findById(swipedId);
+            Account swiper = accountDAO.findById(swiperId, false);
+            Account swiped = accountDAO.findById(swipedId, false);
             validateSwiped(swiped);
             Wallet wallet = walletDAO.findByAccountId(swiper.getId(), true);
             SwipeMeta swipeMeta = swipeMetaDAO.findFirst();

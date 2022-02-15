@@ -38,7 +38,7 @@ public class PushTokenServiceImpl extends BaseServiceImpl implements PushTokenSe
         PushToken pushToken = pushTokenDAO.findById(new PushTokenId(accountId, type));
         Date now = new Date();
         if (pushToken == null) {
-            Account account = accountDAO.findById(accountId);
+            Account account = accountDAO.findById(accountId, false);
             pushToken = new PushToken(account, type, token, now);
             pushTokenDAO.persist(pushToken);
         } else {
