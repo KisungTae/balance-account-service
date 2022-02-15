@@ -35,29 +35,4 @@ public class ReportController extends BaseController {
         this.reportService = reportService;
     }
 
-    @PostMapping("/profile")
-    public ResponseEntity<String> reportProfile(@Valid @RequestBody ReportVM reportVM,
-                                                BindingResult bindingResult,
-                                                Principal principal) throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        reportService.reportProfile(getAccountIdFrom(principal),
-                                    reportVM.getReportedId(),
-                                    reportVM.getReportReasonId(),
-                                    reportVM.getDescription());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
-    }
-
-    @PostMapping("/match")
-    public ResponseEntity<String> reportMatch(@Valid @RequestBody ReportVM reportVM,
-                                              BindingResult bindingResult,
-                                              Principal principal) throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        reportService.reportMatch(getAccountIdFrom(principal),
-                                  reportVM.getReportedId(),
-                                  reportVM.getReportReasonId(),
-                                  reportVM.getDescription());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
-    }
-
-
 }

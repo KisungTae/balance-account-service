@@ -7,6 +7,7 @@ import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.match.MatchService;
 import com.beeswork.balanceaccountservice.vm.match.ListMatchesVM;
 import com.beeswork.balanceaccountservice.vm.match.UnmatchVM;
+import com.beeswork.balanceaccountservice.vm.report.ReportVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
@@ -50,6 +51,15 @@ public class MatchController extends BaseController {
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         matchService.unmatch(getAccountIdFrom(principal), unmatchVM.getSwipedId());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+    }
+
+    @PostMapping("/report")
+    public ResponseEntity<String> reportMatch(@Valid @RequestBody ReportVM reportVM,
+                                              BindingResult bindingResult,
+                                              Principal principal) throws JsonProcessingException {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        matchService.reportMatch(getAccountIdFrom(principal), reportVM.getReportedId(), reportVM.getReportReasonId(), reportVM.getDescription());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 

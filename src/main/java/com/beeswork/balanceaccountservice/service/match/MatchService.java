@@ -11,5 +11,6 @@ import java.util.UUID;
 public interface MatchService {
     ListMatchesDTO listMatches(UUID accountId, Date fetchedAt);
     void unmatch(UUID swiperId, UUID swipedId);
+    void reportMatch(UUID reporterId, UUID reportedId, int reportReasonId, String description);
 
 }

@@ -5,12 +5,21 @@ import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.match.UnmatchAuditDAO;
+import com.beeswork.balanceaccountservice.dao.report.ReportDAO;
+import com.beeswork.balanceaccountservice.dao.report.ReportReasonDAO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
+import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.UnmatchAudit;
+import com.beeswork.balanceaccountservice.entity.report.Report;
+import com.beeswork.balanceaccountservice.entity.report.ReportReason;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
+import com.beeswork.balanceaccountservice.exception.report.ReportReasonNotFoundException;
+import com.beeswork.balanceaccountservice.exception.report.ReportedNotFoundException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
+import com.beeswork.balanceaccountservice.service.report.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -28,19 +37,22 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     private final MatchDAO           matchDAO;
     private final ChatMessageDAO     chatMessageDAO;
     private final SentChatMessageDAO sentChatMessageDAO;
-    private final UnmatchAuditDAO unmatchAuditDAO;
+    private final UnmatchAuditDAO    unmatchAuditDAO;
+    private final ReportService reportService;
 
     @Autowired
     public MatchServiceImpl(AccountDAO accountDAO,
                             MatchDAO matchDAO,
                             ChatMessageDAO chatMessageDAO,
                             SentChatMessageDAO sentChatMessageDAO,
-                            UnmatchAuditDAO unmatchAuditDAO) {
+                            UnmatchAuditDAO unmatchAuditDAO,
+                            ReportService reportService) {
         this.accountDAO = accountDAO;
         this.matchDAO = matchDAO;
         this.chatMessageDAO = chatMessageDAO;
         this.sentChatMessageDAO = sentChatMessageDAO;
         this.unmatchAuditDAO = unmatchAuditDAO;
+        this.reportService = reportService;
     }
 
 
@@ -72,12 +84,32 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Override
     @Transactional
-    @SuppressWarnings("Duplicates")
     public void unmatch(UUID swiperId, UUID swipedId) {
+        Date now = new Date();
+        unmatch(swiperId, swipedId, now);
+        if (!unmatchAuditDAO.existsBy(swiperId, swipedId)) {
+            Account swiper = accountDAO.findById(swiperId);
+            Account swiped = accountDAO.findById(swipedId);
+            if (swiped == null) {
+                throw new SwipedNotFoundException();
+            }
+            UnmatchAudit unmatchAudit = new UnmatchAudit(swiper, swiped, now);
+            unmatchAuditDAO.persist(unmatchAudit);
+        }
+    }
 
+    @Override
+    @Transactional
+    public void reportMatch(UUID reporterId, UUID reportedId, int reportReasonId, String description) {
+        Date now = new Date();
+        unmatch(reporterId, reportedId, now);
+        reportService.createReport(reporterId, reportedId, reportReasonId, description, now);
+    }
+
+    @SuppressWarnings("Duplicates")
+    private void unmatch(UUID swiperId, UUID swipedId, Date now) {
         // NOTE 1. Even if you fetch an entity with writeLock,
         //         you can still write on the entity if you fetch it without writeLock on another thread
-
         Match swiperMatch, swipedMatch;
         if (swiperId.compareTo(swipedId) > 0) {
             swiperMatch = matchDAO.findBy(swiperId, swipedId, true);
@@ -91,7 +123,6 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
             throw new MatchNotFoundException();
         }
 
-        Date now = new Date();
         if (swiperMatch.isUnmatched() && swipedMatch.isUnmatched()) {
             if (!swiperMatch.isDeleted()) {
                 swiperMatch.setDeleted(true);
@@ -103,11 +134,6 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
             swiperMatch.setUpdatedAt(now);
             swipedMatch.setUnmatched(true);
             swipedMatch.setUpdatedAt(now);
-        }
-
-        if (!unmatchAuditDAO.existsBy(swiperId, swipedId)) {
-            UnmatchAudit unmatchAudit = new UnmatchAudit(swiperMatch.getSwiper(), swiperMatch.getSwiped(), now);
-            unmatchAuditDAO.persist(unmatchAudit);
         }
     }
 }

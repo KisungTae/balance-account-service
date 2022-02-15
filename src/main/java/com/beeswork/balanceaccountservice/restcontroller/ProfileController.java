@@ -6,8 +6,10 @@ import com.beeswork.balanceaccountservice.dto.profile.RecommendDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.profile.ProfileService;
+import com.beeswork.balanceaccountservice.service.report.ReportService;
 import com.beeswork.balanceaccountservice.vm.account.*;
 import com.beeswork.balanceaccountservice.vm.profile.*;
+import com.beeswork.balanceaccountservice.vm.report.ReportVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
@@ -24,12 +26,15 @@ import java.security.Principal;
 public class ProfileController extends BaseController {
 
     private final ProfileService profileService;
+    private final ReportService  reportService;
 
     public ProfileController(ObjectMapper objectMapper,
                              ModelMapper modelMapper,
-                             ProfileService profileService) {
+                             ProfileService profileService,
+                             ReportService reportService) {
         super(objectMapper, modelMapper);
         this.profileService = profileService;
+        this.reportService = reportService;
     }
 
     @GetMapping
@@ -114,5 +119,17 @@ public class ProfileController extends BaseController {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         String email = profileService.getEmail(getAccountIdFrom(principal));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(email));
+    }
+
+    @PostMapping("/report")
+    public ResponseEntity<String> reportProfile(@Valid @RequestBody ReportVM reportVM,
+                                                BindingResult bindingResult,
+                                                Principal principal) throws JsonProcessingException {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        reportService.createReport(getAccountIdFrom(principal),
+                                   reportVM.getReportedId(),
+                                   reportVM.getReportReasonId(),
+                                   reportVM.getDescription());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 }

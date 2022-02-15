@@ -1,9 +1,9 @@
 package com.beeswork.balanceaccountservice.service.report;
 
+import java.util.Date;
 import java.util.UUID;
 
 public interface ReportService {
-
-    void reportProfile(UUID accountId, UUID reportedId, int reportReasonId, String description);
-    void reportMatch(UUID accountId, UUID reportedId, int reportReasonId, String description);
+    void createReport(UUID reporterId, UUID reportedId, int reportReasonId, String description);
+    void createReport(UUID reporterId, UUID reportedId, int reportReasonId, String description, Date createdAt);
 }

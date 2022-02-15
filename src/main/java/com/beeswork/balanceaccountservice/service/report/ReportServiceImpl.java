@@ -8,6 +8,7 @@ import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.report.Report;
 import com.beeswork.balanceaccountservice.entity.report.ReportReason;
+import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.exception.report.ReportReasonNotFoundException;
 import com.beeswork.balanceaccountservice.exception.report.ReportedNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
@@ -24,52 +25,35 @@ public class ReportServiceImpl extends BaseServiceImpl implements ReportService 
     private final ReportDAO       reportDAO;
     private final ReportReasonDAO reportReasonDAO;
     private final AccountDAO      accountDAO;
-    private final MatchDAO        matchDAO;
 
     @Autowired
     public ReportServiceImpl(ReportDAO reportDAO,
                              ReportReasonDAO reportReasonDAO,
-                             AccountDAO accountDAO,
-                             MatchDAO matchDAO) {
+                             AccountDAO accountDAO) {
         this.reportDAO = reportDAO;
         this.reportReasonDAO = reportReasonDAO;
         this.accountDAO = accountDAO;
-        this.matchDAO = matchDAO;
-    }
-
-
-    @Override
-    @Transactional
-    public void reportProfile(UUID accountId, UUID reportedId, int reportReasonId, String description) {
-        createReport(accountId, reportedId, reportReasonId, description);
     }
 
     @Override
     @Transactional
-    public void reportMatch(UUID accountId, UUID reportedId, int reportReasonId, String description) {
-        createReport(accountId, reportedId, reportReasonId, description);
-        Match reporterMatch = matchDAO.findBy(accountId, reportedId, false);
-        Match reportedMatch = matchDAO.findBy(reportedId, accountId, false);
-
-        reporterMatch.setActive(true);
-        reportedMatch.setActive(true);
-
-//        if (reporterMatch == null || reportedMatch == null) throw new MatchNotFoundException();
-//
-//        Date updatedAt = new Date();
-//        reporterMatch.setupAsUnmatcher(updatedAt);
-//        reportedMatch.setupAsUnmatched(updatedAt);
+    public void createReport(UUID reporterId, UUID reportedId, int reportReasonId, String description) {
+        createReport(reporterId, reportedId, reportReasonId, description, new Date());
     }
 
-    private void createReport(UUID accountId, UUID reportedId, int reportReasonId, String description) {
+    @Override
+    @Transactional
+    public void createReport(UUID reporterId, UUID reportedId, int reportReasonId, String description, Date createdAt) {
         ReportReason reportReason = reportReasonDAO.findById(reportReasonId);
-        if (reportReason == null) throw new ReportReasonNotFoundException();
-
-        Account reporter = accountDAO.findById(accountId);
+        if (reportReason == null) {
+            throw new ReportReasonNotFoundException();
+        }
+        Account reporter = accountDAO.findById(reporterId);
         Account reported = accountDAO.findById(reportedId);
-        if (reported == null) throw new ReportedNotFoundException();
-
-        Report report = new Report(reporter, reported, reportReason, description, new Date());
+        if (reported == null) {
+            throw new ReportedNotFoundException();
+        }
+        Report report = new Report(reporter, reported, reportReason, description, createdAt);
         reportDAO.persist(report);
     }
 }
