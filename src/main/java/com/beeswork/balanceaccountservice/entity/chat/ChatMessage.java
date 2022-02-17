@@ -22,24 +22,19 @@ public class ChatMessage {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Type(type = "pg-uuid")
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id")
     private Chat chat;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipient_id")
-    private Account recipient;
+    @JoinColumn(name = "sender_id")
+    private Account sender;
 
     @Column(name = "body")
     private String body;
-
-    @Column(name = "received")
-    private boolean received;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -49,14 +44,11 @@ public class ChatMessage {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    @Column(name = "recipient_id", insertable = false, updatable = false)
-    private UUID recipientId;
-
-    public ChatMessage(Chat chat, Account recipient, String body, Date createdAt) {
+    public ChatMessage(long id, Chat chat, Account sender, String body, Date createdAt) {
+        this.id = id;
         this.chat = chat;
-        this.recipient = recipient;
+        this.sender = sender;
         this.body = body;
         this.createdAt = createdAt;
-        this.updatedAt = createdAt;
     }
 }

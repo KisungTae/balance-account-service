@@ -13,5 +13,6 @@ import lombok.Setter;
 public class ClickTransactionResult {
     private ClickResult clickResult;
     private Swipe swipe;
-    private Match match;
+    private Match subMatch;
+    private Match objMatch;
 }

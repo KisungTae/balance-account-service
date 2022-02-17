@@ -48,13 +48,18 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
         condition.and(qMatch.swiper.id.eq(swipedId));
         condition.and(qMatch.updatedAt.after(matchFetchedAt).or(qAccount.updatedAt.after(matchFetchedAt)));
         condition.and(qMatch.deleted.eq(false));
-        return jpaQueryFactory.select(new QMatchDTO(qMatch.chat.id,
+        return jpaQueryFactory.select(new QMatchDTO(qMatch.id,
+                                                    qMatch.chat.id,
+                                                    qMatch.swiper.id,
                                                     qMatch.swiped.id,
                                                     qMatch.unmatched,
+                                                    qMatch.deleted,
+                                                    qMatch.lastReadChatMessageId,
+                                                    qMatch.lastChatMessageId,
+                                                    qMatch.lastChatMessageBody,
                                                     qAccount.name,
                                                     qAccount.profilePhotoKey,
-                                                    qAccount.deleted,
-                                                    qMatch.active))
+                                                    qAccount.deleted))
                               .from(qMatch)
                               .leftJoin(qAccount).on(qAccount.id.eq(qMatch.swiped.id))
                               .where(condition)

@@ -28,6 +28,7 @@ import com.beeswork.balanceaccountservice.exception.swipe.*;
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -178,9 +180,18 @@ public class ExceptionControllerAdvice {
 //                             .contentType(MediaType.APPLICATION_JSON)
 //                             .body(messageSource.getMessage(QUERY_EXCEPTION, null, locale));
 //    }
-//
+
+//    InvalidFormatException
+
+    @ExceptionHandler({HttpMessageNotReadableException.class})
+    public ResponseEntity<String> handleInvalidFormatException(HttpMessageNotReadableException exception, Locale locale) throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(exceptionResponse(BadRequestException.CODE, null, locale));
+    }
+
     @ExceptionHandler({Exception.class})
-    public ResponseEntity<String> handleException(Locale locale) throws JsonProcessingException {
+    public ResponseEntity<String> handleException(Exception exception, Locale locale) throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(exceptionResponse(INTERNAL_SERVER_EXCEPTION, null, locale));

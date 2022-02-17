@@ -3,6 +3,7 @@ package com.beeswork.balanceaccountservice.entity.match;
 
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
+import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,19 +18,19 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "match")
-//@Cacheable
-//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Match {
 
-    @EmbeddedId
-    private MatchId matchId;
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("swiperId")
+    @JoinColumn(name = "swiper_id")
     private Account swiper;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("swipedId")
+    @JoinColumn(name = "swiped_id")
     private Account swiped;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,11 +40,24 @@ public class Match {
     @Column(name = "unmatched")
     private boolean unmatched;
 
-    @Column(name = "active")
-    private boolean active;
-
     @Column(name = "deleted")
     private boolean deleted;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "last_read_chat_message_id")
+    private ChatMessage lastReadChatMessage;
+
+    @Column(name = "last_read_chat_message_id", insertable = false, updatable = false)
+    private long lastReadChatMessageId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "last_chat_message_id")
+    private ChatMessage lastChatMessage;
+
+    @Column(name = "last_chat_message_id", insertable = false, updatable = false)
+    private long lastChatMessageId;
+
+    private String lastChatMessageBody;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -54,7 +68,6 @@ public class Match {
     private Date updatedAt;
 
     public Match(Account swiper, Account swiped, Chat chat, Date createdAt) {
-        this.matchId = new MatchId(swiper.getId(), swiped.getId());
         this.chat = chat;
         this.swiper = swiper;
         this.swiped = swiped;
@@ -63,14 +76,14 @@ public class Match {
     }
 
     public UUID getSwiperId() {
-        return this.matchId.getSwiperId();
+        return this.swiper.getId();
     }
 
     public UUID getSwipedId() {
-        return this.matchId.getSwipedId();
+        return this.swiped.getId();
     }
 
-    public long getChatId() {
+    public UUID getChatId() {
         return this.chat.getId();
     }
 
@@ -84,13 +97,5 @@ public class Match {
 
     public boolean isSwipedDeleted() {
         return this.swiped.isDeleted();
-    }
-
-    public void swap() {
-        Account tempSwiper = this.swiper;
-        this.swiper = this.swiped;
-        this.swiped = tempSwiper;
-        this.matchId.setSwiperId(this.swiper.getId());
-        this.matchId.setSwipedId(this.swiped.getId());
     }
 }

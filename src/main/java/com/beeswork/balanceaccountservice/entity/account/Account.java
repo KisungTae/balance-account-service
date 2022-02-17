@@ -66,12 +66,6 @@ public class Account implements UserDetails {
                orphanRemoval = true)
     private List<AccountQuestion> accountQuestions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "swiper",
-               fetch = FetchType.LAZY,
-               cascade = CascadeType.ALL,
-               orphanRemoval = true)
-    private List<Match> matches = new ArrayList<>();
-
     @OneToMany(mappedBy = "account",
                fetch = FetchType.LAZY,
                cascade = CascadeType.ALL,

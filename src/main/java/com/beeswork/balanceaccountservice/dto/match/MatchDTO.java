@@ -3,12 +3,17 @@ package com.beeswork.balanceaccountservice.dto.match;
 
 import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.dto.common.Pushable;
+import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.util.UUID;
 
 @Getter
@@ -20,33 +25,46 @@ public class MatchDTO implements Pushable {
     private static final String PUSH_TITLE_MATCH = "push.title.match";
 
     @JsonIgnore
-    private static final String PUSH_BODY_MATCH  = "push.body.match";
+    private static final String PUSH_BODY_MATCH = "push.body.match";
 
-    private Long    chatId;
+    private long    id;
+    private UUID    chatId;
     private UUID    swiperId;
     private UUID    swipedId;
-    private Boolean active;
     private Boolean unmatched;
     private Boolean deleted;
+    private long    lastReadChatMessageId;
+    private long    lastChatMessageId;
+    private String  lastChatMessageBody;
     private String  swipedName;
     private String  swipedProfilePhotoKey;
     private Boolean swipedDeleted;
 
     @QueryProjection
-    public MatchDTO(Long chatId,
+    public MatchDTO(long id,
+                    UUID chatId,
+                    UUID swiperId,
                     UUID swipedId,
-                    boolean unmatched,
+                    Boolean unmatched,
+                    Boolean deleted,
+                    long lastReadChatMessageId,
+                    long lastChatMessageId,
+                    String lastChatMessageBody,
                     String swipedName,
                     String swipedProfilePhotoKey,
-                    boolean deleted,
-                    boolean active) {
+                    Boolean swipedDeleted) {
+        this.id = id;
         this.chatId = chatId;
+        this.swiperId = swiperId;
         this.swipedId = swipedId;
         this.unmatched = unmatched;
+        this.deleted = deleted;
+        this.lastReadChatMessageId = lastReadChatMessageId;
+        this.lastChatMessageId = lastChatMessageId;
+        this.lastChatMessageBody = lastChatMessageBody;
         this.swipedName = swipedName;
         this.swipedProfilePhotoKey = swipedProfilePhotoKey;
-        this.deleted = deleted;
-        this.active = active;
+        this.swipedDeleted = swipedDeleted;
     }
 
     @Override

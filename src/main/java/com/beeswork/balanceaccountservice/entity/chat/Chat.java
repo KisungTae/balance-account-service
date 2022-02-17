@@ -5,11 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 
 @Getter
@@ -23,13 +26,12 @@ public class Chat {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Type(type = "pg-uuid")
+    private UUID id;
 
-    @OneToMany(mappedBy = "chat",
-               fetch = FetchType.LAZY,
-               cascade = CascadeType.ALL,
-               orphanRemoval = true)
-    private List<ChatMessage> chatMessages = new ArrayList<>();
-
+    public Chat(UUID id) {
+        this.id = id;
+    }
 }

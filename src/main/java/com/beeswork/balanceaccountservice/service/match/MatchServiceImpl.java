@@ -2,7 +2,6 @@ package com.beeswork.balanceaccountservice.service.match;
 
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
-import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.match.UnmatchAuditDAO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
@@ -29,22 +28,16 @@ import java.util.UUID;
 public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     private final AccountDAO         accountDAO;
     private final MatchDAO           matchDAO;
-    private final ChatMessageDAO     chatMessageDAO;
-    private final SentChatMessageDAO sentChatMessageDAO;
     private final UnmatchAuditDAO    unmatchAuditDAO;
     private final ReportService reportService;
 
     @Autowired
     public MatchServiceImpl(AccountDAO accountDAO,
                             MatchDAO matchDAO,
-                            ChatMessageDAO chatMessageDAO,
-                            SentChatMessageDAO sentChatMessageDAO,
                             UnmatchAuditDAO unmatchAuditDAO,
                             ReportService reportService) {
         this.accountDAO = accountDAO;
         this.matchDAO = matchDAO;
-        this.chatMessageDAO = chatMessageDAO;
-        this.sentChatMessageDAO = sentChatMessageDAO;
         this.unmatchAuditDAO = unmatchAuditDAO;
         this.reportService = reportService;
     }
@@ -61,7 +54,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
                 if (matchDTO.getUnmatched() || matchDTO.getDeleted()) {
                     matchDTO.setSwipedProfilePhotoKey(null);
 //                    matchDTO.setCreatedAt(null);
-                    matchDTO.setActive(true);
+//                    matchDTO.setActive(true);
                     matchDTO.setUnmatched(true);
                 }
 //                if (matchDTO.getUpdatedAt().after(listMatchesDTO.getFetchedAt())) {
@@ -102,8 +95,8 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @SuppressWarnings("Duplicates")
     private void unmatch(UUID swiperId, UUID swipedId, Date now) {
-        // NOTE 1. Even if you fetch an entity with writeLock,
-        //         you can still write on the entity if you fetch it without writeLock on another thread
+        // NOTE 1. if you fetch an entity with writeLock and fetch the same entity without write lock,
+        //         you still need to wait for the write lock to be released when you try to write on the second entity
         Match swiperMatch, swipedMatch;
         if (swiperId.compareTo(swipedId) > 0) {
             swiperMatch = matchDAO.findBy(swiperId, swipedId, true);

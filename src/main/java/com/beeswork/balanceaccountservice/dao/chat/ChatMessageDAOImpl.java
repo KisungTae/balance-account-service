@@ -23,18 +23,21 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
 
     @Override
     public List<ChatMessageDTO> findAllUnreceived(UUID accountId) {
-        return jpaQueryFactory.select(new QChatMessageDTO(qChatMessage.id,
-                                                          qChatMessage.body,
-                                                          qChatMessage.chat.id,
-                                                          qChatMessage.createdAt))
-                              .from(qChatMessage)
-                              .where(qChatMessage.recipient.id.eq(accountId).and(qChatMessage.received.eq(false)))
-                              .fetch();
+//        return jpaQueryFactory.select(new QChatMessageDTO(qChatMessage.id,
+//                                                          qChatMessage.body,
+//                                                          qChatMessage.chat.id,
+//                                                          qChatMessage.createdAt))
+//                              .from(qChatMessage)
+//                              .where(qChatMessage.recipient.id.eq(accountId).and(qChatMessage.received.eq(false)))
+//                              .fetch();
+
+        return null;
     }
 
     @Override
     public List<ChatMessage> findAllIn(List<UUID> chatMessageIds) {
-        return jpaQueryFactory.selectFrom(qChatMessage).where(qChatMessage.id.in(chatMessageIds)).fetch();
+//        return jpaQueryFactory.selectFrom(qChatMessage).where(qChatMessage.id.in(chatMessageIds)).fetch();
+        return null;
     }
 
     @Override

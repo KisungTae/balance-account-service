@@ -4,6 +4,7 @@ import com.beeswork.balanceaccountservice.constant.ClickResult;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
+import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeMetaDAO;
@@ -42,6 +43,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     private final AccountDAO                 accountDAO;
     private final SwipeDAO                   swipeDAO;
+    private final MatchDAO                   matchDAO;
     private final ChatDAO                    chatDAO;
     private final AccountQuestionDAO         accountQuestionDAO;
     private final ProfileDAO                 profileDAO;
@@ -56,15 +58,18 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     public SwipeServiceImpl(ModelMapper modelMapper,
                             AccountDAO accountDAO,
                             SwipeDAO swipeDAO,
+                            MatchDAO matchDAO,
                             ChatDAO chatDAO,
                             AccountQuestionDAO accountQuestionDAO,
-                            ProfileDAO profileDAO, SwipeMetaDAO swipeMetaDAO,
+                            ProfileDAO profileDAO,
+                            SwipeMetaDAO swipeMetaDAO,
                             WalletDAO walletDAO,
                             StompService stompService,
                             PlatformTransactionManager transactionManager) {
         this.modelMapper = modelMapper;
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
+        this.matchDAO = matchDAO;
         this.chatDAO = chatDAO;
         this.accountQuestionDAO = accountQuestionDAO;
         this.profileDAO = profileDAO;
@@ -113,7 +118,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         SwipeDTO swipeDTO = modelMapper.map(result.getSwipe(), SwipeDTO.class);
         stompService.push(swipeDTO, locale);
-        return modelMapper.map(result.getQuestions(), new TypeToken<List<QuestionDTO>>() {}.getType());
+        return modelMapper.map(result.getQuestions(), new TypeToken<List<QuestionDTO>>() {
+        }.getType());
     }
 
     @Override
@@ -181,7 +187,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             }
 
             if (accountQuestionDAO.countAllByAnswers(swipedId, answers) != answers.size()) {
-                return new ClickTransactionResult(ClickResult.MISSED, null, null);
+                return new ClickTransactionResult(ClickResult.MISSED, null, null, null);
             }
 
             Date now = new Date();
@@ -189,21 +195,21 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             subSwipe.setUpdatedAt(now);
 
             if (objSwipe == null || !objSwipe.isClicked()) {
-                return new ClickTransactionResult(ClickResult.CLICKED, subSwipe, null);
+                return new ClickTransactionResult(ClickResult.CLICKED, subSwipe, null, null);
             } else {
-                Chat chat = new Chat();
+                Chat chat = new Chat(UUID.randomUUID());
                 chatDAO.persist(chat);
 
                 Match subMatch = new Match(swiper, swiped, chat, now);
                 Match objMatch = new Match(swiped, swiper, chat, now);
-                swiper.getMatches().add(subMatch);
-                swiped.getMatches().add(objMatch);
+                matchDAO.persist(subMatch);
+                matchDAO.persist(objMatch);
 
                 subSwipe.setMatched(true);
                 objSwipe.setMatched(true);
                 objSwipe.setUpdatedAt(now);
 
-                return new ClickTransactionResult(ClickResult.MATCHED, null, subMatch);
+                return new ClickTransactionResult(ClickResult.MATCHED, null, subMatch, objMatch);
             }
         });
 
@@ -221,12 +227,10 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             stompService.push(pushable, locale);
             return clickDTO;
         } else {
-            Match match = result.getMatch();
-            MatchDTO matchDTO = modelMapper.map(match, MatchDTO.class);
+            MatchDTO matchDTO = modelMapper.map(result.getSubMatch(), MatchDTO.class);
             clickDTO.setMatchDTO(matchDTO);
 
-            match.swap();
-            Pushable pushable = modelMapper.map(match, MatchDTO.class);
+            Pushable pushable = modelMapper.map(result.getObjMatch(), MatchDTO.class);
             stompService.push(pushable, locale);
             return clickDTO;
         }

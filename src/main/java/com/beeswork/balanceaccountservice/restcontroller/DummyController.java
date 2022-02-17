@@ -3,7 +3,6 @@ package com.beeswork.balanceaccountservice.restcontroller;
 import com.beeswork.balanceaccountservice.config.security.JWTTokenProvider;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
-import com.beeswork.balanceaccountservice.dao.chat.SentChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
@@ -53,7 +52,6 @@ public class DummyController {
     private final FCMService         fcmService;
     private final AccountDAO         accountDAO;
     private final ChatDAO            chatDAO;
-    private final SentChatMessageDAO sentChatMessageDAO;
     private final WalletDAO          walletDAO;
     private final PushSettingDAO     pushSettingDAO;
     private final GeometryFactory    geometryFactory;
@@ -67,7 +65,6 @@ public class DummyController {
                            FCMService FCMService,
                            AccountDAO accountDAO,
                            ChatDAO chatDAO,
-                           SentChatMessageDAO sentChatMessageDAO,
                            WalletDAO walletDAO,
                            PushSettingDAO pushSettingDAO,
                            GeometryFactory geometryFactory,
@@ -78,7 +75,6 @@ public class DummyController {
         this.fcmService = FCMService;
         this.accountDAO = accountDAO;
         this.chatDAO = chatDAO;
-        this.sentChatMessageDAO = sentChatMessageDAO;
         this.walletDAO = walletDAO;
         this.pushSettingDAO = pushSettingDAO;
         this.geometryFactory = geometryFactory;
@@ -146,12 +142,12 @@ public class DummyController {
 
         for (int i = 0; i < 10; i++) {
             date = DateUtils.addSeconds(date, 30);
-            for (Match match : account.getMatches()) {
-                if (random.nextBoolean()) {
-                    innerCount++;
-                    boolean who = random.nextBoolean();
-                    Account sender = who ? match.getSwiper() : match.getSwiped();
-                    Account receiver = who ? match.getSwiped() : match.getSwiper();
+//            for (Match match : account.getMatches()) {
+//                if (random.nextBoolean()) {
+//                    innerCount++;
+//                    boolean who = random.nextBoolean();
+//                    Account sender = who ? match.getSwiper() : match.getSwiped();
+//                    Account receiver = who ? match.getSwiped() : match.getSwiper();
 //                    ChatMessage chatMessage = new ChatMessage(match.getChat(),
 //                                                              receiver,
 //                                                              "message-" + random.nextFloat(),
@@ -162,8 +158,8 @@ public class DummyController {
 //                        SentChatMessage sentChatMessage = new SentChatMessage(chatMessage, sender, innerCount, date);
 //                        sentChatMessageDAO.persist(sentChatMessage);
 //                    }
-                }
-            }
+//                }
+//            }
         }
 
 
