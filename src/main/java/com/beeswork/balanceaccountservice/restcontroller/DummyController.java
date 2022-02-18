@@ -8,6 +8,7 @@ import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.entity.account.*;
+import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
@@ -24,6 +25,7 @@ import com.beeswork.balanceaccountservice.service.stomp.StompService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.querydsl.jpa.JPQLQueryFactory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.commons.lang3.time.DateUtils;
 import org.locationtech.jts.geom.Coordinate;
@@ -58,6 +60,7 @@ public class DummyController {
     private final StompService       stompService;
     private final ChatService chatService;
     private final JWTTokenProvider jwtTokenProvider;
+    private final JPQLQueryFactory jpqlQueryFactory;
 
     @Autowired
     public DummyController(MatchDAO matchDAO,
@@ -69,7 +72,9 @@ public class DummyController {
                            PushSettingDAO pushSettingDAO,
                            GeometryFactory geometryFactory,
                            StompService stompService,
-                           ChatService chatService, JWTTokenProvider jwtTokenProvider) {
+                           ChatService chatService,
+                           JWTTokenProvider jwtTokenProvider,
+                           JPQLQueryFactory jpqlQueryFactory) {
         this.matchDAO = matchDAO;
         this.objectMapper = objectMapper;
         this.fcmService = FCMService;
@@ -81,6 +86,7 @@ public class DummyController {
         this.stompService = stompService;
         this.chatService = chatService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.jpqlQueryFactory = jpqlQueryFactory;
     }
 
 
@@ -632,7 +638,50 @@ public class DummyController {
 //    }
 
 
+    @Transactional
+    @GetMapping("/create/matches/for/account")
+    public void createDummyMatchesForAccount(@RequestParam("accountId") UUID accountId) {
+        Account swiper = accountDAO.findById(accountId, false);
+        List<Account> accounts = jpqlQueryFactory.selectFrom(QAccount.account).fetch();
 
+        Random random = new Random();
+        for (Account account : accounts) {
+            if (swiper == account) {
+                continue;
+            }
+            Chat chat = new Chat();
+            chatDAO.persist(chat);
+
+            Match subMatch = new Match(swiper, account, chat.getId(), new Date());
+            Match objMatch = new Match(account, swiper, chat.getId(), new Date());
+
+
+            if (random.nextInt(10) > 8) {
+                subMatch.setUnmatched(true);
+                objMatch.setUnmatched(true);
+
+                if (random.nextBoolean()) {
+                    subMatch.setDeleted(true);
+                }
+            }
+
+            if (random.nextInt(10) > 3) {
+                subMatch.setLastChatMessageId((long) (random.nextInt(50) + 1));
+                if (random.nextInt(10) > 7) {
+                    subMatch.setLastReadChatMessageId(subMatch.getLastChatMessageId());
+                } else {
+                    subMatch.setLastReadChatMessageId((long) (random.nextInt(50) + 1));
+                }
+            }
+
+
+
+            matchDAO.persist(subMatch);
+
+
+
+        }
+    }
 
 
 }

@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.service.match;
 
+import com.beeswork.balanceaccountservice.constant.MatchPageFilter;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
@@ -44,29 +45,36 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
 
     @Override
+    public List<MatchDTO> fetchMatches(UUID swiperId, UUID lastSwipedId, int loadSize, MatchPageFilter matchPageFilter) {
+
+        return null;
+    }
+
+    @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public ListMatchesDTO listMatches(UUID accountId, Date fetchedAt) {
-        ListMatchesDTO listMatchesDTO = new ListMatchesDTO(fetchedAt);
-        List<MatchDTO> matchDTOs = matchDAO.findAllAfter(accountId, offsetFetchedAt(fetchedAt));
-
-        if (matchDTOs != null) {
-            for (MatchDTO matchDTO : matchDTOs) {
-                if (matchDTO.getUnmatched() || matchDTO.getDeleted()) {
-                    matchDTO.setSwipedProfilePhotoKey(null);
+        return null;
+//        ListMatchesDTO listMatchesDTO = new ListMatchesDTO(fetchedAt);
+//        List<MatchDTO> matchDTOs = matchDAO.findAllAfter(accountId, offsetFetchedAt(fetchedAt));
+//
+//        if (matchDTOs != null) {
+//            for (MatchDTO matchDTO : matchDTOs) {
+//                if (matchDTO.getUnmatched() || matchDTO.getDeleted()) {
+//                    matchDTO.setSwipedProfilePhotoKey(null);
 //                    matchDTO.setCreatedAt(null);
 //                    matchDTO.setActive(true);
-                    matchDTO.setUnmatched(true);
-                }
+//                    matchDTO.setUnmatched(true);
+//                }
 //                if (matchDTO.getUpdatedAt().after(listMatchesDTO.getFetchedAt())) {
 //                    listMatchesDTO.setFetchedAt(matchDTO.getUpdatedAt());
 //                }
-
+//
 //                matchDTO.setUpdatedAt(null);
-                matchDTO.setDeleted(null);
-            }
-        }
-        listMatchesDTO.setMatchDTOs(matchDTOs);
-        return listMatchesDTO;
+//                matchDTO.setDeleted(null);
+//            }
+//        }
+//        listMatchesDTO.setMatchDTOs(matchDTOs);
+//        return listMatchesDTO;
     }
 
     @Override

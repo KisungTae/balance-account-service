@@ -1,10 +1,12 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.constant.MatchPageFilter;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.match.MatchService;
+import com.beeswork.balanceaccountservice.vm.match.FetchMatchesVM;
 import com.beeswork.balanceaccountservice.vm.match.ListMatchesVM;
 import com.beeswork.balanceaccountservice.vm.match.UnmatchVM;
 import com.beeswork.balanceaccountservice.vm.report.ReportVM;
@@ -32,6 +34,18 @@ public class MatchController extends BaseController {
     public MatchController(ObjectMapper objectMapper, ModelMapper modelMapper, MatchService matchService) {
         super(objectMapper, modelMapper);
         this.matchService = matchService;
+    }
+
+    @GetMapping("/fetch")
+    public ResponseEntity<String> fetchMatches(@Valid @ModelAttribute FetchMatchesVM fetchMatchesVM,
+                                               BindingResult bindingResult,
+                                               Principal principal) throws JsonProcessingException {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        List<MatchDTO> matchDTOs = matchService.fetchMatches(getAccountIdFrom(principal),
+                                                             fetchMatchesVM.getLastSwipedId(),
+                                                             fetchMatchesVM.getLoadSize(),
+                                                             fetchMatchesVM.getMatchPageFilter());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(matchDTOs));
     }
 
     @GetMapping("/list")

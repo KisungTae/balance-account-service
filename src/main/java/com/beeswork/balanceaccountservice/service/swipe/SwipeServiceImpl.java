@@ -125,7 +125,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<SwipeDTO> listSwipes(UUID accountId, int startPosition, int loadSize) {
-        List<SwipeDTO> swipes = swipeDAO.findSwipes(accountId, startPosition, loadSize);
+        List<SwipeDTO> swipes = swipeDAO.findAllBy(accountId, startPosition, loadSize);
         for (SwipeDTO swipeDTO : swipes) {
             if (swipeDTO.getSwiperDeleted()) {
                 swipeDTO.setSwipedId(null);
@@ -140,7 +140,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<SwipeDTO> fetchSwipes(UUID accountId, UUID lastSwiperId, int loadSize) {
-        return swipeDAO.findSwipes(accountId, lastSwiperId, loadSize);
+        return swipeDAO.findAllBy(accountId, lastSwiperId, loadSize);
     }
 
     @Override
@@ -197,11 +197,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             if (objSwipe == null || !objSwipe.isClicked()) {
                 return new ClickTransactionResult(ClickResult.CLICKED, subSwipe, null, null);
             } else {
-                Chat chat = new Chat(UUID.randomUUID());
+                Chat chat = new Chat();
                 chatDAO.persist(chat);
 
-                Match subMatch = new Match(swiper, swiped, chat, now);
-                Match objMatch = new Match(swiped, swiper, chat, now);
+                Match subMatch = new Match(swiper, swiped, chat.getId(), now);
+                Match objMatch = new Match(swiped, swiper, chat.getId(), now);
                 matchDAO.persist(subMatch);
                 matchDAO.persist(objMatch);
 

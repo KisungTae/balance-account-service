@@ -2,12 +2,9 @@ package com.beeswork.balanceaccountservice.entity.match;
 
 
 import com.beeswork.balanceaccountservice.entity.account.Account;
-import com.beeswork.balanceaccountservice.entity.chat.Chat;
-import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -33,9 +30,12 @@ public class Match {
     @JoinColumn(name = "swiped_id")
     private Account swiped;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_id")
-    private Chat chat;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "chat_id")
+//    private Chat chat;
+
+    @Column(name = "chat_id")
+    private UUID chatId;
 
     @Column(name = "unmatched")
     private boolean unmatched;
@@ -43,20 +43,21 @@ public class Match {
     @Column(name = "deleted")
     private boolean deleted;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "last_read_chat_message_id")
-    private ChatMessage lastReadChatMessage;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "last_read_chat_message_id")
+//    private ChatMessage lastReadChatMessage;
 
-    @Column(name = "last_read_chat_message_id", insertable = false, updatable = false)
-    private long lastReadChatMessageId;
+    @Column(name = "last_read_chat_message_id")
+    private Long lastReadChatMessageId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "last_chat_message_id")
-    private ChatMessage lastChatMessage;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "last_chat_message_id")
+//    private ChatMessage lastChatMessage;
 
-    @Column(name = "last_chat_message_id", insertable = false, updatable = false)
-    private long lastChatMessageId;
+    @Column(name = "last_chat_message_id")
+    private Long lastChatMessageId;
 
+    @Column(name = "last_chat_message_body")
     private String lastChatMessageBody;
 
     @Column(name = "created_at")
@@ -67,10 +68,10 @@ public class Match {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public Match(Account swiper, Account swiped, Chat chat, Date createdAt) {
-        this.chat = chat;
+    public Match(Account swiper, Account swiped, UUID chatId, Date createdAt) {
         this.swiper = swiper;
         this.swiped = swiped;
+        this.chatId = chatId;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
     }
@@ -81,10 +82,6 @@ public class Match {
 
     public UUID getSwipedId() {
         return this.swiped.getId();
-    }
-
-    public UUID getChatId() {
-        return this.chat.getId();
     }
 
     public String getSwipedName() {
