@@ -52,7 +52,6 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                                                     qMatch.swiper.id,
                                                     qMatch.swiped.id,
                                                     qMatch.unmatched,
-                                                    qMatch.deleted,
                                                     qMatch.lastReadChatMessageId,
                                                     qMatch.lastChatMessageId,
                                                     qMatch.lastChatMessageBody,
@@ -74,7 +73,6 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                                                     qMatch.swiper.id,
                                                     qMatch.swiped.id,
                                                     qMatch.unmatched,
-                                                    qMatch.deleted,
                                                     qMatch.lastReadChatMessageId,
                                                     qMatch.lastChatMessageId,
                                                     qMatch.lastChatMessageBody,
@@ -94,13 +92,13 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
         if (matchPageFilter != null) {
             switch (matchPageFilter) {
                 case CHAT:
-                    condition.and(qMatch.lastChatMessageId.isNotNull());
+                    condition = condition.and(qMatch.lastChatMessageId.isNotNull());
                     break;
                 case MATCH:
-                    condition.and(qMatch.lastChatMessageId.isNull());
+                    condition = condition.and(qMatch.lastChatMessageId.isNull());
                     break;
                 case CHAT_WITH_UNREAD_MESSAGE:
-                    condition.and(qMatch.lastReadChatMessageId.lt(qMatch.lastChatMessageId));
+                    condition = condition.and(qMatch.lastReadChatMessageId.lt(qMatch.lastChatMessageId));
                     break;
             }
         }

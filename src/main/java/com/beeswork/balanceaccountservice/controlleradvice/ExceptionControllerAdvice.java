@@ -4,6 +4,7 @@ package com.beeswork.balanceaccountservice.controlleradvice;
 import com.beeswork.balanceaccountservice.constant.PhotoConstant;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.BaseException;
+import com.beeswork.balanceaccountservice.exception.InternalServerException;
 import com.beeswork.balanceaccountservice.exception.account.*;
 import com.beeswork.balanceaccountservice.exception.chat.ChatMessageNotFoundException;
 import com.beeswork.balanceaccountservice.exception.jwt.ExpiredJWTException;
@@ -188,6 +189,13 @@ public class ExceptionControllerAdvice {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(exceptionResponse(BadRequestException.CODE, null, locale));
+    }
+
+    @ExceptionHandler({InternalServerException.class})
+    public ResponseEntity<String> handleInternalServerException(InternalServerException exception, Locale locale) throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(exceptionResponse(exception.getExceptionCode(), null, locale));
     }
 
     @ExceptionHandler({Exception.class})

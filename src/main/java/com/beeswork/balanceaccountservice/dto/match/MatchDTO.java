@@ -32,7 +32,6 @@ public class MatchDTO implements Pushable {
     private UUID    swiperId;
     private UUID    swipedId;
     private Boolean unmatched;
-    private Boolean deleted;
     private long    lastReadChatMessageId;
     private long    lastChatMessageId;
     private String  lastChatMessageBody;
@@ -46,7 +45,6 @@ public class MatchDTO implements Pushable {
                     UUID swiperId,
                     UUID swipedId,
                     Boolean unmatched,
-                    Boolean deleted,
                     long lastReadChatMessageId,
                     long lastChatMessageId,
                     String lastChatMessageBody,
@@ -58,7 +56,6 @@ public class MatchDTO implements Pushable {
         this.swiperId = swiperId;
         this.swipedId = swipedId;
         this.unmatched = unmatched;
-        this.deleted = deleted;
         this.lastReadChatMessageId = lastReadChatMessageId;
         this.lastChatMessageId = lastChatMessageId;
         this.lastChatMessageBody = lastChatMessageBody;

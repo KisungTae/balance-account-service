@@ -53,10 +53,10 @@ public class SwipeController extends BaseController {
                                              Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<SwipeDTO> swipeDTOs = swipeService.listSwipes(getAccountIdFrom(principal),
-                                                           listSwipesVM.getStartPosition(),
-                                                           listSwipesVM.getLoadSize());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(swipeDTOs));
+        ListSwipesDTO listSwipesDTO = swipeService.listSwipes(getAccountIdFrom(principal),
+                                                              listSwipesVM.getStartPosition(),
+                                                              listSwipesVM.getLoadSize());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listSwipesDTO));
     }
 
     @GetMapping("/swipe/fetch")

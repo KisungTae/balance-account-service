@@ -666,17 +666,18 @@ public class DummyController {
             }
 
             if (random.nextInt(10) > 3) {
-                subMatch.setLastChatMessageId((long) (random.nextInt(50) + 1));
+                subMatch.setLastChatMessageId(random.nextInt(50) + 1);
                 if (random.nextInt(10) > 7) {
                     subMatch.setLastReadChatMessageId(subMatch.getLastChatMessageId());
                 } else {
-                    subMatch.setLastReadChatMessageId((long) (random.nextInt(50) + 1));
+                    subMatch.setLastReadChatMessageId(random.nextInt((int) subMatch.getLastChatMessageId()));
                 }
             }
 
 
 
             matchDAO.persist(subMatch);
+            matchDAO.persist(objMatch);
 
 
 

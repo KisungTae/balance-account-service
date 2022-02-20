@@ -48,14 +48,14 @@ public class Match {
 //    private ChatMessage lastReadChatMessage;
 
     @Column(name = "last_read_chat_message_id")
-    private Long lastReadChatMessageId;
+    private long lastReadChatMessageId;
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "last_chat_message_id")
 //    private ChatMessage lastChatMessage;
 
     @Column(name = "last_chat_message_id")
-    private Long lastChatMessageId;
+    private long lastChatMessageId;
 
     @Column(name = "last_chat_message_body")
     private String lastChatMessageBody;

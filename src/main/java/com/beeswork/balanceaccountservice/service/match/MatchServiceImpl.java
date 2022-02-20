@@ -2,7 +2,6 @@ package com.beeswork.balanceaccountservice.service.match;
 
 import com.beeswork.balanceaccountservice.constant.MatchPageFilter;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
-import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.match.UnmatchAuditDAO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
@@ -46,35 +45,13 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Override
     public List<MatchDTO> fetchMatches(UUID swiperId, UUID lastSwipedId, int loadSize, MatchPageFilter matchPageFilter) {
-
-        return null;
+        return matchDAO.findAllBy(swiperId, lastSwipedId, loadSize, matchPageFilter);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public ListMatchesDTO listMatches(UUID accountId, Date fetchedAt) {
-        return null;
-//        ListMatchesDTO listMatchesDTO = new ListMatchesDTO(fetchedAt);
-//        List<MatchDTO> matchDTOs = matchDAO.findAllAfter(accountId, offsetFetchedAt(fetchedAt));
-//
-//        if (matchDTOs != null) {
-//            for (MatchDTO matchDTO : matchDTOs) {
-//                if (matchDTO.getUnmatched() || matchDTO.getDeleted()) {
-//                    matchDTO.setSwipedProfilePhotoKey(null);
-//                    matchDTO.setCreatedAt(null);
-//                    matchDTO.setActive(true);
-//                    matchDTO.setUnmatched(true);
-//                }
-//                if (matchDTO.getUpdatedAt().after(listMatchesDTO.getFetchedAt())) {
-//                    listMatchesDTO.setFetchedAt(matchDTO.getUpdatedAt());
-//                }
-//
-//                matchDTO.setUpdatedAt(null);
-//                matchDTO.setDeleted(null);
-//            }
-//        }
-//        listMatchesDTO.setMatchDTOs(matchDTOs);
-//        return listMatchesDTO;
+    public List<MatchDTO> listMatches(UUID swiperId, int startPosition, int loadSize, MatchPageFilter matchPageFilter) {
+        return matchDAO.findAllBy(swiperId, startPosition, loadSize, matchPageFilter);
     }
 
     @Override

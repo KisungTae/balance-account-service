@@ -20,6 +20,8 @@ import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
+import com.beeswork.balanceaccountservice.exception.BadRequestException;
+import com.beeswork.balanceaccountservice.exception.InternalServerException;
 import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
 import com.beeswork.balanceaccountservice.exception.swipe.*;
@@ -28,6 +30,7 @@ import com.beeswork.balanceaccountservice.service.stomp.StompService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Isolation;
@@ -37,6 +40,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.PersistenceException;
 import java.util.*;
+import java.util.concurrent.*;
 
 @Service
 public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
@@ -123,8 +127,27 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     }
 
     @Override
+    public ListSwipesDTO listSwipes(final UUID accountId, final int startPosition, final int loadSize) {
+        try {
+            ExecutorService executorService = Executors.newFixedThreadPool(2);
+            Future<List<SwipeDTO>> listSwipesFuture = executorService.submit(() -> doListSwipes(accountId, startPosition, loadSize));
+            Future<CountSwipesDTO> countSwipesFuture = executorService.submit(() -> countSwipes(accountId));
+
+            ListSwipesDTO listSwipesDTO = new ListSwipesDTO();
+            List<SwipeDTO> swipeDTOs = listSwipesFuture.get(1, TimeUnit.MINUTES);
+            CountSwipesDTO countSwipesDTO = countSwipesFuture.get(1, TimeUnit.MINUTES);
+
+            listSwipesDTO.setSwipeDTOs(swipeDTOs);
+            listSwipesDTO.setSwipeCount(countSwipesDTO.getCount());
+            listSwipesDTO.setSwipeCountFetchedAt(countSwipesDTO.getFetchedAt());
+            return listSwipesDTO;
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new InternalServerException();
+        }
+    }
+
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<SwipeDTO> listSwipes(UUID accountId, int startPosition, int loadSize) {
+    public List<SwipeDTO> doListSwipes(UUID accountId, int startPosition, int loadSize) {
         List<SwipeDTO> swipes = swipeDAO.findAllBy(accountId, startPosition, loadSize);
         for (SwipeDTO swipeDTO : swipes) {
             if (swipeDTO.getSwiperDeleted()) {
@@ -137,6 +160,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         return swipes;
     }
 
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<SwipeDTO> fetchSwipes(UUID accountId, UUID lastSwiperId, int loadSize) {
@@ -146,7 +170,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public CountSwipesDTO countSwipes(UUID accountId) {
-        return new CountSwipesDTO(swipeDAO.countClicks(accountId));
+        Date now = new Date();
+        return new CountSwipesDTO(swipeDAO.countClicks(accountId), now);
     }
 
     @Override
