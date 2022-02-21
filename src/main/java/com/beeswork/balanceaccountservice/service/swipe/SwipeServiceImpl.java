@@ -20,7 +20,6 @@ import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
-import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.InternalServerException;
 import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
@@ -30,7 +29,6 @@ import com.beeswork.balanceaccountservice.service.stomp.StompService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Isolation;
@@ -122,56 +120,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         SwipeDTO swipeDTO = modelMapper.map(result.getSwipe(), SwipeDTO.class);
         stompService.push(swipeDTO, locale);
-        return modelMapper.map(result.getQuestions(), new TypeToken<List<QuestionDTO>>() {
-        }.getType());
-    }
-
-    @Override
-    public ListSwipesDTO listSwipes(final UUID accountId, final int startPosition, final int loadSize) {
-        try {
-            ExecutorService executorService = Executors.newFixedThreadPool(2);
-            Future<List<SwipeDTO>> listSwipesFuture = executorService.submit(() -> doListSwipes(accountId, startPosition, loadSize));
-            Future<CountSwipesDTO> countSwipesFuture = executorService.submit(() -> countSwipes(accountId));
-
-            ListSwipesDTO listSwipesDTO = new ListSwipesDTO();
-            List<SwipeDTO> swipeDTOs = listSwipesFuture.get(1, TimeUnit.MINUTES);
-            CountSwipesDTO countSwipesDTO = countSwipesFuture.get(1, TimeUnit.MINUTES);
-
-            listSwipesDTO.setSwipeDTOs(swipeDTOs);
-            listSwipesDTO.setSwipeCount(countSwipesDTO.getCount());
-            listSwipesDTO.setSwipeCountFetchedAt(countSwipesDTO.getFetchedAt());
-            return listSwipesDTO;
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            throw new InternalServerException();
-        }
-    }
-
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<SwipeDTO> doListSwipes(UUID accountId, int startPosition, int loadSize) {
-        List<SwipeDTO> swipes = swipeDAO.findAllBy(accountId, startPosition, loadSize);
-        for (SwipeDTO swipeDTO : swipes) {
-            if (swipeDTO.getSwiperDeleted()) {
-                swipeDTO.setSwipedId(null);
-                swipeDTO.setClicked(null);
-                swipeDTO.setSwiperProfilePhotoKey(null);
-                swipeDTO.setId(null);
-            }
-        }
-        return swipes;
-    }
-
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<SwipeDTO> fetchSwipes(UUID accountId, UUID lastSwiperId, int loadSize) {
-        return swipeDAO.findAllBy(accountId, lastSwiperId, loadSize);
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public CountSwipesDTO countSwipes(UUID accountId) {
-        Date now = new Date();
-        return new CountSwipesDTO(swipeDAO.countClicks(accountId), now);
+        return modelMapper.map(result.getQuestions(), new TypeToken<List<QuestionDTO>>() {}.getType());
     }
 
     @Override
@@ -278,5 +227,59 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         } else if (swiped.isBlocked()) {
             throw new SwipedBlockedException();
         }
+    }
+
+    @Override
+    public ListSwipesDTO listSwipes(final UUID accountId, final int startPosition, final int loadSize) {
+        return getListSwipesDTO(() -> doListSwipes(accountId, startPosition, loadSize), accountId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public List<SwipeDTO> doListSwipes(UUID accountId, int startPosition, int loadSize) {
+        List<SwipeDTO> swipes = swipeDAO.findAllBy(accountId, startPosition, loadSize);
+        for (SwipeDTO swipeDTO : swipes) {
+            if (swipeDTO.getSwiperDeleted()) {
+                swipeDTO.setSwipedId(null);
+                swipeDTO.setClicked(null);
+                swipeDTO.setSwiperProfilePhotoKey(null);
+                swipeDTO.setId(null);
+            }
+        }
+        return swipes;
+    }
+
+    @Override
+    public ListSwipesDTO fetchSwipes(final UUID accountId, final UUID lastSwiperId, final int loadSize) {
+        return getListSwipesDTO(() -> doFetchSwipes(accountId, lastSwiperId, loadSize), accountId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public List<SwipeDTO> doFetchSwipes(UUID accountId, UUID lastSwiperId, int loadSize) {
+        return swipeDAO.findAllBy(accountId, lastSwiperId, loadSize);
+    }
+
+    private ListSwipesDTO getListSwipesDTO(final Callable<List<SwipeDTO>> listSwipeDTOsCallable, final UUID accountId) {
+        try {
+            ExecutorService executorService = Executors.newFixedThreadPool(2);
+            Future<List<SwipeDTO>> listSwipesFuture = executorService.submit(listSwipeDTOsCallable);
+            Future<CountSwipesDTO> countSwipesFuture = executorService.submit(() -> countSwipes(accountId));
+
+            ListSwipesDTO listSwipesDTO = new ListSwipesDTO();
+            List<SwipeDTO> swipeDTOs = listSwipesFuture.get(1, TimeUnit.MINUTES);
+            CountSwipesDTO countSwipesDTO = countSwipesFuture.get(1, TimeUnit.MINUTES);
+
+            listSwipesDTO.setSwipeDTOs(swipeDTOs);
+            listSwipesDTO.setSwipeCount(countSwipesDTO.getCount());
+            listSwipesDTO.setSwipeCountFetchedAt(countSwipesDTO.getFetchedAt());
+            return listSwipesDTO;
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new InternalServerException();
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public CountSwipesDTO countSwipes(UUID accountId) {
+        Date now = new Date();
+        return new CountSwipesDTO(swipeDAO.countClicks(accountId), now);
     }
 }

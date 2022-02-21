@@ -13,7 +13,5 @@ public interface SwipeService {
 
     ListSwipesDTO listSwipes(final UUID accountId, final int startPosition, final int loadSize);
 
-    List<SwipeDTO> fetchSwipes(UUID accountId, UUID lastSwiperId, int loadSize);
-
-    CountSwipesDTO countSwipes(UUID accountId);
+    ListSwipesDTO fetchSwipes(final UUID accountId, final UUID lastSwiperId, final int loadSize);
 }
