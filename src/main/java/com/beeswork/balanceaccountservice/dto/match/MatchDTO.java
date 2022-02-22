@@ -14,6 +14,7 @@ import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -35,9 +36,11 @@ public class MatchDTO implements Pushable {
     private long    lastReadChatMessageId;
     private long    lastChatMessageId;
     private String  lastChatMessageBody;
+    private Date    createdAt;
     private String  swipedName;
     private String  swipedProfilePhotoKey;
     private Boolean swipedDeleted;
+
 
     @QueryProjection
     public MatchDTO(long id,

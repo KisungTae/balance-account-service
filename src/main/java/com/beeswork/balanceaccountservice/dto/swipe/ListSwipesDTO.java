@@ -12,5 +12,5 @@ import java.util.List;
 public class ListSwipesDTO {
     private List<SwipeDTO> swipeDTOs = new ArrayList<>();
     private long swipeCount;
-    private Date swipeCountFetchedAt;
+    private Date swipeCountCountedAt;
 }

@@ -270,7 +270,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
             listSwipesDTO.setSwipeDTOs(swipeDTOs);
             listSwipesDTO.setSwipeCount(countSwipesDTO.getCount());
-            listSwipesDTO.setSwipeCountFetchedAt(countSwipesDTO.getFetchedAt());
+            listSwipesDTO.setSwipeCountCountedAt(countSwipesDTO.getFetchedAt());
             return listSwipesDTO;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             throw new InternalServerException();

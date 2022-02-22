@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -20,20 +21,22 @@ public class SwipeDTO implements Pushable {
     private static final String PUSH_TITLE_SWIPE = "push.title.swipe";
 
     @JsonIgnore
-    private static final String PUSH_BODY_SWIPE  = "push.body.swipe";
+    private static final String PUSH_BODY_SWIPE = "push.body.swipe";
 
     @JsonIgnore
     private static final String PUSH_TITLE_CLICK = "push.title.click";
 
     @JsonIgnore
-    private static final String PUSH_BODY_CLICK  = "push.body.click";
+    private static final String PUSH_BODY_CLICK = "push.body.click";
 
-    private Long     id;
-    private UUID     swiperId;
+    private Long    id;
+    private UUID    swiperId;
     private UUID    swipedId;
     private Boolean clicked;
+    private Date    createdAt;
     private String  swiperProfilePhotoKey;
     private Boolean swiperDeleted;
+
 
     @QueryProjection
     public SwipeDTO(Long id, UUID swiperId, UUID swipedId, String swiperProfilePhotoKey, Boolean clicked) {
