@@ -120,7 +120,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         SwipeDTO swipeDTO = modelMapper.map(result.getSwipe(), SwipeDTO.class);
         stompService.push(swipeDTO, locale);
-        return modelMapper.map(result.getQuestions(), new TypeToken<List<QuestionDTO>>() {}.getType());
+        return modelMapper.map(result.getQuestions(), new TypeToken<List<QuestionDTO>>() {
+        }.getType());
     }
 
     @Override
@@ -230,39 +231,40 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     }
 
     @Override
-    public ListSwipesDTO listSwipes(final UUID accountId, final int startPosition, final int loadSize) {
-        return getListSwipesDTO(() -> doListSwipes(accountId, startPosition, loadSize), accountId);
+    public ListSwipesDTO listSwipes(final UUID swipedId, final int startPosition, final int loadSize) {
+        return getListSwipesDTO(() -> doListSwipes(swipedId, startPosition, loadSize), swipedId);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<SwipeDTO> doListSwipes(UUID accountId, int startPosition, int loadSize) {
-        List<SwipeDTO> swipes = swipeDAO.findAllBy(accountId, startPosition, loadSize);
+    public List<SwipeDTO> doListSwipes(UUID swipedId, int startPosition, int loadSize) {
+        List<SwipeDTO> swipes = swipeDAO.findAllBy(swipedId, startPosition, loadSize);
         for (SwipeDTO swipeDTO : swipes) {
             if (swipeDTO.getSwiperDeleted()) {
+                swipeDTO.setId(null);
                 swipeDTO.setSwipedId(null);
                 swipeDTO.setClicked(null);
+                swipeDTO.setUpdatedAt(null);
                 swipeDTO.setSwiperProfilePhotoKey(null);
-                swipeDTO.setId(null);
             }
         }
         return swipes;
     }
 
     @Override
-    public ListSwipesDTO fetchSwipes(final UUID accountId, final UUID lastSwiperId, final int loadSize) {
-        return getListSwipesDTO(() -> doFetchSwipes(accountId, lastSwiperId, loadSize), accountId);
+    public ListSwipesDTO fetchSwipes(final UUID swipedId, final UUID lastSwiperId, final int loadSize) {
+        return getListSwipesDTO(() -> doFetchSwipes(swipedId, lastSwiperId, loadSize), swipedId);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<SwipeDTO> doFetchSwipes(UUID accountId, UUID lastSwiperId, int loadSize) {
-        return swipeDAO.findAllBy(accountId, lastSwiperId, loadSize);
+    public List<SwipeDTO> doFetchSwipes(UUID swipedId, UUID lastSwiperId, int loadSize) {
+        return swipeDAO.findAllBy(swipedId, lastSwiperId, loadSize);
     }
 
-    private ListSwipesDTO getListSwipesDTO(final Callable<List<SwipeDTO>> listSwipeDTOsCallable, final UUID accountId) {
+    private ListSwipesDTO getListSwipesDTO(final Callable<List<SwipeDTO>> listSwipeDTOsCallable, final UUID swipedId) {
         try {
             ExecutorService executorService = Executors.newFixedThreadPool(2);
             Future<List<SwipeDTO>> listSwipesFuture = executorService.submit(listSwipeDTOsCallable);
-            Future<CountSwipesDTO> countSwipesFuture = executorService.submit(() -> countSwipes(accountId));
+            Future<CountSwipesDTO> countSwipesFuture = executorService.submit(() -> countSwipes(swipedId));
 
             ListSwipesDTO listSwipesDTO = new ListSwipesDTO();
             List<SwipeDTO> swipeDTOs = listSwipesFuture.get(1, TimeUnit.MINUTES);
@@ -270,7 +272,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
             listSwipesDTO.setSwipeDTOs(swipeDTOs);
             listSwipesDTO.setSwipeCount(countSwipesDTO.getCount());
-            listSwipesDTO.setSwipeCountCountedAt(countSwipesDTO.getFetchedAt());
+            listSwipesDTO.setSwipeCountCountedAt(countSwipesDTO.getCountedAt());
             return listSwipesDTO;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             throw new InternalServerException();
@@ -278,8 +280,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public CountSwipesDTO countSwipes(UUID accountId) {
+    public CountSwipesDTO countSwipes(UUID swipedId) {
         Date now = new Date();
-        return new CountSwipesDTO(swipeDAO.countClicks(accountId), now);
+        return new CountSwipesDTO(swipeDAO.countSwipesBy(swipedId), now);
     }
 }

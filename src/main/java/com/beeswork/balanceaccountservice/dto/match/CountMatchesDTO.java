@@ -1,4 +1,4 @@
-package com.beeswork.balanceaccountservice.dto.swipe;
+package com.beeswork.balanceaccountservice.dto.match;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CountSwipesDTO {
+public class CountMatchesDTO {
     private long count;
     private Date countedAt;
 }

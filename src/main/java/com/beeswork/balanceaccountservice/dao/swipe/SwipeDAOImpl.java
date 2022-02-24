@@ -82,7 +82,7 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
     @Override
-    public long countClicks(UUID swipedId) {
+    public long countSwipesBy(UUID swipedId) {
         return jpaQueryFactory.selectFrom(qSwipe)
                        .leftJoin(qAccount).on(qSwipe.swiper.id.eq(qAccount.id))
                        .where(qSwipe.swiped.id.eq(swipedId)

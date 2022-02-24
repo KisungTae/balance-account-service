@@ -30,10 +30,6 @@ public class Match {
     @JoinColumn(name = "swiped_id")
     private Account swiped;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "chat_id")
-//    private Chat chat;
-
     @Column(name = "chat_id")
     private UUID chatId;
 
@@ -43,16 +39,8 @@ public class Match {
     @Column(name = "deleted")
     private boolean deleted;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "last_read_chat_message_id")
-//    private ChatMessage lastReadChatMessage;
-
     @Column(name = "last_read_chat_message_id")
     private long lastReadChatMessageId;
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "last_chat_message_id")
-//    private ChatMessage lastChatMessage;
 
     @Column(name = "last_chat_message_id")
     private long lastChatMessageId;

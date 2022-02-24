@@ -40,11 +40,11 @@ public class MatchController extends BaseController {
                                                BindingResult bindingResult,
                                                Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<MatchDTO> matchDTOs = matchService.fetchMatches(getAccountIdFrom(principal),
-                                                             fetchMatchesVM.getLastSwipedId(),
-                                                             fetchMatchesVM.getLoadSize(),
-                                                             fetchMatchesVM.getMatchPageFilter());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(matchDTOs));
+        ListMatchesDTO listMatchesDTO = matchService.fetchMatches(getAccountIdFrom(principal),
+                                                                  fetchMatchesVM.getLastSwipedId(),
+                                                                  fetchMatchesVM.getLoadSize(),
+                                                                  fetchMatchesVM.getMatchPageFilter());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listMatchesDTO));
     }
 
     @GetMapping("/list")
@@ -53,11 +53,11 @@ public class MatchController extends BaseController {
                                               Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<MatchDTO> matchDTOs = matchService.listMatches(getAccountIdFrom(principal),
-                                                            listMatchesVM.getStartPosition(),
-                                                            listMatchesVM.getLoadSize(),
-                                                            listMatchesVM.getMatchPageFilter());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(matchDTOs));
+        ListMatchesDTO listMatchesDTO = matchService.listMatches(getAccountIdFrom(principal),
+                                                                 listMatchesVM.getStartPosition(),
+                                                                 listMatchesVM.getLoadSize(),
+                                                                 listMatchesVM.getMatchPageFilter());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listMatchesDTO));
     }
 
     @PostMapping("/unmatch")

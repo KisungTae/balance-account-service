@@ -33,7 +33,7 @@ public class SwipeDTO implements Pushable {
     private UUID    swiperId;
     private UUID    swipedId;
     private Boolean clicked;
-    private Date    createdAt;
+    private Date    updatedAt;
     private String  swiperProfilePhotoKey;
     private Boolean swiperDeleted;
 

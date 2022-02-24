@@ -11,7 +11,7 @@ public interface SwipeService {
 
     ClickDTO click(UUID swiperId, UUID swipedId, Map<Integer, Boolean> answers, Locale locale);
 
-    ListSwipesDTO listSwipes(final UUID accountId, final int startPosition, final int loadSize);
+    ListSwipesDTO listSwipes(final UUID swipedId, final int startPosition, final int loadSize);
 
-    ListSwipesDTO fetchSwipes(final UUID accountId, final UUID lastSwiperId, final int loadSize);
+    ListSwipesDTO fetchSwipes(final UUID swipedId, final UUID lastSwiperId, final int loadSize);
 }

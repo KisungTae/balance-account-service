@@ -7,6 +7,7 @@ import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
@@ -577,6 +578,18 @@ public class DummyController {
         stompService.pushChatMessage(chatMessageDTO, Locale.getDefault());
     }
 
+    @GetMapping("/send/swipe")
+    public void sendDummySwipe(@RequestParam("swipedId") UUID swipedId) {
+        SwipeDTO swipeDTO = new SwipeDTO();
+        Random random = new Random();
+        swipeDTO.setId(random.nextLong());
+        swipeDTO.setSwipedId(swipedId);
+        swipeDTO.setSwiperId(UUID.fromString("4b6a2ce3-eb48-4d05-89e7-9b2f086bf84b"));
+        swipeDTO.setUpdatedAt(new Date());
+        swipeDTO.setClicked(false);
+        stompService.push(swipeDTO, Locale.getDefault());
+    }
+
     @GetMapping("/send/match")
     public void sendDummyMatch() {
 //        MatchDTO matchDTO = new MatchDTO(1L, UUID.randomUUID(), false, "Michael", "profilephotoeky", false, true, new Date(), new Date());
@@ -674,15 +687,12 @@ public class DummyController {
                 }
             }
 
-
-
             matchDAO.persist(subMatch);
             matchDAO.persist(objMatch);
-
-
-
         }
     }
+
+
 
 
 }

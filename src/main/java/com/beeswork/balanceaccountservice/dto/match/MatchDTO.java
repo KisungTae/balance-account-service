@@ -28,13 +28,13 @@ public class MatchDTO implements Pushable {
     @JsonIgnore
     private static final String PUSH_BODY_MATCH = "push.body.match";
 
-    private long    id;
+    private Long    id;
     private UUID    chatId;
     private UUID    swiperId;
     private UUID    swipedId;
     private Boolean unmatched;
-    private long    lastReadChatMessageId;
-    private long    lastChatMessageId;
+    private Long    lastReadChatMessageId;
+    private Long    lastChatMessageId;
     private String  lastChatMessageBody;
     private Date    createdAt;
     private String  swipedName;

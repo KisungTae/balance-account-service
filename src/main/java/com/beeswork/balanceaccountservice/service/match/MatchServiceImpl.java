@@ -4,11 +4,15 @@ import com.beeswork.balanceaccountservice.constant.MatchPageFilter;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.match.UnmatchAuditDAO;
+import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
+import com.beeswork.balanceaccountservice.dto.match.CountMatchesDTO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
+import com.beeswork.balanceaccountservice.dto.swipe.CountSwipesDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.UnmatchAudit;
+import com.beeswork.balanceaccountservice.exception.InternalServerException;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.SwipedNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
@@ -22,37 +26,103 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.*;
 
 
 @Service
 public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
-    private final AccountDAO         accountDAO;
-    private final MatchDAO           matchDAO;
-    private final UnmatchAuditDAO    unmatchAuditDAO;
-    private final ReportService reportService;
+    private final AccountDAO      accountDAO;
+    private final MatchDAO        matchDAO;
+    private final UnmatchAuditDAO unmatchAuditDAO;
+    private final SwipeDAO        swipeDAO;
+    private final ReportService   reportService;
 
     @Autowired
     public MatchServiceImpl(AccountDAO accountDAO,
                             MatchDAO matchDAO,
                             UnmatchAuditDAO unmatchAuditDAO,
+                            SwipeDAO swipeDAO,
                             ReportService reportService) {
         this.accountDAO = accountDAO;
         this.matchDAO = matchDAO;
         this.unmatchAuditDAO = unmatchAuditDAO;
+        this.swipeDAO = swipeDAO;
         this.reportService = reportService;
     }
 
-
     @Override
-    public List<MatchDTO> fetchMatches(UUID swiperId, UUID lastSwipedId, int loadSize, MatchPageFilter matchPageFilter) {
-        return matchDAO.findAllBy(swiperId, lastSwipedId, loadSize, matchPageFilter);
+    public ListMatchesDTO fetchMatches(final UUID swiperId, final UUID lastSwipedId, final int loadSize, final MatchPageFilter matchPageFilter) {
+        return getListMatchesDTO(() -> doFetchMatches(swiperId, lastSwipedId, loadSize, matchPageFilter), swiperId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public List<MatchDTO> doFetchMatches(UUID swiperId, UUID lastSwipedId, int loadSize, MatchPageFilter matchPageFilter) {
+        List<MatchDTO> matchDTOs = matchDAO.findAllBy(swiperId, lastSwipedId, loadSize, matchPageFilter);
+        nullifyMatches(matchDTOs);
+        return matchDTOs;
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<MatchDTO> listMatches(UUID swiperId, int startPosition, int loadSize, MatchPageFilter matchPageFilter) {
-        return matchDAO.findAllBy(swiperId, startPosition, loadSize, matchPageFilter);
+    public ListMatchesDTO listMatches(final UUID swiperId, final int startPosition, final int loadSize, final MatchPageFilter matchPageFilter) {
+        return getListMatchesDTO(() -> doListMatches(swiperId, startPosition, loadSize, matchPageFilter), swiperId);
     }
+
+    private List<MatchDTO> doListMatches(UUID swiperId, int startPosition, int loadSize, MatchPageFilter matchPageFilter) {
+        List<MatchDTO> matchDTOs = matchDAO.findAllBy(swiperId, startPosition, loadSize, matchPageFilter);
+        nullifyMatches(matchDTOs);
+        return matchDTOs;
+    }
+
+    private void nullifyMatches(List<MatchDTO> matchDTOs) {
+        for (MatchDTO matchDTO : matchDTOs) {
+            if (matchDTO.getUnmatched() || matchDTO.getSwipedDeleted()) {
+                matchDTO.setChatId(null);
+                matchDTO.setLastChatMessageId(null);
+                matchDTO.setLastReadChatMessageId(null);
+                matchDTO.setSwipedName(null);
+                matchDTO.setSwipedProfilePhotoKey(null);
+            }
+        }
+    }
+
+    private ListMatchesDTO getListMatchesDTO(final Callable<List<MatchDTO>> listMatchesCallable, final UUID swiperId) {
+        try {
+            ExecutorService executorService = Executors.newFixedThreadPool(3);
+            Future<List<MatchDTO>> listMatchesFuture = executorService.submit(listMatchesCallable);
+            Future<CountMatchesDTO> countMatchesFuture = executorService.submit(() -> countMatches(swiperId));
+            Future<CountSwipesDTO> countSwipesFuture = executorService.submit(() -> countSwipes(swiperId));
+
+            ListMatchesDTO listMatchesDTO = new ListMatchesDTO();
+
+            List<MatchDTO> matchDTOs = listMatchesFuture.get(1, TimeUnit.MINUTES);
+            CountMatchesDTO countMatchesDTO = countMatchesFuture.get(1, TimeUnit.MINUTES);
+            CountSwipesDTO countSwipesDTO = countSwipesFuture.get(1, TimeUnit.MINUTES);
+
+            listMatchesDTO.setMatchDTOs(matchDTOs);
+            listMatchesDTO.setMatchCount(countMatchesDTO.getCount());
+            listMatchesDTO.setMatchCountCountedAt(countMatchesDTO.getCountedAt());
+            listMatchesDTO.setSwipeCount(countSwipesDTO.getCount());
+            listMatchesDTO.setSwipeCountCountedAt(countSwipesDTO.getCountedAt());
+
+            return listMatchesDTO;
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new InternalServerException();
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public CountSwipesDTO countSwipes(UUID swipedId) {
+        Date now = new Date();
+        return new CountSwipesDTO(swipeDAO.countSwipesBy(swipedId), now);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public CountMatchesDTO countMatches(UUID swiperId) {
+        Date now = new Date();
+        return new CountMatchesDTO(matchDAO.countMatchesBy(swiperId), now);
+    }
+
 
     @Override
     @Transactional
