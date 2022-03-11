@@ -28,18 +28,18 @@ public class MatchDTO implements Pushable {
     @JsonIgnore
     private static final String PUSH_BODY_MATCH = "push.body.match";
 
-    private Long    id;
+    private long    id;
     private UUID    chatId;
     private UUID    swiperId;
     private UUID    swipedId;
-    private Boolean unmatched;
-    private Long    lastReadChatMessageId;
-    private Long    lastChatMessageId;
+    private boolean unmatched;
+    private long    lastReadChatMessageId;
+    private long    lastChatMessageId;
     private String  lastChatMessageBody;
     private Date    createdAt;
     private String  swipedName;
     private String  swipedProfilePhotoKey;
-    private Boolean swipedDeleted;
+    private boolean swipedDeleted;
 
 
     @QueryProjection
@@ -51,6 +51,7 @@ public class MatchDTO implements Pushable {
                     long lastReadChatMessageId,
                     long lastChatMessageId,
                     String lastChatMessageBody,
+                    Date createdAt,
                     String swipedName,
                     String swipedProfilePhotoKey,
                     Boolean swipedDeleted) {
@@ -62,6 +63,7 @@ public class MatchDTO implements Pushable {
         this.lastReadChatMessageId = lastReadChatMessageId;
         this.lastChatMessageId = lastChatMessageId;
         this.lastChatMessageBody = lastChatMessageBody;
+        this.createdAt = createdAt;
         this.swipedName = swipedName;
         this.swipedProfilePhotoKey = swipedProfilePhotoKey;
         this.swipedDeleted = swipedDeleted;

@@ -7,7 +7,6 @@ import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.chat.SaveChatMessageDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
-import com.beeswork.balanceaccountservice.exception.jwt.ExpiredJWTException;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
@@ -80,8 +79,9 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
             }
 
             ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessageVM, ChatMessageDTO.class);
+//          TODO: convert username to UUID and chatMessageVM.setAccountId(userName)
             String userName = jwtTokenProvider.getUserName(jws);
-            if (!userName.equals(chatMessageDTO.getAccountId().toString())) {
+            if (!userName.equals(chatMessageDTO.getSenderId().toString())) {
                 throw new AccountNotFoundException();
             }
             SaveChatMessageDTO saveChatMessageDTO = chatService.saveChatMessage(chatMessageDTO);

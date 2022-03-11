@@ -22,29 +22,16 @@ public class ChatMessageDTO implements Pushable {
     private static final String PUSH_TITLE_CHAT_MESSAGE = "push.title.chat.message";
 
     @JsonIgnore
-    private static final String PUSH_BODY_CHAT_MESSAGE  = "push.body.chat.message";
+    private static final String PUSH_BODY_CHAT_MESSAGE = "push.body.chat.message";
 
-    private UUID     id;
-    private UUID     accountId;
-    private UUID     recipientId;
-    private String   body;
-    private Long     chatId;
-    private Date     createdAt;
-    private String   senderName;
-
-    @QueryProjection
-    public ChatMessageDTO(UUID id, Date createdAt) {
-        this.id = id;
-        this.createdAt = createdAt;
-    }
-
-    @QueryProjection
-    public ChatMessageDTO(UUID id, String body, Long chatId, Date createdAt) {
-        this.id = id;
-        this.body = body;
-        this.chatId = chatId;
-        this.createdAt = createdAt;
-    }
+    private Long   id;
+    private UUID   chatId;
+    private UUID   senderId;
+    private UUID   recipientId;
+    private String body;
+    private UUID   tag;
+    private Date   createdAt;
+    private String senderName;
 
     @Override
     @JsonIgnore
@@ -64,7 +51,7 @@ public class ChatMessageDTO implements Pushable {
         if (StringUtils.isBlank(senderName)) {
             this.senderName = "";
         }
-        String[] args = new String[] {senderName};
+        String[] args = new String[]{senderName};
         this.senderName = null;
         return args;
     }

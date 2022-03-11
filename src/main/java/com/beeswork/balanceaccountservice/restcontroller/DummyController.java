@@ -3,13 +3,16 @@ package com.beeswork.balanceaccountservice.restcontroller;
 import com.beeswork.balanceaccountservice.config.security.JWTTokenProvider;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
+import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.*;
 import com.beeswork.balanceaccountservice.entity.chat.Chat;
+import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
@@ -50,18 +53,19 @@ public class DummyController {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private final MatchDAO           matchDAO;
-    private final ObjectMapper       objectMapper;
-    private final FCMService         fcmService;
-    private final AccountDAO         accountDAO;
-    private final ChatDAO            chatDAO;
-    private final WalletDAO          walletDAO;
-    private final PushSettingDAO     pushSettingDAO;
-    private final GeometryFactory    geometryFactory;
-    private final StompService       stompService;
-    private final ChatService chatService;
+    private final MatchDAO         matchDAO;
+    private final ObjectMapper     objectMapper;
+    private final FCMService       fcmService;
+    private final AccountDAO       accountDAO;
+    private final ChatDAO          chatDAO;
+    private final WalletDAO        walletDAO;
+    private final PushSettingDAO   pushSettingDAO;
+    private final GeometryFactory  geometryFactory;
+    private final StompService     stompService;
+    private final ChatService      chatService;
     private final JWTTokenProvider jwtTokenProvider;
     private final JPQLQueryFactory jpqlQueryFactory;
+    private final ChatMessageDAO chatMessageDAO;
 
     @Autowired
     public DummyController(MatchDAO matchDAO,
@@ -75,7 +79,7 @@ public class DummyController {
                            StompService stompService,
                            ChatService chatService,
                            JWTTokenProvider jwtTokenProvider,
-                           JPQLQueryFactory jpqlQueryFactory) {
+                           JPQLQueryFactory jpqlQueryFactory, ChatMessageDAO chatMessageDAO) {
         this.matchDAO = matchDAO;
         this.objectMapper = objectMapper;
         this.fcmService = FCMService;
@@ -88,6 +92,7 @@ public class DummyController {
         this.chatService = chatService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.jpqlQueryFactory = jpqlQueryFactory;
+        this.chatMessageDAO = chatMessageDAO;
     }
 
 
@@ -140,36 +145,22 @@ public class DummyController {
     }
 
     @Transactional
-    @PostMapping("/create/chat-message-for-account")
-    public void createDummyChatMessageForAccount(@RequestParam UUID accountId, @RequestParam int seed) {
-        Account account = accountDAO.findById(accountId, false);
+    @PostMapping("/create/chat-message")
+    public void createDummyChatMessage(@RequestParam UUID swiperId,
+                                       @RequestParam UUID swipedId,
+                                       @RequestParam UUID chatId,
+                                       @RequestParam int count) {
+        Account swiper = accountDAO.findById(swiperId, false);
+        Account swiped = accountDAO.findById(swipedId, false);
+        Chat chat = chatDAO.findBy(chatId);
         Random random = new Random();
-        int innerCount = seed;
         Date date = new Date();
-
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < count; i++) {
             date = DateUtils.addSeconds(date, 30);
-//            for (Match match : account.getMatches()) {
-//                if (random.nextBoolean()) {
-//                    innerCount++;
-//                    boolean who = random.nextBoolean();
-//                    Account sender = who ? match.getSwiper() : match.getSwiped();
-//                    Account receiver = who ? match.getSwiped() : match.getSwiper();
-//                    ChatMessage chatMessage = new ChatMessage(match.getChat(),
-//                                                              receiver,
-//                                                              "message-" + random.nextFloat(),
-//                                                              date);
-//                    match.getChat().getChatMessages().add(chatMessage);
-//
-//                    if (sender.getId().equals(account.getId())) {
-//                        SentChatMessage sentChatMessage = new SentChatMessage(chatMessage, sender, innerCount, date);
-//                        sentChatMessageDAO.persist(sentChatMessage);
-//                    }
-//                }
-//            }
+            Account sender = random.nextBoolean() ? swiper : swiped;
+            ChatMessage chatMessage = new ChatMessage(chat, sender, "message-" + i, UUID.randomUUID(), date, date);
+            chatMessageDAO.persist(chatMessage);
         }
-
-
     }
 
 
@@ -557,23 +548,23 @@ public class DummyController {
         chatMessageDTO.setRecipientId(recipientId);
         chatMessageDTO.setBody(body);
         chatMessageDTO.setCreatedAt(new Date());
-        chatMessageDTO.setChatId(chatId);
-        chatMessageDTO.setAccountId(accountId);
+//        chatMessageDTO.setChatId(chatId);
+        chatMessageDTO.setSenderId(accountId);
 
         chatService.saveChatMessage(chatMessageDTO);
 
-        chatMessageDTO.setId(UUID.randomUUID());
+//        chatMessageDTO.setId(UUID.randomUUID());
 //        stompService.pushChatMessage(chatMessageDTO, Locale.getDefault());
     }
 
     @GetMapping("/send/chat/message")
     public void sendDummyChatMessageToFCM(@RequestParam("body") String body) {
         ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
-        chatMessageDTO.setAccountId(UUID.fromString("5b677c5b-46c3-4749-83f6-704cd3c21ab8"));
+        chatMessageDTO.setSenderId(UUID.fromString("5b677c5b-46c3-4749-83f6-704cd3c21ab8"));
         chatMessageDTO.setRecipientId(UUID.fromString("2c2743bf-23ab-4e23-bd4e-4955b8191e12"));
         chatMessageDTO.setBody(body);
-        chatMessageDTO.setChatId(1L);
-        chatMessageDTO.setId(UUID.fromString("ecbeacc4-3409-4195-8c47-76a1f6a4798c"));
+//        chatMessageDTO.setChatId(1L);
+//        chatMessageDTO.setId(UUID.fromString("ecbeacc4-3409-4195-8c47-76a1f6a4798c"));
         chatMessageDTO.setCreatedAt(new Date());
         stompService.pushChatMessage(chatMessageDTO, Locale.getDefault());
     }
@@ -592,6 +583,19 @@ public class DummyController {
 
     @GetMapping("/send/match")
     public void sendDummyMatch() {
+        MatchDTO matchDTO = new MatchDTO();
+        matchDTO.setSwiperId(UUID.fromString("2c2743bf-23ab-4e23-bd4e-4955b8191e12"));
+        matchDTO.setSwipedId(UUID.randomUUID());
+        matchDTO.setSwipedName("Test user");
+        matchDTO.setLastReadChatMessageId(0L);
+        matchDTO.setChatId(UUID.randomUUID());
+        matchDTO.setLastChatMessageId(0L);
+        matchDTO.setCreatedAt(new Date());
+        matchDTO.setLastChatMessageBody("");
+        matchDTO.setId(10L);
+        matchDTO.setSwipedDeleted(false);
+        matchDTO.setUnmatched(false);
+        stompService.push(matchDTO, Locale.getDefault());
 //        MatchDTO matchDTO = new MatchDTO(1L, UUID.randomUUID(), false, "Michael", "profilephotoeky", false, true, new Date(), new Date());
 //        matchDTO.setPushType(PushType.MATCHED);
 //        fcmService.sendMatch(matchDTO,
@@ -616,11 +620,11 @@ public class DummyController {
     @GetMapping("/save/chat/message")
     public void saveDummyChatMessage(@RequestParam("body") String body) {
         ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
-        chatMessageDTO.setAccountId(UUID.fromString("5b677c5b-46c3-4749-83f6-704cd3c21ab8"));
+        chatMessageDTO.setSenderId(UUID.fromString("5b677c5b-46c3-4749-83f6-704cd3c21ab8"));
         chatMessageDTO.setRecipientId(UUID.fromString("2c2743bf-23ab-4e23-bd4e-4955b8191e12"));
         chatMessageDTO.setBody(body);
-        chatMessageDTO.setChatId(1L);
-        chatMessageDTO.setId(UUID.fromString("ecbeacc4-3409-4195-8c47-76a1f6a4798c"));
+//        chatMessageDTO.setChatId(1L);
+//        chatMessageDTO.setId(UUID.fromString("ecbeacc4-3409-4195-8c47-76a1f6a4798c"));
         chatService.saveChatMessage(chatMessageDTO);
     }
 
@@ -691,8 +695,6 @@ public class DummyController {
             matchDAO.persist(objMatch);
         }
     }
-
-
 
 
 }

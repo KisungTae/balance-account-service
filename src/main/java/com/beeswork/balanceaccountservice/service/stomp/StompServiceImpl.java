@@ -4,7 +4,6 @@ import com.beeswork.balanceaccountservice.constant.PushType;
 import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.common.Pushable;
-import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.service.push.PushService;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.QueueInformation;
@@ -44,7 +43,7 @@ public class StompServiceImpl implements StompService {
         } else {
             MessageHeaders outHeaders = sendingHeaders(chatMessageDTO.getPushType());
             chatMessageDTO.setRecipientId(null);
-            chatMessageDTO.setAccountId(null);
+            chatMessageDTO.setSenderId(null);
             simpMessagingTemplate.convertAndSend(queue, chatMessageDTO, outHeaders);
         }
     }

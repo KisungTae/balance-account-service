@@ -50,6 +50,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                                                     qMatch.lastReadChatMessageId,
                                                     qMatch.lastChatMessageId,
                                                     qMatch.lastChatMessageBody,
+                                                    qMatch.createdAt,
                                                     qAccount.name,
                                                     qAccount.profilePhotoKey,
                                                     qAccount.deleted))
@@ -71,6 +72,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                                                     qMatch.lastReadChatMessageId,
                                                     qMatch.lastChatMessageId,
                                                     qMatch.lastChatMessageBody,
+                                                    qMatch.createdAt,
                                                     qAccount.name,
                                                     qAccount.profilePhotoKey,
                                                     qAccount.deleted))
@@ -109,6 +111,11 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     @Override
     public long countMatchesBy(UUID swiperId) {
         return jpaQueryFactory.selectFrom(qMatch).where(matchPageCondition(swiperId, MatchPageFilter.MATCH)).fetchCount();
+    }
+
+    @Override
+    public boolean existsBy(UUID swiperId, UUID chatId) {
+        return jpaQueryFactory.selectFrom(qMatch).where(qMatch.swiper.id.eq(swiperId).and(qMatch.chatId.eq(chatId))).fetchCount() > 0;
     }
 
 }

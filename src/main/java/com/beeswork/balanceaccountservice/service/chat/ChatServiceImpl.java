@@ -12,10 +12,14 @@ import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -27,30 +31,55 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     private final ChatMessageDAO        chatMessageDAO;
     private final ChatMessageReceiptDAO chatMessageReceiptDAO;
     private final AccountDAO            accountDAO;
+    private final ModelMapper           modelMapper;
 
 
     @Autowired
     public ChatServiceImpl(MatchDAO matchDAO,
                            ChatMessageDAO chatMessageDAO,
                            ChatMessageReceiptDAO chatMessageReceiptDAO,
-                           AccountDAO accountDAO) {
+                           AccountDAO accountDAO, ModelMapper modelMapper) {
         this.matchDAO = matchDAO;
         this.chatMessageDAO = chatMessageDAO;
         this.chatMessageReceiptDAO = chatMessageReceiptDAO;
         this.accountDAO = accountDAO;
+        this.modelMapper = modelMapper;
     }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public List<ChatMessageDTO> fetchChatMessages(UUID senderId, UUID chatId, Long lastChatMessageId, int loadSize) {
+        if (!matchDAO.existsBy(senderId, chatId)) {
+            throw new MatchNotFoundException();
+        }
+        List<ChatMessage> chatMessages = chatMessageDAO.findAllBy(chatId, lastChatMessageId, loadSize);
+        return convertToChatMessageDTO(senderId, chatMessages);
+    }
+
+    private List<ChatMessageDTO> convertToChatMessageDTO(UUID senderId, List<ChatMessage> chatMessages) {
+        List<ChatMessageDTO> chatMessageDTOs = new ArrayList<>();
+        for (ChatMessage chatMessage : chatMessages) {
+            ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessage, ChatMessageDTO.class);
+            if (!chatMessage.getSenderId().equals(senderId)) {
+                chatMessageDTO.setTag(null);
+            }
+            chatMessageDTOs.add(chatMessageDTO);
+        }
+        return chatMessageDTOs;
+    }
+
 
     @Override
     @Transactional
     public SaveChatMessageDTO saveChatMessage(ChatMessageDTO chatMessageDTO) {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
         SaveChatMessageDTO saveChatMessageDTO = new SaveChatMessageDTO();
-        Match match = matchDAO.findBy(chatMessageDTO.getAccountId(), chatMessageDTO.getRecipientId(), true);
+        Match match = matchDAO.findBy(chatMessageDTO.getSenderId(), chatMessageDTO.getRecipientId(), true);
 //        if (match == null || match.getSwiped() == null || match.getChat() == null || match.getChatId() != chatMessageDTO.getChatId()) {
 //            saveChatMessageDTO.setError(MatchNotFoundException.CODE);
 //            return saveChatMessageDTO;
 //        }
-
+//      TODO: return swipeDId as well because android sends chatMessage wihtout swipedId
         if (match.isUnmatched() || match.getSwiped().isDeleted() || match.getSwiped().isBlocked()) {
             saveChatMessageDTO.setError(MatchUnmatchedException.CODE);
             return saveChatMessageDTO;

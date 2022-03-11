@@ -7,10 +7,7 @@ import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
-import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
-import com.beeswork.balanceaccountservice.vm.chat.FetchedChatMessageVM;
-import com.beeswork.balanceaccountservice.vm.chat.ReceivedChatMessageVM;
-import com.beeswork.balanceaccountservice.vm.chat.SyncChatMessagesVM;
+import com.beeswork.balanceaccountservice.vm.chat.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
@@ -25,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 import java.util.Locale;
 
 @RestController
@@ -47,6 +45,20 @@ public class ChatController extends BaseController {
             Locale locale = StompHeader.getLocale(messageHeaders);
             stompService.pushChatMessage(modelMapper.map(chatMessageVM, ChatMessageDTO.class), locale);
         }
+    }
+
+    @GetMapping("/message/fetch")
+    public ResponseEntity<String> fetchChatMessages(@Valid @ModelAttribute FetchChatMessagesVM fetchChatMessagesVM,
+                                                    BindingResult bindingResult,
+                                                    Principal principal) throws JsonProcessingException {
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException();
+        }
+        List<ChatMessageDTO> chatMessageDTOs = chatService.fetchChatMessages(getAccountIdFrom(principal),
+                                                                             fetchChatMessagesVM.getChatId(),
+                                                                             fetchChatMessagesVM.getLastChatMessageId(),
+                                                                             fetchChatMessagesVM.getLoadSize());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(chatMessageDTOs));
     }
 
     @PostMapping("/message/sync")
@@ -73,8 +85,8 @@ public class ChatController extends BaseController {
 
     @PostMapping("/message/received")
     public ResponseEntity<String> receivedChatMessage(@Valid @RequestBody ReceivedChatMessageVM receivedChatMessageVM,
-                                                     BindingResult bindingResult,
-                                                     Principal principal) throws JsonProcessingException {
+                                                      BindingResult bindingResult,
+                                                      Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         chatService.receivedChatMessage(getAccountIdFrom(principal), receivedChatMessageVM.getChatMessageId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));

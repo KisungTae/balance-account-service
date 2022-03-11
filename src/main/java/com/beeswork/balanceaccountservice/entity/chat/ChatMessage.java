@@ -29,12 +29,21 @@ public class ChatMessage {
     @JoinColumn(name = "chat_id")
     private Chat chat;
 
+    @Column(name = "chat_id", insertable = false, updatable = false)
+    private UUID chatId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id")
     private Account sender;
 
+    @Column(name = "sender_id", insertable = false, updatable = false)
+    private UUID senderId;
+
     @Column(name = "body")
     private String body;
+
+    @Column(name = "tag")
+    private UUID tag;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -44,11 +53,12 @@ public class ChatMessage {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public ChatMessage(long id, Chat chat, Account sender, String body, Date createdAt) {
-        this.id = id;
+    public ChatMessage(Chat chat, Account sender, String body, UUID tag, Date createdAt, Date updatedAt) {
         this.chat = chat;
         this.sender = sender;
         this.body = body;
+        this.tag = tag;
         this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 }

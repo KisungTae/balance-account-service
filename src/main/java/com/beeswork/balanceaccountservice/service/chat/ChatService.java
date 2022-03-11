@@ -3,14 +3,13 @@ package com.beeswork.balanceaccountservice.service.chat;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.chat.ListChatMessagesDTO;
 import com.beeswork.balanceaccountservice.dto.chat.SaveChatMessageDTO;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ChatService {
+
+    List<ChatMessageDTO> fetchChatMessages(UUID senderId, UUID chatId, Long lastChatMessageId, int loadSize);
 
     SaveChatMessageDTO saveChatMessage(ChatMessageDTO chatMessageDTO);
     void syncChatMessages(List<UUID> sentChatMessageIds, List<UUID> receivedChatMessageIds);

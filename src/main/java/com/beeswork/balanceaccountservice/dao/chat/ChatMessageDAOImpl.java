@@ -22,6 +22,15 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
     }
 
     @Override
+    public List<ChatMessage> findAllBy(UUID chatId, long lastChatMessageId, int loadSize) {
+        return jpaQueryFactory.selectFrom(qChatMessage)
+                              .where(qChatMessage.chatId.eq(chatId).and(qChatMessage.id.lt(lastChatMessageId)))
+                              .orderBy(qChatMessage.id.desc())
+                              .limit(loadSize)
+                              .fetch();
+    }
+
+    @Override
     public List<ChatMessageDTO> findAllUnreceived(UUID accountId) {
 //        return jpaQueryFactory.select(new QChatMessageDTO(qChatMessage.id,
 //                                                          qChatMessage.body,

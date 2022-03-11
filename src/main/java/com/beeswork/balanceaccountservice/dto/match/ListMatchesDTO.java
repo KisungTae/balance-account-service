@@ -13,6 +13,4 @@ public class ListMatchesDTO {
     private List<MatchDTO> matchDTOs;
     private long           matchCount;
     private Date           matchCountCountedAt;
-    private long           swipeCount;
-    private Date           swipeCountCountedAt;
 }

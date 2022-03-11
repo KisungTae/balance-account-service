@@ -48,7 +48,7 @@ public class PushServiceImpl implements PushService {
         if (pushToken == null || StringUtils.isBlank(pushToken.getToken())) {
             return;
         }
-        Account sender = accountDAO.findById(chatMessageDTO.getAccountId(), false);
+        Account sender = accountDAO.findById(chatMessageDTO.getSenderId(), false);
         chatMessageDTO.setSenderName(sender.getName());
         push(chatMessageDTO, pushToken, locale);
     }

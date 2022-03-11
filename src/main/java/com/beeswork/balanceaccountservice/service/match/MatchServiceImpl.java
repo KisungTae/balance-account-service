@@ -76,10 +76,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     private void nullifyMatches(List<MatchDTO> matchDTOs) {
         for (MatchDTO matchDTO : matchDTOs) {
-            if (matchDTO.getUnmatched() || matchDTO.getSwipedDeleted()) {
-                matchDTO.setChatId(null);
-                matchDTO.setLastChatMessageId(null);
-                matchDTO.setLastReadChatMessageId(null);
+            if (matchDTO.isUnmatched() || matchDTO.isSwipedDeleted()) {
                 matchDTO.setSwipedName(null);
                 matchDTO.setSwipedProfilePhotoKey(null);
             }
@@ -91,30 +88,19 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
             ExecutorService executorService = Executors.newFixedThreadPool(3);
             Future<List<MatchDTO>> listMatchesFuture = executorService.submit(listMatchesCallable);
             Future<CountMatchesDTO> countMatchesFuture = executorService.submit(() -> countMatches(swiperId));
-            Future<CountSwipesDTO> countSwipesFuture = executorService.submit(() -> countSwipes(swiperId));
 
             ListMatchesDTO listMatchesDTO = new ListMatchesDTO();
-
             List<MatchDTO> matchDTOs = listMatchesFuture.get(1, TimeUnit.MINUTES);
             CountMatchesDTO countMatchesDTO = countMatchesFuture.get(1, TimeUnit.MINUTES);
-            CountSwipesDTO countSwipesDTO = countSwipesFuture.get(1, TimeUnit.MINUTES);
 
             listMatchesDTO.setMatchDTOs(matchDTOs);
             listMatchesDTO.setMatchCount(countMatchesDTO.getCount());
             listMatchesDTO.setMatchCountCountedAt(countMatchesDTO.getCountedAt());
-            listMatchesDTO.setSwipeCount(countSwipesDTO.getCount());
-            listMatchesDTO.setSwipeCountCountedAt(countSwipesDTO.getCountedAt());
 
             return listMatchesDTO;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             throw new InternalServerException();
         }
-    }
-
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public CountSwipesDTO countSwipes(UUID swipedId) {
-        Date now = new Date();
-        return new CountSwipesDTO(swipeDAO.countSwipesBy(swipedId), now);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)

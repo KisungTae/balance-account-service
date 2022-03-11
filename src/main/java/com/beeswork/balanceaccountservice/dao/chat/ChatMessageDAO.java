@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChatMessageDAO extends BaseDAO<ChatMessage> {
+    List<ChatMessage> findAllBy(UUID chatId, long lastChatMessageId, int loadSize);
     List<ChatMessageDTO> findAllUnreceived(UUID accountId);
     List<ChatMessage> findAllIn(List<UUID> chatMessageIds);
     ChatMessage findById(UUID chatMessageId);
