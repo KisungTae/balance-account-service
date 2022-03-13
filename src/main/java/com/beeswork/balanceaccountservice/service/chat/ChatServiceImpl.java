@@ -52,7 +52,16 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         if (!matchDAO.existsBy(senderId, chatId)) {
             throw new MatchNotFoundException();
         }
+        if (lastChatMessageId == null) {
+            lastChatMessageId = Long.MAX_VALUE;
+        }
         List<ChatMessage> chatMessages = chatMessageDAO.findAllBy(chatId, lastChatMessageId, loadSize);
+        return convertToChatMessageDTO(senderId, chatMessages);
+    }
+
+    @Override
+    public List<ChatMessageDTO> listChatMessages(UUID senderId, UUID chatId, UUID appToken, int startPosition, int loadSize) {
+        List<ChatMessage> chatMessages = chatMessageDAO.findAllBy(senderId, chatId, appToken, startPosition, loadSize);
         return convertToChatMessageDTO(senderId, chatMessages);
     }
 
@@ -126,13 +135,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
 //        }
     }
 
-    @Override
-    public ListChatMessagesDTO listChatMessages(UUID accountId) {
-        ListChatMessagesDTO listChatMessagesDTO = new ListChatMessagesDTO();
-        listChatMessagesDTO.setReceivedChatMessageDTOs(chatMessageDAO.findAllUnreceived(accountId));
-//        listChatMessagesDTO.setSentChatMessageDTOs(sentChatMessageDAO.findAllUnfetched(accountId));
-        return listChatMessagesDTO;
-    }
+
 
     @Override
     @Transactional

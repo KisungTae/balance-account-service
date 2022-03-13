@@ -10,10 +10,10 @@ import java.util.UUID;
 public interface ChatService {
 
     List<ChatMessageDTO> fetchChatMessages(UUID senderId, UUID chatId, Long lastChatMessageId, int loadSize);
+    List<ChatMessageDTO> listChatMessages(UUID senderId, UUID chatId, UUID appToken, int startPosition, int loadSize);
 
     SaveChatMessageDTO saveChatMessage(ChatMessageDTO chatMessageDTO);
     void syncChatMessages(List<UUID> sentChatMessageIds, List<UUID> receivedChatMessageIds);
-    ListChatMessagesDTO listChatMessages(UUID accountId);
     void fetchedChatMessage(UUID accountId, UUID chatMessageId);
     void receivedChatMessage(UUID accountId, UUID chatMessageId);
 
