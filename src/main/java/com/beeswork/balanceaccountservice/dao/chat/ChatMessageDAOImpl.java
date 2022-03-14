@@ -42,7 +42,7 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
                                                "on sub.id = cmr.chat_message_id " +
                                                "   and cmr.account_id = :accountId " +
                                                "where app_token is null " +
-                                               "or app_token = :appToken", ChatMessage.class)
+                                               "or app_token != :appToken", ChatMessage.class)
                             .setParameter("chatId", chatId)
                             .setParameter("limit", loadSize)
                             .setParameter("offset", startPosition)
@@ -52,28 +52,9 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
     }
 
     @Override
-    public List<ChatMessageDTO> findAllUnreceived(UUID accountId) {
-//        return jpaQueryFactory.select(new QChatMessageDTO(qChatMessage.id,
-//                                                          qChatMessage.body,
-//                                                          qChatMessage.chat.id,
-//                                                          qChatMessage.createdAt))
-//                              .from(qChatMessage)
-//                              .where(qChatMessage.recipient.id.eq(accountId).and(qChatMessage.received.eq(false)))
-//                              .fetch();
-
-        return null;
+    public ChatMessage findBy(UUID chatId, Long chatMessageId) {
+        return jpaQueryFactory.selectFrom(qChatMessage)
+                              .where(qChatMessage.chatId.eq(chatId).and(qChatMessage.id.eq(chatMessageId)))
+                              .fetchFirst();
     }
-
-    @Override
-    public List<ChatMessage> findAllIn(List<UUID> chatMessageIds) {
-//        return jpaQueryFactory.selectFrom(qChatMessage).where(qChatMessage.id.in(chatMessageIds)).fetch();
-        return null;
-    }
-
-    @Override
-    public ChatMessage findById(UUID chatMessageId) {
-        return entityManager.find(ChatMessage.class, chatMessageId);
-    }
-
-
 }

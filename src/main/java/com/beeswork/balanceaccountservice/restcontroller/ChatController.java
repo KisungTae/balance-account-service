@@ -2,7 +2,6 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.constant.StompHeader;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
-import com.beeswork.balanceaccountservice.dto.chat.ListChatMessagesDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
@@ -74,9 +73,14 @@ public class ChatController extends BaseController {
     }
 
     @PostMapping("/message/sync")
-    public void syncChatMessages(@Valid @RequestBody SyncChatMessagesVM syncChatMessagesVM, BindingResult bindingResult) {
+    public void syncChatMessages(@Valid @RequestBody SyncChatMessagesVM syncChatMessagesVM,
+                                 BindingResult bindingResult,
+                                 Principal principal) {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        chatService.syncChatMessages(syncChatMessagesVM.getSentChatMessageIds(), syncChatMessagesVM.getReceivedChatMessageIds());
+        chatService.syncChatMessages(getAccountIdFrom(principal),
+                                     syncChatMessagesVM.getChatId(),
+                                     syncChatMessagesVM.getAppToken(),
+                                     syncChatMessagesVM.getChatMessageIds());
     }
 
 

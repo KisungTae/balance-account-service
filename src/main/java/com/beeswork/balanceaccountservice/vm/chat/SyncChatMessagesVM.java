@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.vm.chat;
 
+import com.beeswork.balanceaccountservice.validator.ValidUUID;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.ArrayList;
@@ -9,6 +10,12 @@ import java.util.UUID;
 @Getter
 @Setter
 public class SyncChatMessagesVM {
-    private List<UUID> receivedChatMessageIds = new ArrayList<>();
-    private List<UUID> sentChatMessageIds     = new ArrayList<>();
+
+    @ValidUUID
+    private UUID chatId;
+
+    @ValidUUID
+    private UUID appToken;
+
+    private List<Long> chatMessageIds = new ArrayList<>();
 }

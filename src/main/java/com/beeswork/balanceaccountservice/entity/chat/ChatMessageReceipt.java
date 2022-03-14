@@ -37,4 +37,17 @@ public class ChatMessageReceipt {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
+    public ChatMessageReceipt(ChatMessage chatMessage,
+                              Account account,
+                              UUID appToken,
+                              Date createdAt,
+                              Date updatedAt) {
+        this.chatMessageReceiptId = new ChatMessageReceiptId(chatMessage.getId(), account.getId());
+        this.chatMessage = chatMessage;
+        this.account = account;
+        this.appToken = appToken;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 }
