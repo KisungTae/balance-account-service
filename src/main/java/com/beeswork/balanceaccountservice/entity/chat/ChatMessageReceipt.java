@@ -27,6 +27,9 @@ public class ChatMessageReceipt {
     @MapsId("accountId")
     private Account account;
 
+    @Column(name = "chat_id")
+    private UUID chatId;
+
     @Column(name = "app_token")
     private UUID appToken;
 
@@ -46,6 +49,7 @@ public class ChatMessageReceipt {
         this.chatMessageReceiptId = new ChatMessageReceiptId(chatMessage.getId(), account.getId());
         this.chatMessage = chatMessage;
         this.account = account;
+        this.chatId = chatMessage.getChatId();
         this.appToken = appToken;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;

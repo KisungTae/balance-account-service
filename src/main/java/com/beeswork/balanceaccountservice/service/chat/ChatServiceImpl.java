@@ -70,11 +70,23 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     @Transactional
     public void syncChatMessages(UUID accountId, UUID chatId, UUID appToken, List<Long> chatMessageIds) {
         Account account = accountDAO.findById(accountId, false);
+        if (account == null) {
+            return;
+        }
         Date now = new Date();
         for (long chatMessageId : chatMessageIds) {
-            ChatMessage chatMessage = chatMessageDAO.findBy(chatId, chatMessageId);
-            ChatMessageReceipt chatMessageReceipt = new ChatMessageReceipt(chatMessage, account, appToken, now, now);
-            chatMessageReceiptDAO.persist(chatMessageReceipt);
+            ChatMessageReceipt chatMessageReceipt = chatMessageReceiptDAO.findBy(accountId, chatId, chatMessageId);
+            if (chatMessageReceipt == null) {
+                ChatMessage chatMessage = chatMessageDAO.findBy(chatId, chatMessageId);
+                if (chatMessage == null) {
+                    continue;
+                }
+                ChatMessageReceipt newChatMessageReceipt = new ChatMessageReceipt(chatMessage, account, appToken, now, now);
+                chatMessageReceiptDAO.persist(newChatMessageReceipt);
+            } else {
+                chatMessageReceipt.setAppToken(appToken);
+                chatMessageReceipt.setUpdatedAt(now);
+            }
         }
     }
 

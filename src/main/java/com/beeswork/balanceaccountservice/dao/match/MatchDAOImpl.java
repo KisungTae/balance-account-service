@@ -12,6 +12,7 @@ import com.beeswork.balanceaccountservice.entity.match.QMatch;;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -47,7 +48,9 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                                                     qMatch.swiper.id,
                                                     qMatch.swiped.id,
                                                     qMatch.unmatched,
-                                                    qMatch.lastReadChatMessageId,
+                                                    qMatch.lastReceivedChatMessageId,
+                                                    qMatch.lastReadReceivedChatMessageId,
+                                                    qMatch.lastReadByChatMessageId,
                                                     qMatch.lastChatMessageId,
                                                     qMatch.lastChatMessageBody,
                                                     qMatch.createdAt,
@@ -69,7 +72,9 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                                                     qMatch.swiper.id,
                                                     qMatch.swiped.id,
                                                     qMatch.unmatched,
-                                                    qMatch.lastReadChatMessageId,
+                                                    qMatch.lastReceivedChatMessageId,
+                                                    qMatch.lastReadReceivedChatMessageId,
+                                                    qMatch.lastReadByChatMessageId,
                                                     qMatch.lastChatMessageId,
                                                     qMatch.lastChatMessageBody,
                                                     qMatch.createdAt,
@@ -95,7 +100,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                     condition = condition.and(qMatch.lastChatMessageId.gt(0L));
                     break;
                 case CHAT_WITH_MESSAGES:
-                    condition = condition.and(qMatch.lastReadChatMessageId.lt(qMatch.lastChatMessageId));
+                    condition = condition.and(qMatch.lastReadReceivedChatMessageId.lt(qMatch.lastReceivedChatMessageId));
                     break;
             }
             condition.and(qMatch.unmatched.eq(false).and(qAccount.deleted.eq(false)));
@@ -105,7 +110,11 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
 
     @Override
     public Match findBy(UUID swiperId, UUID swipedId, boolean writeLock) {
-        return entityManager.find(Match.class, new MatchId(swiperId, swipedId), writeLock ? LockModeType.PESSIMISTIC_WRITE : LockModeType.NONE);
+        JPAQuery<Match> query = jpaQueryFactory.selectFrom(qMatch).where(qMatch.swiper.id.eq(swiperId).and(qMatch.swiped.id.eq(swipedId)));
+        if (writeLock) {
+            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+        }
+        return query.fetchFirst();
     }
 
     @Override
@@ -116,6 +125,15 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     @Override
     public boolean existsBy(UUID swiperId, UUID chatId) {
         return jpaQueryFactory.selectFrom(qMatch).where(qMatch.swiper.id.eq(swiperId).and(qMatch.chatId.eq(chatId))).fetchCount() > 0;
+    }
+
+    @Override
+    public List<Match> findAllBy(UUID chatId, boolean writeLock) {
+        JPAQuery<Match> query = jpaQueryFactory.selectFrom(qMatch).where(qMatch.chatId.eq(chatId));
+        if (writeLock) {
+            query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+        }
+        return query.fetch();
     }
 
 }

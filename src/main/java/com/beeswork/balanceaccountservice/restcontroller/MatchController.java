@@ -1,12 +1,12 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
-import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.match.MatchService;
 import com.beeswork.balanceaccountservice.vm.match.FetchMatchesVM;
 import com.beeswork.balanceaccountservice.vm.match.ListMatchesVM;
+import com.beeswork.balanceaccountservice.vm.match.SyncMatchVM;
 import com.beeswork.balanceaccountservice.vm.match.UnmatchVM;
 import com.beeswork.balanceaccountservice.vm.report.ReportVM;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.List;
 
 @Validated
 @RestController
@@ -76,6 +75,15 @@ public class MatchController extends BaseController {
                                               Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         matchService.reportMatch(getAccountIdFrom(principal), reportVM.getReportedId(), reportVM.getReportReasonId(), reportVM.getDescription());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+    }
+
+    @PostMapping("/sync")
+    public ResponseEntity<String> syncMatch(@Valid @RequestBody SyncMatchVM syncMatchVM,
+                                            BindingResult bindingResult,
+                                            Principal principal) throws JsonProcessingException {
+        if (bindingResult.hasErrors()) throw new BadRequestException();
+        matchService.syncMatch(getAccountIdFrom(principal), syncMatchVM.getChatId(), syncMatchVM.getLastReadReceivedChatMessageId());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 

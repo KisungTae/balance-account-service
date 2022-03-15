@@ -26,9 +26,15 @@ public class Match {
     @JoinColumn(name = "swiper_id")
     private Account swiper;
 
+    @Column(name = "swiper_Id", insertable = false, updatable = false)
+    private UUID swiperId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "swiped_id")
     private Account swiped;
+
+    @Column(name = "swiped_Id", insertable = false, updatable = false)
+    private UUID swipedId;
 
     @Column(name = "chat_id")
     private UUID chatId;
@@ -39,8 +45,14 @@ public class Match {
     @Column(name = "deleted")
     private boolean deleted;
 
-    @Column(name = "last_read_chat_message_id")
-    private long lastReadChatMessageId;
+    @Column(name = "last_received_chat_message_id")
+    private long lastReceivedChatMessageId;
+
+    @Column(name = "last_read_received_chat_message_id")
+    private long lastReadReceivedChatMessageId;
+
+    @Column(name = "last_read_by_chat_message_id")
+    private long lastReadByChatMessageId;
 
     @Column(name = "last_chat_message_id")
     private long lastChatMessageId;
@@ -58,18 +70,12 @@ public class Match {
 
     public Match(Account swiper, Account swiped, UUID chatId, Date createdAt) {
         this.swiper = swiper;
+        this.swiperId = swiper.getId();
         this.swiped = swiped;
+        this.swipedId = swiped.getId();
         this.chatId = chatId;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
-    }
-
-    public UUID getSwiperId() {
-        return this.swiper.getId();
-    }
-
-    public UUID getSwipedId() {
-        return this.swiped.getId();
     }
 
     public String getSwipedName() {

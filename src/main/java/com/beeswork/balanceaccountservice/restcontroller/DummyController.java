@@ -587,7 +587,6 @@ public class DummyController {
         matchDTO.setSwiperId(UUID.fromString("2c2743bf-23ab-4e23-bd4e-4955b8191e12"));
         matchDTO.setSwipedId(UUID.randomUUID());
         matchDTO.setSwipedName("Test user");
-        matchDTO.setLastReadChatMessageId(0L);
         matchDTO.setChatId(UUID.randomUUID());
         matchDTO.setLastChatMessageId(0L);
         matchDTO.setCreatedAt(new Date());
@@ -684,10 +683,11 @@ public class DummyController {
 
             if (random.nextInt(10) > 3) {
                 subMatch.setLastChatMessageId(random.nextInt(50) + 1);
+                subMatch.setLastReceivedChatMessageId(random.nextInt(50) + 1);
                 if (random.nextInt(10) > 7) {
-                    subMatch.setLastReadChatMessageId(subMatch.getLastChatMessageId());
+                    subMatch.setLastReadReceivedChatMessageId(subMatch.getLastReceivedChatMessageId());
                 } else {
-                    subMatch.setLastReadChatMessageId(random.nextInt((int) subMatch.getLastChatMessageId()));
+                    subMatch.setLastReadReceivedChatMessageId(random.nextInt((int) subMatch.getLastReceivedChatMessageId()));
                 }
             }
 

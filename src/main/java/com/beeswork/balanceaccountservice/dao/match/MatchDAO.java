@@ -15,4 +15,5 @@ public interface MatchDAO extends BaseDAO<Match> {
     Match findBy(UUID swiperId, UUID swipedId, boolean writeLock);
     long countMatchesBy(UUID swiperId);
     boolean existsBy(UUID swiperId, UUID chatId);
+    List<Match> findAllBy(UUID chatId, boolean writeLock);
 }

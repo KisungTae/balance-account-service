@@ -8,7 +8,6 @@ import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
 import com.beeswork.balanceaccountservice.dto.match.CountMatchesDTO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
-import com.beeswork.balanceaccountservice.dto.swipe.CountSwipesDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.UnmatchAudit;
@@ -109,6 +108,22 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
         return new CountMatchesDTO(matchDAO.countMatchesBy(swiperId), now);
     }
 
+    @Override
+    @Transactional
+    public void syncMatch(UUID swiperId, UUID chatId, long lastReadReceivedChatMessageId) {
+        List<Match> matches = matchDAO.findAllBy(chatId, true);
+        for (Match match : matches) {
+            if (match.getSwiperId().equals(swiperId)) {
+                if (match.getLastReadReceivedChatMessageId() < lastReadReceivedChatMessageId) {
+                    match.setLastReadReceivedChatMessageId(lastReadReceivedChatMessageId);
+                }
+            } else {
+                if (match.getLastReadByChatMessageId() < lastReadReceivedChatMessageId) {
+                    match.setLastReadByChatMessageId(lastReadReceivedChatMessageId);
+                }
+            }
+        }
+    }
 
     @Override
     @Transactional
