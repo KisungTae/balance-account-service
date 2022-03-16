@@ -40,7 +40,7 @@ public class MatchController extends BaseController {
                                                Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         ListMatchesDTO listMatchesDTO = matchService.fetchMatches(getAccountIdFrom(principal),
-                                                                  fetchMatchesVM.getLastSwipedId(),
+                                                                  fetchMatchesVM.getLastMatchId(),
                                                                   fetchMatchesVM.getLoadSize(),
                                                                   fetchMatchesVM.getMatchPageFilter());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listMatchesDTO));

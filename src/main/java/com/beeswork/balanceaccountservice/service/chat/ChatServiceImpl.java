@@ -53,9 +53,6 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         if (!matchDAO.existsBy(senderId, chatId)) {
             throw new MatchNotFoundException();
         }
-        if (lastChatMessageId == null) {
-            lastChatMessageId = Long.MAX_VALUE;
-        }
         List<ChatMessage> chatMessages = chatMessageDAO.findAllBy(chatId, lastChatMessageId, loadSize);
         return convertToChatMessageDTO(senderId, chatMessages);
     }

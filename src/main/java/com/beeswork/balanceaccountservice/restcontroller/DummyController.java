@@ -155,11 +155,29 @@ public class DummyController {
         Chat chat = chatDAO.findBy(chatId);
         Random random = new Random();
         Date date = new Date();
+
+        Match swiperMatch = matchDAO.findBy(swiperId, swipedId, false);
+        Match swipedMatch = matchDAO.findBy(swipedId, swiperId, false);
+
         for (int i = 0; i < count; i++) {
             date = DateUtils.addSeconds(date, 30);
-            Account sender = random.nextBoolean() ? swiper : swiped;
-            ChatMessage chatMessage = new ChatMessage(chat, sender, "message-" + i, UUID.randomUUID(), date, date);
-            chatMessageDAO.persist(chatMessage);
+            if (random.nextBoolean()) {
+                ChatMessage chatMessage = new ChatMessage(chat, swiper, "message-" + i, UUID.randomUUID(), date, date);
+                chatMessageDAO.persist(chatMessage);
+                swipedMatch.setLastReceivedChatMessageId(chatMessage.getId());
+                swipedMatch.setLastChatMessageId(chatMessage.getId());
+                swipedMatch.setLastChatMessageBody(chatMessage.getBody());
+                swiperMatch.setLastChatMessageId(chatMessage.getId());
+                swiperMatch.setLastChatMessageBody(chatMessage.getBody());
+            } else {
+                ChatMessage chatMessage = new ChatMessage(chat, swiped, "message-" + i, UUID.randomUUID(), date, date);
+                chatMessageDAO.persist(chatMessage);
+                swiperMatch.setLastReceivedChatMessageId(chatMessage.getId());
+                swiperMatch.setLastChatMessageId(chatMessage.getId());
+                swiperMatch.setLastChatMessageBody(chatMessage.getBody());
+                swipedMatch.setLastChatMessageId(chatMessage.getId());
+                swipedMatch.setLastChatMessageBody(chatMessage.getBody());
+            }
         }
     }
 

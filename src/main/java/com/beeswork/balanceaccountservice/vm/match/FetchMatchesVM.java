@@ -11,7 +11,7 @@ import java.util.UUID;
 @Setter
 public class FetchMatchesVM {
 
-    private UUID lastSwipedId;
+    private Long lastMatchId;
 
     @NotNull
     private Integer loadSize;

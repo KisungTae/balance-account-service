@@ -251,13 +251,13 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     }
 
     @Override
-    public ListSwipesDTO fetchSwipes(final UUID swipedId, final UUID lastSwiperId, final int loadSize) {
-        return getListSwipesDTO(() -> doFetchSwipes(swipedId, lastSwiperId, loadSize), swipedId);
+    public ListSwipesDTO fetchSwipes(final UUID swipedId, final Long lastSwipeId, final int loadSize) {
+        return getListSwipesDTO(() -> doFetchSwipes(swipedId, lastSwipeId, loadSize), swipedId);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<SwipeDTO> doFetchSwipes(UUID swipedId, UUID lastSwiperId, int loadSize) {
-        return swipeDAO.findAllBy(swipedId, lastSwiperId, loadSize);
+    public List<SwipeDTO> doFetchSwipes(UUID swipedId, Long lastSwipeId, int loadSize) {
+        return swipeDAO.findAllBy(swipedId, lastSwipeId, loadSize);
     }
 
     private ListSwipesDTO getListSwipesDTO(final Callable<List<SwipeDTO>> listSwipeDTOsCallable, final UUID swipedId) {

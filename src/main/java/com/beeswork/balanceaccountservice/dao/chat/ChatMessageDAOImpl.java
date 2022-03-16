@@ -1,8 +1,8 @@
 package com.beeswork.balanceaccountservice.dao.chat;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
-import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.entity.chat.*;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
@@ -22,9 +22,13 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
     }
 
     @Override
-    public List<ChatMessage> findAllBy(UUID chatId, long lastChatMessageId, int loadSize) {
+    public List<ChatMessage> findAllBy(UUID chatId, Long lastChatMessageId, int loadSize) {
+        BooleanExpression condition = qChatMessage.chat.id.eq(chatId);
+        if (lastChatMessageId != null) {
+            condition = condition.and(qChatMessage.id.lt(lastChatMessageId));
+        }
         return jpaQueryFactory.selectFrom(qChatMessage)
-                              .where(qChatMessage.chat.id.eq(chatId).and(qChatMessage.id.lt(lastChatMessageId)))
+                              .where(condition)
                               .orderBy(qChatMessage.id.desc())
                               .limit(loadSize)
                               .fetch();

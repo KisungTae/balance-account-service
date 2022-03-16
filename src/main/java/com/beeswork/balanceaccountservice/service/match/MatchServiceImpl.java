@@ -50,13 +50,13 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     }
 
     @Override
-    public ListMatchesDTO fetchMatches(final UUID swiperId, final UUID lastSwipedId, final int loadSize, final MatchPageFilter matchPageFilter) {
-        return getListMatchesDTO(() -> doFetchMatches(swiperId, lastSwipedId, loadSize, matchPageFilter), swiperId);
+    public ListMatchesDTO fetchMatches(final UUID swiperId, final Long lastMatchId, final int loadSize, final MatchPageFilter matchPageFilter) {
+        return getListMatchesDTO(() -> doFetchMatches(swiperId, lastMatchId, loadSize, matchPageFilter), swiperId);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<MatchDTO> doFetchMatches(UUID swiperId, UUID lastSwipedId, int loadSize, MatchPageFilter matchPageFilter) {
-        List<MatchDTO> matchDTOs = matchDAO.findAllBy(swiperId, lastSwipedId, loadSize, matchPageFilter);
+    public List<MatchDTO> doFetchMatches(UUID swiperId, Long lastMatchId, int loadSize, MatchPageFilter matchPageFilter) {
+        List<MatchDTO> matchDTOs = matchDAO.findAllBy(swiperId, lastMatchId, loadSize, matchPageFilter);
         nullifyMatches(matchDTOs);
         return matchDTOs;
     }

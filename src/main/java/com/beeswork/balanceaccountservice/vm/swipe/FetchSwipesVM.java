@@ -10,7 +10,7 @@ import java.util.UUID;
 @Setter
 public class FetchSwipesVM {
 
-    private UUID lastSwiperId;
+    private Long lastSwipeId;
 
     @NotNull
     private Integer loadSize;

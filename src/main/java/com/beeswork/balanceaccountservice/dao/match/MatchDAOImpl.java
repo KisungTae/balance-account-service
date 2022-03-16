@@ -7,7 +7,6 @@ import com.beeswork.balanceaccountservice.dto.match.QMatchDTO;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
 import com.beeswork.balanceaccountservice.entity.chat.QChat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
-import com.beeswork.balanceaccountservice.entity.match.MatchId;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -35,38 +34,30 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public List<MatchDTO> findAllBy(UUID swiperId, UUID lastSwipedId, int loadSize, MatchPageFilter matchPageFilter) {
+    public List<MatchDTO> findAllBy(UUID swiperId, Long lastMatchId, int loadSize, MatchPageFilter matchPageFilter) {
         BooleanExpression condition = matchPageCondition(swiperId, matchPageFilter);
-        if (lastSwipedId != null) {
-            JPQLQuery<Long> lastMatchId = JPAExpressions.select(qMatch.id)
-                                                        .from(qMatch)
-                                                        .where(qMatch.swiper.id.eq(swiperId).and(qMatch.swiped.id.eq(lastSwipedId)));
+        if (lastMatchId != null) {
             condition = condition.and(qMatch.id.lt(lastMatchId));
         }
-        return jpaQueryFactory.select(new QMatchDTO(qMatch.id,
-                                                    qMatch.chatId,
-                                                    qMatch.swiper.id,
-                                                    qMatch.swiped.id,
-                                                    qMatch.unmatched,
-                                                    qMatch.lastReceivedChatMessageId,
-                                                    qMatch.lastReadReceivedChatMessageId,
-                                                    qMatch.lastReadByChatMessageId,
-                                                    qMatch.lastChatMessageId,
-                                                    qMatch.lastChatMessageBody,
-                                                    qMatch.createdAt,
-                                                    qAccount.name,
-                                                    qAccount.profilePhotoKey,
-                                                    qAccount.deleted))
-                              .from(qMatch)
-                              .leftJoin(qAccount).on(qAccount.id.eq(qMatch.swiped.id))
-                              .where(condition)
-                              .orderBy(qMatch.id.desc())
-                              .limit(loadSize)
-                              .fetch();
+        return selectMatchDTO().from(qMatch)
+                               .leftJoin(qAccount).on(qAccount.id.eq(qMatch.swiped.id))
+                               .where(condition)
+                               .orderBy(qMatch.id.desc())
+                               .limit(loadSize)
+                               .fetch();
     }
 
     @Override
     public List<MatchDTO> findAllBy(UUID swiperId, int startPosition, int loadSize, MatchPageFilter matchPageFilter) {
+        return selectMatchDTO().from(qMatch)
+                               .leftJoin(qAccount).on(qAccount.id.eq(qMatch.swiped.id))
+                               .where(matchPageCondition(swiperId, matchPageFilter))
+                               .orderBy(qMatch.id.desc())
+                               .limit(loadSize)
+                               .offset(startPosition).fetch();
+    }
+
+    private JPAQuery<MatchDTO> selectMatchDTO() {
         return jpaQueryFactory.select(new QMatchDTO(qMatch.id,
                                                     qMatch.chatId,
                                                     qMatch.swiper.id,
@@ -80,13 +71,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                                                     qMatch.createdAt,
                                                     qAccount.name,
                                                     qAccount.profilePhotoKey,
-                                                    qAccount.deleted))
-                              .from(qMatch)
-                              .leftJoin(qAccount).on(qAccount.id.eq(qMatch.swiped.id))
-                              .where(matchPageCondition(swiperId, matchPageFilter))
-                              .orderBy(qMatch.id.desc())
-                              .limit(loadSize)
-                              .offset(startPosition).fetch();
+                                                    qAccount.deleted));
     }
 
     private BooleanExpression matchPageCondition(UUID swiperId, MatchPageFilter matchPageFilter) {

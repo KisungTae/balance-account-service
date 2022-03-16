@@ -66,7 +66,7 @@ public class SwipeController extends BaseController {
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         ListSwipesDTO listSwipesDTO = swipeService.fetchSwipes(getAccountIdFrom(principal),
-                                                               fetchSwipesVM.getLastSwiperId(),
+                                                               fetchSwipesVM.getLastSwipeId(),
                                                                fetchSwipesVM.getLoadSize());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listSwipesDTO));
     }

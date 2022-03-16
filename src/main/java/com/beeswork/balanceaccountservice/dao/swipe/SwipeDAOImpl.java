@@ -58,14 +58,11 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
     @Override
-    public List<SwipeDTO> findAllBy(UUID swipedId, UUID lastSwiperId, int loadSize) {
+    public List<SwipeDTO> findAllBy(UUID swipedId, Long lastSwipeId, int loadSize) {
         BooleanExpression condition = qSwipe.swiped.id.eq(swipedId)
                                                       .and(qAccount.deleted.eq(false))
                                                       .and(qSwipe.matched.eq(false));
-        if (lastSwiperId != null) {
-            JPQLQuery<Long> lastSwipeId = JPAExpressions.select(qSwipe.id)
-                                                        .from(qSwipe)
-                                                        .where(qSwipe.swiper.id.eq(lastSwiperId).and(qSwipe.swiped.id.eq(swipedId)));
+        if (lastSwipeId != null) {
             condition = condition.and(qSwipe.id.lt(lastSwipeId));
         }
         return jpaQueryFactory.select(new QSwipeDTO(qSwipe.id,
