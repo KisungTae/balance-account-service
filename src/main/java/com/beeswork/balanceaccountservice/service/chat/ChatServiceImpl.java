@@ -59,6 +59,9 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
 
     @Override
     public List<ChatMessageDTO> listChatMessages(UUID senderId, UUID chatId, UUID appToken, int startPosition, int loadSize) {
+        if (!matchDAO.existsBy(senderId, chatId)) {
+            throw new MatchNotFoundException();
+        }
         List<ChatMessage> chatMessages = chatMessageDAO.findAllBy(senderId, chatId, appToken, startPosition, loadSize);
         return convertToChatMessageDTO(senderId, chatMessages);
     }

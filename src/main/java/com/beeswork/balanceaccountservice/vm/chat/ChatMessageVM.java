@@ -11,17 +11,26 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class ChatMessageVM {
-    private UUID    id;
-    private String  body;
-    private Long    chatId;
-    private UUID    accountId;
-    private UUID    recipientId;
-    private Date    createdAt;
-    private String  error;
+    private Long   id;
+    private UUID   tag;
+    private String body;
+    private Long   chatId;
+    private UUID   accountId;
+    private UUID   recipientId;
+    private Date   createdAt;
+    private String error;
+    private String errorMessage;
 
-    public ChatMessageVM(UUID id, String error) {
-        this.id = id;
+    public ChatMessageVM(UUID tag, String error, String errorMessage) {
+        this.tag = tag;
         this.error = error;
+        this.errorMessage = errorMessage;
+    }
+
+    public ChatMessageVM(Long id, UUID tag, Date createdAt) {
+        this.id = id;
+        this.tag = tag;
+        this.createdAt = createdAt;
     }
 
     public boolean isError() {

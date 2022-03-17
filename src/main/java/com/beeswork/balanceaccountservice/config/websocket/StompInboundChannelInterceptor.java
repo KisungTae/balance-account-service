@@ -17,6 +17,7 @@ import io.micrometer.core.lang.NonNull;
 import lombok.SneakyThrows;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.converter.CompositeMessageConverter;
@@ -24,6 +25,8 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
+
+import java.util.Locale;
 
 public class StompInboundChannelInterceptor implements ChannelInterceptor {
 
@@ -44,6 +47,9 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
 
     @Autowired
     private JWTTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private MessageSource messageSource;
 
     private static final String QUEUE = "/queue/";
 
@@ -66,12 +72,13 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
         }
 
         if (stompCommand == StompCommand.SUBSCRIBE) {
-            String userName = jwtTokenProvider.getUserName(jws);
-            String correctDestination = QUEUE + userName;
-            if (!correctDestination.equals(stompHeaderAccessor.getDestination())) {
-                throw new BadRequestException();
-            }
-            return updateSubscribeHeaders(stompHeaderAccessor, message);
+//            String userName = jwtTokenProvider.getUserName(jws);
+//            String correctDestination = QUEUE + userName;
+//            if (!correctDestination.equals(stompHeaderAccessor.getDestination())) {
+//                throw new BadRequestException();
+//            }
+//            return updateSubscribeHeaders(stompHeaderAccessor, message);
+            throw new BadRequestException();
         } else if (stompCommand == StompCommand.SEND) {
             ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
             if (chatMessageVM == null) {
@@ -86,12 +93,13 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
             }
             SaveChatMessageDTO saveChatMessageDTO = chatService.saveChatMessage(chatMessageDTO);
             if (saveChatMessageDTO.isError()) {
-                chatMessageVM = new ChatMessageVM(chatMessageVM.getId(), saveChatMessageDTO.getError());
+                Locale locale = StompHeader.getLocale(stompHeaderAccessor);
+                String errorMessage = messageSource.getMessage(saveChatMessageDTO.getError(), null, locale);
+                chatMessageVM = new ChatMessageVM(chatMessageVM.getTag(), saveChatMessageDTO.getError(), errorMessage);
             } else {
                 chatMessageVM.setCreatedAt(saveChatMessageDTO.getCreatedAt());
             }
-            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM),
-                                                stompHeaderAccessor.getMessageHeaders());
+            return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM), stompHeaderAccessor.getMessageHeaders());
         }
         return message;
     }
