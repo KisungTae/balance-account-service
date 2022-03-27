@@ -10,8 +10,10 @@ import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessageReceipt;
 import com.beeswork.balanceaccountservice.entity.match.Match;
+import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedException;
+import com.beeswork.balanceaccountservice.exception.swipe.SwipedDeletedException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,41 +111,62 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     public SaveChatMessageDTO saveChatMessage(ChatMessageDTO chatMessageDTO) {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
         SaveChatMessageDTO saveChatMessageDTO = new SaveChatMessageDTO();
-        Match match = matchDAO.findBy(chatMessageDTO.getSenderId(), chatMessageDTO.getRecipientId(), true);
-//        if (match == null || match.getSwiped() == null || match.getChat() == null || match.getChatId() != chatMessageDTO.getChatId()) {
-//            saveChatMessageDTO.setError(MatchNotFoundException.CODE);
-//            return saveChatMessageDTO;
-//        }
-//      TODO: return swipeDId as well because android sends chatMessage wihtout swipedId
-        if (match.isUnmatched() || match.getSwiped().isDeleted() || match.getSwiped().isBlocked()) {
+
+        List<Match> matches = matchDAO.findAllBy(chatMessageDTO.getChatId(), true);
+        if (matches.size() != 2) {
+            saveChatMessageDTO.setError(MatchNotFoundException.CODE);
+            return saveChatMessageDTO;
+        }
+
+        Match senderMatch = null;
+        Match recipientMatch = null;
+        for (Match match : matches) {
+            if (match.getSwiperId().equals(chatMessageDTO.getSenderId())) {
+                senderMatch = match;
+            } else {
+                recipientMatch = match;
+            }
+        }
+
+        if (senderMatch == null || recipientMatch == null) {
+            saveChatMessageDTO.setError(MatchNotFoundException.CODE);
+            return saveChatMessageDTO;
+        }
+
+        if (senderMatch.isUnmatched() || recipientMatch.isUnmatched()) {
             saveChatMessageDTO.setError(MatchUnmatchedException.CODE);
             return saveChatMessageDTO;
         }
 
-//        SentChatMessage sentChatMessage = sentChatMessageDAO.findById(chatMessageDTO.getId());
-//        if (sentChatMessage == null) {
-//            Date now = new Date();
-//            ChatMessage chatMessage = new ChatMessage(match.getChat(), match.getSwiped(), chatMessageDTO.getBody(), now);
-//            sentChatMessage = new SentChatMessage(chatMessage, match.getSwiper(), now);
-//            chatMessageDAO.persist(chatMessage);
-//            sentChatMessageDAO.persist(sentChatMessage);
-//        }
+        ChatMessage chatMessage = chatMessageDAO.findBy(chatMessageDTO.getSenderId(), chatMessageDTO.getChatId(), chatMessageDTO.getTag());
+        if (chatMessage == null) {
+            Date now = new Date();
+            chatMessage = modelMapper.map(chatMessageDTO, ChatMessage.class);
+            chatMessage.setSender(senderMatch.getSwiper());
+            chatMessage.setCreatedAt(now);
+            chatMessage.setUpdatedAt(now);
+            chatMessageDAO.persist(chatMessage);
+        }
 
-//        if (!match.isActive()) {
-//            activateMatch(chatMessageDTO.getAccountId(), chatMessageDTO.getRecipientId());
-//        }
-//        saveChatMessageDTO.setCreatedAt(sentChatMessage.getCreatedAt());
+        if (chatMessage.getId() > senderMatch.getLastChatMessageId()) {
+            senderMatch.setLastChatMessageId(chatMessage.getId());
+            senderMatch.setLastChatMessageBody(chatMessage.getBody());
+        }
+
+        if (chatMessage.getId() > recipientMatch.getLastChatMessageId()) {
+            recipientMatch.setLastChatMessageId(chatMessage.getId());
+            recipientMatch.setLastChatMessageBody(chatMessage.getBody());
+        }
+
+        if (chatMessage.getId() > recipientMatch.getLastReceivedChatMessageId()) {
+            recipientMatch.setLastReceivedChatMessageId(chatMessage.getId());
+        }
+
+        saveChatMessageDTO.setCreatedAt(chatMessage.getCreatedAt());
+        saveChatMessageDTO.setRecipientId(senderMatch.getSwipedId());
         return saveChatMessageDTO;
     }
 
-    private void activateMatch(UUID senderId, UUID recipientId) {
-        UUID swiperId = senderId.compareTo(recipientId) > 0 ? senderId : recipientId;
-        UUID swipedId = senderId.compareTo(recipientId) > 0 ? recipientId : senderId;
-        Match swiperMatch = matchDAO.findBy(swiperId, swipedId, true);
-        Match swipedMatch = matchDAO.findBy(swipedId, swiperId, true);
-//        swiperMatch.setActive(true);
-//        swipedMatch.setActive(true);
-    }
 
     @Override
     @Transactional

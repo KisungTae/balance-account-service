@@ -36,9 +36,9 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
                 exceptionCode = InternalServerException.CODE;
             }
             String exceptionMessage = messageSource.getMessage(exceptionCode, null, locale);
-            if (clientHeaderAccessor.getReceipt() != null) {
-                errorHeaderAccessor.setReceiptId(clientHeaderAccessor.getReceipt());
-            }
+//            if (clientHeaderAccessor.getReceipt() != null) {
+//                errorHeaderAccessor.setReceiptId(clientHeaderAccessor.getReceipt());
+//            }
             errorHeaderAccessor.addNativeHeader(StompHeader.ERROR, exceptionCode);
             errorHeaderAccessor.setMessage(exceptionMessage);
         }

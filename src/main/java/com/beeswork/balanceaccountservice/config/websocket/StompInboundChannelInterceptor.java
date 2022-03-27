@@ -72,13 +72,12 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
         }
 
         if (stompCommand == StompCommand.SUBSCRIBE) {
-//            String userName = jwtTokenProvider.getUserName(jws);
-//            String correctDestination = QUEUE + userName;
-//            if (!correctDestination.equals(stompHeaderAccessor.getDestination())) {
-//                throw new BadRequestException();
-//            }
-//            return updateSubscribeHeaders(stompHeaderAccessor, message);
-            throw new BadRequestException();
+            String userName = jwtTokenProvider.getUserName(jws);
+            String correctDestination = QUEUE + userName;
+            if (!correctDestination.equals(stompHeaderAccessor.getDestination())) {
+                throw new BadRequestException();
+            }
+            return updateSubscribeHeaders(stompHeaderAccessor, message);
         } else if (stompCommand == StompCommand.SEND) {
             ChatMessageVM chatMessageVM = (ChatMessageVM) compositeMessageConverter.fromMessage(message, ChatMessageVM.class);
             if (chatMessageVM == null) {

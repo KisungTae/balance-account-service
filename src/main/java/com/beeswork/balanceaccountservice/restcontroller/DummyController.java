@@ -2,7 +2,6 @@ package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.config.security.JWTTokenProvider;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
-import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.chat.ChatMessageDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
@@ -11,7 +10,6 @@ import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.*;
-import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;
@@ -57,7 +55,6 @@ public class DummyController {
     private final ObjectMapper     objectMapper;
     private final FCMService       fcmService;
     private final AccountDAO       accountDAO;
-    private final ChatDAO          chatDAO;
     private final WalletDAO        walletDAO;
     private final PushSettingDAO   pushSettingDAO;
     private final GeometryFactory  geometryFactory;
@@ -72,7 +69,6 @@ public class DummyController {
                            ObjectMapper objectMapper,
                            FCMService FCMService,
                            AccountDAO accountDAO,
-                           ChatDAO chatDAO,
                            WalletDAO walletDAO,
                            PushSettingDAO pushSettingDAO,
                            GeometryFactory geometryFactory,
@@ -84,7 +80,6 @@ public class DummyController {
         this.objectMapper = objectMapper;
         this.fcmService = FCMService;
         this.accountDAO = accountDAO;
-        this.chatDAO = chatDAO;
         this.walletDAO = walletDAO;
         this.pushSettingDAO = pushSettingDAO;
         this.geometryFactory = geometryFactory;
@@ -152,7 +147,6 @@ public class DummyController {
                                        @RequestParam int count) {
         Account swiper = accountDAO.findById(swiperId, false);
         Account swiped = accountDAO.findById(swipedId, false);
-        Chat chat = chatDAO.findBy(chatId);
         Random random = new Random();
         Date date = new Date();
 
@@ -162,7 +156,7 @@ public class DummyController {
         for (int i = 0; i < count; i++) {
             date = DateUtils.addSeconds(date, 30);
             if (random.nextBoolean()) {
-                ChatMessage chatMessage = new ChatMessage(chat, swiper, "message-" + i, UUID.randomUUID(), date, date);
+                ChatMessage chatMessage = new ChatMessage(swiper, chatId, "message-" + i, UUID.randomUUID(), date, date);
                 chatMessageDAO.persist(chatMessage);
                 swipedMatch.setLastReceivedChatMessageId(chatMessage.getId());
                 swipedMatch.setLastChatMessageId(chatMessage.getId());
@@ -170,7 +164,7 @@ public class DummyController {
                 swiperMatch.setLastChatMessageId(chatMessage.getId());
                 swiperMatch.setLastChatMessageBody(chatMessage.getBody());
             } else {
-                ChatMessage chatMessage = new ChatMessage(chat, swiped, "message-" + i, UUID.randomUUID(), date, date);
+                ChatMessage chatMessage = new ChatMessage(swiped, chatId, "message-" + i, UUID.randomUUID(), date, date);
                 chatMessageDAO.persist(chatMessage);
                 swiperMatch.setLastReceivedChatMessageId(chatMessage.getId());
                 swiperMatch.setLastChatMessageId(chatMessage.getId());
@@ -683,11 +677,9 @@ public class DummyController {
             if (swiper == account) {
                 continue;
             }
-            Chat chat = new Chat();
-            chatDAO.persist(chat);
-
-            Match subMatch = new Match(swiper, account, chat.getId(), new Date());
-            Match objMatch = new Match(account, swiper, chat.getId(), new Date());
+            UUID chatId = UUID.randomUUID();
+            Match subMatch = new Match(swiper, account, chatId, new Date());
+            Match objMatch = new Match(account, swiper, chatId, new Date());
 
 
             if (random.nextInt(10) > 8) {

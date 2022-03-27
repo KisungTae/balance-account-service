@@ -21,11 +21,7 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_id")
-    private Chat chat;
-
-    @Column(name = "chat_id", insertable = false, updatable = false)
+    @Column(name = "chat_id")
     private UUID chatId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -49,9 +45,9 @@ public class ChatMessage {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public ChatMessage(Chat chat, Account sender, String body, UUID tag, Date createdAt, Date updatedAt) {
-        this.chat = chat;
+    public ChatMessage(Account sender, UUID chatId, String body, UUID tag, Date createdAt, Date updatedAt) {
         this.sender = sender;
+        this.chatId = chatId;
         this.body = body;
         this.tag = tag;
         this.createdAt = createdAt;

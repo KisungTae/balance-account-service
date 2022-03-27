@@ -3,7 +3,6 @@ package com.beeswork.balanceaccountservice.service.swipe;
 import com.beeswork.balanceaccountservice.constant.ClickResult;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
-import com.beeswork.balanceaccountservice.dao.chat.ChatDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
@@ -15,7 +14,6 @@ import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.*;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.account.Wallet;
-import com.beeswork.balanceaccountservice.entity.chat.Chat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
@@ -46,7 +44,6 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     private final AccountDAO                 accountDAO;
     private final SwipeDAO                   swipeDAO;
     private final MatchDAO                   matchDAO;
-    private final ChatDAO                    chatDAO;
     private final AccountQuestionDAO         accountQuestionDAO;
     private final ProfileDAO                 profileDAO;
     private final SwipeMetaDAO               swipeMetaDAO;
@@ -61,7 +58,6 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
                             AccountDAO accountDAO,
                             SwipeDAO swipeDAO,
                             MatchDAO matchDAO,
-                            ChatDAO chatDAO,
                             AccountQuestionDAO accountQuestionDAO,
                             ProfileDAO profileDAO,
                             SwipeMetaDAO swipeMetaDAO,
@@ -72,7 +68,6 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         this.accountDAO = accountDAO;
         this.swipeDAO = swipeDAO;
         this.matchDAO = matchDAO;
-        this.chatDAO = chatDAO;
         this.accountQuestionDAO = accountQuestionDAO;
         this.profileDAO = profileDAO;
         this.swipeMetaDAO = swipeMetaDAO;
@@ -172,11 +167,9 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             if (objSwipe == null || !objSwipe.isClicked()) {
                 return new ClickTransactionResult(ClickResult.CLICKED, subSwipe, null, null);
             } else {
-                Chat chat = new Chat();
-                chatDAO.persist(chat);
-
-                Match subMatch = new Match(swiper, swiped, chat.getId(), now);
-                Match objMatch = new Match(swiped, swiper, chat.getId(), now);
+                UUID chatId = UUID.randomUUID();
+                Match subMatch = new Match(swiper, swiped, chatId, now);
+                Match objMatch = new Match(swiped, swiper, chatId, now);
                 matchDAO.persist(subMatch);
                 matchDAO.persist(objMatch);
 

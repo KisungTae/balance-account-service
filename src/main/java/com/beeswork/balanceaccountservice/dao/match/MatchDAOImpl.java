@@ -5,7 +5,6 @@ import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.dto.match.QMatchDTO;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
-import com.beeswork.balanceaccountservice.entity.chat.QChat;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.QMatch;;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -26,7 +25,6 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
 
     private final QMatch   qMatch   = QMatch.match;
     private final QAccount qAccount = QAccount.account;
-    private final QChat    qChat    = QChat.chat;
 
     @Autowired
     public MatchDAOImpl(EntityManager entityManager, JPAQueryFactory jpaQueryFactory) {
@@ -114,7 +112,8 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
 
     @Override
     public List<Match> findAllBy(UUID chatId, boolean writeLock) {
-        JPAQuery<Match> query = jpaQueryFactory.selectFrom(qMatch).where(qMatch.chatId.eq(chatId));
+//      NOTE 1. orderBy is for deadlock
+        JPAQuery<Match> query = jpaQueryFactory.selectFrom(qMatch).where(qMatch.chatId.eq(chatId)).orderBy(qMatch.swiperId.desc());
         if (writeLock) {
             query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         }

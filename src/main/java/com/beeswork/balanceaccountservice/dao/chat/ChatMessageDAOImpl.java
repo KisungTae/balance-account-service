@@ -23,7 +23,7 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
 
     @Override
     public List<ChatMessage> findAllBy(UUID chatId, Long lastChatMessageId, int loadSize) {
-        BooleanExpression condition = qChatMessage.chat.id.eq(chatId);
+        BooleanExpression condition = qChatMessage.chatId.eq(chatId);
         if (lastChatMessageId != null) {
             condition = condition.and(qChatMessage.id.lt(lastChatMessageId));
         }
@@ -59,6 +59,15 @@ public class ChatMessageDAOImpl extends BaseDAOImpl<ChatMessage> implements Chat
     public ChatMessage findBy(UUID chatId, Long chatMessageId) {
         return jpaQueryFactory.selectFrom(qChatMessage)
                               .where(qChatMessage.chatId.eq(chatId).and(qChatMessage.id.eq(chatMessageId)))
+                              .fetchFirst();
+    }
+
+    @Override
+    public ChatMessage findBy(UUID senderId, UUID chatId, UUID tag) {
+        return jpaQueryFactory.selectFrom(qChatMessage)
+                              .where(qChatMessage.senderId.eq(senderId)
+                                                          .and(qChatMessage.chatId.eq(chatId))
+                                                          .and(qChatMessage.tag.eq(tag)))
                               .fetchFirst();
     }
 }

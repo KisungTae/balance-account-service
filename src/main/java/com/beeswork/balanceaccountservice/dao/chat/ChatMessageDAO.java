@@ -10,4 +10,5 @@ public interface ChatMessageDAO extends BaseDAO<ChatMessage> {
     List<ChatMessage> findAllBy(UUID chatId, Long lastChatMessageId, int loadSize);
     List<ChatMessage> findAllBy(UUID senderId, UUID chatId, UUID appToken, int startPosition, int loadSize);
     ChatMessage findBy(UUID chatId, Long chatMessageId);
+    ChatMessage findBy(UUID senderId, UUID chatId, UUID tag);
 }
