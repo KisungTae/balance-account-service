@@ -9,6 +9,7 @@ import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.service.account.AccountService;
 import com.beeswork.balanceaccountservice.service.chat.ChatService;
+import com.beeswork.balanceaccountservice.util.Convert;
 import com.beeswork.balanceaccountservice.vm.chat.ChatMessageVM;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -27,6 +28,7 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
 
 import java.util.Locale;
+import java.util.UUID;
 
 public class StompInboundChannelInterceptor implements ChannelInterceptor {
 
@@ -84,18 +86,20 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
                 return message;
             }
 
-            ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessageVM, ChatMessageDTO.class);
-//          TODO: convert username to UUID and chatMessageVM.setAccountId(userName)
             String userName = jwtTokenProvider.getUserName(jws);
-            if (!userName.equals(chatMessageDTO.getSenderId().toString())) {
+            UUID senderId = Convert.toUUID(userName);
+            if (senderId == null) {
                 throw new AccountNotFoundException();
             }
+            chatMessageVM.setSenderId(senderId);
+            ChatMessageDTO chatMessageDTO = modelMapper.map(chatMessageVM, ChatMessageDTO.class);
             SaveChatMessageDTO saveChatMessageDTO = chatService.saveChatMessage(chatMessageDTO);
             if (saveChatMessageDTO.isError()) {
                 Locale locale = StompHeader.getLocale(stompHeaderAccessor);
                 String errorMessage = messageSource.getMessage(saveChatMessageDTO.getError(), null, locale);
                 chatMessageVM = new ChatMessageVM(chatMessageVM.getTag(), saveChatMessageDTO.getError(), errorMessage);
             } else {
+                chatMessageVM.setId(saveChatMessageDTO.getId());
                 chatMessageVM.setCreatedAt(saveChatMessageDTO.getCreatedAt());
             }
             return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM), stompHeaderAccessor.getMessageHeaders());

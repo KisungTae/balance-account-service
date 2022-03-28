@@ -162,6 +162,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
             recipientMatch.setLastReceivedChatMessageId(chatMessage.getId());
         }
 
+        saveChatMessageDTO.setId(chatMessage.getId());
         saveChatMessageDTO.setCreatedAt(chatMessage.getCreatedAt());
         saveChatMessageDTO.setRecipientId(senderMatch.getSwipedId());
         return saveChatMessageDTO;

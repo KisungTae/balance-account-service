@@ -12,11 +12,10 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ChatMessageVM {
     private Long   id;
+    private UUID   chatId;
+    private UUID   senderId;
     private UUID   tag;
     private String body;
-    private Long   chatId;
-    private UUID   accountId;
-    private UUID   recipientId;
     private Date   createdAt;
     private String error;
     private String errorMessage;

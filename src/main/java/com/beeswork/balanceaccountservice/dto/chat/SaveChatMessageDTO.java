@@ -11,6 +11,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 public class SaveChatMessageDTO {
+    private Long   id;
     private Date   createdAt;
     private UUID   recipientId;
     private String error;

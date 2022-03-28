@@ -109,17 +109,6 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                     if (!chatMessageVM.isError()) {
                         chatMessageVM = new ChatMessageVM(chatMessageVM.getId(), chatMessageVM.getTag(), chatMessageVM.getCreatedAt());
                     }
-//                    if (chatMessageVM.isError()) {
-//                        Locale locale = StompHeader.getLocale(inAccessor);
-//                        String exceptionMessage = messageSource.getMessage(chatMessageVM.getError(), null, locale);
-//                        chatMessageVM.setErrorMessage(exceptionMessage);
-//                    } else {
-//                        chatMessageVM.setBody(null);
-//                    }
-//                    outAccessor.setReceiptId(inAccessor.getReceipt());
-//                    chatMessageVM.setChatId(null);
-//                    chatMessageVM.setAccountId(null);
-//                    chatMessageVM.setRecipientId(null);
                     byte[] payload = objectMapper.writeValueAsString(chatMessageVM).getBytes();
                     StompHeaderAccessor outAccessor = StompHeaderAccessor.create(StompCommand.RECEIPT);
                     outAccessor.setSessionId(inAccessor.getSessionId());
