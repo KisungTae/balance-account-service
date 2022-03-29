@@ -24,14 +24,15 @@ public class ChatMessageDTO implements Pushable {
     @JsonIgnore
     private static final String PUSH_BODY_CHAT_MESSAGE = "push.body.chat.message";
 
-    private Long   id;
-    private UUID   chatId;
-    private UUID   senderId;
-    private UUID   recipientId;
-    private String body;
-    private UUID   tag;
-    private Date   createdAt;
-    private String senderName;
+    private Long    id;
+    private UUID    chatId;
+    private UUID    senderId;
+    private UUID    recipientId;
+    private UUID    tag;
+    private String  body;
+    private Boolean firstMessage;
+    private Date    createdAt;
+    private String  senderName;
 
     @Override
     @JsonIgnore

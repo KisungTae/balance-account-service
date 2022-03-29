@@ -99,39 +99,7 @@ public class DummyController {
     }
 
 
-    @Transactional
-    @PostMapping("/create/swipe-for-account")
-    public void createDummySwipeForAccount(@RequestParam UUID accountId) {
-        Account swiper = accountDAO.findById(accountId, false);
-        List<Account> accounts = new JPAQueryFactory(entityManager).selectFrom(QAccount.account).fetch();
-        Random random = new Random();
 
-        for (Account swiped : accounts) {
-            if (swiper.getId().equals(swiped.getId())) continue;
-
-            Date now = new Date();
-//            Swipe subSwipe = new Swipe();
-//            subSwipe.setSwiper(swiper);
-//            subSwipe.setSwiped(swiped);
-//            subSwipe.setClicked(random.nextBoolean());
-//            subSwipe.setCount((random.nextInt(10) + 1));
-//            subSwipe.setCreatedAt(now);
-//            subSwipe.setUpdatedAt(now);
-
-            now = new Date();
-            Swipe objSwipe = new Swipe();
-            objSwipe.setSwiper(swiped);
-            objSwipe.setSwiped(swiper);
-            objSwipe.setClicked(random.nextBoolean());
-            objSwipe.setCount((random.nextInt(10) + 1));
-            objSwipe.setCreatedAt(now);
-            objSwipe.setUpdatedAt(now);
-
-//            entityManager.persist(subSwipe);
-            entityManager.persist(objSwipe);
-        }
-
-    }
 
     @Transactional
     @PostMapping("/create/match-for-account")
@@ -666,13 +634,50 @@ public class DummyController {
 
 
     @Transactional
+    @PostMapping("/create/swipe-for-account")
+    public void createDummySwipeForAccount(@RequestParam UUID accountId) {
+        Account swiper = accountDAO.findById(accountId, false);
+        List<Account> accounts = new JPAQueryFactory(entityManager).selectFrom(QAccount.account).fetch();
+        Random random = new Random();
+
+        for (Account swiped : accounts) {
+            if (swiper.getId().equals(swiped.getId())) continue;
+
+            Date now = new Date();
+//            Swipe subSwipe = new Swipe();
+//            subSwipe.setSwiper(swiper);
+//            subSwipe.setSwiped(swiped);
+//            subSwipe.setClicked(random.nextBoolean());
+//            subSwipe.setCount((random.nextInt(10) + 1));
+//            subSwipe.setCreatedAt(now);
+//            subSwipe.setUpdatedAt(now);
+
+            now = new Date();
+            Swipe objSwipe = new Swipe();
+            objSwipe.setSwiper(swiped);
+            objSwipe.setSwiped(swiper);
+            objSwipe.setClicked(random.nextBoolean());
+            objSwipe.setCount((random.nextInt(10) + 1));
+            objSwipe.setCreatedAt(now);
+            objSwipe.setUpdatedAt(now);
+
+//            entityManager.persist(subSwipe);
+            entityManager.persist(objSwipe);
+        }
+
+    }
+
+    @Transactional
     @GetMapping("/create/matches/for/account")
-    public void createDummyMatchesForAccount(@RequestParam("accountId") UUID accountId) {
+    public void createDummyMatchesForAccount(@RequestParam("accountId") UUID accountId,
+                                             @RequestParam("count") int count) {
         Account swiper = accountDAO.findById(accountId, false);
         List<Account> accounts = jpqlQueryFactory.selectFrom(QAccount.account).fetch();
 
         Random random = new Random();
+        int matchCount = 0;
         for (Account account : accounts) {
+
             if (swiper == account) {
                 continue;
             }
@@ -681,27 +686,32 @@ public class DummyController {
             Match objMatch = new Match(account, swiper, chatId, new Date());
 
 
-            if (random.nextInt(10) > 8) {
-                subMatch.setUnmatched(true);
-                objMatch.setUnmatched(true);
-
-                if (random.nextBoolean()) {
-                    subMatch.setDeleted(true);
-                }
-            }
-
-            if (random.nextInt(10) > 3) {
-                subMatch.setLastChatMessageId(random.nextInt(50) + 1);
-                subMatch.setLastReceivedChatMessageId(random.nextInt(50) + 1);
-                if (random.nextInt(10) > 7) {
-                    subMatch.setLastReadReceivedChatMessageId(subMatch.getLastReceivedChatMessageId());
-                } else {
-                    subMatch.setLastReadReceivedChatMessageId(random.nextInt((int) subMatch.getLastReceivedChatMessageId()));
-                }
-            }
+//            if (random.nextInt(10) > 8) {
+//                subMatch.setUnmatched(true);
+//                objMatch.setUnmatched(true);
+//
+//                if (random.nextBoolean()) {
+//                    subMatch.setDeleted(true);
+//                }
+//            }
+//
+//            if (random.nextInt(10) > 3) {
+//                subMatch.setLastChatMessageId(random.nextInt(50) + 1);
+//                subMatch.setLastReceivedChatMessageId(random.nextInt(50) + 1);
+//                if (random.nextInt(10) > 7) {
+//                    subMatch.setLastReadReceivedChatMessageId(subMatch.getLastReceivedChatMessageId());
+//                } else {
+//                    subMatch.setLastReadReceivedChatMessageId(random.nextInt((int) subMatch.getLastReceivedChatMessageId()));
+//                }
+//            }
 
             matchDAO.persist(subMatch);
             matchDAO.persist(objMatch);
+
+            matchCount++;
+            if (matchCount > count) {
+                break;
+            }
         }
     }
 

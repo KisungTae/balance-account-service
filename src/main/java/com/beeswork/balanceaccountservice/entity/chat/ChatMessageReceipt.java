@@ -16,16 +16,16 @@ import java.util.UUID;
 @Table(name = "chat_message_receipt")
 public class ChatMessageReceipt {
 
-    @EmbeddedId
-    private ChatMessageReceiptId chatMessageReceiptId;
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("chatMessageId")
-    private ChatMessage chatMessage;
+    @Column(name = "chat_message_id")
+    private long chatMessageId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("accountId")
-    private Account account;
+    @Column(name = "account_id")
+    private UUID accountId;
 
     @Column(name = "chat_id")
     private UUID chatId;
@@ -41,17 +41,12 @@ public class ChatMessageReceipt {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public ChatMessageReceipt(ChatMessage chatMessage,
-                              Account account,
-                              UUID appToken,
-                              Date createdAt,
-                              Date updatedAt) {
-        this.chatMessageReceiptId = new ChatMessageReceiptId(chatMessage.getId(), account.getId());
-        this.chatMessage = chatMessage;
-        this.account = account;
-        this.chatId = chatMessage.getChatId();
+    public ChatMessageReceipt(long chatMessageId, UUID accountId, UUID chatId, UUID appToken, Date createdAt) {
+        this.chatMessageId = chatMessageId;
+        this.accountId = accountId;
+        this.chatId = chatId;
         this.appToken = appToken;
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.updatedAt = createdAt;
     }
 }

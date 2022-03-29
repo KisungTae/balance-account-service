@@ -22,10 +22,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
@@ -71,24 +69,22 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     @Override
     @Transactional
     public void syncChatMessages(UUID accountId, UUID chatId, UUID appToken, List<Long> chatMessageIds) {
-        Account account = accountDAO.findById(accountId, false);
-        if (account == null) {
+        if (chatMessageIds.size() <= 0) {
             return;
         }
         Date now = new Date();
-        for (long chatMessageId : chatMessageIds) {
-            ChatMessageReceipt chatMessageReceipt = chatMessageReceiptDAO.findBy(accountId, chatId, chatMessageId);
-            if (chatMessageReceipt == null) {
-                ChatMessage chatMessage = chatMessageDAO.findBy(chatId, chatMessageId);
-                if (chatMessage == null) {
-                    continue;
-                }
-                ChatMessageReceipt newChatMessageReceipt = new ChatMessageReceipt(chatMessage, account, appToken, now, now);
-                chatMessageReceiptDAO.persist(newChatMessageReceipt);
-            } else {
-                chatMessageReceipt.setAppToken(appToken);
-                chatMessageReceipt.setUpdatedAt(now);
-            }
+        List<ChatMessageReceipt> chatMessageReceipts = chatMessageReceiptDAO.findAllBy(accountId, chatId, chatMessageIds);
+        Set<Long> chatMessageIdsSet = new HashSet<>(chatMessageIds);
+
+        for (ChatMessageReceipt chatMessageReceipt : chatMessageReceipts) {
+            chatMessageReceipt.setAppToken(appToken);
+            chatMessageReceipt.setUpdatedAt(now);
+            chatMessageIdsSet.remove(chatMessageReceipt.getChatMessageId());
+        }
+
+        for (Long chatMessageId : chatMessageIdsSet) {
+            ChatMessageReceipt chatMessageReceipt = new ChatMessageReceipt(chatMessageId, accountId, chatId, appToken, now);
+            chatMessageReceiptDAO.persist(chatMessageReceipt);
         }
     }
 

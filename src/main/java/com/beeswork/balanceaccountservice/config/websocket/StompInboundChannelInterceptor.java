@@ -100,7 +100,6 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
                 chatMessageVM = new ChatMessageVM(chatMessageVM.getTag(), saveChatMessageDTO.getError(), errorMessage);
             } else {
                 chatMessageVM.setId(saveChatMessageDTO.getId());
-                chatMessageVM.setTag(null);
                 chatMessageVM.setRecipientId(saveChatMessageDTO.getRecipientId());
                 chatMessageVM.setFirstMessage(saveChatMessageDTO.isFirstMessage());
                 chatMessageVM.setCreatedAt(saveChatMessageDTO.getCreatedAt());
