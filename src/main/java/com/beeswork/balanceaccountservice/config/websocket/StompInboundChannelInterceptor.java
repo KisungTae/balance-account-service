@@ -99,7 +99,9 @@ public class StompInboundChannelInterceptor implements ChannelInterceptor {
                 String errorMessage = messageSource.getMessage(saveChatMessageDTO.getError(), null, locale);
                 chatMessageVM = new ChatMessageVM(chatMessageVM.getTag(), saveChatMessageDTO.getError(), errorMessage);
             } else {
+                chatMessageVM.setTag(null);
                 chatMessageVM.setId(saveChatMessageDTO.getId());
+                chatMessageVM.setRecipientId(saveChatMessageDTO.getRecipientId());
                 chatMessageVM.setCreatedAt(saveChatMessageDTO.getCreatedAt());
             }
             return MessageBuilder.createMessage(objectMapper.writeValueAsString(chatMessageVM), stompHeaderAccessor.getMessageHeaders());

@@ -168,39 +168,4 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         return saveChatMessageDTO;
     }
 
-
-    @Override
-    @Transactional
-    public void fetchedChatMessage(UUID accountId, UUID chatMessageId) {
-        Match match = matchDAO.findBy(accountId, chatMessageId, false);
-
-        Match match1 = matchDAO.findBy(accountId, chatMessageId, true);
-        match1.setUpdatedAt(new Date());
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-//        SentChatMessage sentChatMessage = sentChatMessageDAO.findById(chatMessageId);
-//        if (sentChatMessage == null || !sentChatMessage.getAccountId().equals(accountId)) {
-//            throw new ChatMessageNotFoundException();
-//        }
-//        sentChatMessage.setFetched(true);
-//        sentChatMessage.setUpdatedAt(new Date());
-    }
-
-    @Override
-    @Transactional
-    public void receivedChatMessage(UUID accountId, UUID chatMessageId) {
-        Match match1 = matchDAO.findBy(accountId, chatMessageId, true);
-        match1.setUpdatedAt(new Date());
-//        ChatMessage chatMessage = chatMessageDAO.findById(chatMessageId);
-//        if (chatMessage == null || !chatMessage.getRecipientId().equals(accountId)) {
-//            throw new ChatMessageNotFoundException();
-//        }
-//        chatMessage.setReceived(true);
-//        chatMessage.setUpdatedAt(new Date());
-    }
-
-
 }

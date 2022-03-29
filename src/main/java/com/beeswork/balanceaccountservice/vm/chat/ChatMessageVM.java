@@ -14,6 +14,7 @@ public class ChatMessageVM {
     private Long   id;
     private UUID   chatId;
     private UUID   senderId;
+    private UUID   recipientId;
     private UUID   tag;
     private String body;
     private Date   createdAt;

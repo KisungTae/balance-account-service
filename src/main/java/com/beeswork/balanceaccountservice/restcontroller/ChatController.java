@@ -82,34 +82,4 @@ public class ChatController extends BaseController {
                                      syncChatMessagesVM.getAppToken(),
                                      syncChatMessagesVM.getChatMessageIds());
     }
-
-
-    @PostMapping("/message/fetched")
-    public ResponseEntity<String> fetchedChatMessage(@Valid @RequestBody FetchedChatMessageVM fetchedChatMessageVM,
-                                                     BindingResult bindingResult,
-                                                     Principal principal) throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        chatService.fetchedChatMessage(getAccountIdFrom(principal), fetchedChatMessageVM.getChatMessageId());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
-    }
-
-    @PostMapping("/message/received")
-    public ResponseEntity<String> receivedChatMessage(@Valid @RequestBody ReceivedChatMessageVM receivedChatMessageVM,
-                                                      BindingResult bindingResult,
-                                                      Principal principal) throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        chatService.receivedChatMessage(getAccountIdFrom(principal), receivedChatMessageVM.getChatMessageId());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
-    }
-
-
 }
-
-
-// maximum topic
-
-// no subscriber channel, have to be handled manually,
-
-// how @subscribe works
-
-// how to check if there is subscriber discconected

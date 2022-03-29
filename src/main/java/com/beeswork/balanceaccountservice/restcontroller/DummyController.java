@@ -7,6 +7,7 @@ import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.setting.PushSettingDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
+import com.beeswork.balanceaccountservice.dto.chat.SaveChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.*;
@@ -552,21 +553,19 @@ public class DummyController {
     @GetMapping("/send/chat/message/stomp")
     public void sendDummyChatMessageToStomp(@RequestParam("accountId") UUID accountId,
                                             @RequestParam("recipientId") UUID recipientId,
-                                            @RequestParam("chatId") long chatId,
+                                            @RequestParam("chatId") UUID chatId,
                                             @RequestParam("body") String body) {
-
-
         ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
-        chatMessageDTO.setRecipientId(recipientId);
-        chatMessageDTO.setBody(body);
-        chatMessageDTO.setCreatedAt(new Date());
-//        chatMessageDTO.setChatId(chatId);
+        chatMessageDTO.setChatId(chatId);
         chatMessageDTO.setSenderId(accountId);
-
-        chatService.saveChatMessage(chatMessageDTO);
-
-//        chatMessageDTO.setId(UUID.randomUUID());
-//        stompService.pushChatMessage(chatMessageDTO, Locale.getDefault());
+        chatMessageDTO.setBody(body);
+        chatMessageDTO.setTag(UUID.randomUUID());
+        SaveChatMessageDTO saveChatMessageDTO = chatService.saveChatMessage(chatMessageDTO);
+        chatMessageDTO.setId(saveChatMessageDTO.getId());
+        chatMessageDTO.setRecipientId(saveChatMessageDTO.getRecipientId());
+        chatMessageDTO.setCreatedAt(saveChatMessageDTO.getCreatedAt());
+        chatMessageDTO.setTag(null);
+        stompService.push(chatMessageDTO, Locale.getDefault());
     }
 
     @GetMapping("/send/chat/message")
