@@ -12,8 +12,9 @@ import java.util.UUID;
 @NoArgsConstructor
 public class SaveChatMessageDTO {
     private Long   id;
-    private Date   createdAt;
     private UUID   recipientId;
+    private boolean firstMessage;
+    private Date   createdAt;
     private String error;
 
     public boolean isError() {

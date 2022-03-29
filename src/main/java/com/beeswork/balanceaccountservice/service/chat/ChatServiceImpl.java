@@ -148,6 +148,10 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
             chatMessageDAO.persist(chatMessage);
         }
 
+        if (senderMatch.getLastChatMessageId() == 0) {
+            saveChatMessageDTO.setFirstMessage(true);
+        }
+
         if (chatMessage.getId() > senderMatch.getLastChatMessageId()) {
             senderMatch.setLastChatMessageId(chatMessage.getId());
             senderMatch.setLastChatMessageBody(chatMessage.getBody());

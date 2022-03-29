@@ -107,7 +107,10 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                     }
 
                     if (!chatMessageVM.isError()) {
-                        chatMessageVM = new ChatMessageVM(chatMessageVM.getId(), chatMessageVM.getTag(), chatMessageVM.getCreatedAt());
+                        chatMessageVM.setBody(null);
+                        chatMessageVM.setChatId(null);
+                        chatMessageVM.setRecipientId(null);
+                        chatMessageVM.setSenderId(null);
                     }
                     byte[] payload = objectMapper.writeValueAsString(chatMessageVM).getBytes();
                     StompHeaderAccessor outAccessor = StompHeaderAccessor.create(StompCommand.RECEIPT);

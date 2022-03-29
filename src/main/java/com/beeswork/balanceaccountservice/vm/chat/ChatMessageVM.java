@@ -11,15 +11,16 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class ChatMessageVM {
-    private Long   id;
-    private UUID   chatId;
-    private UUID   senderId;
-    private UUID   recipientId;
-    private UUID   tag;
-    private String body;
-    private Date   createdAt;
-    private String error;
-    private String errorMessage;
+    private Long    id;
+    private UUID    chatId;
+    private UUID    senderId;
+    private UUID    recipientId;
+    private UUID    tag;
+    private String  body;
+    private boolean firstMessage;
+    private Date    createdAt;
+    private String  error;
+    private String  errorMessage;
 
     public ChatMessageVM(UUID tag, String error, String errorMessage) {
         this.tag = tag;
