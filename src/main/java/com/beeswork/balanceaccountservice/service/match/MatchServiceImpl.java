@@ -5,9 +5,7 @@ import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dao.match.UnmatchAuditDAO;
 import com.beeswork.balanceaccountservice.dao.swipe.SwipeDAO;
-import com.beeswork.balanceaccountservice.dto.match.CountMatchesDTO;
-import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
-import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
+import com.beeswork.balanceaccountservice.dto.match.*;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.match.UnmatchAudit;
@@ -127,30 +125,30 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Override
     @Transactional
-    public void unmatch(UUID swiperId, UUID swipedId) {
-        Date now = new Date();
-        unmatch(swiperId, swipedId, now);
+    public UnmatchDTO unmatch(UUID swiperId, UUID swipedId) {
+        Date unmatchedAt = doUnmatch(swiperId, swipedId);
         if (!unmatchAuditDAO.existsBy(swiperId, swipedId)) {
             Account swiper = accountDAO.findById(swiperId, false);
             Account swiped = accountDAO.findById(swipedId, false);
             if (swiped == null) {
                 throw new SwipedNotFoundException();
             }
-            UnmatchAudit unmatchAudit = new UnmatchAudit(swiper, swiped, now);
+            UnmatchAudit unmatchAudit = new UnmatchAudit(swiper, swiped, unmatchedAt);
             unmatchAuditDAO.persist(unmatchAudit);
         }
+        return new UnmatchDTO(unmatchedAt);
     }
 
     @Override
     @Transactional
-    public void reportMatch(UUID reporterId, UUID reportedId, int reportReasonId, String description) {
-        Date now = new Date();
-        unmatch(reporterId, reportedId, now);
-        reportService.createReport(reporterId, reportedId, reportReasonId, description, now);
+    public ReportMatchDTO reportMatch(UUID reporterId, UUID reportedId, int reportReasonId, String description) {
+        Date reportedAt = doUnmatch(reporterId, reportedId);
+        reportService.createReport(reporterId, reportedId, reportReasonId, description, reportedAt);
+        return new ReportMatchDTO(reportedAt);
     }
 
     @SuppressWarnings("Duplicates")
-    private void unmatch(UUID swiperId, UUID swipedId, Date now) {
+    private Date doUnmatch(UUID swiperId, UUID swipedId) {
         // NOTE 1. if you fetch an entity with writeLock and fetch the same entity without write lock,
         //         you still need to wait for the write lock to be released when you try to write on the second entity
         Match swiperMatch, swipedMatch;
@@ -166,6 +164,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
             throw new MatchNotFoundException();
         }
 
+        Date now = new Date();
         if (swiperMatch.isUnmatched() && swipedMatch.isUnmatched()) {
             if (!swiperMatch.isDeleted()) {
                 swiperMatch.setDeleted(true);
@@ -178,6 +177,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
             swipedMatch.setUnmatched(true);
             swipedMatch.setUpdatedAt(now);
         }
+        return now;
     }
 }
 

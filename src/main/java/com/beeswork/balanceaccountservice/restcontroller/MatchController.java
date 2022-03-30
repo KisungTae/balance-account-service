@@ -1,6 +1,8 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
+import com.beeswork.balanceaccountservice.dto.match.ReportMatchDTO;
+import com.beeswork.balanceaccountservice.dto.match.UnmatchDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
 import com.beeswork.balanceaccountservice.service.match.MatchService;
@@ -65,8 +67,8 @@ public class MatchController extends BaseController {
                                           Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        matchService.unmatch(getAccountIdFrom(principal), unmatchVM.getSwipedId());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+        UnmatchDTO unmatchDTO = matchService.unmatch(getAccountIdFrom(principal), unmatchVM.getSwipedId());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(unmatchDTO));
     }
 
     @PostMapping("/report")
@@ -74,8 +76,11 @@ public class MatchController extends BaseController {
                                               BindingResult bindingResult,
                                               Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        matchService.reportMatch(getAccountIdFrom(principal), reportVM.getReportedId(), reportVM.getReportReasonId(), reportVM.getDescription());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
+        ReportMatchDTO reportMatchDTO = matchService.reportMatch(getAccountIdFrom(principal),
+                                                                 reportVM.getReportedId(),
+                                                                 reportVM.getReportReasonId(),
+                                                                 reportVM.getDescription());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(reportMatchDTO));
     }
 
     @PostMapping("/sync")
