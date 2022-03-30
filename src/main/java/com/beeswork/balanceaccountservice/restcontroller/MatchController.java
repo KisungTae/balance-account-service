@@ -1,7 +1,7 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.dto.match.CountMatchesDTO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
-import com.beeswork.balanceaccountservice.dto.match.ReportMatchDTO;
 import com.beeswork.balanceaccountservice.dto.match.UnmatchDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
@@ -76,11 +76,11 @@ public class MatchController extends BaseController {
                                               BindingResult bindingResult,
                                               Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ReportMatchDTO reportMatchDTO = matchService.reportMatch(getAccountIdFrom(principal),
-                                                                 reportVM.getReportedId(),
-                                                                 reportVM.getReportReasonId(),
-                                                                 reportVM.getDescription());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(reportMatchDTO));
+        UnmatchDTO unmatchDTO = matchService.reportMatch(getAccountIdFrom(principal),
+                                                         reportVM.getReportedId(),
+                                                         reportVM.getReportReasonId(),
+                                                         reportVM.getDescription());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(unmatchDTO));
     }
 
     @PostMapping("/sync")

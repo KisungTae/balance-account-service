@@ -136,15 +136,17 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
             UnmatchAudit unmatchAudit = new UnmatchAudit(swiper, swiped, unmatchedAt);
             unmatchAuditDAO.persist(unmatchAudit);
         }
-        return new UnmatchDTO(unmatchedAt);
+        CountMatchesDTO countMatchesDTO = countMatches(swiperId);
+        return new UnmatchDTO(countMatchesDTO.getCount(), countMatchesDTO.getCountedAt());
     }
 
     @Override
     @Transactional
-    public ReportMatchDTO reportMatch(UUID reporterId, UUID reportedId, int reportReasonId, String description) {
-        Date reportedAt = doUnmatch(reporterId, reportedId);
-        reportService.createReport(reporterId, reportedId, reportReasonId, description, reportedAt);
-        return new ReportMatchDTO(reportedAt);
+    public UnmatchDTO reportMatch(UUID reporterId, UUID reportedId, int reportReasonId, String description) {
+        Date unmatchedAt = doUnmatch(reporterId, reportedId);
+        reportService.createReport(reporterId, reportedId, reportReasonId, description, unmatchedAt);
+        CountMatchesDTO countMatchesDTO = countMatches(reporterId);
+        return new UnmatchDTO(countMatchesDTO.getCount(), countMatchesDTO.getCountedAt());
     }
 
     @SuppressWarnings("Duplicates")

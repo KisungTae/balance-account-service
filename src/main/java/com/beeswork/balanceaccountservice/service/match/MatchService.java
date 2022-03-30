@@ -1,8 +1,8 @@
 package com.beeswork.balanceaccountservice.service.match;
 
 import com.beeswork.balanceaccountservice.constant.MatchPageFilter;
+import com.beeswork.balanceaccountservice.dto.match.CountMatchesDTO;
 import com.beeswork.balanceaccountservice.dto.match.ListMatchesDTO;
-import com.beeswork.balanceaccountservice.dto.match.ReportMatchDTO;
 import com.beeswork.balanceaccountservice.dto.match.UnmatchDTO;
 
 import java.util.UUID;
@@ -12,5 +12,5 @@ public interface MatchService {
     ListMatchesDTO listMatches(UUID swiperId, int startPosition, int loadSize, MatchPageFilter matchPageFilter);
     void syncMatch(UUID swiperId, UUID chatId, long lastReadReceivedChatMessageId);
     UnmatchDTO unmatch(UUID swiperId, UUID swipedId);
-    ReportMatchDTO reportMatch(UUID reporterId, UUID reportedId, int reportReasonId, String description);
+    UnmatchDTO reportMatch(UUID reporterId, UUID reportedId, int reportReasonId, String description);
 }

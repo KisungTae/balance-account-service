@@ -10,5 +10,6 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 public class UnmatchDTO {
-    private Date unmatchedAt;
+    private long matchCount;
+    private Date matchCountCountedAt;
 }
