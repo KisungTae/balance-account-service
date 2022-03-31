@@ -124,8 +124,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
 
         Profile profile = profileDAO.findById(account.getId(), false);
         boolean profileExists = profile != null && profile.isEnabled();
-        Boolean gender = profileExists ? profile.isGender() : null;
-        return new LoginDTO(account.getId(), profileExists, accessToken, newRefreshToken, login.getEmail(), gender);
+        return new LoginDTO(account.getId(), profileExists, accessToken, newRefreshToken, login.getEmail());
     }
 
     @Override
@@ -173,13 +172,10 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         pushTokenService.savePushToken(refreshAccessTokenDTO.getAccountId(), pushToken, pushTokenType);
         Profile profile = profileDAO.findById(refreshAccessTokenDTO.getAccountId(), false);
         boolean profileExists = profile != null && profile.isEnabled();
-        Boolean gender = profileExists ? profile.isGender() : null;
-
         return new LoginDTO(refreshAccessTokenDTO.getAccountId(),
                             profileExists,
                             refreshAccessTokenDTO.getAccessToken(),
-                            refreshAccessTokenDTO.getRefreshToken(),
-                            gender);
+                            refreshAccessTokenDTO.getRefreshToken());
     }
 
 
