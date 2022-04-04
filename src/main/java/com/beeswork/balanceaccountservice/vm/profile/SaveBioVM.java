@@ -6,7 +6,7 @@ import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter
-public class SaveAboutVM {
+public class SaveBioVM {
 
     @Length(max = 50, message = "{about.length}")
     private String about;

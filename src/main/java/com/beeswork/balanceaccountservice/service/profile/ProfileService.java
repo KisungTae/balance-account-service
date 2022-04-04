@@ -13,7 +13,7 @@ public interface ProfileService {
     ProfileDTO getProfile(UUID accountId);
     CardDTO getCard(UUID accountId, UUID swipedId);
     void saveProfile(UUID accountId, String name, Date birth, String about, int height, boolean gender, double latitude, double longitude);
-    void saveAbout(UUID accountId, String about, Integer height);
+    void saveBio(UUID accountId, String about, Integer height);
     void saveLocation(UUID accountId, double latitude, double longitude, Date updatedAt);
     RecommendDTO recommend(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int pageIndex);
     void saveEmail(UUID accountId, String email);

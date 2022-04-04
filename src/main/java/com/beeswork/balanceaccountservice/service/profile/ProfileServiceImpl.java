@@ -113,7 +113,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
 
     @Override
     @Transactional
-    public void saveAbout(UUID accountId, String about, Integer height) {
+    public void saveBio(UUID accountId, String about, Integer height) {
         Profile profile = findValidProfile(accountId, true);
         profile.setAbout(about);
         profile.setHeight(height);

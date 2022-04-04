@@ -71,12 +71,12 @@ public class ProfileController extends BaseController {
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
-    @PostMapping("/about")
-    public ResponseEntity<String> saveAbout(@Valid @RequestBody SaveAboutVM saveAboutVM,
+    @PostMapping("/bio")
+    public ResponseEntity<String> saveBio(@Valid @RequestBody SaveBioVM saveBioVM,
                                             BindingResult bindingResult,
                                             Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
-        profileService.saveAbout(getAccountIdFrom(principal), saveAboutVM.getAbout(), saveAboutVM.getHeight());
+        profileService.saveBio(getAccountIdFrom(principal), saveBioVM.getAbout(), saveBioVM.getHeight());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
     }
 
