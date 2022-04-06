@@ -22,6 +22,7 @@ import com.beeswork.balanceaccountservice.exception.InternalServerException;
 import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
 import com.beeswork.balanceaccountservice.exception.swipe.*;
+import com.beeswork.balanceaccountservice.exception.wallet.WalletNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
 import org.modelmapper.ModelMapper;
@@ -84,7 +85,13 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             Account swiped = accountDAO.findById(swipedId, false);
             validateSwiped(swiped);
             Wallet wallet = walletDAO.findByAccountId(swiper.getId(), true);
+            if (wallet == null) {
+                throw new WalletNotFoundException();
+            }
             SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
+            if (swipeMeta == null) {
+                throw new SwipeMetaNotFoundException();
+            }
             rechargeFreeSwipe(wallet, swipeMeta);
 
             if (wallet.getFreeSwipe() < swipeMeta.getSwipePoint() && wallet.getPoint() < swipeMeta.getSwipePoint()) {
@@ -115,8 +122,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         SwipeDTO swipeDTO = modelMapper.map(result.getSwipe(), SwipeDTO.class);
         stompService.push(swipeDTO, locale);
-        return modelMapper.map(result.getQuestions(), new TypeToken<List<QuestionDTO>>() {
-        }.getType());
+        return modelMapper.map(result.getQuestions(), new TypeToken<List<QuestionDTO>>() {}.getType());
     }
 
     @Override
@@ -146,7 +152,13 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             validateSwiped(swiped);
 
             Wallet wallet = walletDAO.findByAccountId(swiper.getId(), true);
+            if (wallet == null) {
+                throw new WalletNotFoundException();
+            }
             SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
+            if (swipeMeta == null) {
+                throw new SwipeMetaNotFoundException();
+            }
 
             if (wallet.getFreeSwipe() >= swipeMeta.getSwipePoint()) {
                 wallet.setFreeSwipe((wallet.getFreeSwipe() - swipeMeta.getSwipePoint()));
@@ -201,15 +213,6 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             Pushable pushable = modelMapper.map(result.getObjMatch(), MatchDTO.class);
             stompService.push(pushable, locale);
             return clickDTO;
-        }
-    }
-
-    private void rechargeFreeSwipe(Wallet wallet, SwipeMeta swipeMeta) {
-        Date now = new Date();
-        long elapsedTime = now.getTime() - wallet.getFreeSwipeRechargedAt().getTime();
-        if (elapsedTime > swipeMeta.getFreeSwipePeriod()) {
-            wallet.setFreeSwipe(swipeMeta.getMaxFreeSwipe());
-            wallet.setFreeSwipeRechargedAt(now);
         }
     }
 

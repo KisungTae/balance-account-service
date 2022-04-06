@@ -1,6 +1,8 @@
 package com.beeswork.balanceaccountservice.service.base;
 
 import com.beeswork.balanceaccountservice.entity.account.Account;
+import com.beeswork.balanceaccountservice.entity.account.Wallet;
+import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
 import com.beeswork.balanceaccountservice.exception.account.AccountBlockedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountDeletedException;
 import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
@@ -19,5 +21,17 @@ public abstract class BaseServiceImpl {
 
     protected Date offsetFetchedAt(Date date) {
         return DateUtils.addMinutes(date, FETCH_OFFSET_IN_MINUTES);
+    }
+
+    protected void rechargeFreeSwipe(Wallet wallet, SwipeMeta swipeMeta) {
+        if (wallet == null || swipeMeta == null) {
+            return;
+        }
+        Date now = new Date();
+        long elapsedTime = now.getTime() - wallet.getFreeSwipeRechargedAt().getTime();
+        if (elapsedTime > swipeMeta.getFreeSwipePeriod()) {
+            wallet.setFreeSwipe(swipeMeta.getMaxFreeSwipe());
+            wallet.setFreeSwipeRechargedAt(now);
+        }
     }
 }

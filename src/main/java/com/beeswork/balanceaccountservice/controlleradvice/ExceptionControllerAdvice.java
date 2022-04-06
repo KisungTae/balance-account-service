@@ -26,6 +26,7 @@ import com.beeswork.balanceaccountservice.exception.report.ReportedNotFoundExcep
 import com.beeswork.balanceaccountservice.exception.setting.SettingNotFoundException;
 import com.beeswork.balanceaccountservice.exception.stomp.QueueNotFoundException;
 import com.beeswork.balanceaccountservice.exception.swipe.*;
+import com.beeswork.balanceaccountservice.exception.wallet.WalletNotFoundException;
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -73,7 +74,8 @@ public class ExceptionControllerAdvice {
                        ProfileNotFoundException.class, MatchNotFoundException.class,
                        ReportReasonNotFoundException.class, ReportedNotFoundException.class,
                        QueueNotFoundException.class, SwipeMetaNotFoundException.class,
-                       SettingNotFoundException.class, ChatMessageNotFoundException.class})
+                       SettingNotFoundException.class, ChatMessageNotFoundException.class,
+                       WalletNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(BaseException exception, Locale locale) throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .contentType(MediaType.APPLICATION_JSON)
@@ -185,14 +187,16 @@ public class ExceptionControllerAdvice {
 //    InvalidFormatException
 
     @ExceptionHandler({HttpMessageNotReadableException.class})
-    public ResponseEntity<String> handleInvalidFormatException(HttpMessageNotReadableException exception, Locale locale) throws JsonProcessingException {
+    public ResponseEntity<String> handleInvalidFormatException(HttpMessageNotReadableException exception, Locale locale)
+    throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(exceptionResponse(BadRequestException.CODE, null, locale));
     }
 
     @ExceptionHandler({InternalServerException.class})
-    public ResponseEntity<String> handleInternalServerException(InternalServerException exception, Locale locale) throws JsonProcessingException {
+    public ResponseEntity<String> handleInternalServerException(InternalServerException exception, Locale locale)
+    throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                              .contentType(MediaType.APPLICATION_JSON)
                              .body(exceptionResponse(exception.getExceptionCode(), null, locale));

@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
 
+import com.beeswork.balanceaccountservice.dto.question.ListQuestionsDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.response.EmptyJsonResponse;
@@ -40,12 +41,6 @@ public class QuestionController extends BaseController {
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTO));
     }
 
-    @GetMapping("/random/list")
-    public ResponseEntity<String> listRandomQuestions() throws JsonProcessingException {
-        List<QuestionDTO> questionDTOs = questionService.listRandomQuestions();
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
-    }
-
     @PostMapping("/answers")
     public ResponseEntity<String> saveAnswers(@Valid @RequestBody SaveAnswersVM saveAnswersVM,
                                               BindingResult bindingResult,
@@ -59,8 +54,8 @@ public class QuestionController extends BaseController {
     @GetMapping("/list")
     public ResponseEntity<String> listQuestions(BindingResult bindingResult, Principal principal) throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<QuestionDTO> questionDTOs = questionService.listQuestions(getAccountIdFrom(principal));
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
+        ListQuestionsDTO listQuestionsDTO = questionService.listQuestions(getAccountIdFrom(principal));
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listQuestionsDTO));
     }
 
 
