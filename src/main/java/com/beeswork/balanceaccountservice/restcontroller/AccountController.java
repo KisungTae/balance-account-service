@@ -40,23 +40,6 @@ public class AccountController extends BaseController {
         this.s3Service = s3Service;
     }
 
-    @PostMapping("/question/answers")
-    public ResponseEntity<String> saveAnswers(@Valid @RequestBody SaveAnswersVM saveAnswersVM,
-                                              BindingResult bindingResult,
-                                              Principal principal)
-    throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        accountService.saveQuestionAnswers(getAccountIdFrom(principal), saveAnswersVM.getAnswers());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(new EmptyJsonResponse()));
-    }
-
-    @GetMapping("/question/list")
-    public ResponseEntity<String> listQuestions(BindingResult bindingResult, Principal principal) throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<QuestionDTO> questionDTOs = accountService.listQuestions(getAccountIdFrom(principal));
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
-    }
-
 
 //  TODO: comment in s3Service.deletephoto
     @PostMapping("/delete")

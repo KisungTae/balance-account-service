@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface AccountService {
-    void saveQuestionAnswers(UUID accountId, Map<Integer, Boolean> answers);
-    List<QuestionDTO> listQuestions(UUID accountId);
+
     DeleteAccountDTO deleteAccount(UUID accountId);
 }
