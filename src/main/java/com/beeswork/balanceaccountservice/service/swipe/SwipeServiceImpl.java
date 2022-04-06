@@ -84,14 +84,9 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             Account swiper = accountDAO.findById(swiperId, false);
             Account swiped = accountDAO.findById(swipedId, false);
             validateSwiped(swiped);
+
             Wallet wallet = walletDAO.findByAccountId(swiper.getId(), true);
-            if (wallet == null) {
-                throw new WalletNotFoundException();
-            }
             SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
-            if (swipeMeta == null) {
-                throw new SwipeMetaNotFoundException();
-            }
             rechargeFreeSwipe(wallet, swipeMeta);
 
             if (wallet.getFreeSwipe() < swipeMeta.getSwipePoint() && wallet.getPoint() < swipeMeta.getSwipePoint()) {
@@ -213,6 +208,21 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             Pushable pushable = modelMapper.map(result.getObjMatch(), MatchDTO.class);
             stompService.push(pushable, locale);
             return clickDTO;
+        }
+    }
+
+    private void rechargeFreeSwipe(Wallet wallet, SwipeMeta swipeMeta) {
+        if (wallet == null) {
+            throw new WalletNotFoundException();
+        }
+        if (swipeMeta == null) {
+            throw new SwipeMetaNotFoundException();
+        }
+        Date now = new Date();
+        long elapsedTime = now.getTime() - wallet.getFreeSwipeRechargedAt().getTime();
+        if (elapsedTime > swipeMeta.getFreeSwipePeriod()) {
+            wallet.setFreeSwipe(swipeMeta.getMaxFreeSwipe());
+            wallet.setFreeSwipeRechargedAt(now);
         }
     }
 

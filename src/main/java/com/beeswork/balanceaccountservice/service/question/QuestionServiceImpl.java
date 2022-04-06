@@ -31,7 +31,6 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
     private final ModelMapper modelMapper;
     private final AccountDAO accountDAO;
     private final WalletDAO          walletDAO;
-    private final SwipeMetaDAO       swipeMetaDAO;
     private final AccountQuestionDAO accountQuestionDAO;
     private static final int MIN_NUM_OF_QUESTIONS = 3;
 
@@ -40,12 +39,11 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
                                ModelMapper modelMapper,
                                AccountDAO accountDAO,
                                WalletDAO walletDAO,
-                               SwipeMetaDAO swipeMetaDAO, AccountQuestionDAO accountQuestionDAO) {
+                               AccountQuestionDAO accountQuestionDAO) {
         this.modelMapper = modelMapper;
         this.questionDAO = questionDAO;
         this.accountDAO = accountDAO;
         this.walletDAO = walletDAO;
-        this.swipeMetaDAO = swipeMetaDAO;
         this.accountQuestionDAO = accountQuestionDAO;
     }
 
@@ -118,7 +116,6 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
     @Override
     public ListQuestionsDTO listQuestions(UUID accountId) {
         ListQuestionsDTO listQuestionsDTO = new ListQuestionsDTO();
-
         listQuestionsDTO.setQuestionDTOs(accountQuestionDAO.findAllQuestionDTOsWithAnswer(accountId));
         // NOTE 1. this means that user has not saved any answers yet so it's equal to questionDTO.size() == 0
         if (listQuestionsDTO.getQuestionDTOs().size() < MIN_NUM_OF_QUESTIONS) {
@@ -126,13 +123,9 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
         }
 
         Wallet wallet = walletDAO.findByAccountId(accountId, true);
-        SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
-        rechargeFreeSwipe(wallet, swipeMeta);
-
         if (wallet != null) {
             listQuestionsDTO.setPoint(wallet.getPoint());
         }
-
         return listQuestionsDTO;
     }
 

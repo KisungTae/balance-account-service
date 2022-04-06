@@ -22,16 +22,4 @@ public abstract class BaseServiceImpl {
     protected Date offsetFetchedAt(Date date) {
         return DateUtils.addMinutes(date, FETCH_OFFSET_IN_MINUTES);
     }
-
-    protected void rechargeFreeSwipe(Wallet wallet, SwipeMeta swipeMeta) {
-        if (wallet == null || swipeMeta == null) {
-            return;
-        }
-        Date now = new Date();
-        long elapsedTime = now.getTime() - wallet.getFreeSwipeRechargedAt().getTime();
-        if (elapsedTime > swipeMeta.getFreeSwipePeriod()) {
-            wallet.setFreeSwipe(swipeMeta.getMaxFreeSwipe());
-            wallet.setFreeSwipeRechargedAt(now);
-        }
-    }
 }
