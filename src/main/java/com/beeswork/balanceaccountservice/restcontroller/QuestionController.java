@@ -52,8 +52,7 @@ public class QuestionController extends BaseController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<String> listQuestions(BindingResult bindingResult, Principal principal) throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
+    public ResponseEntity<String> listQuestions(Principal principal) throws JsonProcessingException {
         ListQuestionsDTO listQuestionsDTO = questionService.listQuestions(getAccountIdFrom(principal));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listQuestionsDTO));
     }

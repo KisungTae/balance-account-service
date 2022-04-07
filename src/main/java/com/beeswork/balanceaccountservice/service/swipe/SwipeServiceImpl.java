@@ -10,6 +10,7 @@ import com.beeswork.balanceaccountservice.dao.swipe.SwipeMetaDAO;
 import com.beeswork.balanceaccountservice.dao.wallet.WalletDAO;
 import com.beeswork.balanceaccountservice.dto.common.Pushable;
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
+import com.beeswork.balanceaccountservice.dto.question.ListQuestionsDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.*;
 import com.beeswork.balanceaccountservice.entity.account.Account;
@@ -79,7 +80,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     }
 
     @Override
-    public List<QuestionDTO> like(UUID swiperId, UUID swipedId, Locale locale) {
+    public ListQuestionsDTO like(UUID swiperId, UUID swipedId, Locale locale) {
         LikeTransactionResult result = transactionTemplate.execute(status -> {
             Account swiper = accountDAO.findById(swiperId, false);
             Account swiped = accountDAO.findById(swipedId, false);
@@ -108,7 +109,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
                 throw new SwipeClickedExistsException();
             }
             swipe.setCount((swipe.getCount() + 1));
-            return new LikeTransactionResult(questions, swipe);
+            return new LikeTransactionResult(questions, wallet.getPoint(), swipe);
         });
 
         if (result == null) {
@@ -117,7 +118,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         SwipeDTO swipeDTO = modelMapper.map(result.getSwipe(), SwipeDTO.class);
         stompService.push(swipeDTO, locale);
-        return modelMapper.map(result.getQuestions(), new TypeToken<List<QuestionDTO>>() {}.getType());
+
+        ListQuestionsDTO listQuestionsDTO = new ListQuestionsDTO();
+        listQuestionsDTO.setQuestionDTOs(modelMapper.map(result.getQuestions(), new TypeToken<List<QuestionDTO>>() {}.getType()));
+        listQuestionsDTO.setPoint(result.getPoint());
+        return listQuestionsDTO;
     }
 
     @Override
@@ -147,13 +152,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             validateSwiped(swiped);
 
             Wallet wallet = walletDAO.findByAccountId(swiper.getId(), true);
-            if (wallet == null) {
-                throw new WalletNotFoundException();
-            }
             SwipeMeta swipeMeta = swipeMetaDAO.findFirst();
-            if (swipeMeta == null) {
-                throw new SwipeMetaNotFoundException();
-            }
+            rechargeFreeSwipe(wallet, swipeMeta);
 
             if (wallet.getFreeSwipe() >= swipeMeta.getSwipePoint()) {
                 wallet.setFreeSwipe((wallet.getFreeSwipe() - swipeMeta.getSwipePoint()));

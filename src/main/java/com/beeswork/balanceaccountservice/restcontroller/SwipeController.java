@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.restcontroller;
 
+import com.beeswork.balanceaccountservice.dto.question.ListQuestionsDTO;
 import com.beeswork.balanceaccountservice.dto.question.QuestionDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.*;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
@@ -43,8 +44,8 @@ public class SwipeController extends BaseController {
                                        Locale locale)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        List<QuestionDTO> questionDTOs = swipeService.like(getAccountIdFrom(principal), likeVM.getSwipedId(), locale);
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(questionDTOs));
+        ListQuestionsDTO listQuestionsDTO = swipeService.like(getAccountIdFrom(principal), likeVM.getSwipedId(), locale);
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listQuestionsDTO));
     }
 
     @GetMapping("/swipe/list")

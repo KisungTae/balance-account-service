@@ -114,6 +114,7 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public ListQuestionsDTO listQuestions(UUID accountId) {
         ListQuestionsDTO listQuestionsDTO = new ListQuestionsDTO();
         listQuestionsDTO.setQuestionDTOs(accountQuestionDAO.findAllQuestionDTOsWithAnswer(accountId));
@@ -122,7 +123,7 @@ public class QuestionServiceImpl extends BaseServiceImpl implements QuestionServ
             listQuestionsDTO.setQuestionDTOs(listRandomQuestions());
         }
 
-        Wallet wallet = walletDAO.findByAccountId(accountId, true);
+        Wallet wallet = walletDAO.findByAccountId(accountId, false);
         if (wallet != null) {
             listQuestionsDTO.setPoint(wallet.getPoint());
         }

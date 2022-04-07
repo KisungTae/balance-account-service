@@ -16,5 +16,6 @@ import java.util.List;
 @AllArgsConstructor
 public class LikeTransactionResult {
     private List<Question> questions = new ArrayList<>();
+    private int            point;
     private Swipe          swipe;
 }
