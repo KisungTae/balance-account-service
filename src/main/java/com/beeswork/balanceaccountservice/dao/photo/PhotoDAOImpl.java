@@ -8,6 +8,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -22,5 +23,10 @@ public class PhotoDAOImpl extends BaseDAOImpl<Photo> implements PhotoDAO {
     @Override
     public boolean existsByKey(UUID accountId, String key) {
         return jpaQueryFactory.selectFrom(qPhoto).where(qPhoto.photoId.eq(new PhotoId(accountId, key))).fetchCount() > 0;
+    }
+
+    @Override
+    public List<Photo> findAllBy(UUID accountId) {
+        return jpaQueryFactory.selectFrom(qPhoto).where(qPhoto.photoId.accountId.eq(accountId)).fetch();
     }
 }

@@ -50,6 +50,10 @@ public class Photo implements Comparable<Photo> {
         return photoId.getKey();
     }
 
+    public UUID getAccountId() {
+        return photoId.getAccountId();
+    }
+
     @Override
     public int compareTo(@NonNull Photo o) {
         return Integer.compare(this.sequence, o.sequence);

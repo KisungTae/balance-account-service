@@ -59,12 +59,10 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
         accountDAO.persist(account);
     }
 
-//    TODO: right away check photodao should find all
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<PhotoDTO> listPhotos(UUID accountId) {
-        Account account = accountDAO.findById(accountId, false);
-        return modelMapper.map(account.getPhotos(), new TypeToken<List<PhotoDTO>>() {}.getType());
+        return modelMapper.map(photoDAO.findAllBy(accountId), new TypeToken<List<PhotoDTO>>() {}.getType());
     }
 
     @Override
