@@ -71,16 +71,19 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
         Account account = accountDAO.findById(accountId, true);
         List<Photo> photos = account.getPhotos();
 
-        Photo photo = photos.stream()
-                            .filter(p -> p.getPhotoId().getKey().equals(photoKey))
-                            .findAny()
-                            .orElseThrow(PhotoNotFoundException::new);
-
         if (photos.size() <= 1) {
             throw new PhotoInvalidDeleteException();
         }
-        photos.remove(photo);
-        resetProfilePhoto(account, photos);
+
+        Photo photo = photos.stream()
+                            .filter(p -> p.getPhotoId().getKey().equals(photoKey))
+                            .findAny()
+                            .orElse(null);
+
+        if (photo != null) {
+            photos.remove(photo);
+            resetProfilePhoto(account, photos);
+        }
     }
 
     private void resetProfilePhoto(Account account, List<Photo> photos) {

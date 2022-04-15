@@ -9,6 +9,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class PhotoDTO {
+    private UUID accountId;
     private String key;
     private int sequence;
 }

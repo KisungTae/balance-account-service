@@ -60,9 +60,8 @@ public class PhotoController extends BaseController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<String> listPhotos(BindingResult bindingResult, Principal principal)
+    public ResponseEntity<String> listPhotos(Principal principal)
     throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
         List<PhotoDTO> photoDTOs = photoService.listPhotos(getAccountIdFrom(principal));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(photoDTOs));
     }
