@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.service.login;
 
+import com.beeswork.balanceaccountservice.config.properties.AWSProperties;
 import com.beeswork.balanceaccountservice.config.security.JWTTokenProvider;
 import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.constant.PushTokenType;
@@ -26,10 +27,12 @@ import com.beeswork.balanceaccountservice.exception.jwt.ExpiredJWTException;
 import com.beeswork.balanceaccountservice.exception.jwt.InvalidRefreshTokenException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import com.beeswork.balanceaccountservice.service.pushtoken.PushTokenService;
+import com.beeswork.balanceaccountservice.service.security.UserDetailService;
 import com.beeswork.balanceaccountservice.util.Convert;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,16 +42,18 @@ import java.util.UUID;
 @Service
 public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
 
-    private final LoginDAO         loginDAO;
-    private final AccountDAO       accountDAO;
-    private final SwipeMetaDAO     swipeMetaDAO;
-    private final PushTokenDAO     pushTokenDAO;
-    private final WalletDAO        walletDAO;
-    private final PushSettingDAO   pushSettingDAO;
-    private final ProfileDAO       profileDAO;
-    private final RefreshTokenDAO  refreshTokenDAO;
-    private final JWTTokenProvider jwtTokenProvider;
-    private final PushTokenService pushTokenService;
+    private final LoginDAO          loginDAO;
+    private final AccountDAO        accountDAO;
+    private final SwipeMetaDAO      swipeMetaDAO;
+    private final PushTokenDAO      pushTokenDAO;
+    private final WalletDAO         walletDAO;
+    private final PushSettingDAO    pushSettingDAO;
+    private final ProfileDAO        profileDAO;
+    private final RefreshTokenDAO   refreshTokenDAO;
+    private final JWTTokenProvider  jwtTokenProvider;
+    private final PushTokenService  pushTokenService;
+    private final AWSProperties     awsProperties;
+    private final UserDetailService userDetailService;
 
 
     @Autowired
@@ -61,7 +66,9 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
                             ProfileDAO profileDAO,
                             RefreshTokenDAO refreshTokenDAO,
                             JWTTokenProvider jwtTokenProvider,
-                            PushTokenService pushTokenService) {
+                            PushTokenService pushTokenService,
+                            AWSProperties awsProperties,
+                            UserDetailService userDetailsService) {
         this.loginDAO = loginDAO;
         this.accountDAO = accountDAO;
         this.swipeMetaDAO = swipeMetaDAO;
@@ -72,6 +79,8 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         this.refreshTokenDAO = refreshTokenDAO;
         this.jwtTokenProvider = jwtTokenProvider;
         this.pushTokenService = pushTokenService;
+        this.awsProperties = awsProperties;
+        this.userDetailService = userDetailsService;
     }
 
     @Override
@@ -110,7 +119,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         RefreshToken refreshToken = new RefreshToken(account);
         String newRefreshToken = createNewRefreshToken(account, refreshToken);
         String accessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
-        return new LoginDTO(account.getId(), false, accessToken, newRefreshToken, email);
+        return new LoginDTO(account.getId(), false, accessToken, newRefreshToken, email, awsProperties.getBalancePhotoBucketURL());
     }
 
     private LoginDTO loginWithExistingAccount(Login login) {
@@ -124,7 +133,12 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
 
         Profile profile = profileDAO.findById(account.getId(), false);
         boolean profileExists = profile != null && profile.isEnabled();
-        return new LoginDTO(account.getId(), profileExists, accessToken, newRefreshToken, login.getEmail());
+        return new LoginDTO(account.getId(),
+                            profileExists,
+                            accessToken,
+                            newRefreshToken,
+                            login.getEmail(),
+                            awsProperties.getBalancePhotoBucketURL());
     }
 
     @Override
@@ -152,7 +166,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
             throw new InvalidRefreshTokenException();
         }
 
-        Account account = findValidAccountFromJWTToken(refreshTokenUserName);
+        Account account = (Account) userDetailService.loadValidUserByUsername(refreshTokenUserName);
         validateRefreshTokenKey(account.getId(), refreshTokenJws);
         String newRefreshToken = null;
         if (jwtTokenProvider.shouldReissueRefreshToken(refreshTokenJws)) {
@@ -175,23 +189,19 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         return new LoginDTO(refreshAccessTokenDTO.getAccountId(),
                             profileExists,
                             refreshAccessTokenDTO.getAccessToken(),
-                            refreshAccessTokenDTO.getRefreshToken());
+                            refreshAccessTokenDTO.getRefreshToken(),
+                            awsProperties.getBalancePhotoBucketURL());
     }
 
 
     private void validateRefreshTokenKey(UUID accountId, Jws<Claims> jws) {
         UUID refreshTokenKey = jwtTokenProvider.getRefreshTokenKey(jws);
-        if (refreshTokenKey == null) throw new InvalidRefreshTokenException();
-        if (!refreshTokenDAO.existsByAccountIdAndKey(accountId, refreshTokenKey))
+        if (refreshTokenKey == null) {
             throw new InvalidRefreshTokenException();
-    }
-
-    private Account findValidAccountFromJWTToken(UUID userName) {
-        if (userName == null) throw new AccountNotFoundException();
-        Account account = accountDAO.findById(userName, false);
-        if (account == null) throw new AccountNotFoundException();
-        account.validate();
-        return account;
+        }
+        if (!refreshTokenDAO.existsByAccountIdAndKey(accountId, refreshTokenKey)) {
+            throw new InvalidRefreshTokenException();
+        }
     }
 
     private String createNewRefreshToken(Account account, RefreshToken refreshToken) {

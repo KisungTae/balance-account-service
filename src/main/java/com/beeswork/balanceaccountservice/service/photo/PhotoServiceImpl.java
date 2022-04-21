@@ -7,7 +7,6 @@ import com.beeswork.balanceaccountservice.dto.photo.PhotoDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteException;
-import com.beeswork.balanceaccountservice.exception.photo.PhotoNotFoundException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoExceededMaxException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
@@ -24,9 +23,9 @@ import java.util.*;
 @Service
 public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
 
-    private final AccountDAO accountDAO;
+    private final AccountDAO  accountDAO;
     private final ModelMapper modelMapper;
-    private final PhotoDAO photoDAO;
+    private final PhotoDAO    photoDAO;
 
     @Autowired
     public PhotoServiceImpl(ModelMapper modelMapper,
@@ -43,7 +42,9 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
 
         Account account = accountDAO.findById(accountId, true);
         List<Photo> photos = account.getPhotos();
-        if (photos.size() >= PhotoConstant.MAX_NUM_OF_PHOTOS) throw new PhotoExceededMaxException();
+        if (photos.size() >= PhotoConstant.MAX_NUM_OF_PHOTOS) {
+            throw new PhotoExceededMaxException();
+        }
 
         Photo photo = photos.stream()
                             .filter(p -> p.getPhotoId().getKey().equals(photoKey))
@@ -62,7 +63,7 @@ public class PhotoServiceImpl extends BaseServiceImpl implements PhotoService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<PhotoDTO> listPhotos(UUID accountId) {
-        return modelMapper.map(photoDAO.findAllBy(accountId), new TypeToken<List<PhotoDTO>>() {}.getType());
+        return modelMapper.map(photoDAO.findAllBy(accountId, PhotoConstant.MAX_NUM_OF_PHOTOS), new TypeToken<List<PhotoDTO>>() {}.getType());
     }
 
     @Override

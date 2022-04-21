@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.config.properties;
 
 
+import com.beeswork.balanceaccountservice.constant.Delimiter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,4 +19,8 @@ public class AWSProperties {
     private String accessKeyId;
     private String secretKey;
     private String region;
+
+    public String getBalancePhotoBucketURL() {
+        return String.format(s3Url, region, balancePhotoBucket);
+    }
 }

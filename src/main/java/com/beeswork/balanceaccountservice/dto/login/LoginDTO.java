@@ -19,11 +19,13 @@ public class LoginDTO {
     private String  accessToken;
     private String  refreshToken;
     private String  email;
+    private String  balancePhotoBucketURL;
 
-    public LoginDTO(UUID accountId, boolean profileExists, String accessToken, String refreshToken) {
+    public LoginDTO(UUID accountId, boolean profileExists, String accessToken, String refreshToken, String balancePhotoBucketURL) {
         this.accountId = accountId;
         this.profileExists = profileExists;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
+        this.balancePhotoBucketURL = balancePhotoBucketURL;
     }
 }

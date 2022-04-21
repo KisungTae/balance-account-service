@@ -60,13 +60,15 @@ public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public PreSignedUrl generatePreSignedUrl(UUID accountId, String photoKey) throws JsonProcessingException {
-        if (photoDAO.existsByKey(accountId, photoKey)) throw new PhotoAlreadyExistsException();
+        if (photoDAO.existsByKey(accountId, photoKey)) {
+            throw new PhotoAlreadyExistsException();
+        }
 
         String key = generateKey(accountId.toString(), photoKey);
         String region = awsProperties.getRegion();
         String accessKeyId = awsProperties.getAccessKeyId();
         String secretKey = awsProperties.getSecretKey();
-        String endpoint = String.format(awsProperties.getS3Url(), region, awsProperties.getBalancePhotoBucket());
+        String endpoint = awsProperties.getBalancePhotoBucketURL();
 
         Instant now = Instant.now();
         PreSignedUrl preSignedUrl = new PreSignedUrl(endpoint, accessKeyId, region, awsProperties.getBalancePhotoBucket(), key, now);

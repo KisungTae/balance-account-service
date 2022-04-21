@@ -26,7 +26,11 @@ public class PhotoDAOImpl extends BaseDAOImpl<Photo> implements PhotoDAO {
     }
 
     @Override
-    public List<Photo> findAllBy(UUID accountId) {
-        return jpaQueryFactory.selectFrom(qPhoto).where(qPhoto.photoId.accountId.eq(accountId)).fetch();
+    public List<Photo> findAllBy(UUID accountId, int limit) {
+        return jpaQueryFactory.selectFrom(qPhoto)
+                              .where(qPhoto.photoId.accountId.eq(accountId))
+                              .orderBy(qPhoto.sequence.asc())
+                              .limit(limit)
+                              .fetch();
     }
 }
