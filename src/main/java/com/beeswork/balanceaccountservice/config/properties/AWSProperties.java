@@ -16,11 +16,9 @@ import org.springframework.stereotype.Component;
 public class AWSProperties {
     private String balancePhotoBucket;
     private String s3Url;
-    private String accessKeyId;
-    private String secretKey;
     private String region;
 
-    public String getBalancePhotoBucketURL() {
+    public String getPhotoBucketUrl() {
         return String.format(s3Url, region, balancePhotoBucket);
     }
 }

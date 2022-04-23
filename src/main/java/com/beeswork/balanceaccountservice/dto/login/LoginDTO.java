@@ -1,12 +1,10 @@
 package com.beeswork.balanceaccountservice.dto.login;
 
-import com.beeswork.balanceaccountservice.entity.account.Account;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -18,14 +16,14 @@ public class LoginDTO {
     private boolean profileExists;
     private String  accessToken;
     private String  refreshToken;
-    private String  email;
-    private String  balancePhotoBucketURL;
+    private String email;
+    private String photoBucketUrl;
 
-    public LoginDTO(UUID accountId, boolean profileExists, String accessToken, String refreshToken, String balancePhotoBucketURL) {
+    public LoginDTO(UUID accountId, boolean profileExists, String accessToken, String refreshToken, String photoBucketUrl) {
         this.accountId = accountId;
         this.profileExists = profileExists;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
-        this.balancePhotoBucketURL = balancePhotoBucketURL;
+        this.photoBucketUrl = photoBucketUrl;
     }
 }

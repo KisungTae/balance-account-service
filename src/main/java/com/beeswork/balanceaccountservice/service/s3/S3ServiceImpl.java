@@ -1,9 +1,13 @@
 package com.beeswork.balanceaccountservice.service.s3;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.regions.DefaultAwsRegionProviderChain;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.beeswork.balanceaccountservice.config.properties.AWSProperties;
+import com.beeswork.balanceaccountservice.constant.Delimiter;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.photo.PhotoDAO;
 import com.beeswork.balanceaccountservice.dto.s3.PreSignedUrl;
@@ -36,25 +40,33 @@ public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
     private final AccountDAO    accountDAO;
     private final PhotoDAO      photoDAO;
     private final AWSProperties awsProperties;
+    private final AWSCredentials awsCredentials;
 
     @Autowired
     public S3ServiceImpl(ObjectMapper objectMapper,
                          AmazonS3 amazonS3,
                          AccountDAO accountDAO,
                          PhotoDAO photoDAO,
-                         AWSProperties awsProperties) {
+                         AWSProperties awsProperties,
+                         DefaultAWSCredentialsProviderChain defaultAWSCredentialsProviderChain) {
         this.objectMapper = objectMapper;
         this.amazonS3 = amazonS3;
         this.accountDAO = accountDAO;
         this.photoDAO = photoDAO;
         this.awsProperties = awsProperties;
+        this.awsCredentials = defaultAWSCredentialsProviderChain.getCredentials();
     }
 
     @Override
     @Async("processExecutor")
     public void deletePhoto(UUID accountId, String photoKey) {
         String key = generateKey(accountId.toString(), photoKey);
-        amazonS3.deleteObject(new DeleteObjectRequest(awsProperties.getBalancePhotoBucket(), key));
+        try {
+            amazonS3.deleteObject(new DeleteObjectRequest(awsProperties.getBalancePhotoBucket(), key));
+        } catch (Exception e) {
+            //todo: log error
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override
@@ -64,16 +76,15 @@ public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
             throw new PhotoAlreadyExistsException();
         }
 
-        String key = generateKey(accountId.toString(), photoKey);
-        String region = awsProperties.getRegion();
-        String accessKeyId = awsProperties.getAccessKeyId();
-        String secretKey = awsProperties.getSecretKey();
-        String endpoint = awsProperties.getBalancePhotoBucketURL();
-
         Instant now = Instant.now();
-        PreSignedUrl preSignedUrl = new PreSignedUrl(endpoint, accessKeyId, region, awsProperties.getBalancePhotoBucket(), key, now);
+        PreSignedUrl preSignedUrl = new PreSignedUrl(awsProperties.getPhotoBucketUrl(),
+                                                     awsCredentials.getAWSAccessKeyId(),
+                                                     awsProperties.getRegion(),
+                                                     awsProperties.getBalancePhotoBucket(),
+                                                     generateKey(accountId.toString(), photoKey),
+                                                     now);
         String encodePolicy = encodePolicy(preSignedUrl.getUploadPolicy(now));
-        String signature = computeSignature(encodePolicy, secretKey, region, now);
+        String signature = computeSignature(encodePolicy, awsCredentials.getAWSSecretKey(), awsProperties.getRegion(), now);
         preSignedUrl.sign(encodePolicy, signature);
         return preSignedUrl;
     }
@@ -106,6 +117,6 @@ public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
     }
 
     private static String generateKey(String accountId, String photoKey) {
-        return accountId + "/" + photoKey;
+        return accountId + Delimiter.FORWARD_SLASH + photoKey;
     }
 }
