@@ -20,11 +20,13 @@ public class SaveProfileVM {
     @Length(min = 1, max = 15, message = "{name.length}")
     private String name;
 
-    @NotNull(message = "{birth.null}")
-    private Date birth;
-
     @NotNull(message = "{gender.null}")
     private Boolean gender;
+
+    @NotNull(message = "{birth.null}")
+    private Date birthDate;
+
+    private Integer height;
 
     @Length(max = 500, message = "{about.length}")
     private String about;
@@ -39,6 +41,6 @@ public class SaveProfileVM {
     @DecimalMax("180.0")
     private Double longitude;
 
-    private int height;
+
 
 }

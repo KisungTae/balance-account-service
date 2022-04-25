@@ -62,7 +62,7 @@ public class ProfileController extends BaseController {
         if (bindingResult.hasErrors()) return super.fieldExceptionResponse(bindingResult);
         profileService.saveProfile(getAccountIdFrom(principal),
                                    saveProfileVM.getName(),
-                                   saveProfileVM.getBirth(),
+                                   saveProfileVM.getBirthDate(),
                                    saveProfileVM.getAbout(),
                                    saveProfileVM.getHeight(),
                                    saveProfileVM.getGender(),

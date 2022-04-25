@@ -9,4 +9,5 @@ import java.util.UUID;
 public interface PhotoDAO extends BaseDAO<Photo> {
     boolean existsByKey(UUID accountId, String key);
     List<Photo> findAllBy(UUID accountId, int limit);
+    long countBy(UUID accountId);
 }

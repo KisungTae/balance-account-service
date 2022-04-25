@@ -15,4 +15,5 @@ public interface AccountQuestionDAO extends BaseDAO<AccountQuestion> {
     long countAllByAnswers(UUID accountId, Map<Integer, Boolean> answers);
     List<Question> findAllQuestionsSelected(UUID accountId);
     List<QuestionDTO> findAllQuestionDTOsWithAnswer(UUID accountId);
+    long countBy(UUID accountId);
 }

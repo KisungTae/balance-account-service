@@ -71,6 +71,11 @@ public class AccountQuestionDAOImpl extends BaseDAOImpl<AccountQuestion> impleme
                               .fetch();
     }
 
+    @Override
+    public long countBy(UUID accountId) {
+        return jpaQueryFactory.selectFrom(qAccountQuestion).where(qAccountQuestion.account.id.eq(accountId)).fetchCount();
+    }
+
     private BooleanBuilder conditionForSelected(UUID accountId) {
         BooleanBuilder condition = new BooleanBuilder();
         condition.and(qAccountQuestion.accountQuestionId.accountId.eq(accountId));

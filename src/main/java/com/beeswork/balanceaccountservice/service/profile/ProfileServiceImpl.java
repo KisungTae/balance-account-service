@@ -2,7 +2,9 @@ package com.beeswork.balanceaccountservice.service.profile;
 
 import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
+import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.login.LoginDAO;
+import com.beeswork.balanceaccountservice.dao.photo.PhotoDAO;
 import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
 import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
@@ -45,21 +47,29 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
 
     private static final int DEFAULT_OFFSET = 0;
 
-    private final AccountDAO      accountDAO;
-    private final ProfileDAO      profileDAO;
-    private final LoginDAO        loginDAO;
-    private final GeometryFactory geometryFactory;
-    private final ModelMapper     modelMapper;
+    private final AccountDAO         accountDAO;
+    private final ProfileDAO         profileDAO;
+    private final LoginDAO           loginDAO;
+    private final PhotoDAO           photoDAO;
+    private final AccountQuestionDAO accountQuestionDAO;
+    private final GeometryFactory    geometryFactory;
+    private final ModelMapper        modelMapper;
 
     @Autowired
     public ProfileServiceImpl(ModelMapper modelMapper,
-                              GeometryFactory geometryFactory, AccountDAO accountDAO,
-                              ProfileDAO profileDAO, LoginDAO loginDAO) {
+                              GeometryFactory geometryFactory,
+                              AccountDAO accountDAO,
+                              ProfileDAO profileDAO,
+                              LoginDAO loginDAO,
+                              PhotoDAO photoDAO,
+                              AccountQuestionDAO accountQuestionDAO) {
         this.modelMapper = modelMapper;
         this.geometryFactory = geometryFactory;
         this.accountDAO = accountDAO;
         this.profileDAO = profileDAO;
         this.loginDAO = loginDAO;
+        this.photoDAO = photoDAO;
+        this.accountQuestionDAO = accountQuestionDAO;
     }
 
     @Override
@@ -90,7 +100,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     @Transactional
     public void saveProfile(UUID accountId,
                             String name,
-                            Date birth,
+                            Date birthDate,
                             String about,
                             int height,
                             boolean gender,
@@ -102,12 +112,13 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         Account account = accountDAO.findById(accountId, true);
         account.setName(name);
 
-        int birthYear = DateUtil.getYearFrom(birth);
-        Point location = getLocation(latitude, longitude);
-        if (about == null) {
-            about = "";
+        if (photoDAO.countBy(accountId) <= 0 || accountQuestionDAO.countBy(accountId) <= 0) {
+            throw new BadRequestException();
         }
-        Profile profile = new Profile(account, name, birthYear, birth, gender, height, about, location, true, new Date());
+
+        int birthYear = DateUtil.getYearFrom(birthDate);
+        Point location = getLocation(latitude, longitude);
+        Profile profile = new Profile(account, name, birthYear, birthDate, gender, height, about, location, true, new Date());
         profileDAO.persist(profile);
     }
 
