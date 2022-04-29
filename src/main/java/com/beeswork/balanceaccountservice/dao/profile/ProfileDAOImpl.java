@@ -2,13 +2,16 @@ package com.beeswork.balanceaccountservice.dao.profile;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
 import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
-import com.beeswork.balanceaccountservice.dto.profile.CardDTOResultTransformer;
+import com.beeswork.balanceaccountservice.entity.photo.Photo;
+import com.beeswork.balanceaccountservice.entity.profile.Card;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.profile.QProfile;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.hibernate.annotations.NamedNativeQuery;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -34,15 +37,16 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
     @Override
     @SuppressWarnings("unchecked")
     public CardDTO findCardDTO(UUID swipedId, Point pivot) {
-        List<Object[]> rows = entityManager.createNativeQuery(
-                "select cast(pr.account_id as varchar), pr.name, pr.birth_year, pr.gender, pr.height, pr.about, st_distance(pr.location, :pivot), ph.key " +
-                "from profile pr " +
-                "left join photo ph on pr.account_id = ph.account_id " +
-                "where pr.account_id = :swipedId ")
-                                           .setParameter("swipedId", swipedId)
-                                           .setParameter("pivot", pivot)
-                                           .getResultList();
-        return CardDTOResultTransformer.map(rows);
+//        List<Object[]> rows = entityManager.createNativeQuery(
+//                "select cast(pr.account_id as varchar), pr.name, pr.birth_year, pr.gender, pr.height, pr.about, st_distance(pr.location, :pivot), ph.key " +
+//                "from profile pr " +
+//                "left join photo ph on pr.account_id = ph.account_id " +
+//                "where pr.account_id = :swipedId ")
+//                                           .setParameter("swipedId", swipedId)
+//                                           .setParameter("pivot", pivot)
+//                                           .getResultList();
+//        return CardDTOResultTransformer.map(rows);
+        return null;
     }
 
     @Override
@@ -50,11 +54,49 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
         return jpaQueryFactory.selectFrom(qProfile).where(qProfile.accountId.eq(accountId)).fetchCount() > 0;
     }
 
+
+    //  NOTE 1. If you want to use st_dwithin in HQL, then you can do where dwithin(pr.location, :pivot, :distance) = TRUE
     @Override
     @SuppressWarnings("unchecked")
     public List<CardDTO> findCardDTOs(int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point pivot) {
-        List<Object[]> rows = entityManager.createNativeQuery(
-                "select cast(b.account_id as varchar) as id, b.name, b.birth_year, b.height, b.about, st_distance(b.location, :pivot), p.key " +
+//        List<Object[]> rows = entityManager.createNativeQuery(
+//                "select cast(b.account_id as varchar) as id, b.name, b.birth_year, b.height, b.about, st_distance(b.location, :pivot), p.key " +
+//                "from (select * " +
+//                "      from profile  " +
+//                "      where st_dwithin(location, :pivot, :distance) " +
+//                "        and gender = :gender " +
+//                "        and birth_year <= :minAge " +
+//                "        and birth_year >= :maxAge " +
+//                "        and enabled = true " +
+//                "        order by score " +
+//                "       limit :limit " +
+//                "       offset :offset) as b " +
+//                "left join photo as p " +
+//                "on p.account_id = b.account_id " +
+//                "order by id, p.sequence")
+//                                           .setParameter("pivot", pivot)
+//                                           .setParameter("distance", distance)
+//                                           .setParameter("gender", gender)
+//                                           .setParameter("minAge", minAge)
+//                                           .setParameter("maxAge", maxAge)
+//                                           .setParameter("limit", limit)
+//                                           .setParameter("offset", offset)
+//                                           .getResultList();
+//        return CardDTOResultTransformer.mapList(rows);
+
+//        List<Profile> profiles = entityManager.createNativeQuery(
+//                "select distinct * from profile left join photo on profile.account_id = photo.account_id", Profile.class).getResultList();
+
+
+//        List<Profile> profiles = entityManager.createQuery(
+//                "select pr from Profile pr where dwithin(pr.location, :pivot, :distance) = TRUE", Profile.class)
+//                                              .setParameter("pivot", pivot)
+//                                              .setParameter("distance", distance)
+//                                              .getResultList();
+
+
+        List<Card> cards = entityManager.createNativeQuery(
+                "select cast(b.account_id as varchar) as account_id, b.name, b.birth_year, b.height, b.about, st_distance(b.location, :pivot) as distance, p.key as photo_key " +
                 "from (select * " +
                 "      from profile  " +
                 "      where st_dwithin(location, :pivot, :distance) " +
@@ -67,15 +109,19 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                 "       offset :offset) as b " +
                 "left join photo as p " +
                 "on p.account_id = b.account_id " +
-                "order by id, p.sequence")
-                                           .setParameter("pivot", pivot)
-                                           .setParameter("distance", distance)
-                                           .setParameter("gender", gender)
-                                           .setParameter("minAge", minAge)
-                                           .setParameter("maxAge", maxAge)
-                                           .setParameter("limit", limit)
-                                           .setParameter("offset", offset)
-                                           .getResultList();
-        return CardDTOResultTransformer.mapList(rows);
+                "order by account_id, p.sequence", "Card")
+                                       .setParameter("pivot", pivot)
+                                       .setParameter("distance", distance)
+                                       .setParameter("gender", gender)
+                                       .setParameter("minAge", minAge)
+                                       .setParameter("maxAge", maxAge)
+                                       .setParameter("limit", limit)
+                                       .setParameter("offset", offset)
+                                       .getResultList();
+
+        for (Card card : cards) {
+            System.out.println(card);
+        }
+        return null;
     }
 }

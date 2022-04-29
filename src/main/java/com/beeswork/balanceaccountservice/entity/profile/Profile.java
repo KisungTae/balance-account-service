@@ -2,6 +2,7 @@ package com.beeswork.balanceaccountservice.entity.profile;
 
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.photo.Photo;
+import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,11 +16,29 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "profile")
+@SqlResultSetMapping(
+        name = "Card",
+        classes = {
+                @ConstructorResult(
+                        targetClass = Card.class,
+                        columns = {
+                                @ColumnResult(name = "account_id", type = UUID.class),
+                                @ColumnResult(name = "name", type = String.class),
+                                @ColumnResult(name = "birth_year", type = Integer.class),
+                                @ColumnResult(name = "height", type = Integer.class),
+                                @ColumnResult(name = "about", type = String.class),
+                                @ColumnResult(name = "distance", type = Double.class),
+                                @ColumnResult(name = "photo_key", type = String.class)
+                        }
+                )
+        }
+)
 public class Profile {
 
     @Id
