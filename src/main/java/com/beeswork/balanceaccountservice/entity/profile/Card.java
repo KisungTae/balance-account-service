@@ -33,17 +33,4 @@ public class Card {
         this.distance = distance;
         this.photoKey = photoKey;
     }
-
-    @Override
-    public String toString() {
-        return "Card{" +
-               "accountId='" + accountId + '\'' +
-               ", name='" + name + '\'' +
-               ", birthYear=" + birthYear +
-               ", height=" + height +
-               ", about='" + about + '\'' +
-               ", distance=" + distance +
-               ", photoKey='" + photoKey + '\'' +
-               '}';
-    }
 }

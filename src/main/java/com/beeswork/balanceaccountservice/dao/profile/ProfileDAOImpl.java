@@ -16,7 +16,9 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @Repository
@@ -58,43 +60,7 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
     //  NOTE 1. If you want to use st_dwithin in HQL, then you can do where dwithin(pr.location, :pivot, :distance) = TRUE
     @Override
     @SuppressWarnings("unchecked")
-    public List<CardDTO> findCardDTOs(int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point pivot) {
-//        List<Object[]> rows = entityManager.createNativeQuery(
-//                "select cast(b.account_id as varchar) as id, b.name, b.birth_year, b.height, b.about, st_distance(b.location, :pivot), p.key " +
-//                "from (select * " +
-//                "      from profile  " +
-//                "      where st_dwithin(location, :pivot, :distance) " +
-//                "        and gender = :gender " +
-//                "        and birth_year <= :minAge " +
-//                "        and birth_year >= :maxAge " +
-//                "        and enabled = true " +
-//                "        order by score " +
-//                "       limit :limit " +
-//                "       offset :offset) as b " +
-//                "left join photo as p " +
-//                "on p.account_id = b.account_id " +
-//                "order by id, p.sequence")
-//                                           .setParameter("pivot", pivot)
-//                                           .setParameter("distance", distance)
-//                                           .setParameter("gender", gender)
-//                                           .setParameter("minAge", minAge)
-//                                           .setParameter("maxAge", maxAge)
-//                                           .setParameter("limit", limit)
-//                                           .setParameter("offset", offset)
-//                                           .getResultList();
-//        return CardDTOResultTransformer.mapList(rows);
-
-//        List<Profile> profiles = entityManager.createNativeQuery(
-//                "select distinct * from profile left join photo on profile.account_id = photo.account_id", Profile.class).getResultList();
-
-
-//        List<Profile> profiles = entityManager.createQuery(
-//                "select pr from Profile pr where dwithin(pr.location, :pivot, :distance) = TRUE", Profile.class)
-//                                              .setParameter("pivot", pivot)
-//                                              .setParameter("distance", distance)
-//                                              .getResultList();
-
-
+    public List<Card> findCards(int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point pivot) {
         List<Card> cards = entityManager.createNativeQuery(
                 "select cast(b.account_id as varchar) as account_id, b.name, b.birth_year, b.height, b.about, st_distance(b.location, :pivot) as distance, p.key as photo_key " +
                 "from (select * " +
@@ -119,9 +85,20 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                                        .setParameter("offset", offset)
                                        .getResultList();
 
-        for (Card card : cards) {
-            System.out.println(card);
+        Card card = null;
+        int index = 0;
+        while (index < cards.size()) {
+            Card currentCard = cards.get(index);
+            if (card == null || !card.getAccountId().equals(currentCard.getAccountId())) {
+                currentCard.getPhotoKeys().add(currentCard.getPhotoKey());
+                currentCard.setPhotoKey(null);
+                card = currentCard;
+                index++;
+            } else {
+                card.getPhotoKeys().add(currentCard.getPhotoKey());
+                cards.remove(index);
+            }
         }
-        return null;
+        return cards;
     }
 }

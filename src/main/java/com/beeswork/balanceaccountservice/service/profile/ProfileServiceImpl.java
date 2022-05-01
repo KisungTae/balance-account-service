@@ -11,6 +11,7 @@ import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
 import com.beeswork.balanceaccountservice.dto.profile.RecommendDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.login.Login;
+import com.beeswork.balanceaccountservice.entity.profile.Card;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.exception.profile.EmailDuplicateException;
@@ -173,12 +174,12 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
             maxAge = currentYear - maxAge + 1;
         }
 
-        List<CardDTO> cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, profile.getLocation());
-        if (cardDTOs.size() == 0 && pageIndex > 0) {
-            cardDTOs = profileDAO.findCardDTOs(distance, minAge, maxAge, gender, PAGE_LIMIT, DEFAULT_OFFSET, profile.getLocation());
-            recommendDTO.setReset(true);
-        }
-        recommendDTO.setCardDTOs(cardDTOs);
+        List<Card> cards = profileDAO.findCards(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, profile.getLocation());
+//        if (cardDTOs.size() == 0 && pageIndex > 0) {
+//            cardDTOs = profileDAO.findCards(distance, minAge, maxAge, gender, PAGE_LIMIT, DEFAULT_OFFSET, profile.getLocation());
+//            recommendDTO.setReset(true);
+//        }
+//        recommendDTO.setCardDTOs(cardDTOs);
         return recommendDTO;
     }
 
