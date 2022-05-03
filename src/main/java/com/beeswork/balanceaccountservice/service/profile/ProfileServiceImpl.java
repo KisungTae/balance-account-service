@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.service.profile;
 
+import com.beeswork.balanceaccountservice.config.properties.AWSProperties;
 import com.beeswork.balanceaccountservice.constant.LoginType;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
@@ -8,7 +9,6 @@ import com.beeswork.balanceaccountservice.dao.photo.PhotoDAO;
 import com.beeswork.balanceaccountservice.dao.profile.ProfileDAO;
 import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
 import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
-import com.beeswork.balanceaccountservice.dto.profile.RecommendDTO;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.login.Login;
 import com.beeswork.balanceaccountservice.entity.profile.Card;
@@ -24,6 +24,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -54,7 +55,8 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     private final PhotoDAO           photoDAO;
     private final AccountQuestionDAO accountQuestionDAO;
     private final GeometryFactory    geometryFactory;
-    private final ModelMapper        modelMapper;
+    private final ModelMapper     modelMapper;
+    private final AWSProperties awsProperties;
 
     @Autowired
     public ProfileServiceImpl(ModelMapper modelMapper,
@@ -63,7 +65,8 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
                               ProfileDAO profileDAO,
                               LoginDAO loginDAO,
                               PhotoDAO photoDAO,
-                              AccountQuestionDAO accountQuestionDAO) {
+                              AccountQuestionDAO accountQuestionDAO,
+                              AWSProperties awsProperties) {
         this.modelMapper = modelMapper;
         this.geometryFactory = geometryFactory;
         this.accountDAO = accountDAO;
@@ -71,6 +74,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         this.loginDAO = loginDAO;
         this.photoDAO = photoDAO;
         this.accountQuestionDAO = accountQuestionDAO;
+        this.awsProperties = awsProperties;
     }
 
     @Override
@@ -83,11 +87,11 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public CardDTO getCard(UUID accountId, UUID swipedId) {
         Profile profile = findValidProfile(accountId, false);
-        CardDTO cardDTO = profileDAO.findCardDTO(swipedId, profile.getLocation());
-        if (cardDTO == null) {
+        Card card = profileDAO.findCard(swipedId, profile.getLocation());
+        if (card == null) {
             throw new ProfileNotFoundException();
         }
-        return cardDTO;
+        return modelMapper.map(card, CardDTO.class);
     }
 
     //  DESC 1. when registering, an account will be created with enabled = false, then when finish profiles,
@@ -150,9 +154,8 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     // TEST 1. matches are mapped by matcher_id not matched_id
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public RecommendDTO recommend(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int pageIndex) {
+    public List<CardDTO> recommend(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int pageIndex) {
         Profile profile = findValidProfile(accountId, false);
-        RecommendDTO recommendDTO = new RecommendDTO();
 
         if (distance < MIN_DISTANCE) {
             distance = MIN_DISTANCE;
@@ -167,20 +170,13 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
             minAge = MIN_AGE;
         }
         minAge = currentYear - minAge + 1;
-
         if (maxAge >= MAX_AGE) {
             maxAge = 0;
         } else {
             maxAge = currentYear - maxAge + 1;
         }
-
         List<Card> cards = profileDAO.findCards(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, profile.getLocation());
-//        if (cardDTOs.size() == 0 && pageIndex > 0) {
-//            cardDTOs = profileDAO.findCards(distance, minAge, maxAge, gender, PAGE_LIMIT, DEFAULT_OFFSET, profile.getLocation());
-//            recommendDTO.setReset(true);
-//        }
-//        recommendDTO.setCardDTOs(cardDTOs);
-        return recommendDTO;
+        return modelMapper.map(cards, new TypeToken<List<CardDTO>>() {}.getType());
     }
 
     private Profile findValidProfile(UUID accountId, boolean writeLock) {

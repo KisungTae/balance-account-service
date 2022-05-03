@@ -11,6 +11,7 @@ import com.beeswork.balanceaccountservice.constant.Delimiter;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.photo.PhotoDAO;
 import com.beeswork.balanceaccountservice.dto.s3.PreSignedUrl;
+import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoAlreadyExistsException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -60,9 +61,8 @@ public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
     @Override
     @Async("processExecutor")
     public void deletePhoto(UUID accountId, String photoKey) {
-        String key = generateKey(accountId.toString(), photoKey);
         try {
-            amazonS3.deleteObject(new DeleteObjectRequest(awsProperties.getBalancePhotoBucket(), key));
+            amazonS3.deleteObject(new DeleteObjectRequest(awsProperties.getPhotoBucket(), Photo.getPhotoKey(accountId, photoKey)));
         } catch (Exception e) {
             //todo: log error
             System.out.println(e.getMessage());
@@ -77,11 +77,11 @@ public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
         }
 
         Instant now = Instant.now();
-        PreSignedUrl preSignedUrl = new PreSignedUrl(awsProperties.getPhotoBucketUrl(),
+        PreSignedUrl preSignedUrl = new PreSignedUrl(awsProperties.getPhotoBucketURL(),
                                                      awsCredentials.getAWSAccessKeyId(),
                                                      awsProperties.getRegion(),
-                                                     awsProperties.getBalancePhotoBucket(),
-                                                     generateKey(accountId.toString(), photoKey),
+                                                     awsProperties.getPhotoBucket(),
+                                                     Photo.getPhotoKey(accountId, photoKey),
                                                      now);
         String encodePolicy = encodePolicy(preSignedUrl.getUploadPolicy(now));
         String signature = computeSignature(encodePolicy, awsCredentials.getAWSSecretKey(), awsProperties.getRegion(), now);
@@ -93,11 +93,12 @@ public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
     @Async("processExecutor")
     public void deletePhotosAsync(UUID accountId, List<String> photoKeys) {
         ArrayList<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<>();
-        for (String photoKey : photoKeys)
-            keys.add(new DeleteObjectsRequest.KeyVersion(generateKey(accountId.toString(), photoKey)));
+        for (String photoKey : photoKeys) {
+            keys.add(new DeleteObjectsRequest.KeyVersion(Photo.getPhotoKey(accountId, photoKey)));
+        }
 
         if (!keys.isEmpty()) {
-            DeleteObjectsRequest request = new DeleteObjectsRequest(awsProperties.getBalancePhotoBucket()).withKeys(keys).withQuiet(true);
+            DeleteObjectsRequest request = new DeleteObjectsRequest(awsProperties.getPhotoBucket()).withKeys(keys).withQuiet(true);
             amazonS3.deleteObjects(request);
         }
     }
@@ -114,9 +115,5 @@ public class S3ServiceImpl extends BaseServiceImpl implements S3Service {
     private String encodePolicy(PreSignedUrl.UploadPolicy uploadPolicy) throws JsonProcessingException {
         String policyJson = objectMapper.writeValueAsString(uploadPolicy);
         return Base64.getEncoder().encodeToString(policyJson.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private static String generateKey(String accountId, String photoKey) {
-        return accountId + Delimiter.FORWARD_SLASH + photoKey;
     }
 }

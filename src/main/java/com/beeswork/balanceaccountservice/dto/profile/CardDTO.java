@@ -15,23 +15,9 @@ import java.util.UUID;
 public class CardDTO {
     private String       accountId;
     private String       name;
-    private int          birthYear;
+    private Integer      birthYear;
     private Integer      height;
     private String       about;
-    private int          distance;
+    private Integer      distance;
     private List<String> photoKeys = new ArrayList<>();
-
-    public CardDTO(String accountId,
-                   String name,
-                   int birthYear,
-                   Integer height,
-                   String about,
-                   int distance) {
-        this.accountId = accountId;
-        this.name = name;
-        this.birthYear = birthYear;
-        this.height = height;
-        this.about = about;
-        this.distance = distance;
-    }
 }

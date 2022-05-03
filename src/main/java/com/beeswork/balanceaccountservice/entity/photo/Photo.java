@@ -1,6 +1,7 @@
 package com.beeswork.balanceaccountservice.entity.photo;
 
 
+import com.beeswork.balanceaccountservice.constant.Delimiter;
 import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import lombok.Getter;
@@ -58,4 +59,9 @@ public class Photo implements Comparable<Photo> {
     public int compareTo(@NonNull Photo o) {
         return Integer.compare(this.sequence, o.sequence);
     }
+
+    public static String getPhotoKey(UUID accountId, String key) {
+        return accountId.toString() + Delimiter.FORWARD_SLASH + key;
+    }
+
 }

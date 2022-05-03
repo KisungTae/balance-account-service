@@ -6,6 +6,7 @@ import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.profile.Card;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.profile.QProfile;
+import com.beeswork.balanceaccountservice.exception.profile.ProfileNotFoundException;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.hibernate.annotations.NamedNativeQuery;
@@ -38,17 +39,18 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public CardDTO findCardDTO(UUID swipedId, Point pivot) {
-//        List<Object[]> rows = entityManager.createNativeQuery(
-//                "select cast(pr.account_id as varchar), pr.name, pr.birth_year, pr.gender, pr.height, pr.about, st_distance(pr.location, :pivot), ph.key " +
-//                "from profile pr " +
-//                "left join photo ph on pr.account_id = ph.account_id " +
-//                "where pr.account_id = :swipedId ")
-//                                           .setParameter("swipedId", swipedId)
-//                                           .setParameter("pivot", pivot)
-//                                           .getResultList();
-//        return CardDTOResultTransformer.map(rows);
-        return null;
+    public Card findCard(UUID swipedId, Point pivot) {
+        List<Card> cards = entityManager.createNativeQuery(
+                "select cast(pr.account_id as varchar), pr.name, pr.birth_year, pr.gender, pr.height, pr.about, st_distance(pr.location, :pivot), ph.key " +
+                "from profile pr " +
+                "left join photo ph on pr.account_id = ph.account_id " +
+                "where pr.account_id = :swipedId " +
+                "order by ph.sequence", "Card")
+                                        .setParameter("pivot", pivot)
+                                        .setParameter("swipedId", swipedId)
+                                        .getResultList();
+        combineCards(cards);
+        return cards.isEmpty() ? null : cards.get(0);
     }
 
     @Override
@@ -76,15 +78,23 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                 "left join photo as p " +
                 "on p.account_id = b.account_id " +
                 "order by account_id, p.sequence", "Card")
-                                       .setParameter("pivot", pivot)
-                                       .setParameter("distance", distance)
-                                       .setParameter("gender", gender)
-                                       .setParameter("minAge", minAge)
-                                       .setParameter("maxAge", maxAge)
-                                       .setParameter("limit", limit)
-                                       .setParameter("offset", offset)
-                                       .getResultList();
+                                        .setParameter("pivot", pivot)
+                                        .setParameter("distance", distance)
+                                        .setParameter("gender", gender)
+                                        .setParameter("minAge", minAge)
+                                        .setParameter("maxAge", maxAge)
+                                        .setParameter("limit", limit)
+                                        .setParameter("offset", offset)
+                                        .getResultList();
 
+        combineCards(cards);
+        return cards;
+    }
+
+    private void combineCards(List<Card> cards) {
+        if (cards == null) {
+            return;
+        }
         Card card = null;
         int index = 0;
         while (index < cards.size()) {
@@ -99,6 +109,5 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                 cards.remove(index);
             }
         }
-        return cards;
     }
 }

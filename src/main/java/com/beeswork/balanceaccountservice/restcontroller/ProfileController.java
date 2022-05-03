@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/profile")
@@ -98,13 +99,13 @@ public class ProfileController extends BaseController {
                                             Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        RecommendDTO recommendDTO = profileService.recommend(getAccountIdFrom(principal),
-                                                             recommendVM.getDistance(),
-                                                             recommendVM.getMinAge(),
-                                                             recommendVM.getMaxAge(),
-                                                             recommendVM.isGender(),
-                                                             recommendVM.getPageIndex());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(recommendDTO));
+        List<CardDTO> cardDTOs = profileService.recommend(getAccountIdFrom(principal),
+                                                          recommendVM.getDistance(),
+                                                          recommendVM.getMinAge(),
+                                                          recommendVM.getMaxAge(),
+                                                          recommendVM.isGender(),
+                                                          recommendVM.getPageIndex());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(cardDTOs));
     }
 
     @PostMapping("/email")

@@ -8,17 +8,17 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
 @Getter
 @Setter
 @Component
 @NoArgsConstructor
 @ConfigurationProperties("aws")
 public class AWSProperties {
-    private String balancePhotoBucket;
-    private String s3Url;
-    private String region;
 
-    public String getPhotoBucketUrl() {
-        return String.format(s3Url, region, balancePhotoBucket);
-    }
+    private String photoBucket;
+    private String photoBucketURL;
+    private String photoDomain;
+    private String region;
 }

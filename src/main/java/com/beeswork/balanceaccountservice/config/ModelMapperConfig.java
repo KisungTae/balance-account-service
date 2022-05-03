@@ -2,12 +2,11 @@ package com.beeswork.balanceaccountservice.config;
 
 
 import com.beeswork.balanceaccountservice.dto.match.MatchDTO;
+import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
 import com.beeswork.balanceaccountservice.entity.match.Match;
+import com.beeswork.balanceaccountservice.entity.profile.Card;
 import net.sf.ehcache.search.parser.MAggregate;
-import org.modelmapper.AbstractConverter;
-import org.modelmapper.Converter;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
+import org.modelmapper.*;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +30,7 @@ public class ModelMapperConfig {
 
     private void setCustomMapping(ModelMapper modelMapper) {
         modelMapper.addConverter(stringToUUIDConverter());
+        addCardToCardDTOMapping(modelMapper);
     }
 
     private Converter<String, UUID> stringToUUIDConverter() {
@@ -39,5 +39,11 @@ public class ModelMapperConfig {
                 return source == null ? null : UUID.fromString(source);
             }
         };
+    }
+
+    private void addCardToCardDTOMapping(ModelMapper modelMapper) {
+        TypeMap<Card, CardDTO> typeMap = modelMapper.createTypeMap(Card.class, CardDTO.class);
+        Converter<Double, Integer> distanceConverter = c -> c.getSource() <= 0 ? 1 : (int) Math.ceil(c.getSource());
+        typeMap.addMappings(mapper -> mapper.using(distanceConverter).map(Card::getDistance, CardDTO::setDistance));
     }
 }

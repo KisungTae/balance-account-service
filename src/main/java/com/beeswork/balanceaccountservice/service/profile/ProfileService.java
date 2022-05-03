@@ -5,6 +5,7 @@ import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
 import com.beeswork.balanceaccountservice.dto.profile.RecommendDTO;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public interface ProfileService {
@@ -15,7 +16,7 @@ public interface ProfileService {
     void saveProfile(UUID accountId, String name, Date birth, String about, int height, boolean gender, double latitude, double longitude);
     void saveBio(UUID accountId, String about, Integer height);
     void saveLocation(UUID accountId, double latitude, double longitude, Date updatedAt);
-    RecommendDTO recommend(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int pageIndex);
+    List<CardDTO> recommend(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int pageIndex);
     void saveEmail(UUID accountId, String email);
     String getEmail(UUID accountId);
 }

@@ -15,12 +15,12 @@ import java.util.UUID;
 @Setter
 public class Card {
 
-    private UUID    accountId;
-    private String  name;
-    private Integer birthYear;
-    private Integer height;
-    private String  about;
-    private Double  distance;
+    private UUID         accountId;
+    private String       name;
+    private Integer      birthYear;
+    private Integer      height;
+    private String       about;
+    private Double       distance;
     private String       photoKey;
     private List<String> photoKeys = new ArrayList<>();
 

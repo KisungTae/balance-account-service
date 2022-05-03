@@ -118,7 +118,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         RefreshToken refreshToken = new RefreshToken(account);
         String newRefreshToken = createNewRefreshToken(account, refreshToken);
         String accessToken = jwtTokenProvider.createAccessToken(account.getId().toString(), account.getRoleNames());
-        return new LoginDTO(account.getId(), false, accessToken, newRefreshToken, email, awsProperties.getPhotoBucketUrl());
+        return new LoginDTO(account.getId(), false, accessToken, newRefreshToken, email, awsProperties.getPhotoDomain());
     }
 
     private LoginDTO loginWithExistingAccount(Login login) {
@@ -137,7 +137,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
                             accessToken,
                             newRefreshToken,
                             login.getEmail(),
-                            awsProperties.getPhotoBucketUrl());
+                            awsProperties.getPhotoDomain());
     }
 
     @Override
@@ -189,7 +189,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
                             profileExists,
                             refreshAccessTokenDTO.getAccessToken(),
                             refreshAccessTokenDTO.getRefreshToken(),
-                            awsProperties.getPhotoBucketUrl());
+                            awsProperties.getPhotoDomain());
     }
 
 
