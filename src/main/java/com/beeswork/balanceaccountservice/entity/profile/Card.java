@@ -17,6 +17,7 @@ public class Card {
 
     private UUID         accountId;
     private String       name;
+    private Boolean      gender;
     private Integer      birthYear;
     private Integer      height;
     private String       about;
@@ -24,9 +25,10 @@ public class Card {
     private String       photoKey;
     private List<String> photoKeys = new ArrayList<>();
 
-    public Card(UUID accountId, String name, Integer birthYear, Integer height, String about, Double distance, String photoKey) {
+    public Card(UUID accountId, String name, Boolean gender, Integer birthYear, Integer height, String about, Double distance, String photoKey) {
         this.accountId = accountId;
         this.name = name;
+        this.gender = gender;
         this.birthYear = birthYear;
         this.height = height;
         this.about = about;

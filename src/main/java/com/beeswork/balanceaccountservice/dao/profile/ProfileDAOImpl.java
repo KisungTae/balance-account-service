@@ -1,25 +1,17 @@
 package com.beeswork.balanceaccountservice.dao.profile;
 
 import com.beeswork.balanceaccountservice.dao.base.BaseDAOImpl;
-import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
-import com.beeswork.balanceaccountservice.entity.photo.Photo;
 import com.beeswork.balanceaccountservice.entity.profile.Card;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.entity.profile.QProfile;
-import com.beeswork.balanceaccountservice.exception.profile.ProfileNotFoundException;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.hibernate.annotations.NamedNativeQuery;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 @Repository
@@ -62,12 +54,20 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
     //  NOTE 1. If you want to use st_dwithin in HQL, then you can do where dwithin(pr.location, :pivot, :distance) = TRUE
     @Override
     @SuppressWarnings("unchecked")
-    public List<Card> findCards(int distance, int minAge, int maxAge, boolean gender, int limit, int offset, Point pivot) {
+    public List<Card> findCards(UUID accountId,
+                                int distance,
+                                int minAge,
+                                int maxAge,
+                                boolean gender,
+                                int limit,
+                                int offset,
+                                Point pivot) {
         List<Card> cards = entityManager.createNativeQuery(
-                "select cast(b.account_id as varchar) as account_id, b.name, b.birth_year, b.height, b.about, st_distance(b.location, :pivot) as distance, p.key as photo_key " +
+                "select cast(b.account_id as varchar) as account_id, b.name, b.gender, b.birth_year, b.height, b.about, st_distance(b.location, :pivot) as distance, p.key as photo_key " +
                 "from (select * " +
                 "      from profile  " +
                 "      where st_dwithin(location, :pivot, :distance) " +
+//                "        and account_id != :accountId " +
                 "        and gender = :gender " +
                 "        and birth_year <= :minAge " +
                 "        and birth_year >= :maxAge " +
@@ -80,6 +80,7 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                 "order by account_id, p.sequence", "Card")
                                         .setParameter("pivot", pivot)
                                         .setParameter("distance", distance)
+//                                        .setParameter("accountId", accountId)
                                         .setParameter("gender", gender)
                                         .setParameter("minAge", minAge)
                                         .setParameter("maxAge", maxAge)

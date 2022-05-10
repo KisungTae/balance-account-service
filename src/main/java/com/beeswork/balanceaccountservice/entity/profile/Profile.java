@@ -30,6 +30,7 @@ import java.util.UUID;
                         columns = {
                                 @ColumnResult(name = "account_id", type = UUID.class),
                                 @ColumnResult(name = "name", type = String.class),
+                                @ColumnResult(name = "gender", type = Boolean.class),
                                 @ColumnResult(name = "birth_year", type = Integer.class),
                                 @ColumnResult(name = "height", type = Integer.class),
                                 @ColumnResult(name = "about", type = String.class),

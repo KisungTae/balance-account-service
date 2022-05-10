@@ -163,7 +163,6 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
             distance = MAX_DISTANCE;
         }
         distance = distance * DISTANCE_UNIT;
-        int offset = pageIndex * PAGE_LIMIT;
 
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         if (minAge < MIN_AGE) {
@@ -175,7 +174,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         } else {
             maxAge = currentYear - maxAge + 1;
         }
-        List<Card> cards = profileDAO.findCards(distance, minAge, maxAge, gender, PAGE_LIMIT, offset, profile.getLocation());
+        List<Card> cards = profileDAO.findCards(accountId, distance, minAge, maxAge, gender, PAGE_LIMIT, pageIndex, profile.getLocation());
         return modelMapper.map(cards, new TypeToken<List<CardDTO>>() {}.getType());
     }
 
