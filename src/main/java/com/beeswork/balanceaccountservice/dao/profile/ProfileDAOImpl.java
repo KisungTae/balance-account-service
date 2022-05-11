@@ -65,13 +65,16 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
         List<Card> cards = entityManager.createNativeQuery(
                 "select cast(b.account_id as varchar) as account_id, b.name, b.gender, b.birth_year, b.height, b.about, st_distance(b.location, :pivot) as distance, p.key as photo_key " +
                 "from (select * " +
-                "      from profile  " +
+                "      from profile " +
+                "      left join swipe on profile.account_id = swipe.swiper_id  " +
                 "      where st_dwithin(location, :pivot, :distance) " +
 //                "        and account_id != :accountId " +
                 "        and gender = :gender " +
                 "        and birth_year <= :minAge " +
                 "        and birth_year >= :maxAge " +
                 "        and enabled = true " +
+                "        and clicked = false" +
+                "        and matched = false " +
                 "        order by score " +
                 "       limit :limit " +
                 "       offset :offset) as b " +
