@@ -1,6 +1,6 @@
 package com.beeswork.balanceaccountservice.dto.swipe;
 
-import com.beeswork.balanceaccountservice.constant.ClickResult;
+import com.beeswork.balanceaccountservice.constant.ClickOutcome;
 import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import lombok.AllArgsConstructor;
@@ -11,8 +11,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ClickTransactionResult {
-    private ClickResult clickResult;
-    private Swipe swipe;
+    private ClickOutcome clickOutcome;
+    private Swipe        swipe;
     private Match subMatch;
     private Match objMatch;
 }

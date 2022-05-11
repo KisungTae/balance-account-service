@@ -1,6 +1,6 @@
 package com.beeswork.balanceaccountservice.service.swipe;
 
-import com.beeswork.balanceaccountservice.constant.ClickResult;
+import com.beeswork.balanceaccountservice.constant.ClickOutcome;
 import com.beeswork.balanceaccountservice.dao.account.AccountDAO;
 import com.beeswork.balanceaccountservice.dao.account.AccountQuestionDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
@@ -164,7 +164,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             }
 
             if (accountQuestionDAO.countAllByAnswers(swipedId, answers) != answers.size()) {
-                return new ClickTransactionResult(ClickResult.MISSED, null, null, null);
+                return new ClickTransactionResult(ClickOutcome.MISSED, null, null, null);
             }
 
             Date now = new Date();
@@ -172,7 +172,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             subSwipe.setUpdatedAt(now);
 
             if (objSwipe == null || !objSwipe.isClicked()) {
-                return new ClickTransactionResult(ClickResult.CLICKED, subSwipe, null, null);
+                return new ClickTransactionResult(ClickOutcome.CLICKED, subSwipe, null, null);
             } else {
                 UUID chatId = UUID.randomUUID();
                 Match subMatch = new Match(swiper, swiped, chatId, now);
@@ -184,7 +184,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
                 objSwipe.setMatched(true);
                 objSwipe.setUpdatedAt(now);
 
-                return new ClickTransactionResult(ClickResult.MATCHED, null, subMatch, objMatch);
+                return new ClickTransactionResult(ClickOutcome.MATCHED, null, subMatch, objMatch);
             }
         });
 
@@ -193,11 +193,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         }
 
         ClickDTO clickDTO = new ClickDTO();
-        clickDTO.setClickResult(result.getClickResult());
+        clickDTO.setClickOutcome(result.getClickOutcome());
 
-        if (clickDTO.getClickResult() == ClickResult.MISSED) {
+        if (clickDTO.getClickOutcome() == ClickOutcome.MISSED) {
             return clickDTO;
-        } else if (clickDTO.getClickResult() == ClickResult.CLICKED) {
+        } else if (clickDTO.getClickOutcome() == ClickOutcome.CLICKED) {
             Pushable pushable = modelMapper.map(result.getSwipe(), SwipeDTO.class);
             stompService.push(pushable, locale);
             return clickDTO;

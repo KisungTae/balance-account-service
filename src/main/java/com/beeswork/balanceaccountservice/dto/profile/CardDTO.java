@@ -15,6 +15,7 @@ import java.util.UUID;
 public class CardDTO {
     private String       accountId;
     private String       name;
+    private Boolean      gender;
     private Integer      birthYear;
     private Integer      height;
     private String       about;

@@ -1,6 +1,6 @@
 package com.beeswork.balanceaccountservice.constant;
 
-public enum ClickResult {
+public enum ClickOutcome {
     MISSED,
     CLICKED,
     MATCHED

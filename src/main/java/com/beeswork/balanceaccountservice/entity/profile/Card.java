@@ -1,12 +1,7 @@
 package com.beeswork.balanceaccountservice.entity.profile;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.persistence.ColumnResult;
-import javax.persistence.ConstructorResult;
-import javax.persistence.SqlResultSetMapping;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
