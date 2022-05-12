@@ -21,7 +21,7 @@ import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
 import com.beeswork.balanceaccountservice.exception.InternalServerException;
 import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFoundException;
-import com.beeswork.balanceaccountservice.exception.account.AccountShortOfPointException;
+import com.beeswork.balanceaccountservice.exception.account.InsufficientPointException;
 import com.beeswork.balanceaccountservice.exception.swipe.*;
 import com.beeswork.balanceaccountservice.exception.wallet.WalletNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
@@ -91,7 +91,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             rechargeFreeSwipe(wallet, swipeMeta);
 
             if (wallet.getFreeSwipe() < swipeMeta.getSwipePoint() && wallet.getPoint() < swipeMeta.getSwipePoint()) {
-                throw new AccountShortOfPointException();
+                throw new InsufficientPointException();
             }
 
             List<Question> questions = accountQuestionDAO.findAllQuestionsSelected(swipedId);
@@ -158,7 +158,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             if (wallet.getFreeSwipe() >= swipeMeta.getSwipePoint()) {
                 wallet.setFreeSwipe((wallet.getFreeSwipe() - swipeMeta.getSwipePoint()));
             } else if (wallet.getPoint() < swipeMeta.getSwipePoint()) {
-                throw new AccountShortOfPointException();
+                throw new InsufficientPointException();
             } else {
                 wallet.setPoint((wallet.getPoint() - swipeMeta.getSwipePoint()));
             }

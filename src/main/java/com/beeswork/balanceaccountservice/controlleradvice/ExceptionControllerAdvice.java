@@ -30,9 +30,6 @@ import com.beeswork.balanceaccountservice.exception.wallet.WalletNotFoundExcepti
 import com.beeswork.balanceaccountservice.response.ExceptionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import io.jsonwebtoken.ExpiredJwtException;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.Ordered;
@@ -130,7 +127,7 @@ public class ExceptionControllerAdvice {
 //                             .body(exceptionResponse("expired.jwt.exception", null, locale));
 //    }
 
-    @ExceptionHandler({AccountShortOfPointException.class, AccountBlockedException.class,
+    @ExceptionHandler({InsufficientPointException.class, AccountBlockedException.class,
                        SwipeClickedExistsException.class, BadRequestException.class,
                        SwipedBlockedException.class, SwipedNotFoundException.class,
                        QuestionSetChangedException.class, EmailNotMutableException.class,
