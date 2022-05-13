@@ -120,7 +120,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         stompService.push(swipeDTO, locale);
 
         ListQuestionsDTO listQuestionsDTO = new ListQuestionsDTO();
-        listQuestionsDTO.setQuestionDTOs(modelMapper.map(result.getQuestions(), new TypeToken<List<QuestionDTO>>() {}.getType()));
+        listQuestionsDTO.setQuestionDTOs(modelMapper.map(result.getQuestions(), new TypeToken<List<QuestionDTO>>() {
+        }.getType()));
         listQuestionsDTO.setPoint(result.getPoint());
         return listQuestionsDTO;
     }
@@ -164,7 +165,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             }
 
             if (accountQuestionDAO.countAllByAnswers(swipedId, answers) != answers.size()) {
-                return new ClickTransactionResult(ClickOutcome.MISSED, null, null, null);
+                return new ClickTransactionResult(ClickOutcome.MISSED, wallet.getPoint(), null, null, null);
             }
 
             Date now = new Date();
@@ -172,7 +173,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             subSwipe.setUpdatedAt(now);
 
             if (objSwipe == null || !objSwipe.isClicked()) {
-                return new ClickTransactionResult(ClickOutcome.CLICKED, subSwipe, null, null);
+                return new ClickTransactionResult(ClickOutcome.CLICKED, wallet.getPoint(), subSwipe, null, null);
             } else {
                 UUID chatId = UUID.randomUUID();
                 Match subMatch = new Match(swiper, swiped, chatId, now);
@@ -184,7 +185,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
                 objSwipe.setMatched(true);
                 objSwipe.setUpdatedAt(now);
 
-                return new ClickTransactionResult(ClickOutcome.MATCHED, null, subMatch, objMatch);
+                return new ClickTransactionResult(ClickOutcome.MATCHED, wallet.getPoint(), null, subMatch, objMatch);
             }
         });
 
@@ -194,6 +195,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
         ClickDTO clickDTO = new ClickDTO();
         clickDTO.setClickOutcome(result.getClickOutcome());
+        clickDTO.setPoint(result.getPoint());
 
         if (clickDTO.getClickOutcome() == ClickOutcome.MISSED) {
             return clickDTO;

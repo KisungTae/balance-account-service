@@ -11,5 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ClickDTO {
     private ClickOutcome clickOutcome;
+    private int          point;
     private MatchDTO     matchDTO;
 }

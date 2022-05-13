@@ -66,15 +66,15 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                 "select cast(b.account_id as varchar) as account_id, b.name, b.gender, b.birth_year, b.height, b.about, st_distance(b.location, :pivot) as distance, p.key as photo_key " +
                 "from (select * " +
                 "      from profile " +
-                "      left join swipe on profile.account_id = swipe.swiper_id  " +
+                "      left join swipe on swipe.swiper_id = :accountId and profile.account_id = swipe.swiped_id " +
                 "      where st_dwithin(location, :pivot, :distance) " +
 //                "        and account_id != :accountId " +
                 "        and gender = :gender " +
                 "        and birth_year <= :minAge " +
                 "        and birth_year >= :maxAge " +
                 "        and enabled = true " +
-                "        and clicked = false" +
-                "        and matched = false " +
+                "        and (clicked = false or clicked is null) " +
+                "        and (matched = false or matched is null) " +
                 "        order by score " +
                 "       limit :limit " +
                 "       offset :offset) as b " +
@@ -83,7 +83,7 @@ public class ProfileDAOImpl extends BaseDAOImpl<Profile> implements ProfileDAO {
                 "order by account_id, p.sequence", "Card")
                                         .setParameter("pivot", pivot)
                                         .setParameter("distance", distance)
-//                                        .setParameter("accountId", accountId)
+                                        .setParameter("accountId", accountId)
                                         .setParameter("gender", gender)
                                         .setParameter("minAge", minAge)
                                         .setParameter("maxAge", maxAge)

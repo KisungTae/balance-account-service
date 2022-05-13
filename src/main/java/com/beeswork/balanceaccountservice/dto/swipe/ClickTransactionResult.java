@@ -12,7 +12,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ClickTransactionResult {
     private ClickOutcome clickOutcome;
+    private int          point;
     private Swipe        swipe;
-    private Match subMatch;
-    private Match objMatch;
+    private Match        subMatch;
+    private Match        objMatch;
+
 }
