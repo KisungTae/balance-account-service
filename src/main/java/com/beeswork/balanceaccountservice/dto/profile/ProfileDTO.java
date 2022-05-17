@@ -11,9 +11,10 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ProfileDTO {
+    private UUID accountId;
     private String name;
     private Integer height;
-    private Date birth;
-    private String about;
+    private Date    birthDate;
+    private String  about;
     private boolean gender;
 }

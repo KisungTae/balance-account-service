@@ -2,7 +2,6 @@ package com.beeswork.balanceaccountservice.service.profile;
 
 import com.beeswork.balanceaccountservice.dto.profile.CardDTO;
 import com.beeswork.balanceaccountservice.dto.profile.ProfileDTO;
-import com.beeswork.balanceaccountservice.dto.profile.RecommendDTO;
 
 import java.util.Date;
 import java.util.List;
@@ -13,7 +12,7 @@ public interface ProfileService {
     //    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 1))
     ProfileDTO getProfile(UUID accountId);
     CardDTO getCard(UUID accountId, UUID swipedId);
-    void saveProfile(UUID accountId, String name, Date birth, String about, int height, boolean gender, double latitude, double longitude);
+    void saveProfile(UUID accountId, String name, Date birthDate, String about, int height, boolean gender, double latitude, double longitude);
     void saveBio(UUID accountId, String about, Integer height);
     void saveLocation(UUID accountId, double latitude, double longitude, Date updatedAt);
     List<CardDTO> recommend(UUID accountId, int distance, int minAge, int maxAge, boolean gender, int pageIndex);

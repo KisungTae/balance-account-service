@@ -23,7 +23,7 @@ public class SaveProfileVM {
     @NotNull(message = "{gender.null}")
     private Boolean gender;
 
-    @NotNull(message = "{birth.null}")
+    @NotNull(message = "{birthDate.null}")
     private Date birthDate;
 
     private Integer height;

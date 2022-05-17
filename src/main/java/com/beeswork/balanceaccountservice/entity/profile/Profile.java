@@ -1,19 +1,13 @@
 package com.beeswork.balanceaccountservice.entity.profile;
 
 import com.beeswork.balanceaccountservice.entity.account.Account;
-import com.beeswork.balanceaccountservice.entity.photo.Photo;
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.LazyToOne;
-import org.hibernate.annotations.LazyToOneOption;
 import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 
@@ -56,8 +50,8 @@ public class Profile {
     @Column(name = "birth_year")
     private int birthYear;
 
-    @Column(name = "birth")
-    private Date birth;
+    @Column(name = "birth_date")
+    private Date birthDate;
 
     @Column(name = "gender")
     private boolean gender;
@@ -95,7 +89,7 @@ public class Profile {
     public Profile(Account account,
                    String name,
                    int birthYear,
-                   Date birth,
+                   Date birthDate,
                    boolean gender,
                    Integer height,
                    String about,
@@ -105,7 +99,7 @@ public class Profile {
         this.account = account;
         this.name = name;
         this.birthYear = birthYear;
-        this.birth = birth;
+        this.birthDate = birthDate;
         this.gender = gender;
         this.height = height;
         this.about = about;
