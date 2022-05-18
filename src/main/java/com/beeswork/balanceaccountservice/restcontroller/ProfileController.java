@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @RestController
@@ -39,8 +41,7 @@ public class ProfileController extends BaseController {
     }
 
     @GetMapping
-    public ResponseEntity<String> getProfile(BindingResult bindingResult, Principal principal) throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
+    public ResponseEntity<String> getProfile(Principal principal) throws JsonProcessingException {
         ProfileDTO profileDTO = profileService.getProfile(getAccountIdFrom(principal));
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(profileDTO));
     }

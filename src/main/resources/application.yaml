@@ -35,6 +35,8 @@ spring:
           use_second_level_cache=true: true
           region:
             factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+        jdbc:
+          time_zone: UTC
       javax:
         persistence:
           sharedCache:

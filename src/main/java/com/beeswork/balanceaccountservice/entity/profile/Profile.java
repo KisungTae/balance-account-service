@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
@@ -51,7 +52,7 @@ public class Profile {
     private int birthYear;
 
     @Column(name = "birth_date")
-    private Date birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "gender")
     private boolean gender;
@@ -99,7 +100,7 @@ public class Profile {
         this.account = account;
         this.name = name;
         this.birthYear = birthYear;
-        this.birthDate = birthDate;
+//        this.birthDate = birthDate;
         this.gender = gender;
         this.height = height;
         this.about = about;
