@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -55,8 +56,8 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     private final PhotoDAO           photoDAO;
     private final AccountQuestionDAO accountQuestionDAO;
     private final GeometryFactory    geometryFactory;
-    private final ModelMapper     modelMapper;
-    private final AWSProperties awsProperties;
+    private final ModelMapper        modelMapper;
+    private final AWSProperties      awsProperties;
 
     @Autowired
     public ProfileServiceImpl(ModelMapper modelMapper,
@@ -105,7 +106,7 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
     @Transactional
     public void saveProfile(UUID accountId,
                             String name,
-                            Date birthDate,
+                            LocalDate birthDate,
                             String about,
                             int height,
                             boolean gender,
@@ -121,9 +122,8 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
             throw new BadRequestException();
         }
 
-        int birthYear = DateUtil.getYearFrom(birthDate);
         Point location = getLocation(latitude, longitude);
-        Profile profile = new Profile(account, name, birthYear, birthDate, gender, height, about, location, true, new Date());
+        Profile profile = new Profile(account, name, birthDate.getYear(), birthDate, gender, height, about, location, true, new Date());
         profileDAO.persist(profile);
     }
 
@@ -175,7 +175,8 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
             maxAge = currentYear - maxAge + 1;
         }
         List<Card> cards = profileDAO.findCards(accountId, distance, minAge, maxAge, gender, PAGE_LIMIT, pageIndex, profile.getLocation());
-        return modelMapper.map(cards, new TypeToken<List<CardDTO>>() {}.getType());
+        return modelMapper.map(cards, new TypeToken<List<CardDTO>>() {
+        }.getType());
     }
 
     private Profile findValidProfile(UUID accountId, boolean writeLock) {

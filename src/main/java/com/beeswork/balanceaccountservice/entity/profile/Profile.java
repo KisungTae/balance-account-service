@@ -90,7 +90,7 @@ public class Profile {
     public Profile(Account account,
                    String name,
                    int birthYear,
-                   Date birthDate,
+                   LocalDate birthDate,
                    boolean gender,
                    Integer height,
                    String about,
@@ -100,7 +100,7 @@ public class Profile {
         this.account = account;
         this.name = name;
         this.birthYear = birthYear;
-//        this.birthDate = birthDate;
+        this.birthDate = birthDate;
         this.gender = gender;
         this.height = height;
         this.about = about;

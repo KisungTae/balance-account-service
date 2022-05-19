@@ -31,6 +31,7 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.querydsl.jpa.JPQLQueryFactory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.tomcat.jni.Local;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -43,6 +44,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.time.LocalDate;
 import java.util.*;
 
 @RestController
@@ -171,9 +173,7 @@ public class DummyController {
     @Transactional(propagation = Propagation.REQUIRED)
     public void saveAccount(double lat, double lon, int count, Random random, GeometryFactory geometryFactory) {
         Account account = new Account();
-        Date birth = randomBirth();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(birth);
+        LocalDate birth = randomBirth();
         Date now = new Date();
 
         String name = "user-" + count;
@@ -199,7 +199,7 @@ public class DummyController {
         // profile
         Profile profile = new Profile(account,
                                       name,
-                                      calendar.get(Calendar.YEAR),
+                                      birth.getYear(),
                                       birth,
                                       random.nextBoolean(),
                                       random.nextInt(50) + 150,
@@ -235,14 +235,12 @@ public class DummyController {
 
     }
 
-    private Date randomBirth() {
+    private LocalDate randomBirth() {
         Random random = new Random();
         int year = random.nextInt((2003 - 1970)) + 1970;
         int month = random.nextInt((12 - 1));
         int day = random.nextInt((25 - 1)) + 1;
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day, 0, 0);
-        return calendar.getTime();
+        return LocalDate.of(year, month, day);
     }
 
 
