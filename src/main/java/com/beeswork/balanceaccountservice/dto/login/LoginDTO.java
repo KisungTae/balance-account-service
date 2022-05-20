@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.dto.login;
 
+import com.beeswork.balanceaccountservice.dto.photo.PhotoDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class LoginDTO {
     private String  refreshToken;
     private String  email;
     private String  photoDomain;
+    private PhotoDTO photoDTO;
 
     public LoginDTO(UUID accountId, boolean profileExists, String accessToken, String refreshToken, String photoDomain) {
         this.accountId = accountId;

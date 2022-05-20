@@ -38,4 +38,13 @@ public class PhotoDAOImpl extends BaseDAOImpl<Photo> implements PhotoDAO {
     public long countBy(UUID accountId) {
         return jpaQueryFactory.selectFrom(qPhoto).where(qPhoto.photoId.accountId.eq(accountId)).fetchCount();
     }
+
+    @Override
+    public Photo getProfilePhotoBy(UUID accountId) {
+        return jpaQueryFactory.selectFrom(qPhoto)
+                              .where(qPhoto.photoId.accountId.eq(accountId))
+                              .orderBy(qPhoto.sequence.asc())
+                              .limit(1)
+                              .fetchFirst();
+    }
 }
