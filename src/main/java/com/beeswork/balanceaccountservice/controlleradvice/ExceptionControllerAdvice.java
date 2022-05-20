@@ -16,9 +16,7 @@ import com.beeswork.balanceaccountservice.exception.photo.PhotoAlreadyExistsExce
 import com.beeswork.balanceaccountservice.exception.photo.PhotoExceededMaxException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoInvalidDeleteException;
 import com.beeswork.balanceaccountservice.exception.photo.PhotoNotFoundException;
-import com.beeswork.balanceaccountservice.exception.profile.EmailDuplicateException;
-import com.beeswork.balanceaccountservice.exception.profile.EmailNotMutableException;
-import com.beeswork.balanceaccountservice.exception.profile.ProfileNotFoundException;
+import com.beeswork.balanceaccountservice.exception.profile.*;
 import com.beeswork.balanceaccountservice.exception.question.QuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.question.QuestionSetChangedException;
 import com.beeswork.balanceaccountservice.exception.report.ReportReasonNotFoundException;
@@ -134,7 +132,8 @@ public class ExceptionControllerAdvice {
                        EmailDuplicateException.class, PhotoInvalidDeleteException.class,
                        AccountDeletedException.class, PhotoAlreadyExistsException.class,
                        InvalidSocialLoginException.class, InvalidRefreshTokenException.class,
-                       InvalidJWTTokenException.class, SwipeMatchedExistsException.class})
+                       InvalidJWTTokenException.class, SwipeMatchedExistsException.class,
+                       NoPhotoUploadedException.class, NoQuestionSavedException.class})
     public ResponseEntity<String> handleBadRequestException(BaseException exception, Locale locale)
     throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

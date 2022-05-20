@@ -14,10 +14,8 @@ import com.beeswork.balanceaccountservice.entity.login.Login;
 import com.beeswork.balanceaccountservice.entity.profile.Card;
 import com.beeswork.balanceaccountservice.entity.profile.Profile;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
-import com.beeswork.balanceaccountservice.exception.profile.EmailDuplicateException;
-import com.beeswork.balanceaccountservice.exception.profile.EmailNotMutableException;
+import com.beeswork.balanceaccountservice.exception.profile.*;
 import com.beeswork.balanceaccountservice.exception.login.LoginNotFoundException;
-import com.beeswork.balanceaccountservice.exception.profile.ProfileNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import com.beeswork.balanceaccountservice.util.DateUtil;
 import org.locationtech.jts.geom.Coordinate;
@@ -118,8 +116,10 @@ public class ProfileServiceImpl extends BaseServiceImpl implements ProfileServic
         Account account = accountDAO.findById(accountId, true);
         account.setName(name);
 
-        if (photoDAO.countBy(accountId) <= 0 || accountQuestionDAO.countBy(accountId) <= 0) {
-            throw new BadRequestException();
+        if (photoDAO.countBy(accountId) <= 0) {
+            throw new NoPhotoUploadedException();
+        } else if (accountQuestionDAO.countBy(accountId) <= 0) {
+            throw new NoQuestionSavedException();
         }
 
         Point location = getLocation(latitude, longitude);
