@@ -151,11 +151,13 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         if (chatMessage.getId() > senderMatch.getLastChatMessageId()) {
             senderMatch.setLastChatMessageId(chatMessage.getId());
             senderMatch.setLastChatMessageBody(chatMessage.getBody());
+            senderMatch.setLastChatMessageCreatedAt(chatMessage.getCreatedAt());
         }
 
         if (chatMessage.getId() > recipientMatch.getLastChatMessageId()) {
             recipientMatch.setLastChatMessageId(chatMessage.getId());
             recipientMatch.setLastChatMessageBody(chatMessage.getBody());
+            recipientMatch.setLastChatMessageCreatedAt(chatMessage.getCreatedAt());
         }
 
         if (chatMessage.getId() > recipientMatch.getLastReceivedChatMessageId()) {

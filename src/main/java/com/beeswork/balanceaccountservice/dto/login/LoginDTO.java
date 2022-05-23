@@ -18,8 +18,8 @@ public class LoginDTO {
     private String  accessToken;
     private String  refreshToken;
     private String  email;
-    private String  photoDomain;
-    private PhotoDTO photoDTO;
+    private String   photoDomain;
+    private PhotoDTO profilePhotoDTO;
 
     public LoginDTO(UUID accountId, boolean profileExists, String accessToken, String refreshToken, String photoDomain) {
         this.accountId = accountId;

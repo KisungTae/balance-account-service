@@ -60,6 +60,10 @@ public class Match {
     @Column(name = "last_chat_message_body")
     private String lastChatMessageBody;
 
+    @Column(name = "last_chat_message_created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastChatMessageCreatedAt;
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
