@@ -38,6 +38,7 @@ public class MatchDTO implements Pushable {
     private long    lastReadByChatMessageId;
     private long    lastChatMessageId;
     private String  lastChatMessageBody;
+    private Date    lastChatMessageCreatedAt;
     private Date    createdAt;
     private String  swipedName;
     private String  swipedProfilePhotoKey;
@@ -55,6 +56,7 @@ public class MatchDTO implements Pushable {
                     long lastReadByChatMessageId,
                     long lastChatMessageId,
                     String lastChatMessageBody,
+                    Date lastChatMessageCreatedAt,
                     Date createdAt,
                     String swipedName,
                     String swipedProfilePhotoKey,
@@ -69,6 +71,7 @@ public class MatchDTO implements Pushable {
         this.lastReadByChatMessageId = lastReadByChatMessageId;
         this.lastChatMessageId = lastChatMessageId;
         this.lastChatMessageBody = lastChatMessageBody;
+        this.lastChatMessageCreatedAt = lastChatMessageCreatedAt;
         this.createdAt = createdAt;
         this.swipedName = swipedName;
         this.swipedProfilePhotoKey = swipedProfilePhotoKey;

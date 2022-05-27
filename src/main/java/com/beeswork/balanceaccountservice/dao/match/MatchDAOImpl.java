@@ -66,6 +66,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
                                                     qMatch.lastReadByChatMessageId,
                                                     qMatch.lastChatMessageId,
                                                     qMatch.lastChatMessageBody,
+                                                    qMatch.lastChatMessageCreatedAt,
                                                     qMatch.createdAt,
                                                     qAccount.name,
                                                     qAccount.profilePhotoKey,
