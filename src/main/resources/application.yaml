@@ -73,7 +73,7 @@ task-executor:
 aws:
   photo-bucket: balance-photo-bucket
   photo-bucket-url: https://s3.ap-northeast-2.amazonaws.com/balance-photo-bucket
-  photo-domain: https://s3.ap-northeast-2.amazonaws.com/balance-photo-bucket
+  photo-url-domain: https://s3.ap-northeast-2.amazonaws.com/balance-photo-bucket
   region: ap-northeast-2
 
 stomp:

@@ -18,14 +18,14 @@ public class LoginDTO {
     private String  accessToken;
     private String  refreshToken;
     private String  email;
-    private String   photoDomain;
+    private String   photoURLDomain;
     private PhotoDTO profilePhotoDTO;
 
-    public LoginDTO(UUID accountId, boolean profileExists, String accessToken, String refreshToken, String photoDomain) {
+    public LoginDTO(UUID accountId, boolean profileExists, String accessToken, String refreshToken, String photoURLDomain) {
         this.accountId = accountId;
         this.profileExists = profileExists;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
-        this.photoDomain = photoDomain;
+        this.photoURLDomain = photoURLDomain;
     }
 }

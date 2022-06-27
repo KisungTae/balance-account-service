@@ -19,6 +19,6 @@ public class AWSProperties {
 
     private String photoBucket;
     private String photoBucketURL;
-    private String photoDomain;
+    private String photoURLDomain;
     private String region;
 }
