@@ -12,5 +12,6 @@ public interface SwipeDAO extends BaseDAO<Swipe> {
     Swipe findBy(UUID swiperId, UUID swipedId, boolean writeLock);
     List<SwipeDTO> findAllBy(UUID swipedId, int startPosition, int loadSize);
     List<SwipeDTO> findAllBy(UUID swipedId, Long lastSwipeId, int loadSize);
+    List<SwipeDTO> findAllBy(UUID swipedId, Long loadKey, int loadSize, boolean isAppend, boolean isIncludeLoadKey);
     long countSwipesBy(UUID swipedId);
 }

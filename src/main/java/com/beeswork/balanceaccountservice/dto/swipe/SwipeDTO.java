@@ -32,11 +32,21 @@ public class SwipeDTO implements Pushable {
     private Long    id;
     private UUID    swiperId;
     private UUID    swipedId;
+    private String  swipedName;
     private Boolean clicked;
     private Date    updatedAt;
     private String  swiperProfilePhotoKey;
     private Boolean swiperDeleted;
 
+    @QueryProjection
+    public SwipeDTO(Long id, UUID swiperId, UUID swipedId, String swipedName, Boolean clicked, String swiperProfilePhotoKey) {
+        this.id = id;
+        this.swiperId = swiperId;
+        this.swipedId = swipedId;
+        this.swipedName = swipedName;
+        this.clicked = clicked;
+        this.swiperProfilePhotoKey = swiperProfilePhotoKey;
+    }
 
     @QueryProjection
     public SwipeDTO(Long id, UUID swiperId, UUID swipedId, String swiperProfilePhotoKey, Boolean clicked) {

@@ -6,9 +6,8 @@ import com.beeswork.balanceaccountservice.dto.swipe.SwipeDTO;
 import com.beeswork.balanceaccountservice.entity.account.QAccount;
 import com.beeswork.balanceaccountservice.entity.swipe.QSwipe;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,13 +78,41 @@ public class SwipeDAOImpl extends BaseDAOImpl<Swipe> implements SwipeDAO {
     }
 
     @Override
+    public List<SwipeDTO> findAllBy(UUID swipedId, Long loadKey, int loadSize, boolean isAppend, boolean isIncludeLoadKey) {
+        BooleanExpression whereCondition = qSwipe.swiped.id.eq(swipedId)
+                                                      .and(qAccount.deleted.eq(false))
+                                                      .and(qSwipe.matched.eq(false));
+
+        if (isAppend) {
+            whereCondition = isIncludeLoadKey ? whereCondition.and(qSwipe.id.loe(loadKey)) : whereCondition.and(qSwipe.id.lt(loadKey));
+        } else {
+            whereCondition = isIncludeLoadKey ? whereCondition.and(qSwipe.id.goe(loadKey)) : whereCondition.and(qSwipe.id.gt(loadKey));
+        }
+
+        OrderSpecifier<Long> orderByCondition = isAppend ? qSwipe.id.desc() : qSwipe.id.asc();
+
+        return jpaQueryFactory.select(new QSwipeDTO(qSwipe.id,
+                                                    qSwipe.swiper.id,
+                                                    qSwipe.swiped.id,
+                                                    qSwipe.swiped.name,
+                                                    qSwipe.clicked,
+                                                    qAccount.profilePhotoKey))
+                              .from(qSwipe)
+                              .leftJoin(qAccount).on(qSwipe.swiper.id.eq(qAccount.id))
+                              .where(whereCondition)
+                              .orderBy(orderByCondition)
+                              .limit(loadSize)
+                              .fetch();
+    }
+
+    @Override
     public long countSwipesBy(UUID swipedId) {
         return jpaQueryFactory.selectFrom(qSwipe)
-                       .leftJoin(qAccount).on(qSwipe.swiper.id.eq(qAccount.id))
-                       .where(qSwipe.swiped.id.eq(swipedId)
-                                              .and(qSwipe.matched.eq(false))
-                                              .and(qAccount.deleted.eq(false)))
-                       .fetchCount();
+                              .leftJoin(qAccount).on(qSwipe.swiper.id.eq(qAccount.id))
+                              .where(qSwipe.swiped.id.eq(swipedId)
+                                                     .and(qSwipe.matched.eq(false))
+                                                     .and(qAccount.deleted.eq(false)))
+                              .fetchCount();
     }
 
 

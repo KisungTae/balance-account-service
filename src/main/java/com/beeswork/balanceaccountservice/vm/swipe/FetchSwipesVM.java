@@ -10,8 +10,11 @@ import java.util.UUID;
 @Setter
 public class FetchSwipesVM {
 
-    private Long lastSwipeId;
+    private Long loadKey;
 
     @NotNull
     private Integer loadSize;
+
+    private boolean append;
+    private boolean includeLoadKey;
 }
