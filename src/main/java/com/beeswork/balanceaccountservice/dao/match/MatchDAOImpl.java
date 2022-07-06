@@ -32,7 +32,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public List<MatchDTO> findAllBy(UUID swiperId, Long lastMatchId, int loadSize, MatchPageFilter matchPageFilter) {
+    public List<MatchDTO> findAll(UUID swiperId, Long lastMatchId, int loadSize, MatchPageFilter matchPageFilter) {
         BooleanExpression condition = matchPageCondition(swiperId, matchPageFilter);
         if (lastMatchId != null) {
             condition = condition.and(qMatch.id.lt(lastMatchId));
@@ -46,7 +46,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public List<MatchDTO> findAllBy(UUID swiperId, int startPosition, int loadSize, MatchPageFilter matchPageFilter) {
+    public List<MatchDTO> findAll(UUID swiperId, int startPosition, int loadSize, MatchPageFilter matchPageFilter) {
         return selectMatchDTO().from(qMatch)
                                .leftJoin(qAccount).on(qAccount.id.eq(qMatch.swiped.id))
                                .where(matchPageCondition(swiperId, matchPageFilter))
@@ -93,7 +93,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public Match findBy(UUID swiperId, UUID swipedId, boolean writeLock) {
+    public Match find(UUID swiperId, UUID swipedId, boolean writeLock) {
         JPAQuery<Match> query = jpaQueryFactory.selectFrom(qMatch).where(qMatch.swiper.id.eq(swiperId).and(qMatch.swiped.id.eq(swipedId)));
         if (writeLock) {
             query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
@@ -102,17 +102,30 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
     }
 
     @Override
-    public long countMatchesBy(UUID swiperId) {
-        return jpaQueryFactory.selectFrom(qMatch).where(matchPageCondition(swiperId, MatchPageFilter.MATCH)).fetchCount();
+    public long countMatches(UUID swiperId) {
+        return jpaQueryFactory.selectFrom(qMatch)
+                              .where(qMatch.swiperId.eq(swiperId)
+                                                    .and(qMatch.deleted.eq(false))
+                                                    .and(qMatch.lastChatMessageId.eq(0L)))
+                              .fetchCount();
     }
 
     @Override
-    public boolean existsBy(UUID swiperId, UUID chatId) {
+    public long countUnreadChats(UUID swiperId) {
+        return jpaQueryFactory.selectFrom(qMatch)
+                              .where(qMatch.swiperId.eq(swiperId)
+                                                    .and(qMatch.deleted.eq(false))
+                                                    .and(qMatch.lastReadReceivedChatMessageId.lt(qMatch.lastReceivedChatMessageId)))
+                              .fetchCount();
+    }
+
+    @Override
+    public boolean exists(UUID swiperId, UUID chatId) {
         return jpaQueryFactory.selectFrom(qMatch).where(qMatch.swiper.id.eq(swiperId).and(qMatch.chatId.eq(chatId))).fetchCount() > 0;
     }
 
     @Override
-    public List<Match> findAllBy(UUID chatId, boolean writeLock) {
+    public List<Match> findAll(UUID chatId, boolean writeLock) {
 //      NOTE 1. orderBy is for deadlock
         JPAQuery<Match> query = jpaQueryFactory.selectFrom(qMatch).where(qMatch.chatId.eq(chatId)).orderBy(qMatch.swiperId.desc());
         if (writeLock) {

@@ -54,7 +54,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<MatchDTO> doFetchMatches(UUID swiperId, Long lastMatchId, int loadSize, MatchPageFilter matchPageFilter) {
-        List<MatchDTO> matchDTOs = matchDAO.findAllBy(swiperId, lastMatchId, loadSize, matchPageFilter);
+        List<MatchDTO> matchDTOs = matchDAO.findAll(swiperId, lastMatchId, loadSize, matchPageFilter);
         nullifyMatches(matchDTOs);
         return matchDTOs;
     }
@@ -66,7 +66,7 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     }
 
     private List<MatchDTO> doListMatches(UUID swiperId, int startPosition, int loadSize, MatchPageFilter matchPageFilter) {
-        List<MatchDTO> matchDTOs = matchDAO.findAllBy(swiperId, startPosition, loadSize, matchPageFilter);
+        List<MatchDTO> matchDTOs = matchDAO.findAll(swiperId, startPosition, loadSize, matchPageFilter);
         nullifyMatches(matchDTOs);
         return matchDTOs;
     }
@@ -103,13 +103,13 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public CountMatchesDTO countMatches(UUID swiperId) {
         Date now = new Date();
-        return new CountMatchesDTO(matchDAO.countMatchesBy(swiperId), now);
+        return new CountMatchesDTO(matchDAO.countMatches(swiperId), now);
     }
 
     @Override
     @Transactional
     public void syncMatch(UUID swiperId, UUID chatId, long lastReadReceivedChatMessageId) {
-        List<Match> matches = matchDAO.findAllBy(chatId, true);
+        List<Match> matches = matchDAO.findAll(chatId, true);
         for (Match match : matches) {
             if (match.getSwiperId().equals(swiperId)) {
                 if (match.getLastReadReceivedChatMessageId() < lastReadReceivedChatMessageId) {
@@ -155,11 +155,11 @@ public class MatchServiceImpl extends BaseServiceImpl implements MatchService {
         //         you still need to wait for the write lock to be released when you try to write on the second entity
         Match swiperMatch, swipedMatch;
         if (swiperId.compareTo(swipedId) > 0) {
-            swiperMatch = matchDAO.findBy(swiperId, swipedId, true);
-            swipedMatch = matchDAO.findBy(swipedId, swiperId, true);
+            swiperMatch = matchDAO.find(swiperId, swipedId, true);
+            swipedMatch = matchDAO.find(swipedId, swiperId, true);
         } else {
-            swipedMatch = matchDAO.findBy(swipedId, swiperId, true);
-            swiperMatch = matchDAO.findBy(swiperId, swipedId, true);
+            swipedMatch = matchDAO.find(swipedId, swiperId, true);
+            swiperMatch = matchDAO.find(swiperId, swipedId, true);
         }
 
         if (swiperMatch == null || swipedMatch == null) {

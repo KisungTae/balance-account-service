@@ -10,10 +10,11 @@ import java.util.UUID;
 
 public interface MatchDAO extends BaseDAO<Match> {
 
-    List<MatchDTO> findAllBy(UUID swiperId, Long lastMatchId, int loadSize, MatchPageFilter matchPageFilter);
-    List<MatchDTO> findAllBy(UUID swiperId, int startPosition, int loadSize, MatchPageFilter matchPageFilter);
-    Match findBy(UUID swiperId, UUID swipedId, boolean writeLock);
-    long countMatchesBy(UUID swiperId);
-    boolean existsBy(UUID swiperId, UUID chatId);
-    List<Match> findAllBy(UUID chatId, boolean writeLock);
+    List<MatchDTO> findAll(UUID swiperId, Long lastMatchId, int loadSize, MatchPageFilter matchPageFilter);
+    List<MatchDTO> findAll(UUID swiperId, int startPosition, int loadSize, MatchPageFilter matchPageFilter);
+    Match find(UUID swiperId, UUID swipedId, boolean writeLock);
+    long countMatches(UUID swiperId);
+    long countUnreadChats(UUID swiperId);
+    boolean exists(UUID swiperId, UUID chatId);
+    List<Match> findAll(UUID chatId, boolean writeLock);
 }

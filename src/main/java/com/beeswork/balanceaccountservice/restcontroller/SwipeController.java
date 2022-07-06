@@ -5,6 +5,7 @@ import com.beeswork.balanceaccountservice.dto.swipe.*;
 import com.beeswork.balanceaccountservice.exception.BadRequestException;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
 import com.beeswork.balanceaccountservice.service.swipe.SwipeService;
+import com.beeswork.balanceaccountservice.vm.common.FetchPageVM;
 import com.beeswork.balanceaccountservice.vm.swipe.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,16 +61,16 @@ public class SwipeController extends BaseController {
     }
 
     @GetMapping("/swipe/fetch")
-    public ResponseEntity<String> fetchSwipes(@Valid @ModelAttribute FetchSwipesVM fetchSwipesVM,
+    public ResponseEntity<String> fetchSwipes(@Valid @ModelAttribute FetchPageVM fetchPageVM,
                                               BindingResult bindingResult,
                                               Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
         ListSwipesDTO listSwipesDTO = swipeService.fetchSwipes(getAccountIdFrom(principal),
-                                                               fetchSwipesVM.getLoadKey(),
-                                                               fetchSwipesVM.getLoadSize(),
-                                                               fetchSwipesVM.isAppend(),
-                                                               fetchSwipesVM.isIncludeLoadKey());
+                                                               fetchPageVM.getLoadKey(),
+                                                               fetchPageVM.getLoadSize(),
+                                                               fetchPageVM.isAppend(),
+                                                               fetchPageVM.isIncludeLoadKey());
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listSwipesDTO));
     }
 

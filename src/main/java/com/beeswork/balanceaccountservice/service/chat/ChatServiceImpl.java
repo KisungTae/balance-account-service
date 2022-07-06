@@ -6,14 +6,11 @@ import com.beeswork.balanceaccountservice.dao.chat.ChatMessageReceiptDAO;
 import com.beeswork.balanceaccountservice.dao.match.MatchDAO;
 import com.beeswork.balanceaccountservice.dto.chat.ChatMessageDTO;
 import com.beeswork.balanceaccountservice.dto.chat.SaveChatMessageDTO;
-import com.beeswork.balanceaccountservice.entity.account.Account;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessage;
 import com.beeswork.balanceaccountservice.entity.chat.ChatMessageReceipt;
 import com.beeswork.balanceaccountservice.entity.match.Match;
-import com.beeswork.balanceaccountservice.exception.account.AccountNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchNotFoundException;
 import com.beeswork.balanceaccountservice.exception.match.MatchUnmatchedException;
-import com.beeswork.balanceaccountservice.exception.swipe.SwipedDeletedException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +20,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
@@ -50,7 +46,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<ChatMessageDTO> fetchChatMessages(UUID senderId, UUID chatId, Long lastChatMessageId, int loadSize) {
-        if (!matchDAO.existsBy(senderId, chatId)) {
+        if (!matchDAO.exists(senderId, chatId)) {
             throw new MatchNotFoundException();
         }
         List<ChatMessage> chatMessages = chatMessageDAO.findAllBy(chatId, lastChatMessageId, loadSize);
@@ -59,7 +55,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
 
     @Override
     public List<ChatMessageDTO> listChatMessages(UUID senderId, UUID chatId, UUID appToken, int startPosition, int loadSize) {
-        if (!matchDAO.existsBy(senderId, chatId)) {
+        if (!matchDAO.exists(senderId, chatId)) {
             throw new MatchNotFoundException();
         }
         List<ChatMessage> chatMessages = chatMessageDAO.findAllBy(senderId, chatId, appToken, startPosition, loadSize);
@@ -108,7 +104,7 @@ public class ChatServiceImpl extends BaseServiceImpl implements ChatService {
         // NOTE 1. because account will be cached no need to query with join which does not go through second level cache
         SaveChatMessageDTO saveChatMessageDTO = new SaveChatMessageDTO();
 
-        List<Match> matches = matchDAO.findAllBy(chatMessageDTO.getChatId(), true);
+        List<Match> matches = matchDAO.findAll(chatMessageDTO.getChatId(), true);
         if (matches.size() != 2) {
             saveChatMessageDTO.setError(MatchNotFoundException.CODE);
             return saveChatMessageDTO;

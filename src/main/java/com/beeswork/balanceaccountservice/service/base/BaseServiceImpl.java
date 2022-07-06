@@ -16,10 +16,4 @@ import java.util.Date;
 import java.util.UUID;
 
 public abstract class BaseServiceImpl {
-
-    private static final int FETCH_OFFSET_IN_MINUTES = -5;
-
-    protected Date offsetFetchedAt(Date date) {
-        return DateUtils.addMinutes(date, FETCH_OFFSET_IN_MINUTES);
-    }
 }

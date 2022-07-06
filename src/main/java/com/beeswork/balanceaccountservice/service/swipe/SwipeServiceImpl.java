@@ -19,7 +19,6 @@ import com.beeswork.balanceaccountservice.entity.match.Match;
 import com.beeswork.balanceaccountservice.entity.question.Question;
 import com.beeswork.balanceaccountservice.entity.swipe.Swipe;
 import com.beeswork.balanceaccountservice.entity.swipe.SwipeMeta;
-import com.beeswork.balanceaccountservice.exception.InternalServerException;
 import com.beeswork.balanceaccountservice.exception.account.AccountQuestionNotFoundException;
 import com.beeswork.balanceaccountservice.exception.account.InsufficientPointException;
 import com.beeswork.balanceaccountservice.exception.swipe.*;
@@ -98,7 +97,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
             if (questions == null || questions.size() <= 0) {
                 throw new AccountQuestionNotFoundException();
             }
-            Swipe swipe = swipeDAO.findBy(swiperId, swipedId, true);
+            Swipe swipe = swipeDAO.find(swiperId, swipedId, true);
             Date updatedAt = new Date();
             if (swipe == null) {
                 swipe = new Swipe(swiper, swiped, updatedAt);
@@ -132,11 +131,11 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         ClickTransactionResult result = transactionTemplate.execute(status -> {
             Swipe subSwipe, objSwipe;
             if (swiperId.compareTo(swipedId) > 0) {
-                subSwipe = swipeDAO.findBy(swiperId, swipedId, true);
-                objSwipe = swipeDAO.findBy(swipedId, swiperId, true);
+                subSwipe = swipeDAO.find(swiperId, swipedId, true);
+                objSwipe = swipeDAO.find(swipedId, swiperId, true);
             } else {
-                objSwipe = swipeDAO.findBy(swipedId, swiperId, true);
-                subSwipe = swipeDAO.findBy(swiperId, swipedId, true);
+                objSwipe = swipeDAO.find(swipedId, swiperId, true);
+                subSwipe = swipeDAO.find(swiperId, swipedId, true);
             }
 
             if (subSwipe == null) {
@@ -246,17 +245,19 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
     public List<SwipeDTO> doListSwipes(UUID swipedId, int startPosition, int loadSize) {
-        List<SwipeDTO> swipes = swipeDAO.findAllBy(swipedId, startPosition, loadSize);
-        for (SwipeDTO swipeDTO : swipes) {
-            if (swipeDTO.getSwiperDeleted()) {
-                swipeDTO.setId(null);
-                swipeDTO.setSwipedId(null);
-                swipeDTO.setClicked(null);
-                swipeDTO.setUpdatedAt(null);
-                swipeDTO.setSwiperProfilePhotoKey(null);
-            }
-        }
-        return swipes;
+//        List<SwipeDTO> swipes = swipeDAO.findAll(swipedId, startPosition, loadSize);
+//        for (SwipeDTO swipeDTO : swipes) {
+//            if (swipeDTO.getSwiperDeleted()) {
+//                swipeDTO.setId(null);
+//                swipeDTO.setSwipedId(null);
+//                swipeDTO.setClicked(null);
+//                swipeDTO.setUpdatedAt(null);
+//                swipeDTO.setSwiperProfilePhotoKey(null);
+//            }
+//        }
+//        return swipes;
+
+        return null;
     }
 
     @Override
@@ -268,7 +269,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
         // todo: need to count the
-        List<SwipeDTO> swipeDTOs = swipeDAO.findAllBy(swipedId, loadKey, loadSize, isAppend, isIncludeLoadKey);
+        List<SwipeDTO> swipeDTOs = swipeDAO.findAll(swipedId, loadKey, loadSize, isAppend, isIncludeLoadKey);
         ListSwipesDTO listSwipesDTO = new ListSwipesDTO();
         listSwipesDTO.setSwipeDTOs(swipeDTOs);
         return listSwipesDTO;

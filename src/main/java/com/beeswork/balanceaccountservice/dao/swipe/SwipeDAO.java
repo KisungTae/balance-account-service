@@ -9,9 +9,7 @@ import java.util.UUID;
 
 public interface SwipeDAO extends BaseDAO<Swipe> {
 
-    Swipe findBy(UUID swiperId, UUID swipedId, boolean writeLock);
-    List<SwipeDTO> findAllBy(UUID swipedId, int startPosition, int loadSize);
-    List<SwipeDTO> findAllBy(UUID swipedId, Long lastSwipeId, int loadSize);
-    List<SwipeDTO> findAllBy(UUID swipedId, Long loadKey, int loadSize, boolean isAppend, boolean isIncludeLoadKey);
-    long countSwipesBy(UUID swipedId);
+    Swipe find(UUID swiperId, UUID swipedId, boolean writeLock);
+    List<SwipeDTO> findAll(UUID swipedId, Long loadKey, int loadSize, boolean isAppend, boolean isIncludeLoadKey);
+    long countSwipes(UUID swipedId);
 }

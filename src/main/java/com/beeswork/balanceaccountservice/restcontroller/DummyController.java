@@ -31,7 +31,6 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.querydsl.jpa.JPQLQueryFactory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.tomcat.jni.Local;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -121,8 +120,8 @@ public class DummyController {
         Random random = new Random();
         Date date = new Date();
 
-        Match swiperMatch = matchDAO.findBy(swiperId, swipedId, false);
-        Match swipedMatch = matchDAO.findBy(swipedId, swiperId, false);
+        Match swiperMatch = matchDAO.find(swiperId, swipedId, false);
+        Match swipedMatch = matchDAO.find(swipedId, swiperId, false);
 
         for (int i = 0; i < count; i++) {
             date = DateUtils.addSeconds(date, 30);
