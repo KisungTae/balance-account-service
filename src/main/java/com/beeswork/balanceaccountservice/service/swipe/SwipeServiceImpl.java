@@ -24,6 +24,7 @@ import com.beeswork.balanceaccountservice.exception.account.InsufficientPointExc
 import com.beeswork.balanceaccountservice.exception.swipe.*;
 import com.beeswork.balanceaccountservice.exception.wallet.WalletNotFoundException;
 import com.beeswork.balanceaccountservice.service.base.BaseServiceImpl;
+import com.beeswork.balanceaccountservice.service.count.CountService;
 import com.beeswork.balanceaccountservice.service.stomp.StompService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -37,7 +38,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.PersistenceException;
 import java.util.*;
-import java.util.concurrent.*;
 
 @Service
 public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
@@ -48,8 +48,9 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     private final AccountQuestionDAO         accountQuestionDAO;
     private final ProfileDAO                 profileDAO;
     private final SwipeMetaDAO               swipeMetaDAO;
-    private final WalletDAO                  walletDAO;
-    private final ModelMapper                modelMapper;
+    private final WalletDAO    walletDAO;
+    private final CountService countService;
+    private final ModelMapper  modelMapper;
     private final StompService               stompService;
     private final PlatformTransactionManager transactionManager;
     private final TransactionTemplate        transactionTemplate;
@@ -63,6 +64,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
                             ProfileDAO profileDAO,
                             SwipeMetaDAO swipeMetaDAO,
                             WalletDAO walletDAO,
+                            CountService countService,
                             StompService stompService,
                             PlatformTransactionManager transactionManager) {
         this.modelMapper = modelMapper;
@@ -73,6 +75,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         this.profileDAO = profileDAO;
         this.swipeMetaDAO = swipeMetaDAO;
         this.walletDAO = walletDAO;
+        this.countService = countService;
         this.stompService = stompService;
         this.transactionManager = transactionManager;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
@@ -238,6 +241,18 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
+    public List<SwipeDTO> fetchSwipes(UUID swipedId, Long loadKey, int loadSize, boolean isAppend, boolean isIncludeLoadKey) {
+        return swipeDAO.findAll(swipedId, loadKey, loadSize, isAppend, isIncludeLoadKey);
+    }
+
+
+
+
+
+
+
+    @Override
     public ListSwipesDTO listSwipes(final UUID swipedId, final int startPosition, final int loadSize) {
 //        return getListSwipesDTO(() -> doListSwipes(swipedId, startPosition, loadSize), swipedId);
         return null;
@@ -260,20 +275,7 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         return null;
     }
 
-    @Override
-    public ListSwipesDTO fetchSwipes(final UUID swipedId,
-                                     final Long loadKey,
-                                     final int loadSize,
-                                     final boolean isAppend,
-                                     final boolean isIncludeLoadKey) {
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
 
-        // todo: need to count the
-        List<SwipeDTO> swipeDTOs = swipeDAO.findAll(swipedId, loadKey, loadSize, isAppend, isIncludeLoadKey);
-        ListSwipesDTO listSwipesDTO = new ListSwipesDTO();
-        listSwipesDTO.setSwipeDTOs(swipeDTOs);
-        return listSwipesDTO;
-    }
 
 //    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
 //    public List<SwipeDTO> doFetchSwipes(UUID swipedId, Long loadKey, int loadSize, boolean append, boolean includeLoadKey) {

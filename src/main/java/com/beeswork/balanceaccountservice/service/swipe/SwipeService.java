@@ -1,5 +1,6 @@
 package com.beeswork.balanceaccountservice.service.swipe;
 
+import com.beeswork.balanceaccountservice.dto.common.PageDTO;
 import com.beeswork.balanceaccountservice.dto.question.ListQuestionsDTO;
 import com.beeswork.balanceaccountservice.dto.swipe.*;
 
@@ -13,5 +14,5 @@ public interface SwipeService {
 
     ListSwipesDTO listSwipes(final UUID swipedId, final int startPosition, final int loadSize);
 
-    ListSwipesDTO fetchSwipes(final UUID swipedId, final Long loadKey, final int loadSize, final boolean isAppend, final boolean isIncludeLoadKey);
+    List<SwipeDTO> fetchSwipes(UUID swipedId, Long loadKey, int loadSize, boolean isAppend, boolean isIncludeLoadKey);
 }

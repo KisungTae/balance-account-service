@@ -47,6 +47,7 @@ public class MatchDAOImpl extends BaseDAOImpl<Match> implements MatchDAO {
 
     @Override
     public List<MatchDTO> findAll(UUID swiperId, int startPosition, int loadSize, MatchPageFilter matchPageFilter) {
+        // todo: include whether exclude swiped.deleted = true and match.unmatched = true
         return selectMatchDTO().from(qMatch)
                                .leftJoin(qAccount).on(qAccount.id.eq(qMatch.swiped.id))
                                .where(matchPageCondition(swiperId, matchPageFilter))

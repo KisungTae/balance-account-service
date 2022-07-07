@@ -48,17 +48,17 @@ public class SwipeController extends BaseController {
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listQuestionsDTO));
     }
 
-    @GetMapping("/swipe/list")
-    public ResponseEntity<String> listSwipes(@Valid @ModelAttribute ListSwipesVM listSwipesVM,
-                                             BindingResult bindingResult,
-                                             Principal principal)
-    throws JsonProcessingException {
-        if (bindingResult.hasErrors()) throw new BadRequestException();
-        ListSwipesDTO listSwipesDTO = swipeService.listSwipes(getAccountIdFrom(principal),
-                                                              listSwipesVM.getStartPosition(),
-                                                              listSwipesVM.getLoadSize());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listSwipesDTO));
-    }
+//    @GetMapping("/swipe/list")
+//    public ResponseEntity<String> listSwipes(@Valid @ModelAttribute ListSwipesVM listSwipesVM,
+//                                             BindingResult bindingResult,
+//                                             Principal principal)
+//    throws JsonProcessingException {
+//        if (bindingResult.hasErrors()) throw new BadRequestException();
+//        ListSwipesDTO listSwipesDTO = swipeService.listSwipes(getAccountIdFrom(principal),
+//                                                              listSwipesVM.getStartPosition(),
+//                                                              listSwipesVM.getLoadSize());
+//        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listSwipesDTO));
+//    }
 
     @GetMapping("/swipe/fetch")
     public ResponseEntity<String> fetchSwipes(@Valid @ModelAttribute FetchPageVM fetchPageVM,
@@ -66,12 +66,12 @@ public class SwipeController extends BaseController {
                                               Principal principal)
     throws JsonProcessingException {
         if (bindingResult.hasErrors()) throw new BadRequestException();
-        ListSwipesDTO listSwipesDTO = swipeService.fetchSwipes(getAccountIdFrom(principal),
-                                                               fetchPageVM.getLoadKey(),
-                                                               fetchPageVM.getLoadSize(),
-                                                               fetchPageVM.isAppend(),
-                                                               fetchPageVM.isIncludeLoadKey());
-        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(listSwipesDTO));
+        List<SwipeDTO> swipeDTOs = swipeService.fetchSwipes(getAccountIdFrom(principal),
+                                                            fetchPageVM.getLoadKey(),
+                                                            fetchPageVM.getLoadSize(),
+                                                            fetchPageVM.isAppend(),
+                                                            fetchPageVM.isIncludeLoadKey());
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(swipeDTOs));
     }
 
     @PostMapping("/click")
