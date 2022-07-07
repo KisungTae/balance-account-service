@@ -23,6 +23,22 @@ public class CountServiceImpl implements CountService {
 
     @Override
     public List<CountTabDTO> countTabs(UUID accountId) {
+        //        try {
+//            ExecutorService executorService = Executors.newFixedThreadPool(2);
+//            Future<List<SwipeDTO>> listSwipesFuture = executorService.submit(listSwipeDTOsCallable);
+//            Future<CountSwipesDTO> countSwipesFuture = executorService.submit(() -> countSwipes(swipedId));
+//
+//            ListSwipesDTO listSwipesDTO = new ListSwipesDTO();
+//            List<SwipeDTO> swipeDTOs = listSwipesFuture.get(1, TimeUnit.MINUTES);
+//            CountSwipesDTO countSwipesDTO = countSwipesFuture.get(1, TimeUnit.MINUTES);
+//
+//            listSwipesDTO.setSwipeDTOs(swipeDTOs);
+//            listSwipesDTO.setSwipeCount(countSwipesDTO.getCount());
+//            listSwipesDTO.setSwipeCountCountedAt(countSwipesDTO.getCountedAt());
+//            return listSwipesDTO;
+//        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+//            throw new InternalServerException();
+//        }
         return null;
     }
 }

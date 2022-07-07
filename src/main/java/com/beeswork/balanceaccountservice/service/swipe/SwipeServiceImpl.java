@@ -42,18 +42,15 @@ import java.util.*;
 @Service
 public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
 
-    private final AccountDAO                 accountDAO;
-    private final SwipeDAO                   swipeDAO;
-    private final MatchDAO                   matchDAO;
-    private final AccountQuestionDAO         accountQuestionDAO;
-    private final ProfileDAO                 profileDAO;
-    private final SwipeMetaDAO               swipeMetaDAO;
-    private final WalletDAO    walletDAO;
-    private final CountService countService;
-    private final ModelMapper  modelMapper;
-    private final StompService               stompService;
-    private final PlatformTransactionManager transactionManager;
-    private final TransactionTemplate        transactionTemplate;
+    private final AccountDAO          accountDAO;
+    private final SwipeDAO            swipeDAO;
+    private final MatchDAO            matchDAO;
+    private final AccountQuestionDAO  accountQuestionDAO;
+    private final SwipeMetaDAO        swipeMetaDAO;
+    private final WalletDAO           walletDAO;
+    private final ModelMapper         modelMapper;
+    private final StompService        stompService;
+    private final TransactionTemplate transactionTemplate;
 
     @Autowired
     public SwipeServiceImpl(ModelMapper modelMapper,
@@ -61,10 +58,8 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
                             SwipeDAO swipeDAO,
                             MatchDAO matchDAO,
                             AccountQuestionDAO accountQuestionDAO,
-                            ProfileDAO profileDAO,
                             SwipeMetaDAO swipeMetaDAO,
                             WalletDAO walletDAO,
-                            CountService countService,
                             StompService stompService,
                             PlatformTransactionManager transactionManager) {
         this.modelMapper = modelMapper;
@@ -72,12 +67,9 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
         this.swipeDAO = swipeDAO;
         this.matchDAO = matchDAO;
         this.accountQuestionDAO = accountQuestionDAO;
-        this.profileDAO = profileDAO;
         this.swipeMetaDAO = swipeMetaDAO;
         this.walletDAO = walletDAO;
-        this.countService = countService;
         this.stompService = stompService;
-        this.transactionManager = transactionManager;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
@@ -245,70 +237,4 @@ public class SwipeServiceImpl extends BaseServiceImpl implements SwipeService {
     public List<SwipeDTO> fetchSwipes(UUID swipedId, Long loadKey, int loadSize, boolean isAppend, boolean isIncludeLoadKey) {
         return swipeDAO.findAll(swipedId, loadKey, loadSize, isAppend, isIncludeLoadKey);
     }
-
-
-
-
-
-
-
-    @Override
-    public ListSwipesDTO listSwipes(final UUID swipedId, final int startPosition, final int loadSize) {
-//        return getListSwipesDTO(() -> doListSwipes(swipedId, startPosition, loadSize), swipedId);
-        return null;
-    }
-
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public List<SwipeDTO> doListSwipes(UUID swipedId, int startPosition, int loadSize) {
-//        List<SwipeDTO> swipes = swipeDAO.findAll(swipedId, startPosition, loadSize);
-//        for (SwipeDTO swipeDTO : swipes) {
-//            if (swipeDTO.getSwiperDeleted()) {
-//                swipeDTO.setId(null);
-//                swipeDTO.setSwipedId(null);
-//                swipeDTO.setClicked(null);
-//                swipeDTO.setUpdatedAt(null);
-//                swipeDTO.setSwiperProfilePhotoKey(null);
-//            }
-//        }
-//        return swipes;
-
-        return null;
-    }
-
-
-
-//    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-//    public List<SwipeDTO> doFetchSwipes(UUID swipedId, Long loadKey, int loadSize, boolean append, boolean includeLoadKey) {
-//        return swipeDAO.findAllBy(swipedId, lastSwipeId, loadSize);
-//    }
-//
-//    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-//    public List<SwipeDTO> doFetchSwipes(UUID swipedId, Long lastSwipeId, int loadSize) {
-//        return swipeDAO.findAllBy(swipedId, lastSwipeId, loadSize);
-//    }
-//
-//    private ListSwipesDTO getListSwipesDTO(final Callable<List<SwipeDTO>> listSwipeDTOsCallable, final UUID swipedId) {
-//        try {
-//            ExecutorService executorService = Executors.newFixedThreadPool(2);
-//            Future<List<SwipeDTO>> listSwipesFuture = executorService.submit(listSwipeDTOsCallable);
-//            Future<CountSwipesDTO> countSwipesFuture = executorService.submit(() -> countSwipes(swipedId));
-//
-//            ListSwipesDTO listSwipesDTO = new ListSwipesDTO();
-//            List<SwipeDTO> swipeDTOs = listSwipesFuture.get(1, TimeUnit.MINUTES);
-//            CountSwipesDTO countSwipesDTO = countSwipesFuture.get(1, TimeUnit.MINUTES);
-//
-//            listSwipesDTO.setSwipeDTOs(swipeDTOs);
-//            listSwipesDTO.setSwipeCount(countSwipesDTO.getCount());
-//            listSwipesDTO.setSwipeCountCountedAt(countSwipesDTO.getCountedAt());
-//            return listSwipesDTO;
-//        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-//            throw new InternalServerException();
-//        }
-//    }
-//
-//    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-//    public CountSwipesDTO countSwipes(UUID swipedId) {
-//        Date now = new Date();
-//        return new CountSwipesDTO(swipeDAO.countSwipesBy(swipedId), now);
-//    }
 }
